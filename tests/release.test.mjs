@@ -8,10 +8,25 @@ import {fileURLToPath} from 'node:url';
 import {projectForPlay,draftStoreKey} from '../src/publishing.js';
 import {projectProblems} from '../src/model.js';
 import {validate} from '../src/combat/engine.js';
+import {loadAudioBytes} from '../src/media.js';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const read=f=>fs.readFile(path.join(root,f),'utf8');
 const project=JSON.parse(await read('data/project.json'));
 const version=JSON.parse(await read('dist/version.json'));
+
+test('audio loader reads both embedded data and published files and rejects missing audio',async(t)=>{
+ const data=await loadAudioBytes('data:audio/wav;base64,UklGRg==');
+ assert.equal(Buffer.from(data).toString(),'RIFF');
+ const manifest=JSON.parse(await read('asset-manifest.json'));
+ const file=Object.keys(manifest).find(f=>f.endsWith('.ogg'));
+ const bytes=await fs.readFile(path.join(root,'dist/media',file));
+ const requested=[];
+ t.mock.method(globalThis,'fetch',async url=>{requested.push(url);return new Response(bytes);});
+ assert.equal(Buffer.from(await loadAudioBytes('./media/'+file)).subarray(0,4).toString(),'OggS');
+ assert.deepEqual(requested,['./media/'+file]);
+ globalThis.fetch.mock.mockImplementation(async()=>new Response(null,{status:404}));
+ await assert.rejects(loadAudioBytes('./missing.ogg'),/음원 파일/);
+});
 
 test('public play receives new deployment even if a visitor saved different data',()=>{
  const local=structuredClone(project);local.guests[0].name='개인 시험';

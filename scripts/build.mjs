@@ -26,14 +26,14 @@ async function bundle(prefix,names){return (await Promise.all(names.map(f=>read(
 
 let combat=await read('src/combat/index.html');
 const css=(await Promise.all(['style.css','story.css','story-stage.css'].map(f=>read('src/combat/'+f)))).join('\n');
-const combatScript=await bundle('src/combat/',['text-effects.js','dialogue.js','engine.js','workbook.js','versions.js','scene.js','story-scene.js','app.js','bridge.js']);
+const combatScript=await bundle('src/combat/',['../media.js','text-effects.js','dialogue.js','engine.js','workbook.js','versions.js','scene.js','story-scene.js','app.js','bridge.js']);
 const wb=(await fs.readFile(path.join(root,'data/source.xlsx'))).toString('base64');
 const au=(await fs.readFile(path.join(root,'data/source-authoring.xlsm'))).toString('base64');
 const schema=await read('data/schema.json'),assets=await read('src/combat/assets.json');
 const zip=await read('vendor/jszip.min.js'),license=await read('vendor/JSZip-LICENSE.txt');
 combat=combat.replace('<link rel="stylesheet" href="style.css">',()=>`<style>${css}</style>`)
  .replace('<script type="module" src="app.js"></script>',()=>`<script id="host-data" type="application/json">__HOST_JSON__</script><script id="embedded-workbook" type="application/octet-stream">${wb}</script><script id="embedded-authoring" type="application/octet-stream">${au}</script><script id="embedded-schema" type="application/json">${safe(schema)}</script><script id="embedded-assets" type="application/json">${safe(assets)}</script><script>${safe(zip)}</script><script type="module">${safe(combatScript)}</script><script type="text/plain">${safe(license)}</script>`);
-const parentBundle=await bundle('src/',['text-effects.js','combat/dialogue.js','combat/engine.js','model.js','publishing.js','audio.js','app.js']);
+const parentBundle=await bundle('src/',['text-effects.js','combat/dialogue.js','combat/engine.js','model.js','publishing.js','media.js','audio.js','app.js']);
 const appURL=await emit('app','js',parentBundle),styleURL=await emit('style','css',await read('src/style.css'));
 const inputs={
  'flow-assets':[await emit('assets','json',await read('data/assets.json')),'json'],

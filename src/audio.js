@@ -1,7 +1,8 @@
+import {loadAudioBytes} from './media.js';
 class SalonAudio{
  constructor(sources){this.sources=sources;this.cache={};this.enabled=true;this.track=null;this.wanted=null;this.epoch=0;this.voices=new Set();}
  async unlock(){try{this.ctx??=new(window.AudioContext||window.webkitAudioContext)();if(!this.master){this.master=this.ctx.createGain();this.master.gain.value=this.enabled?.6:0;this.master.connect(this.ctx.destination);}await this.ctx.resume();return true;}catch{return false;}}
- async buffer(key){if(!this.sources[key]||!this.ctx)return null;return this.cache[key]??=(async()=>{const bytes=Uint8Array.from(atob(this.sources[key].split(',')[1]),c=>c.charCodeAt(0));return this.ctx.decodeAudioData(bytes.buffer);})().catch(e=>{this.error=e.message;return null;});}
+ async buffer(key){if(!this.sources[key]||!this.ctx)return null;return this.cache[key]??=(async()=>{return this.ctx.decodeAudioData(await loadAudioBytes(this.sources[key]));})().catch(e=>{delete this.cache[key];this.error=e.message;return null;});}
  enable(on){this.enabled=on;if(this.master)this.master.gain.setTargetAtTime(on?.6:0,this.ctx.currentTime,.08);if(on){this.unlock().then(()=>{if(this.wanted&&!this.track)this.music(this.wanted);});}}
  async music(key){this.wanted=key;if(this.track?.key===key)return;const version=++this.epoch;if(!this.ctx)return;const buffer=await this.buffer(key);if(version!==this.epoch||!buffer)return;const now=this.ctx.currentTime,previous=this.track;if(previous){previous.gain.gain.cancelScheduledValues(now);previous.gain.gain.setTargetAtTime(0,now,.18);previous.src.stop(now+1);}
  const src=this.ctx.createBufferSource(),gain=this.ctx.createGain();src.buffer=buffer;src.loop=true;gain.gain.setValueAtTime(0,now);gain.gain.linearRampToValueAtTime(.34,now+.65);src.connect(gain).connect(this.master);src.start();src.onended=()=>{src.disconnect();gain.disconnect();};this.track={key,src,gain};}
