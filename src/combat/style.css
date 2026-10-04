@@ -5,3 +5,7 @@
 .dialoguebox p{font-size:17px;line-height:1.9;min-height:66px;overflow-wrap:anywhere}.dialogueglyph{display:inline-block;white-space:pre;transform-origin:50% 65%}.dialoguebox{border-color:#708f88;background:linear-gradient(125deg,#203b3b,#152930);box-shadow:inset 3px 0 #d6ba78}
 
 .versionbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 24px;background:#172324;border-bottom:1px solid #3c5554}.versionbar input{flex:1;min-width:270px;padding:9px;color:#f3f6f1;background:#101a1c;border:1px solid #526767;border-radius:6px}.versionbar small{width:100%;color:#bdcec6;line-height:1.6}.versionbar label{font-weight:600}
+
+button[data-owner-only][aria-disabled="true"]{opacity:.43;cursor:help;filter:grayscale(.75);box-shadow:none}#ownerStatus{font-size:12px;color:#a8bec5}#ownerLogin{border-color:#bba578}#ownerLogout{font-size:12px}
+
+button[data-owner-only][aria-disabled="true"]::after{content:" 🔒";font-size:.8em}
