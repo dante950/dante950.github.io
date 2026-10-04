@@ -1,0 +1,11 @@
+import fs from 'node:fs/promises';
+import {projectProblems} from '../src/model.js';
+import {validate} from '../src/combat/engine.js';
+const source=process.argv[2];
+if(!source)throw Error('사용법: node scripts/import-project.mjs "저장한 프로젝트.json"');
+const project=JSON.parse(await fs.readFile(source,'utf8'));
+const problems=projectProblems(project);
+for(const guest of project.guests||[]) problems.push(...validate(project.combat,{monsterID:guest.id}).errors);
+if(problems.length)throw Error(problems.join('\n'));
+await fs.writeFile(new URL('../data/project.json',import.meta.url),JSON.stringify(project,null,2)+'\n');
+console.log(`공개할 프로젝트 v${project.version}를 반영했습니다. build/test 후 Git에 올리면 배포됩니다.`);

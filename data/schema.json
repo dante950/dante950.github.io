@@ -1,0 +1,615 @@
+{
+  "version": 1,
+  "source": "https://app.notion.com/p/3ef648bf677880ac939bde40fc57a243",
+  "ignoredSheets": [
+    "Guide",
+    "TextEffectGuide"
+  ],
+  "tables": [
+    {
+      "name": "AttackPattern",
+      "label": "공격 만들기",
+      "key": "PatternID",
+      "columns": [
+        {
+          "name": "PatternID",
+          "type": "int",
+          "label": "패턴 ID"
+        },
+        {
+          "name": "Name",
+          "type": "string",
+          "label": "공격 이름"
+        },
+        {
+          "name": "RangeMode",
+          "type": "string",
+          "label": "범위 사용 방식"
+        },
+        {
+          "name": "ShapePoolID",
+          "type": "int?",
+          "label": "사용할 범위 풀"
+        },
+        {
+          "name": "TilePath",
+          "type": "string",
+          "label": "직접 타일·경로"
+        },
+        {
+          "name": "HitMin",
+          "type": "int?",
+          "label": "최소 횟수"
+        },
+        {
+          "name": "HitMax",
+          "type": "int?",
+          "label": "최대 횟수"
+        },
+        {
+          "name": "GapMinMs",
+          "type": "int?",
+          "label": "예고 간격 최소 ms"
+        },
+        {
+          "name": "GapMaxMs",
+          "type": "int?",
+          "label": "예고 간격 최대 ms"
+        },
+        {
+          "name": "ResponseMs",
+          "type": "int?",
+          "label": "피할 시간 ms"
+        },
+        {
+          "name": "ExtraMinMs",
+          "type": "int?",
+          "label": "엇박 추가 최소 ms"
+        },
+        {
+          "name": "ExtraMaxMs",
+          "type": "int?",
+          "label": "엇박 추가 최대 ms"
+        },
+        {
+          "name": "AvoidRepeat",
+          "type": "bool",
+          "label": "연속 같은 범위 금지"
+        },
+        {
+          "name": "CanDefend",
+          "type": "bool",
+          "label": "방어 가능"
+        },
+        {
+          "name": "BreakTiles",
+          "type": "bool",
+          "label": "타일 파괴"
+        },
+        {
+          "name": "Notes",
+          "type": "string",
+          "label": "공격 분류·설명"
+        }
+      ]
+    },
+    {
+      "name": "PatternPresentation",
+      "label": "이동·연출",
+      "key": "PatternID",
+      "columns": [
+        {
+          "name": "PatternID",
+          "type": "int",
+          "label": "패턴 ID"
+        },
+        {
+          "name": "PatternName",
+          "type": "string",
+          "label": "공격 이름 (자동)"
+        },
+        {
+          "name": "MoveType",
+          "type": "string",
+          "label": "몬스터 이동"
+        },
+        {
+          "name": "MoveSpeed",
+          "type": "double?",
+          "label": "이동 속도"
+        },
+        {
+          "name": "MoveDistance",
+          "type": "double?",
+          "label": "이동 거리"
+        },
+        {
+          "name": "MotionKey",
+          "type": "string",
+          "label": "몬스터 모션"
+        },
+        {
+          "name": "Effect",
+          "type": "string",
+          "label": "공격 연출"
+        },
+        {
+          "name": "SoundKey",
+          "type": "string",
+          "label": "공격 효과음"
+        },
+        {
+          "name": "EffectMs",
+          "type": "int?",
+          "label": "연출 표시 ms"
+        },
+        {
+          "name": "PushDirection",
+          "type": "string",
+          "label": "플레이어 밀 방향"
+        },
+        {
+          "name": "PushTiles",
+          "type": "int?",
+          "label": "밀어낼 칸 수"
+        },
+        {
+          "name": "PushLeadMs",
+          "type": "int?",
+          "label": "밀기 전 예고 ms"
+        },
+        {
+          "name": "PushMoveMs",
+          "type": "int?",
+          "label": "밀려나는 시간 ms"
+        },
+        {
+          "name": "Notes",
+          "type": "string",
+          "label": "연출·이동 설명"
+        }
+      ]
+    },
+    {
+      "name": "MonsterPattern",
+      "label": "몬스터 사용 패턴",
+      "key": "MonsterID + PhaseID + PatternID",
+      "columns": [
+        {
+          "name": "MonsterID",
+          "type": "int",
+          "label": "몬스터 ID"
+        },
+        {
+          "name": "Name",
+          "type": "string",
+          "label": "몬스터 이름 (자동)"
+        },
+        {
+          "name": "PhaseID",
+          "type": "int",
+          "label": "페이즈"
+        },
+        {
+          "name": "PatternID",
+          "type": "int",
+          "label": "패턴 ID"
+        },
+        {
+          "name": "PatternName",
+          "type": "string",
+          "label": "공격 이름 (자동)"
+        },
+        {
+          "name": "HitDamage",
+          "type": "int",
+          "label": "1타 피해"
+        },
+        {
+          "name": "Weight",
+          "type": "double",
+          "label": "선택 비중"
+        },
+        {
+          "name": "Enabled",
+          "type": "bool",
+          "label": "사용"
+        },
+        {
+          "name": "Notes",
+          "type": "string",
+          "label": "용도·설명"
+        }
+      ]
+    },
+    {
+      "name": "MonsterPhase",
+      "label": "몬스터 페이즈",
+      "key": "MonsterID + PhaseID",
+      "columns": [
+        {
+          "name": "MonsterID",
+          "type": "int",
+          "label": "몬스터 ID"
+        },
+        {
+          "name": "Name",
+          "type": "string",
+          "label": "이름"
+        },
+        {
+          "name": "PhaseID",
+          "type": "int",
+          "label": "페이즈"
+        },
+        {
+          "name": "IsInitial",
+          "type": "bool",
+          "label": "시작 페이즈"
+        },
+        {
+          "name": "MaxHP",
+          "type": "int",
+          "label": "최대·진입 HP"
+        },
+        {
+          "name": "GaugeMax",
+          "type": "int",
+          "label": "빈틈 최대"
+        },
+        {
+          "name": "ParryGain",
+          "type": "int",
+          "label": "패링 시 증가"
+        },
+        {
+          "name": "GuardGain",
+          "type": "int",
+          "label": "가드 시 증가"
+        },
+        {
+          "name": "DodgeGain",
+          "type": "int",
+          "label": "회피 시 증가"
+        },
+        {
+          "name": "RecoveryMs",
+          "type": "int",
+          "label": "공격 후 대기 ms"
+        },
+        {
+          "name": "AttackSpeed",
+          "type": "double",
+          "label": "공격속도 배율"
+        },
+        {
+          "name": "TransitionTrigger",
+          "type": "string",
+          "label": "전환 조건"
+        },
+        {
+          "name": "NextPhaseID",
+          "type": "int?",
+          "label": "다음 페이즈"
+        },
+        {
+          "name": "PlayerDodgeMissCount",
+          "type": "int",
+          "label": "처음 MISS 기회 수"
+        },
+        {
+          "name": "EntryDialogueGroupID",
+          "type": "int?",
+          "label": "진입 대화 그룹"
+        },
+        {
+          "name": "PauseForEntryDialogue",
+          "type": "bool",
+          "label": "대화 중 전투 정지"
+        },
+        {
+          "name": "DesignStatus",
+          "type": "string",
+          "label": "작업 메모"
+        },
+        {
+          "name": "OpeningDamageDisplay",
+          "type": "int?",
+          "label": "빈틈 타격 표시 숫자"
+        }
+      ]
+    },
+    {
+      "name": "ShapePool",
+      "label": "범위 풀",
+      "key": "ShapePoolID + Candidate",
+      "columns": [
+        {
+          "name": "ShapePoolID",
+          "type": "int",
+          "label": "범위 풀 ID"
+        },
+        {
+          "name": "Candidate",
+          "type": "int",
+          "label": "후보 번호"
+        },
+        {
+          "name": "SelectMode",
+          "type": "string",
+          "label": "범위 정하는 방법"
+        },
+        {
+          "name": "Tiles",
+          "type": "string",
+          "label": "타일 구성·순서"
+        },
+        {
+          "name": "Weight",
+          "type": "double",
+          "label": "선택 비중"
+        },
+        {
+          "name": "Enabled",
+          "type": "bool",
+          "label": "사용"
+        },
+        {
+          "name": "Notes",
+          "type": "string",
+          "label": "범위 분류·설명"
+        }
+      ]
+    },
+    {
+      "name": "PlayerStatus",
+      "label": "플레이어",
+      "key": "PlayerID",
+      "columns": [
+        {
+          "name": "PlayerID",
+          "type": "int",
+          "label": "플레이어 ID"
+        },
+        {
+          "name": "Name",
+          "type": "string",
+          "label": "이름"
+        },
+        {
+          "name": "MaxHP",
+          "type": "int",
+          "label": "최대 HP"
+        },
+        {
+          "name": "DodgeDamage",
+          "type": "int",
+          "label": "빈틈 공격 피해"
+        },
+        {
+          "name": "GuardMax",
+          "type": "int",
+          "label": "가드 최대"
+        },
+        {
+          "name": "ParryMs",
+          "type": "int",
+          "label": "패링 판정 ms"
+        },
+        {
+          "name": "GuardHitCost",
+          "type": "int",
+          "label": "가드 피격 소모"
+        },
+        {
+          "name": "GuardHoldPerSec",
+          "type": "double",
+          "label": "유지 초당 소모"
+        },
+        {
+          "name": "GuardRegenPerSec",
+          "type": "double",
+          "label": "초당 가드 회복"
+        },
+        {
+          "name": "GuardBreakSec",
+          "type": "double",
+          "label": "가드 붕괴 초"
+        }
+      ]
+    },
+    {
+      "name": "CombatRule",
+      "label": "공통 규칙",
+      "key": "RuleID",
+      "columns": [
+        {
+          "name": "RuleID",
+          "type": "string",
+          "label": "규칙 ID"
+        },
+        {
+          "name": "Value",
+          "type": "string",
+          "label": "값"
+        },
+        {
+          "name": "Description",
+          "type": "string",
+          "label": "쉬운 설명"
+        }
+      ]
+    },
+    {
+      "name": "Dialogue",
+      "label": "대사",
+      "key": "DialogueID (GroupID + Order도 중복 금지)",
+      "columns": [
+        {
+          "name": "DialogueID",
+          "type": "int",
+          "label": "대사 ID"
+        },
+        {
+          "name": "GroupID",
+          "type": "int",
+          "label": "대화 그룹 ID"
+        },
+        {
+          "name": "Order",
+          "type": "int",
+          "label": "그룹 안 순번"
+        },
+        {
+          "name": "Speaker",
+          "type": "string",
+          "label": "누가 말할까"
+        },
+        {
+          "name": "Text",
+          "type": "string",
+          "label": "대사 내용"
+        },
+        {
+          "name": "Notes",
+          "type": "string",
+          "label": "설명"
+        }
+      ]
+    },
+    {
+      "name": "DialogueGroup",
+      "label": "대화 그룹",
+      "key": "GroupID",
+      "columns": [
+        {
+          "name": "GroupID",
+          "type": "int",
+          "label": "대화 그룹 ID"
+        },
+        {
+          "name": "Name",
+          "type": "string",
+          "label": "대화 이름"
+        },
+        {
+          "name": "PlaybackMode",
+          "type": "string",
+          "label": "어떻게 읽을까"
+        },
+        {
+          "name": "PauseCombat",
+          "type": "bool",
+          "label": "전투 시간 멈춤"
+        },
+        {
+          "name": "AdvanceMode",
+          "type": "string",
+          "label": "다음 줄 넘김"
+        },
+        {
+          "name": "CPS",
+          "type": "double",
+          "label": "초당 글자 수"
+        },
+        {
+          "name": "HoldMs",
+          "type": "int",
+          "label": "다 읽은 뒤 유지 ms"
+        },
+        {
+          "name": "GapMs",
+          "type": "int",
+          "label": "줄 사이 간격 ms"
+        },
+        {
+          "name": "Notes",
+          "type": "string",
+          "label": "설명"
+        },
+        {
+          "name": "ActorEffect",
+          "type": "string",
+          "label": "말하는 동안 캐릭터 연출"
+        },
+        {
+          "name": "FinishEffect",
+          "type": "string",
+          "label": "다 읽은 뒤 연출"
+        }
+      ]
+    },
+    {
+      "name": "CombatDialogue",
+      "label": "전투 대사 연결",
+      "key": "TriggerID",
+      "columns": [
+        {
+          "name": "TriggerID",
+          "type": "int",
+          "label": "연결 ID"
+        },
+        {
+          "name": "MonsterID",
+          "type": "int",
+          "label": "몬스터 ID"
+        },
+        {
+          "name": "PhaseID",
+          "type": "int?",
+          "label": "페이즈 조건"
+        },
+        {
+          "name": "EventType",
+          "type": "string",
+          "label": "언제 말할까"
+        },
+        {
+          "name": "PatternID",
+          "type": "int?",
+          "label": "패턴 조건"
+        },
+        {
+          "name": "BeautyCondition",
+          "type": "string",
+          "label": "미용 결과 조건"
+        },
+        {
+          "name": "GroupID",
+          "type": "int",
+          "label": "대화 그룹 ID"
+        },
+        {
+          "name": "HPThresholdPct",
+          "type": "double?",
+          "label": "기준 HP %"
+        },
+        {
+          "name": "CooldownMs",
+          "type": "int",
+          "label": "다시 말하기 대기 ms"
+        },
+        {
+          "name": "MaxPerBattle",
+          "type": "int",
+          "label": "전투당 최대 횟수"
+        },
+        {
+          "name": "Enabled",
+          "type": "bool",
+          "label": "사용"
+        },
+        {
+          "name": "Notes",
+          "type": "string",
+          "label": "설명"
+        },
+        {
+          "name": "EventCount",
+          "type": "int?",
+          "label": "몇 번째 빈틈 결과일까"
+        }
+      ]
+    }
+  ]
+}

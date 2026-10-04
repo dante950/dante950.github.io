@@ -1,0 +1,13 @@
+body.storyMode{margin:0;background:#0d0b0c;overflow:hidden;height:100vh;display:flex;align-items:center;justify-content:center}
+body.storyMode main{display:block;width:min(96vw,calc(96vh * 950 / 531));height:auto;aspect-ratio:950/531;padding:0;margin:0;max-width:none;position:relative}
+body.storyMode .play{max-width:none;padding:0;border:0;border-radius:0;background:transparent;width:100%;height:100%;position:relative}
+body.storyMode #battleArea{outline:0;position:relative;height:100%;width:100%}
+body.storyMode #arena{position:absolute;inset:0;width:100%;height:100%;max-height:none;border:0;border-radius:0;background:transparent;image-rendering:pixelated;display:block}
+body.storyMode .enemyhead,body.storyMode .meterlabels,body.storyMode .dualmeter,body.storyMode .timerline,body.storyMode .beat-track,body.storyMode #battleState,body.storyMode .keyguide,body.storyMode .touch{display:none!important}
+body.storyMode .dialoguebox{display:none;position:absolute;left:8%;right:8%;bottom:8%;min-height:0;margin:0;padding:14px 22px;border:3px solid #563738;border-radius:18px;background:#fff7e9f5;box-shadow:0 6px 0 #38243090;color:#412b2f;z-index:5}
+body.storyMode .dialoguebox.speaking{display:block}body.storyMode .dialoguehead{color:#c25b35;font-size:14px}body.storyMode .dialoguebox p{font-size:clamp(13px,1.5vw,19px);line-height:1.7;min-height:28px;margin:7px 0;color:#412b2f}body.storyMode .dialogueactions button{background:#e7c99a;color:#503137;border:0;border-radius:9px;padding:5px 12px}
+body.storyMode .storyPause{position:absolute;right:1.5%;bottom:7%;z-index:10}body.storyMode #pause{font-size:11px;background:#4e3035dc;color:#ffe8c6;border:1px solid #c79a75;padding:5px 10px;border-radius:8px}
+#fightGate{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;z-index:99;background:#34203355;color:#ffe5b2;text-shadow:3px 3px #492735;backdrop-filter:none}
+#fightGate h2{font-size:clamp(42px,7vw,82px);font-weight:1000;margin:10px 0;transform:rotate(-5deg);animation:yachaArrival .5s cubic-bezier(.2,1.6,.4,1) both}#fightGate small{letter-spacing:4px;font-size:13px}@keyframes yachaArrival{from{transform:scale(1.7) rotate(-15deg);opacity:0}to{transform:scale(1) rotate(-5deg);opacity:1}}
+
+body.storyMode .dialoguebox{background:#332630f7;border-color:#d7b68e;color:#f0eee3}body.storyMode .dialoguehead{color:#ffcf93}body.storyMode .dialoguebox p{color:#f0eee3}

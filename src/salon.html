@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>YACHACHA 전체 플로우 시뮬레이터 v1.1</title>
+<style>
+  :root { color-scheme:dark; }
+  * { box-sizing:border-box; }
+  html,body { width:100%;height:100%;margin:0;overflow:hidden;background:#110f11;color:#fff;font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif; }
+  button,input { font:inherit; }
+  button:focus-visible,input:focus-visible { outline:3px solid #ffd56a;outline-offset:3px; }
+  .screen { position:fixed;inset:0;display:none; }
+  .screen.active { display:flex; }
+  #titleScreen { align-items:center;justify-content:center;background:radial-gradient(circle at 50% 15%,#5d463b 0,#2b2021 38%,#110f11 78%); }
+  .title-card { width:min(570px,88vw);padding:42px 48px;border:3px solid #412d2b;border-radius:30px;background:#f6e7e0;color:#342326;box-shadow:0 28px 80px #000c,0 0 0 7px #a7654b;text-align:center; }
+  .logo { font-size:clamp(42px,7vw,66px);font-weight:1000;letter-spacing:.1em;color:#ff784e;text-shadow:0 4px 0 #45282a; }
+  .sub { margin:8px 0 28px;color:#765954;font-size:13px;letter-spacing:.16em; }
+  .menu { display:grid;gap:13px; }
+  .menu button,.phaseBtn,.modal button { min-height:48px;border:3px solid #4a3030;border-radius:13px;background:#ff8257;color:#fff;font-weight:900;cursor:pointer;box-shadow:0 4px 0 #4a3030;transition:transform .12s,filter .12s; }
+  .menu button:hover,.phaseBtn:hover,.modal button:hover { transform:translateY(-2px);filter:brightness(1.08); }
+  .menu button:active,.phaseBtn:active,.modal button:active { transform:translateY(2px);box-shadow:0 2px 0 #4a3030; }
+  .menu .secondary { background:#65585a; }
+  .footer-note { margin-top:24px;color:#8b726d;font-size:12px; }
+  .overlayPhase { align-items:center;justify-content:center;flex-direction:column;gap:18px;background:radial-gradient(circle,#302529,#0a090a 70%);text-align:center; }
+  .phaseTitle { font-size:clamp(28px,5vw,40px);font-weight:1000;color:#ffd76e; }
+  .phaseDesc { color:#c6babe;font-size:14px;line-height:1.65; }
+  .phaseBtn { padding:0 24px; }
+  .dots::after { content:"";animation:dots 1.2s steps(4,end) infinite; }
+  @keyframes dots { 25%{content:"."}50%{content:".."}75%,100%{content:"..."} }
+  #gameScreen { align-items:center;justify-content:center;background:#0d0b0c; }
+  #gameWrap { position:relative;width:min(96vw,calc(96vh * 950 / 531));aspect-ratio:950/531;overflow:hidden;background:#202426;box-shadow:0 0 70px #000c;image-rendering:pixelated; }
+  #gameWorld { position:absolute;left:0;top:0;width:950px;height:531px;transform-origin:top left;will-change:transform; }
+  .wall { position:absolute;inset:0 0 39% 0;background-image:url("./media/15aed42dfd86a90df043fc67.png");background-size:100% 100%;filter:saturate(.82) brightness(.9);z-index:1; }
+  .sideWall,.ceiling,.floorLines,.foreground { display:none; }
+  .floor { position:absolute;left:0;right:0;bottom:0;height:50%;background-image:url("./media/8ee64bf83a9eaa83fcd4e9f4.png");background-size:118px auto;filter:brightness(.71) saturate(.72);z-index:3;box-shadow:inset 0 18px 25px #0005; }
+  .roomShade { position:absolute;inset:0;background:linear-gradient(90deg,#160f1766,transparent 12%,transparent 87%,#160f1766),linear-gradient(0deg,#0b090c45,transparent 47%),radial-gradient(ellipse at 53% 30%,#ffe7a92c,transparent 30%);pointer-events:none;z-index:8; }
+  .prop { position:absolute;image-rendering:pixelated;user-select:none;pointer-events:none;object-fit:contain; }
+  .windowScene { position:absolute;left:-1%;top:10%;width:24%;height:43%;overflow:hidden;background:linear-gradient(155deg,#9bc6cb 0 35%,#4c8a77 36% 60%,#d6bf9b 61%);border:9px solid #5b342d;z-index:9;box-shadow:inset 0 0 32px #19343c88; }
+  .windowScene::before { content:"";position:absolute;left:7%;right:8%;bottom:0;height:55%;background:repeating-linear-gradient(90deg,#52766a 0 18%,#d5c39f 18% 29%,#7b665b 29% 41%);clip-path:polygon(0 35%,28% 4%,50% 32%,72% 0,100% 24%,100% 100%,0 100%); }
+  .windowFrame { left:-1%;top:7%;width:26%;height:49%;z-index:11; }
+  .windowLight { left:15%;top:13%;width:7%;z-index:12;opacity:.7; }
+  .awning.one { left:0;top:8%;width:25%;height:7%;z-index:12; }
+  .awning.two { left:0;top:15%;width:22%;height:6%;z-index:12; }
+  .carpet { left:17%;bottom:-2%;width:68%;height:44%;z-index:9;filter:saturate(.72) brightness(.72) hue-rotate(320deg); }
+  .station.main { left:38%;top:10%;width:27%;height:39%;z-index:10;filter:drop-shadow(0 7px 3px #0005); }
+  .stationSide { left:63%;top:22%;width:5%;height:24%;z-index:11; }
+  .stationTop { left:38%;top:8%;width:27%;height:9%;z-index:12; }
+  .chair.main { left:48%;top:31%;width:9.5%;height:37%;z-index:16;filter:drop-shadow(0 6px 3px #0008); }
+  .chairFront { z-index:31 !important;clip-path:inset(43% 0 0 0);filter:drop-shadow(0 6px 3px #0008); }
+  .counter { left:37%;top:43%;width:30%;height:17%;z-index:14;filter:drop-shadow(0 5px 3px #0007); }
+  .counterSide { left:64%;top:46%;width:7%;height:16%;z-index:14; }
+  .counterTop { left:36%;top:42%;width:33%;height:7%;z-index:15; }
+  .sofa { left:1%;top:45%;width:28%;height:22%;z-index:15;filter:drop-shadow(0 5px 3px #0007); }
+  .sofaSide { left:25%;top:45%;width:7%;height:22%;z-index:16; }
+  .sofaTop { left:1%;top:43%;width:29%;height:10%;z-index:16; }
+  .cabinet.left { left:22%;top:14%;width:14%;height:32%;z-index:11; }
+  .cabinet.right { right:8%;top:20%;width:18%;height:27%;z-index:11; }
+  .plant { left:25%;top:35%;width:7%;height:23%;z-index:13; }
+  .barberPole { right:27%;top:11%;width:4.4%;height:31%;z-index:12; }
+  .lp { right:2.5%;top:43%;width:7%;height:22%;z-index:14; }
+  .salonProps { left:39%;top:39%;width:26%;height:11%;z-index:15; }
+  .salonProps.leftShelf { left:22%;top:24%;width:14%;height:10%;z-index:13; }
+  .salonProps.rightShelf { left:auto;right:8%;top:28%;width:18%;height:11%;z-index:13; }
+  .magazines.one { left:3%;bottom:4%;width:10%;z-index:18;transform:rotate(-6deg); }
+  .magazines.two { right:4%;bottom:2%;width:11%;z-index:18;transform:rotate(8deg); }
+  .poster.one { left:29%;top:6%;width:7%;height:17%;z-index:12; }
+  .poster.two { right:31%;top:3%;width:7%;height:17%;z-index:12; }
+  .poster.three { right:22%;top:4%;width:6.5%;height:16%;z-index:12; }
+  .barbersSign { left:4%;top:4%;width:15%;height:11%;z-index:13; }
+  .radio { right:9%;top:11%;width:9%;height:13%;z-index:13; }
+  .towel { left:28%;top:46%;width:6%;height:14%;z-index:15; }
+  .shadow { position:absolute;width:48px;height:15px;border-radius:50%;background:#0005;filter:blur(2px);transform:translate(-50%,-50%);z-index:19;pointer-events:none; }
+  #player { position:absolute;width:219px;height:162px;background-repeat:no-repeat;background-size:657px 324px;transform:translate(-50%,-100%) scale(1.32);transform-origin:center bottom;image-rendering:pixelated;z-index:20;pointer-events:none;filter:drop-shadow(0 7px 3px #0008);will-change:left,top,transform; }
+  #customer { position:absolute;display:none;width:78px;height:126px;transform:translate(-50%,-100%) scale(1.28);transform-origin:center bottom;image-rendering:pixelated;pointer-events:none;filter:drop-shadow(0 7px 3px #0008);z-index:27; }
+  .customerLayer { position:absolute;inset:0;background-repeat:no-repeat;background-size:312px 126px;image-rendering:pixelated; }
+  #customerShadow { position:absolute;display:none;width:46px;height:13px;border-radius:50%;background:#0006;filter:blur(2px);transform:translate(-50%,-50%);z-index:25;pointer-events:none; }
+  #seatedCustomer { position:absolute;left:53%;top:61%;display:none;width:90px;height:135px;transform:translate(-50%,-100%) scale(1.2);transform-origin:center bottom;z-index:29;pointer-events:none;filter:drop-shadow(0 5px 3px #0007); }
+  #seatedCustomer img { position:absolute;image-rendering:pixelated; }
+  #seatedCustomer .cape { left:15px;top:45px;width:60px;z-index:2; }
+  #seatedCustomer .hairBack { left:20px;top:8px;width:49px;z-index:1; }
+  #seatedCustomer .head { left:30px;top:18px;width:29px;z-index:3; }
+  #seatedCustomer .hairFront { left:22px;top:7px;width:45px;z-index:4; }
+  #doorSignal { position:absolute;right:14%;bottom:0;width:18%;height:19%;opacity:0;pointer-events:none;z-index:24;background:radial-gradient(ellipse at bottom,#ffe8a9aa,transparent 68%);filter:blur(4px);transition:opacity .25s; }
+  #doorSignal.open { opacity:1;animation:doorGlow .8s ease-in-out 2; }
+  @keyframes doorGlow { 50%{opacity:.35} }
+  .hudTop { position:absolute;left:50%;top:12px;transform:translateX(-50%);z-index:50;padding:7px 14px;border:2px solid #4b3032;border-radius:999px;background:#f6e7e0e8;color:#3a282a;font-size:12px;font-weight:900;box-shadow:0 3px 0 #4b3032; }
+  .phone { position:absolute;left:13px;top:13px;z-index:50;width:46px;height:59px;padding:5px;border:2px solid #eddcd5;border-radius:12px;background-image:url("./media/ab309a51ce8627b275e31dd5.png");background-size:100% 100%;filter:drop-shadow(0 4px 2px #0007);display:grid;place-items:center;color:#fff;font-size:10px;font-weight:900;text-align:center;line-height:1.15; }
+  #openShopBtn { position:absolute;left:13px;top:80px;z-index:51;min-width:102px;height:38px;border:3px solid #4a3030;border-radius:11px;background:#ff8257;color:#fff;font-size:13px;font-weight:1000;cursor:pointer;box-shadow:0 4px 0 #4a3030; }
+  #openShopBtn:hover { transform:translateY(-1px);filter:brightness(1.08); }
+  #openShopBtn:disabled { cursor:default;background:#66585a;color:#eadfda;filter:none;transform:none; }
+  #interactPrompt { position:absolute;left:53%;top:31%;z-index:52;display:none;align-items:center;gap:7px;padding:7px 11px;border:3px solid #4a3030;border-radius:12px;background:#f6e7e0;color:#3a282a;font-size:12px;font-weight:1000;box-shadow:0 4px 0 #4a3030;transform:translate(-50%,-100%);pointer-events:none; }
+  #interactPrompt .key { display:grid;place-items:center;width:28px;height:25px;border-radius:6px;background:#4a3030;color:#fff;font-size:14px; }
+  #interactPrompt.pressed { transform:translate(-50%,-100%) scale(.94); }
+  #dialogueOverlay { position:absolute;inset:0;z-index:200;display:none;background:#100b102c;user-select:none;cursor:pointer;overflow:hidden; }
+  .dialoguePortrait { position:absolute;bottom:17%;width:27%;height:52%;z-index:201;transform-origin:center bottom;transition:transform .2s ease,filter .2s ease,opacity .2s ease;pointer-events:none; }
+  .dialoguePortrait.active { transform:scale(1);filter:none;opacity:1; }
+  .dialoguePortrait.inactive { transform:scale(.72);filter:grayscale(1) brightness(.72);opacity:.72; }
+  #zombiePortrait { left:4%; }
+  #playerPortrait { right:1%; }
+  #zombiePortrait img { position:absolute;left:50%;bottom:0;width:132px;transform:translateX(-50%);image-rendering:pixelated; }
+  .playerPortraitCrop { position:absolute;right:-5%;bottom:-8%;width:330px;height:405px;overflow:hidden; }
+  .playerPortraitCrop img { position:absolute;left:-140px;top:-54px;width:2690px;height:1557px;max-width:none;image-rendering:pixelated; }
+  .dialogueBubble { position:absolute;left:10%;right:10%;bottom:3%;min-height:24%;z-index:203;padding:25px 36px 24px;border:4px solid #352b31;border-radius:24px;background:#fff;color:#292126;box-shadow:0 8px 0 #241b20,0 18px 30px #0007;display:flex;flex-direction:column;justify-content:center; }
+  #dialogueSpeaker { margin-bottom:9px;color:#e86449;font-size:13px;font-weight:1000; }
+  #dialogueText { min-height:48px;font-size:17px;font-weight:700;line-height:1.65;word-break:keep-all; }
+  .dialogueHint { position:absolute;right:24px;bottom:12px;color:#77696e;font-size:10px;font-weight:800; }
+  #beautyScreen { position:absolute;inset:0;z-index:300;display:none;overflow:hidden;opacity:0;background:repeating-linear-gradient(90deg,#d7d5b4 0 36px,#c4c7a9 36px 39px),#d4d0b0;transition:opacity .42s ease; }
+  #beautyScreen.active { opacity:1; }
+  .beautyMirror { position:absolute;left:22%;top:-8%;width:54%;height:97%;border:24px solid #b94b16;border-radius:8% 8% 3% 3%;background:linear-gradient(130deg,#fff9d8 0 22%,#f4dfbd 22% 26%,#fff8d7 26% 69%,#eed4b2 69% 73%,#fff7d6 73%);box-shadow:inset 0 0 0 9px #df6b14,0 10px 0 #79361e,0 18px 36px #48261555; }
+  .beautyMirror::before { content:"";position:absolute;left:-28px;right:-28px;top:-25px;height:38px;background:#d95c08;clip-path:polygon(0 0,100% 0,96% 100%,88% 55%,80% 100%,70% 52%,61% 100%,51% 55%,42% 100%,32% 52%,23% 100%,13% 55%,4% 100%); }
+  .beautyBulbs { position:absolute;left:-17px;top:20%;display:grid;gap:28px; }
+  .beautyBulbs i { width:24px;height:24px;border-radius:50%;background:#fff28e;box-shadow:0 0 18px #ffe16c; }
+  .beautyCustomer { position:absolute;left:50%;bottom:81px;width:320px;height:350px;transform:translateX(-50%);z-index:306;filter:drop-shadow(0 8px 3px #5c362866); }
+  .beautyCustomer img { position:absolute;image-rendering:pixelated; }
+  .beautyCustomer .cape { left:48px;top:159px;width:224px;z-index:2; }
+  .beautyCustomer .hairBack { left:62px;top:5px;width:196px;z-index:1; }
+  .beautyCustomer .head { left:86px;top:28px;width:148px;z-index:3; }
+  .beautyCustomer .hairFront { left:57px;top:-3px;width:190px;z-index:4; }
+  .beautyCounter { position:absolute;left:0;right:0;bottom:0;height:96px;z-index:308;background:linear-gradient(#a9a7bb,#77788e);border-top:8px solid #d6b28e;box-shadow:0 -10px 24px #4b2f2444; }
+  .beautyCounterProps { position:absolute;left:24%;top:21px;width:230px;height:47px;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(0 4px 2px #0005); }
+  .beautyStatus { position:absolute;left:24px;top:18px;z-index:310;width:190px;color:#433238; }
+  .beautyMoney { height:50px;padding:9px 16px 8px 72px;border:4px solid #4b383b;border-radius:28px;background:#f8e9e2;font-size:24px;box-shadow:0 5px 0 #5a4141; }
+  .beautyClock { position:absolute;left:0;top:0;width:68px;height:68px;border:8px solid #4b383b;border-radius:50%;background:conic-gradient(#ffc43d 0 30%,#25263d 30%);box-shadow:0 4px 0 #251c20; }
+  .beautyDay { margin:20px 0 0 18px;width:120px;padding:6px;border:4px solid #4b383b;border-radius:11px;background:#f7e9e3;text-align:center;font-weight:900; }
+  .beautyMood { position:absolute;left:38px;top:190px;z-index:310;width:138px;height:138px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#ffc43d;color:#6a320d;font-weight:900;box-shadow:0 8px 0 #aa4a1c;transition:background .18s,transform .18s; }
+  .beautyMood[data-mood="satisfied"] { background:#ffd84b;transform:scale(1.04); }
+  .beautyMood[data-mood="angry"] { background:#ff9148;transform:scale(1.04); }
+  .satisfactionReadout { position:absolute;left:24px;top:340px;z-index:311;width:166px;padding:9px 8px;border:3px solid #5b3530;border-radius:14px;background:#fff3e6ed;color:#4c3032;text-align:center;font-size:12px;font-weight:1000;line-height:1.35;box-shadow:0 4px 0 #5b3530; }
+  .satisfactionReadout small { display:block;margin-top:2px;color:#a75443;font-size:9px; }
+  .moodEyes { font-size:26px;line-height:1;letter-spacing:17px;margin-left:17px; }
+  .moodMouth { margin-top:8px;font-size:42px;line-height:.7; }
+  .beautyPanel { position:absolute;right:22px;top:42px;bottom:56px;width:190px;z-index:311;padding:48px 27px 34px;display:grid;gap:12px;align-content:center; }
+  .beautyPanelBg { position:absolute;inset:0;width:100%;height:100%;z-index:-1;image-rendering:pixelated; }
+  .beautyToolsViewport { position:absolute;left:27px;right:27px;top:48px;bottom:48px;overflow:hidden; }
+  .beautyToolsList { display:grid;gap:12px;will-change:transform; }
+  .beautyTool { width:100%;height:91px;border:0;border-radius:30px;background:#cdb3a7;display:grid;place-items:center;cursor:pointer; }
+  .beautyTool img { width:94px;max-height:76px;object-fit:contain;image-rendering:pixelated; }
+  .beautyTool.selected { outline:5px solid #ff7a32;outline-offset:-5px;background:#ffe0bd;box-shadow:0 0 0 3px #71311c,0 0 18px #ffb34d; }
+  .beautyScroll { position:absolute;right:15px;top:80px;bottom:75px;width:9px;border-radius:8px;background:#b59a8e; }
+  .beautyScrollThumb { position:absolute;left:-2px;top:0;width:13px;height:62px;border-radius:8px;background:#ef7238;cursor:grab;touch-action:none;box-shadow:0 1px 0 #9b482a; }
+  .beautyScrollThumb.dragging { cursor:grabbing;filter:brightness(1.08); }
+  .beautyNext { position:absolute;right:146px;bottom:14px;z-index:313;width:112px;height:40px;border:2px solid #71311c;border-radius:8px;background:#ff9a60;color:#71311c;font-weight:900; }
+  .beautyFinish { position:absolute;right:22px;bottom:14px;z-index:313;width:112px;height:40px;border:0;background:none;padding:0; }
+  .beautyFinish img { width:112px;height:40px;image-rendering:pixelated; }
+  .beautyStageTag { position:absolute;left:50%;top:15px;z-index:312;transform:translateX(-50%);padding:7px 16px;border-radius:99px;background:#4b3032;color:#fff4e9;font-size:12px;font-weight:900;box-shadow:0 3px 0 #25191c; }
+  .hairCutCanvas { position:absolute;image-rendering:pixelated;pointer-events:none; }
+  .hairZoneOverlay { position:absolute;z-index:8;image-rendering:pixelated;pointer-events:none;display:none; }
+  .zoneControls { position:absolute;left:18px;bottom:18px;z-index:420;display:flex;align-items:center;gap:9px; }
+  .zoneToggle { padding:9px 14px;border:3px solid #513638;border-radius:11px;background:#fff1e7;color:#513638;font-weight:900;cursor:pointer;box-shadow:0 4px 0 #8b5a4f; }
+  .zoneToggle.active { background:#513638;color:#fff8ee;transform:translateY(2px);box-shadow:0 2px 0 #8b5a4f; }
+  .zoneLegend { display:none;padding:7px 10px;border:2px solid #513638;border-radius:10px;background:#fff9f0e8;color:#513638;font-size:12px;font-weight:800;gap:9px; }
+  .zoneControls.active .zoneLegend { display:flex; }
+  .zoneLegend i { width:11px;height:11px;border-radius:3px;display:inline-block;margin-right:3px;vertical-align:-1px; }
+  .hairCutSurface { position:absolute;left:55px;top:0;width:210px;height:175px;z-index:12;pointer-events:none; }
+  .hairCutPreview { position:absolute;inset:0;width:210px;height:175px;pointer-events:none; }
+  .cutCursor { position:absolute;z-index:320;width:44px;height:44px;object-fit:contain;image-rendering:pixelated;pointer-events:none;display:none;transform:translate(-8px,-8px) rotate(-18deg);filter:drop-shadow(0 3px 1px #0008); }
+  .cutCursor.hammer { width:52px;height:52px;transform:translate(-10px,-10px) rotate(-24deg);animation:hammerPulse .7s ease-in-out infinite alternate; }
+  @keyframes hammerPulse { from{scale:.82} to{scale:1.12} }
+  .hammerHit { position:absolute;z-index:18;width:44px;height:44px;border:5px solid #ffd85a;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);animation:hammerHit .32s ease-out forwards;box-shadow:0 0 0 5px #ff7d3788; }
+  @keyframes hammerHit { to{opacity:0;scale:1.7} }
+  .cutHint { position:absolute;left:50%;bottom:105px;z-index:315;display:none;transform:translateX(-50%);padding:8px 15px;border:3px solid #5b3530;border-radius:13px;background:#fff3dc;color:#502e2b;font-size:12px;font-weight:900;box-shadow:0 4px 0 #5b3530;white-space:nowrap; }
+  .phaseNotice { position:absolute;left:50%;top:47%;z-index:318;display:none;transform:translate(-50%,-50%);min-width:260px;padding:22px;border:4px solid #5b3530;border-radius:18px;background:#fff3dceF;color:#502e2b;text-align:center;font-size:18px;font-weight:900;box-shadow:0 7px 0 #5b3530;white-space:pre-line; }
+  .phaseNotice.attachRequest { top:auto;bottom:76px;transform:translateX(-50%);width:440px;max-width:58%;min-width:0;padding:17px 28px;border-radius:24px;font-size:17px;line-height:1.55;pointer-events:none; }
+  .phaseNotice.attachRequest::after { content:'';position:absolute;left:50%;bottom:-17px;transform:translateX(-50%);border:9px solid transparent;border-top-color:#5b3530; }
+  .cutBriefing { position:absolute;left:50%;bottom:72px;z-index:330;transform:translateX(-50%);width:590px;max-width:68%;min-height:106px;padding:52px 28px 20px;border:4px solid #5b3530;border-radius:25px;background:#fff3e6f5;color:#412a2c;box-shadow:0 7px 0 #5b3530;text-align:left; }
+  .cutBriefing::after { content:'';position:absolute;left:50%;bottom:-19px;transform:translateX(-50%);border:10px solid transparent;border-top-color:#5b3530; }
+  .cutBriefingSpeaker { position:absolute;left:25px;top:15px;color:#e85d3c;font-size:12px;font-weight:1000; }
+  .cutBriefingText { font-size:16px;font-weight:800;line-height:1.6;word-break:keep-all; }
+  .cutBriefingActions { position:absolute;right:16px;top:11px;display:flex;gap:7px; }
+  .cutBriefingActions button { min-width:88px;height:32px;padding:0 13px;border:2px solid #603b3a;border-radius:11px;background:#fff9ef;color:#533334;font-size:12px;font-weight:1000;cursor:pointer;box-shadow:0 3px 0 #603b3a; }
+  .cutBriefingActions .acceptCut { background:#ff8b55;color:#fff; }
+  .beautyPanel.briefingLocked { pointer-events:none;filter:grayscale(.75);opacity:.45; }
+  .stickerTray { position:absolute;right:22px;top:42px;bottom:56px;width:190px;z-index:314;display:none;padding:46px 18px 18px;border:4px solid #5b3530;border-radius:30px;background:#fff0e8;box-shadow:0 7px 0 #5b3530;overflow:hidden; }
+  .stickerTrayTitle { position:absolute;left:14px;right:14px;top:10px;text-align:center;color:#573538;font-size:13px;font-weight:900; }
+  .stickerTrayTitle small { display:block;margin-top:2px;font-size:9px;color:#9b5c52; }
+  .stickerTrayList { height:100%;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;align-content:start;gap:8px;padding:3px 2px 10px;scrollbar-color:#ef7238 #c9ada0; }
+  .stickerButton { min-height:76px;padding:5px 3px;border:2px solid #a98579;border-radius:15px;background:#d6bdb1;color:#4d3032;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;font-size:9px;font-weight:900; }
+  .stickerButton img { width:54px;height:37px;object-fit:contain;image-rendering:pixelated; }
+  .stickerButton.selected { border-color:#ff7438;background:#ffe1b8;box-shadow:0 0 0 3px #ffb057; }
+  .stickerButton:disabled { filter:grayscale(1);opacity:.45;cursor:not-allowed; }
+  .stickerTag { padding:2px 5px;border-radius:8px;background:#594049;color:#fff9ef;font-size:8px; }
+  .attachSurface { position:absolute;inset:0;z-index:17;pointer-events:none;cursor:crosshair; }
+  .placedSticker { position:absolute;z-index:19;object-fit:contain;image-rendering:pixelated;transform:translate(-50%,-50%);cursor:pointer;filter:drop-shadow(0 3px 1px #0008); }
+  .placedSticker:hover { outline:2px dashed #ff6d3b;outline-offset:3px; }
+  .attachStatus { position:absolute;left:50%;bottom:105px;z-index:316;display:none;transform:translateX(-50%);padding:8px 15px;border:3px solid #5b3530;border-radius:13px;background:#fff3dc;color:#502e2b;font-size:12px;font-weight:900;box-shadow:0 4px 0 #5b3530;white-space:nowrap; }
+  .faceRegion { position:absolute;z-index:18;display:none;border:3px dashed;border-radius:14px;pointer-events:none;text-align:center;font-size:10px;font-weight:900;padding-top:2px; }
+  .faceRegion.eye { left:112px;top:87px;width:96px;height:48px;border-color:#38d97a;background:#38d97a33;color:#17683b; }
+  .faceRegion.underNose { left:132px;top:118px;width:58px;height:39px;border-color:#ffd247;background:#ffd24744;color:#765800; }
+  .faceRegion.neck { left:120px;top:180px;width:82px;height:48px;border-color:#67a8ff;background:#67a8ff3d;color:#174c8d; }
+  .drawPanel { position:absolute;right:18px;top:50px;bottom:58px;width:228px;z-index:314;display:none;padding:24px 17px 15px;border:5px solid #5b2630;border-radius:24px 8px 25px 13px;background:#c98161;color:#512b2d;box-shadow:8px 9px 0 #4b2a2c;transform:rotate(1deg); }
+  .drawPanelTitle { margin-bottom:12px;text-align:center;font-size:15px;font-weight:1000; }
+  .drawPalette { display:grid;grid-template-columns:repeat(5,1fr);gap:9px 7px;margin-bottom:17px; }
+  .drawColor { aspect-ratio:1;border:3px solid #7a2635;border-radius:50%;padding:0;cursor:pointer;box-shadow:0 2px 0 #5c2930; }
+  .drawColor.selected { outline:5px solid #fff2d7;outline-offset:2px;transform:scale(1.09); }
+  .drawTools { display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px; }
+  .drawTool,.drawSize { height:45px;min-width:0;padding:0 5px;border:3px solid #6b3034;border-radius:13px;background:#fff4ed;color:#5a3032;font-size:11px;font-weight:1000;white-space:nowrap;word-break:keep-all;cursor:pointer;box-shadow:0 3px 0 #6b3034; }
+  .drawTool.selected,.drawSize.selected { background:#ffb175;outline:3px solid #fff1d7; }
+  .drawSizes { display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px; }
+  .drawSize { height:40px;font-size:11px; }
+  .drawDot { display:inline-block;border-radius:50%;background:#45272a;vertical-align:middle;margin-right:3px; }
+  .drawCanvas { position:absolute;inset:0;z-index:18;width:320px;height:350px;image-rendering:pixelated;pointer-events:none; }
+  .drawInputSurface { position:absolute;inset:0;z-index:22;pointer-events:none;cursor:crosshair;touch-action:none; }
+  .drawRegionOverlay { position:absolute;z-index:21;display:none;place-items:center;border:3px dashed;border-radius:50%;pointer-events:none;font-size:9px;font-weight:1000;text-align:center; }
+  .drawRegionOverlay.brain { border-color:#18c867;background:#18c86732;color:#087b3c; }
+  .drawRegionOverlay.eye { border-color:#ff4242;background:#ff42422b;color:#951d1d; }
+  .drawRegionOverlay.mouth { border-color:#ff8a32;background:#ff8a322b;color:#8f4213; }
+  .drawRegionOverlay.faceAll { z-index:20;border-color:#ffd044;background:transparent;color:#7c6400; }
+  .drawRegionOverlay.attire { z-index:20;border-color:#599dff;background:transparent;color:#1d5aa8; }
+  .drawStatus { position:absolute;left:50%;bottom:105px;z-index:316;display:none;transform:translateX(-50%);padding:8px 15px;border:3px solid #5b3530;border-radius:13px;background:#fff3dc;color:#502e2b;font-size:12px;font-weight:900;box-shadow:0 4px 0 #5b3530;white-space:nowrap; }
+  .drawComplete { position:absolute;inset:0;z-index:500;display:none;place-items:center;background:#2b2025b8; }
+  .drawCompleteCard { min-width:360px;padding:28px;border:4px solid #5b3530;border-radius:24px;background:#fff3e6;color:#4b3032;text-align:center;font-size:18px;font-weight:1000;box-shadow:0 8px 0 #342124; }
+  .beautyResultSequence { position:absolute;inset:0;z-index:700;display:none;background:#100b0dd9;color:#412a2c; }
+  .beautyResultGifStage,.beautyResultDialogueStage { position:absolute;inset:0;display:flex;align-items:center;justify-content:center; }
+  .beautyResultGifStage { background:#080607;cursor:pointer; }
+  .beautyResultGifStage img { width:100%;height:100%;object-fit:contain;image-rendering:pixelated; }
+  .beautyResultSkip { position:absolute;right:18px;top:17px;z-index:2;padding:8px 13px;border:2px solid #fff3e0;border-radius:10px;background:#3d292dcc;color:#fff8ee;font-size:11px;font-weight:900; }
+  .beautyResultDialogueStage { display:none;align-items:flex-end;padding:0 8% 54px;background:linear-gradient(#120d1060,#120d10d9); }
+  .beautyResultDialogueBox { position:relative;width:min(760px,88%);min-height:160px;padding:54px 34px 25px;border:5px solid #553235;border-radius:27px;background:#fff6ed;color:#3f292c;box-shadow:0 9px 0 #2b1a1d;text-align:left;cursor:pointer; }
+  .beautyResultBadge { position:absolute;left:25px;top:-27px;padding:11px 22px;border:4px solid #553235;border-radius:99px;background:#ffb15f;color:#542d25;font-size:17px;font-weight:1000;box-shadow:0 4px 0 #553235; }
+  .beautyResultBadge.fail { background:#e85b50;color:#fff; }
+  .beautyResultSpeaker { color:#e2573d;font-size:13px;font-weight:1000; }
+  .beautyResultText { margin-top:10px;min-height:48px;font-size:19px;font-weight:900;line-height:1.55;word-break:keep-all; }
+  .beautyResultHint { position:absolute;right:25px;bottom:15px;color:#8d6e68;font-size:10px;font-weight:800; }
+  .beautyResultActions { display:none;justify-content:flex-end;gap:10px;margin-top:14px; }
+  .beautyResultActions button { min-width:112px;height:40px;border:3px solid #5b3530;border-radius:12px;background:#ff9559;color:#fff;font-weight:1000;box-shadow:0 4px 0 #5b3530;cursor:pointer; }
+  .beautyResultActions button.secondary { background:#786568; }
+  .yachaPrelude { width:min(620px,85%);padding:35px;border:5px solid #553235;border-radius:28px;background:#fff4e9;text-align:center;box-shadow:0 10px 0 #2b1a1d; }
+  .yachaPrelude h2 { margin:0 0 12px;color:#de553b;font-size:32px; }
+  .yachaPrelude p { margin:7px 0;font-size:16px;font-weight:850;line-height:1.55; }
+  .yachaPrelude strong { display:inline-block;margin-top:12px;padding:8px 16px;border-radius:99px;background:#533235;color:#fff8ed; }
+  .hairSnip { position:absolute;z-index:319;width:13px;height:7px;border-radius:60% 15% 60% 15%;background:#21ba70;pointer-events:none;animation:hairSnip .65s ease-in forwards; }
+  @keyframes hairSnip { to { transform:translate(var(--dx),70px) rotate(190deg);opacity:0; } }
+  .help { position:absolute;right:12px;bottom:12px;z-index:50;padding:8px 11px;border:2px solid #4b3032;border-radius:10px;background:#f6e7e0e8;color:#3a282a;font-size:12px;font-weight:800;line-height:1.55; }
+  .badge { display:inline-block;min-width:43px;padding:1px 7px;border-radius:5px;background:#4b3032;color:#fff;text-align:center;margin-right:3px; }
+  .resourceNote { position:absolute;left:12px;bottom:12px;z-index:50;max-width:36%;padding:7px 9px;border:1px solid #fff3;border-radius:7px;background:#171116b8;color:#efe5df;font-size:10px;line-height:1.45; }
+  #settingsModal { position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;background:#0b080bcc;backdrop-filter:blur(5px); }
+  .modal { width:min(480px,90vw);padding:27px;border:4px solid #4a3030;border-radius:28px;background:#f6e7e0;color:#342326;box-shadow:0 22px 75px #000c; }
+  .modal h2 { margin:0 0 7px;font-size:30px;color:#ff704a;text-shadow:0 2px 0 #4a3030; }
+  .modal p { margin:0 0 15px;color:#715957;font-size:13px; }
+  .row { display:flex;justify-content:space-between;align-items:center;gap:16px;padding:13px 0;border-bottom:2px dashed #c4a7a0; }
+  .row input[type=range] { width:180px;accent-color:#ff704a; }
+  .actions { display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:20px; }
+  .actions button { padding:0 17px; }
+  .actions .secondary { background:#65585a; }
+  @media(max-width:650px){.resourceNote{display:none}.hudTop{top:8px}.phone{transform:scale(.82);transform-origin:top left}}
+
+  #yachaHost { position:fixed;inset:0;z-index:1000;display:none;background:#08080b;color:white; }
+  #yachaFrame { width:100%;height:100%;border:0;display:block; }
+  #yachaEnding { position:absolute;inset:0;display:none;place-items:center;background:#08080b;cursor:pointer; }
+  #yachaEnding img { width:100%;height:100%;object-fit:contain;image-rendering:pixelated; }
+  #yachaSettlement { position:absolute;inset:0;display:none;place-items:center;background:linear-gradient(#171015ea,#0b090eea),url('yacha_arena_reference.png') center/cover; }
+  .yachaSettlementCard { width:min(580px,88vw);padding:30px 36px;border:5px solid #e2a864;border-radius:20px;background:#291e28;color:#fff3de;text-align:center;box-shadow:0 15px 45px #000b; }
+  .yachaSettlementCard h2 { margin:0 0 16px;font-size:34px;color:#ffc46d; }
+  .yachaSettlementCard p { font-size:19px;line-height:1.5; }
+  .yachaSettlementCard button { margin-top:18px;padding:12px 28px;border:3px solid #6d392f;border-radius:12px;background:#ffab5e;color:#40201e;font-weight:900;cursor:pointer; }
+
+.resourceNote,.hudTop{display:none}.beautyDay{font-size:14px}.beautyMood{width:110px;height:110px;top:165px}.satisfactionReadout{max-width:215px}.childExit{position:absolute;right:15px;bottom:16px;z-index:100;padding:8px 14px;background:#f2d3a0;color:#332228;border:2px solid #713c42;border-radius:9px;font-weight:bold}body.backdrop #openShopBtn,body.backdrop .phone,body.backdrop .help{display:none} .guestWalk{position:absolute;inset:0;width:78px;height:105px;object-fit:contain;image-rendering:pixelated} .departingGuest{position:absolute;width:80px;height:120px;object-fit:contain;z-index:50;left:53%;top:57%;animation:leaveShop 2.2s ease-in forwards;image-rendering:pixelated}@keyframes leaveShop{to{left:78%;top:95%;opacity:0;transform:scale(.8)}}
+.beautyMood{width:110px!important;height:110px!important;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:17px;box-sizing:border-box;flex-shrink:0;overflow:hidden}
+.faceEyes{display:flex;flex-direction:row;flex-shrink:0;justify-content:space-between;align-items:center;width:54px;height:15px;margin:0;padding:0}
+.faceEyes i{display:block;flex:0 0 12px;width:12px;height:15px;background:#623514;border-radius:50%}
+.faceMouth{display:block;width:32px;height:4px;background:#623514;border-radius:3px;flex-shrink:0}
+[data-mood=satisfied] .faceMouth{height:16px;border-radius:0 0 24px 24px}
+[data-mood=angry] .faceMouth{height:11px;background:transparent;border:4px solid #623514;border-bottom:0;border-radius:20px 20px 0 0}
+[data-mood=angry] .faceEyes i:first-child{transform:rotate(-20deg);border-radius:2px 2px 50% 50%}
+[data-mood=angry] .faceEyes i:last-child{transform:rotate(20deg);border-radius:2px 2px 50% 50%}
+.hairCutCanvas{pointer-events:none}.hairSnip{background:#eedbbb}
+.cutsceneCaption{position:absolute;left:24%;bottom:8%;width:52%;padding:12px 20px;border:3px solid #553837;border-radius:18px;background:#fff6e8;color:#472c2b;text-align:center;font-weight:900;font-size:20px;z-index:150;box-shadow:0 5px 0 #2c1f2480}
+.cutsceneLabel{position:absolute;right:22px;top:18px;z-index:151;font-size:11px;letter-spacing:2px;color:#fff0ce;background:#38222cbb;padding:7px 12px;border-radius:14px}
+.cutsceneGuest{position:absolute;pointer-events:none;image-rendering:pixelated;object-fit:contain;z-index:120;transform-origin:50% 90%}
+.cutsceneBang{position:absolute;left:63%;top:41%;z-index:145;font-weight:1000;font-size:46px;color:#fff0a3;-webkit-text-stroke:2px #622936;transform:rotate(-12deg);text-shadow:4px 4px #5b2533}
+.bottleShard{position:absolute;width:5px;height:10px;background:#80dcb1;border:1px solid #bdffe0;clip-path:polygon(0 0,100% 35%,20% 100%);z-index:130;pointer-events:none}
+body.cutscene #openShopBtn,body.cutscene .phone,body.cutscene .help,body.cutscene .childExit,body.cutscene #interactPrompt{display:none!important}
+body.cutscene #gameWrap:before,body.cutscene #gameWrap:after{content:'';position:absolute;left:0;right:0;height:26px;background:#160f17;z-index:160;pointer-events:none}body.cutscene #gameWrap:before{top:0}body.cutscene #gameWrap:after{bottom:0}
+</style>
+</head>
+<body>
+<section id="titleScreen" class="screen active">
+  <div class="title-card">
+    <div class="logo">YACHACHA</div>
+    <div class="sub">MONSTER HAIR SALON · FLOW SIMULATOR</div>
+    <div class="menu"><button id="startBtn">게임 시작</button><button id="settingBtn" class="secondary">세팅</button></div>
+    <div class="footer-note">v1.1 · 초상화 레이어/플레이어 크기 보정</div>
+  </div>
+</section>
+<section id="cutsceneScreen" class="screen overlayPhase">
+  <div class="phaseTitle">인트로 컷씬 재생 중<span class="dots"></span></div>
+  <div class="phaseDesc">실제 컷씬 리소스가 들어갈 자리입니다.<br>현재는 전체 진입 플로우 확인용 플레이스홀더입니다.</div>
+  <button class="phaseBtn" data-next="tutorialScreen">컷씬 종료 → 튜토리얼</button>
+</section>
+<section id="tutorialScreen" class="screen overlayPhase">
+  <div class="phaseTitle">튜토리얼 진행 중<span class="dots"></span></div>
+  <div class="phaseDesc">실제 튜토리얼 콘텐츠 연결 전,<br>게임의 전체 구조와 진입 흐름만 확인합니다.</div>
+  <button class="phaseBtn" data-next="gameScreen">튜토리얼 완료 → 미용실 입장</button>
+</section>
+<section id="gameScreen" class="screen">
+  <div id="gameWrap">
+   <div id="gameWorld">
+    <div class="wall"></div><div class="sideWall left"></div><div class="sideWall right"></div><div class="ceiling"></div><div class="floor"></div><div class="floorLines"></div>
+    <div class="windowScene"></div>
+    <img class="prop windowFrame" alt="" src="./media/693ab2b33ed2ce1dbe080851.png">
+    <img class="prop windowLight" alt="" src="./media/1ec8c1e132f7d7e45286cdd4.png">
+    <img class="prop awning one" alt="" src="./media/2f3ff3cb56ea4c9fd42bfcde.png">
+    <img class="prop awning two" alt="" src="./media/b81cd7b4023e2e1ed051b765.png">
+    <img class="prop carpet" alt="" src="./media/6e6611eead1d4c3f9a53bb09.png">
+    <img class="prop station main" alt="" src="./media/1c0bf2dab1e7eb72213eb794.png">
+    <img class="prop stationSide" alt="" src="./media/74df1bbe4cad4d8967fe1c69.png">
+    <img class="prop stationTop" alt="" src="./media/77f48a8f36cbb9a7c5b2494a.png">
+    <img class="prop chair main" alt="" src="./media/1eabfa9e853838719fb57873.png">
+    <img class="prop counter" alt="" src="./media/59e4b90cafa571c1bb6c2b97.png">
+    <img class="prop counterSide" alt="" src="./media/19de6fd7067883e63ccf0f77.png">
+    <img class="prop counterTop" alt="" src="./media/04a398ab2db789e1c8dc8749.png">
+    <img class="prop sofa" alt="" src="./media/757eae4c5e60882a89bfc292.png">
+    <img class="prop sofaSide" alt="" src="./media/4570ed84873a60e3f09dfcbd.png">
+    <img class="prop sofaTop" alt="" src="./media/30371ae2976c51fd76b65387.png">
+    <img class="prop cabinet left" alt="" src="./media/98daa865bb40b81502ba0805.png">
+    <img class="prop cabinet right" alt="" src="./media/eab30d2eb0bd9e92caf4abb4.png">
+    <img class="prop plant" alt="" src="./media/457fe4c0ffdbf5169d0b0b08.png">
+    <img class="prop barberPole" alt="" src="./media/c4bc67659ee8a068ef068a1c.png">
+    <img class="prop lp" alt="" src="./media/b4acaf6657bf9096c6dcda54.png">
+    <img class="prop salonProps" alt="" src="./media/7fe2b4c7942d8007ce3d6fc8.png">
+    <img class="prop salonProps leftShelf" alt="" src="./media/7fe2b4c7942d8007ce3d6fc8.png">
+    <img class="prop salonProps rightShelf" alt="" src="./media/7fe2b4c7942d8007ce3d6fc8.png">
+    <img class="prop magazines one" alt="" src="./media/7cf480f33a0c902d4b9cd8d1.png">
+    <img class="prop magazines two" alt="" src="./media/7cf480f33a0c902d4b9cd8d1.png">
+    <img class="prop poster one" alt="" src="./media/407d9a4e7630eb10b394ce22.png">
+    <img class="prop poster two" alt="" src="./media/10af3a1191c1eaefb377ad37.png">
+    <img class="prop poster three" alt="" src="./media/20b58b34e37654f642b5395a.png">
+    <img class="prop barbersSign" alt="" src="./media/8ac5813abe11ee0a5f7e76eb.png">
+    <img class="prop radio" alt="" src="./media/02fa1dc9f9ae51f810f6eb9d.png">
+    <img class="prop towel" alt="" src="./media/88287764c6d7580ae4f63201.png">
+    <img class="prop foreground left" alt="" src="./media/98daa865bb40b81502ba0805.png">
+    <img class="prop foreground right" alt="" src="./media/59e4b90cafa571c1bb6c2b97.png">
+    <div class="roomShade"></div><div id="shadow" class="shadow"></div><div id="player" role="img" aria-label="주인공 야차"></div>
+    <div id="doorSignal"></div><div id="customerShadow"></div>
+    <div id="customer" role="img" aria-label="더벅머리 좀비 손님">
+      <div id="customerBody" class="customerLayer"></div><div id="customerHead" class="customerLayer"></div><div id="customerHair" class="customerLayer"></div>
+    </div>
+    <div id="seatedCustomer" role="img" aria-label="미용 의자에 앉은 좀비 손님">
+      <img class="hairBack" alt="" src="./media/e9c7d9dd46ccfc28cea487f3.png"><img class="cape" alt="" src="./media/1605da332e79debabd5b6fcb.png"><img class="head" alt="" src="./media/c9848def3d0f1d985df36f6a.png"><img class="hairFront" alt="" src="./media/08dfafdc62df074b0937e8fa.png">
+    </div>
+    <div id="interactPrompt"><span class="key">F</span><span>손님과 상호작용</span></div>
+    <div class="phone">DAY 1<br>AM 09:00</div>
+    <button id="openShopBtn">영업 시작</button>
+    <div class="hudTop">메인 인게임 · 2.5D 미용실 · 플레이어 자유 이동</div>
+    <div class="help"><span class="badge">WASD</span> 이동<br><span class="badge">ESC</span> 설정 열기 / 닫기</div>
+    <div class="resourceNote">캐릭터·벽·바닥·가구·UI는 모두 제공된 팀 원본 PNG를 사용했습니다.</div>
+    <div id="dialogueOverlay" aria-hidden="true">
+      <div id="zombiePortrait" class="dialoguePortrait"><img alt="더벅머리 좀비 초상화" src="./media/5b433c40abe0135346bc3d4a.png"></div>
+      <div id="playerPortrait" class="dialoguePortrait"><div class="playerPortraitCrop"><img alt="플레이어 초상화" src="./media/4b01d6d010aabf733b346047.png"></div></div>
+      <div class="dialogueBubble"><div id="dialogueSpeaker"></div><div id="dialogueText"></div><div class="dialogueHint">F 또는 좌클릭</div></div>
+    </div>
+    <div id="beautyScreen" aria-hidden="true">
+      <div class="beautyMirror"><div class="beautyBulbs"><i></i><i></i><i></i><i></i><i></i></div></div>
+      <div class="beautyCustomer" id="beautyCustomer"></div><div class="beautyCounter"><img class="beautyCounterProps" alt=""></div>
+      <div class="beautyStatus"><div class="beautyMoney">2519 G</div><div class="beautyClock"></div><div class="beautyDay">DAY 1<br><small>11 : 00</small></div></div><div class="beautyMood" data-mood="neutral"><span class="moodEyes">● ●</span><span class="moodMouth">_</span></div>
+      <div class="beautyPanel"><img class="beautyPanelBg" alt="" src="./media/359625fa845cceb7bd37819d.png"><button class="beautyTool" aria-label="가위"><img alt="가위" src="./media/28d1dae5f72c18f70f4e1465.png"></button><div class="beautyScroll"></div></div>
+      <button class="beautyNext">다음 단계</button><button class="beautyFinish" aria-label="미용 완성"><img alt="완성" src="./media/8fd96e8043466ebfd8f6ca1f.png"></button><div class="beautyStageTag">미용 화면 · 더벅머리 좀비</div>
+    </div>
+   </div>
+  </div>
+</section>
+<div id="settingsModal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <h2 id="settingsTitle">설정</h2><p>인게임에서 ESC를 누르면 열리고, 다시 ESC를 누르면 닫힙니다.</p>
+    <div class="row"><span>이동 속도</span><input id="speedRange" type="range" min="90" max="320" value="180"></div>
+    <div class="row"><span>상단 단계 표시</span><input id="debugToggle" type="checkbox" checked></div>
+    <div class="actions"><button id="backToTitle" class="secondary">타이틀로 돌아가기</button><button id="closeSettings">게임으로 복귀</button></div>
+  </div>
+</div>
+
+<div id="yachaHost" aria-hidden="true">
+  <iframe id="yachaFrame" title="야차 전투" src="about:blank"></iframe>
+  <div id="yachaEnding"><img alt="야차 결과 연출"></div>
+  <div id="yachaSettlement"><div class="yachaSettlementCard"><h2></h2><p></p><button type="button">타이틀로 돌아가기</button></div></div>
+</div>
+<script id="guest-data" type="application/json">__GUEST_JSON__</script><script>const GUEST=JSON.parse(document.getElementById("guest-data").textContent);
+function beautyInside(x,y,r){if(r.shape==='ellipse')return ((x-r.x-r.w/2)/(r.w/2))**2+((y-r.y-r.h/2)/(r.h/2))**2<=1;return x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h;}
+function beautyAttachScore(placements,b){let score=0,valid=0;const seen=new Set();for(const p of placements){const duplicate=seen.has(p.sticker.id);seen.add(p.sticker.id);if(duplicate||p.sticker.tag!==b.attachTag)score-=b.attachWrong;else if(!b.attachRegions.find(r=>r.key===p.region)?.stickerIDs.includes(p.sticker.id))score-=b.attachMisplaced;else score+=valid++===0?b.attachFirst:b.attachExtra;}return Math.max(0,Math.min(b.weights.attach,score));}
+function beautyDrawScore(pixels,b,width=320,height=350){const totals=b.drawRegions.map(()=>0),painted=totals.slice(),correct=totals.slice(),colors=b.drawColors.map(h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)));for(let y=0;y<height;y++)for(let x=0;x<width;x++){const n=b.drawRegions.findIndex(r=>beautyInside(x,y,r));if(n<0)continue;totals[n]++;const i=(y*width+x)*4;if(pixels[i+3]<=16)continue;painted[n]++;if(colors.some(c=>c.every((v,j)=>Math.abs(v-pixels[i+j])<10)))correct[n]++;}let result=0;for(let i=0;i<totals.length;i++){const r=b.drawRegions[i];result+=(r.kind==='good'?correct[i]:r.kind==='bad'?-painted[i]:0)/Math.max(1,totals[i])*r.points;}return Math.max(0,Math.min(b.weights.draw,result));}
+function beautyTotal(scores,b){return Math.max(0,Math.min(100,Object.keys(b.steps).reduce((s,k)=>s+(b.steps[k]?scores[k]:0),0)));}
+
+
+const SPRITES={front:'./media/a60f39797ec2a08be94bb830.png',back:'./media/a8779e7993df7187d998345f.png',left:'./media/855ab40978f1cafb6734db12.png',right:'./media/f3c56ecc6e0e4af16a6051d8.png'};
+const ZOMBIE_WALK={body:'./media/3a020267b83b0dadb23c770c.png',head:'./media/71edf9e050b25880b364b7cd.png',hair:'./media/e76deff52e3baa856cfe7016.png'};
+const screens=[...document.querySelectorAll('.screen')],settingsModal=document.getElementById('settingsModal'),gameScreen=document.getElementById('gameScreen'),gameWrap=document.getElementById('gameWrap'),gameWorld=document.getElementById('gameWorld'),player=document.getElementById('player'),shadow=document.getElementById('shadow'),hudTop=document.querySelector('.hudTop'),speedRange=document.getElementById('speedRange'),debugToggle=document.getElementById('debugToggle');
+const state={nativeW:950,nativeH:531,x:580,y:438,speed:180,keys:new Set(),direction:'front',frame:0,animClock:0,last:performance.now()};
+function fitGameWorld(){const scale=gameWrap.clientWidth/state.nativeW;gameWorld.style.transform=`scale(${scale})`}
+new ResizeObserver(fitGameWorld).observe(gameWrap);addEventListener('resize',fitGameWorld);fitGameWorld();
+const customerState={phase:'closed',x:720,y:520,target:0,frame:0,animClock:0,wait:0,path:[{x:710,y:485},{x:665,y:455},{x:600,y:425},{x:550,y:405},{x:505,y:392}]};
+let interactionAvailable=false;
+const DIALOGUES=[
+  {speaker:'zombie',name:'더벅머리 좀비',text:'으어어... 안녕하십니까... 지원자 11번... 아, 미용실이지...'},
+  {speaker:'player',name:'플레이어',text:'앗호-! 어서오세요. 그런데 거긴 거울이에요. 저는 옆에 있는데요?'},
+  {speaker:'zombie',name:'더벅머리 좀비',text:'아... 어쩐지... 같이 인사를 해주시더라니...'},
+  {speaker:'zombie',name:'더벅머리 좀비',text:'아무튼... 내일 좀비 보험회사 면접이 있어서요... 죽고 나서 처음 잡힌 면접이에요...'},
+  {speaker:'player',name:'플레이어',text:'보험이요...? 좀비는 보험이 필요없지 않나?'},
+  {speaker:'zombie',name:'더벅머리 좀비',text:'어허, 그거 종족차별 발언입니다..! 요새 그런 말하면... 큰일나요...'},
+  {speaker:'player',name:'플레이어',text:'별 귀찮은 것도 다 있네... 아, 그래서요. 원하는 스타일은 있나요?'},
+  {speaker:'zombie',name:'더벅머리 좀비',text:'지난번엔 면접관님 눈을 보고 대답하라길래... 한참 열심히 했거든요...'},
+  {speaker:'player',name:'플레이어',text:'그런데요?'},
+  {speaker:'zombie',name:'더벅머리 좀비',text:'면접관님은 옆에 계셨대요... 저는 공기청정기한테... 입사 포부를...'},
+  {speaker:'player',name:'플레이어',text:'O.K~ 이해 완료! 앞이 보이게 해 드리면 되는 거죠?'},
+  {speaker:'zombie',name:'더벅머리 좀비',text:'부탁드려요... 이번엔 정말... 산 사람처럼 살고 싶어서요...'}
+];
+const dialogueState={active:false,index:0,tokens:[],shown:0,clock:0,complete:false};
+function show(id){screens.forEach(s=>s.classList.toggle('active',s.id===id));state.last=performance.now();if(id!=='gameScreen'){closeSettings();state.keys.clear();}}
+function inGame(){return gameScreen.classList.contains('active')}
+function settingsOpen(){return settingsModal.style.display==='flex'}
+function openSettings(){settingsModal.style.display='flex';settingsModal.setAttribute('aria-hidden','false');state.keys.clear();document.getElementById('closeSettings').focus()}
+function closeSettings(){settingsModal.style.display='none';settingsModal.setAttribute('aria-hidden','true')}
+document.getElementById('startBtn').onclick=()=>show('cutsceneScreen');
+document.getElementById('settingBtn').onclick=()=>openSettings();
+document.getElementById('closeSettings').onclick=closeSettings;
+document.getElementById('backToTitle').onclick=()=>{closeSettings();show('titleScreen')};
+document.querySelectorAll('[data-next]').forEach(btn=>btn.onclick=()=>show(btn.dataset.next));
+speedRange.oninput=()=>state.speed=Number(speedRange.value);
+debugToggle.onchange=e=>hudTop.style.display=e.target.checked?'block':'none';
+const openShopBtn=document.getElementById('openShopBtn'),customer=document.getElementById('customer'),customerShadow=document.getElementById('customerShadow'),seatedCustomer=document.getElementById('seatedCustomer'),doorSignal=document.getElementById('doorSignal'),customerBody=document.getElementById('customerBody'),customerHead=document.getElementById('customerHead'),customerHair=document.getElementById('customerHair'),interactPrompt=document.getElementById('interactPrompt'),dialogueOverlay=document.getElementById('dialogueOverlay'),dialogueSpeaker=document.getElementById('dialogueSpeaker'),dialogueText=document.getElementById('dialogueText'),zombiePortrait=document.getElementById('zombiePortrait'),playerPortrait=document.getElementById('playerPortrait'),beautyScreen=document.getElementById('beautyScreen'),beautyCustomer=document.getElementById('beautyCustomer');
+const chairFront=document.querySelector('.chair.main').cloneNode(true);chairFront.classList.add('chairFront');chairFront.setAttribute('aria-hidden','true');gameWorld.appendChild(chairFront);
+beautyCustomer.innerHTML=seatedCustomer.innerHTML;
+beautyCustomer.querySelector('.hairBack').style.display='none';
+if(GUEST.skin){for(const root of [seatedCustomer,beautyCustomer]){root.querySelector('.head').src=GUEST.skin.head;root.querySelector('.hairFront').src=GUEST.skin.hair;root.querySelector('.hairBack').style.display='none';}}
+
+document.querySelector('.beautyCounterProps').src=document.querySelector('.salonProps').src;
+const beautyPanel=document.querySelector('.beautyPanel'),beautyToolsViewport=document.createElement('div'),beautyToolsList=document.createElement('div');beautyToolsViewport.className='beautyToolsViewport';beautyToolsList.className='beautyToolsList';beautyToolsViewport.appendChild(beautyToolsList);[...beautyPanel.querySelectorAll(':scope > .beautyTool')].forEach(tool=>beautyToolsList.appendChild(tool));const hammerTool=document.createElement('button');hammerTool.className='beautyTool';hammerTool.setAttribute('aria-label','망치/정');hammerTool.innerHTML='<img alt="망치와 정" src="./media/4cf64fc71cd958bff711deb9.png">';beautyToolsList.appendChild(hammerTool);beautyPanel.appendChild(beautyToolsViewport);const beautyScroll=document.querySelector('.beautyScroll'),beautyScrollThumb=document.createElement('div');beautyScrollThumb.className='beautyScrollThumb';beautyScroll.appendChild(beautyScrollThumb);let beautyScrollRatio=0,scrollDragging=false,scrollGrabY=0;function setBeautyScroll(ratio){beautyScrollRatio=Math.max(0,Math.min(1,ratio));const thumbMax=beautyScroll.clientHeight-beautyScrollThumb.offsetHeight,contentMax=Math.max(0,beautyToolsList.scrollHeight-beautyToolsViewport.clientHeight);beautyScrollThumb.style.top=(thumbMax*beautyScrollRatio)+'px';beautyToolsList.style.transform=`translateY(${-contentMax*beautyScrollRatio}px)`}beautyScrollThumb.addEventListener('pointerdown',e=>{scrollDragging=true;scrollGrabY=e.clientY-beautyScrollThumb.getBoundingClientRect().top;beautyScrollThumb.classList.add('dragging');beautyScrollThumb.setPointerCapture(e.pointerId);e.preventDefault()});beautyScrollThumb.addEventListener('pointermove',e=>{if(!scrollDragging)return;const track=beautyScroll.getBoundingClientRect(),thumbMax=track.height-beautyScrollThumb.offsetHeight;setBeautyScroll((e.clientY-track.top-scrollGrabY)/thumbMax)});beautyScrollThumb.addEventListener('pointerup',e=>{scrollDragging=false;beautyScrollThumb.classList.remove('dragging');beautyScrollThumb.releasePointerCapture(e.pointerId)});beautyScroll.addEventListener('pointerdown',e=>{if(e.target===beautyScrollThumb)return;const track=beautyScroll.getBoundingClientRect(),thumbMax=track.height-beautyScrollThumb.offsetHeight;setBeautyScroll((e.clientY-track.top-beautyScrollThumb.offsetHeight/2)/thumbMax)});beautyToolsViewport.addEventListener('wheel',e=>{setBeautyScroll(beautyScrollRatio+Math.sign(e.deltaY)*.18);e.preventDefault()},{passive:false});
+const scissorsTool=beautyToolsList.querySelector('[aria-label="가위"]');
+const beautyStageTag=document.querySelector('.beautyStageTag'),beautyMood=document.querySelector('.beautyMood');
+const satisfactionReadout=document.createElement('div');satisfactionReadout.className='satisfactionReadout';beautyScreen.appendChild(satisfactionReadout);
+const hairCutSurface=document.createElement('div'),hairCutPreview=document.createElement('canvas');
+hairCutSurface.className='hairCutSurface';hairCutPreview.className='hairCutPreview';hairCutPreview.width=420;hairCutPreview.height=350;hairCutSurface.appendChild(hairCutPreview);beautyCustomer.appendChild(hairCutSurface);
+const cutCursor=document.createElement('img');cutCursor.className='cutCursor';cutCursor.alt='가위 커서';cutCursor.src=scissorsTool.querySelector('img').src;beautyScreen.appendChild(cutCursor);
+const cutHint=document.createElement('div');cutHint.className='cutHint';cutHint.textContent='가위 선택 · 머리카락을 클릭 → 이동 → 다시 클릭';beautyScreen.appendChild(cutHint);
+const zoneControls=document.createElement('div'),zoneToggle=document.createElement('button'),zoneLegend=document.createElement('div');zoneControls.className='zoneControls';zoneToggle.className='zoneToggle';zoneToggle.textContent='영역 보기';zoneLegend.className='zoneLegend';zoneLegend.innerHTML='<span><i style="background:#39d978"></i>상승</span><span><i style="background:#ffd447"></i>유지</span><span><i style="background:#ff5454"></i>하락</span>';zoneControls.append(zoneToggle,zoneLegend);beautyScreen.appendChild(zoneControls);let zonesVisible=false;zoneToggle.addEventListener('click',()=>{zonesVisible=!zonesVisible;zoneControls.classList.toggle('active',zonesVisible);zoneToggle.classList.toggle('active',zonesVisible);zoneToggle.textContent=zonesVisible?'영역 숨기기':'영역 보기';syncRegionVisibility()});
+const phaseNotice=document.createElement('div'),beautyNext=document.querySelector('.beautyNext');phaseNotice.className='phaseNotice';beautyScreen.appendChild(phaseNotice);let beautyPhase='cut',activeCutTool='none';
+const CUT_REQUEST_DIALOGUES=[
+'면접이 내일이라서요… 으어어… 앞이 하나도 안 보이는데 시원하게 인상을 펴주세요.',
+'면접관한테 잘 보여야 하니까… 눈만 보이게 좀 ‘단정하게’ 해달라는 뜻입니다… 으어어…',
+'아니, 앞이 안 보인다고요! 당장 ‘가위’를 들어서 내 눈을 가리는 앞머리를 싹 다 잘라달란 말입니다!'
+];
+const cutBriefing=document.createElement('section'),cutBriefingSpeaker=document.createElement('div'),cutBriefingText=document.createElement('div'),cutBriefingActions=document.createElement('div'),askCutButton=document.createElement('button'),acceptCutButton=document.createElement('button');
+cutBriefing.className='cutBriefing';cutBriefingSpeaker.className='cutBriefingSpeaker';cutBriefingSpeaker.textContent='더벅머리 좀비 · 자르기 요구';cutBriefingText.className='cutBriefingText';cutBriefingText.textContent=CUT_REQUEST_DIALOGUES[0];cutBriefingActions.className='cutBriefingActions';askCutButton.className='askCut';askCutButton.textContent='네?';acceptCutButton.className='acceptCut';acceptCutButton.textContent='알겠습니다';cutBriefingActions.append(askCutButton,acceptCutButton);cutBriefing.append(cutBriefingSpeaker,cutBriefingText,cutBriefingActions);beautyScreen.appendChild(cutBriefing);
+let cutBriefingActive=true,clarificationCount=0;beautyPanel.classList.add('briefingLocked');scissorsTool.disabled=true;hammerTool.disabled=true;beautyNext.disabled=true;
+askCutButton.addEventListener('click',()=>{clarificationCount++;cutBriefingText.textContent=CUT_REQUEST_DIALOGUES[Math.min(clarificationCount,CUT_REQUEST_DIALOGUES.length-1)];beautyStageTag.textContent=`자르기 요구 되묻기 ${clarificationCount}회 · 만족도 -${clarificationCount*10}`;updateOverallSatisfaction();if(clarificationCount>=CUT_REQUEST_DIALOGUES.length-1)askCutButton.style.display='none'});
+acceptCutButton.addEventListener('click',()=>{cutBriefingActive=false;cutBriefingActive=false;cutBriefing.style.display='none';beautyPanel.classList.remove('briefingLocked');scissorsTool.disabled=false;hammerTool.disabled=false;beautyNext.disabled=false;beautyStageTag.textContent='자르기 단계 · 도구를 선택하세요'});
+const STICKERS=[
+{id:'ST-GENTLE-GLASSES-HORN',name:'뿔테안경',tag:'Tag_Gentle',region:'Eye',w:82,h:42,src:'./media/dccca78caf700f0bfd06372c.png'},
+{id:'ST-GENTLE-MOUSTACHE',name:'콧수염',tag:'Tag_Gentle',region:'UnderNose',w:58,h:34,src:'./media/3b5333952446137687059bfa.png'},
+{id:'ST-GENTLE-BOWTIE-BLACK',name:'검정 나비넥타이',tag:'Tag_Gentle',region:'Neck',w:56,h:36,src:'./media/96c0454ac3b7ae0b90eac8b1.png'},
+{id:'ST-CUTE-RIBBON-PINK',name:'분홍 리본',tag:'Tag_Cute',region:'HeadTop',w:52,h:40,src:'./media/2ecb913d3e273f1b5a7ac912.png'},
+{id:'ST-CUTE-HEART-PINK',name:'하트',tag:'Tag_Cute',region:'Cheek',w:38,h:34,src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAGCAYAAAAPDoR2AAAAAXNSR0IArs4c6QAAADhJREFUCJljYGBgYPhfc+j//5pD/9HZjDAGNsCES4KBgYGBEWYUhkSLHSMjjIOsgLHFjhFdMYYJAPVfG25I4zo0AAAAAElFTkSuQmCC'},
+{id:'ST-CUTE-FLOWER-RED',name:'빨간 꽃',tag:'Tag_Cute',region:'Hair',w:42,h:42,src:'./media/fa5d3bb10cafe4c731a7125e.png'},
+{id:'ST-CUTE-FLOWER-BLUE',name:'파란 꽃',tag:'Tag_Cute',region:'Hair',w:42,h:42,src:'./media/5296fc0adb2f010b53e52d07.png'},
+{id:'ST-STRONG-FLAME-BLUE',name:'푸른 불꽃',tag:'Tag_Strong',region:'HeadTop',w:40,h:54,src:'./media/30383902a18f70046e3dfbf8.png'},
+{id:'ST-STRONG-SCAR-01',name:'흉터 1',tag:'Tag_Strong',region:'CheekLeft',w:26,h:58,src:'./media/7599b4fb70ade4248d5e9c05.png'},
+{id:'ST-STRONG-SCAR-02',name:'흉터 2',tag:'Tag_Strong',region:'CheekRight',w:26,h:58,src:'./media/6f6611ef70469594e96b1bab.png'},
+{id:'ST-STRONG-CROWN-01',name:'왕관 1',tag:'Tag_Strong',region:'HeadTop',w:46,h:38,src:'./media/37312c3349ce9f6ed776d274.png'},
+{id:'ST-STRONG-CROWN-02',name:'왕관 2',tag:'Tag_Strong',region:'HeadTop',w:46,h:50,src:'./media/229ac3e6b6c1898b3a4a87d3.png'},
+{id:'ST-HIP-SUNGLASSES-BLACK',name:'검정 선글라스',tag:'Tag_Hip',region:'Eye',w:84,h:34,src:'./media/c1b8b254050dd656ac3c6435.png'},
+{id:'ST-HIP-SUNGLASSES-RED',name:'빨간 선글라스',tag:'Tag_Hip',region:'Eye',w:84,h:38,src:'./media/e2ae1bb46f83e667cf1dce0e.png'},
+{id:'ST-FUN-POOP',name:'똥',tag:'Tag_Fun',region:'HeadTop',w:46,h:38,src:'./media/5771eb357b11a76580e6fa65.png'},
+{id:'ST-FUN-NOSE-RED',name:'빨간 코 장식',tag:'Tag_Fun',region:'Nose',w:38,h:36,src:'./media/bf3eb786d67b326665e8dcb7.png'}
+];
+const TAG_NAMES={Tag_Gentle:'젠틀',Tag_Cute:'큐트',Tag_Strong:'스트롱',Tag_Hip:'힙',Tag_Fun:'펀'};
+const REGION_NAMES={Eye:'눈',UnderNose:'코 아래',Neck:'목',HeadTop:'머리 위',Cheek:'볼',Hair:'머리카락',CheekLeft:'왼쪽 볼',CheekRight:'오른쪽 볼',Nose:'코',Other:'기타'};
+const stickerTray=document.createElement('section'),stickerTrayTitle=document.createElement('div'),stickerTrayList=document.createElement('div');
+stickerTray.className='stickerTray';stickerTrayTitle.className='stickerTrayTitle';stickerTrayTitle.innerHTML='스티커 <b>0/5</b><small>요청 태그 · 젠틀</small>';stickerTrayList.className='stickerTrayList';stickerTray.append(stickerTrayTitle,stickerTrayList);beautyScreen.appendChild(stickerTray);
+const stickerButtons=new Map();let selectedSticker=null,placements=[],attachScore=0,attachReactionTimer=0;
+for(const sticker of STICKERS){const button=document.createElement('button');button.className='stickerButton';button.type='button';button.title=`${sticker.name} · ${REGION_NAMES[sticker.region]||sticker.region}`;button.innerHTML=`<img src="${sticker.src}" alt="${sticker.name}"><span>${sticker.name}</span><small class="stickerTag">#${TAG_NAMES[sticker.tag]}</small>`;button.addEventListener('click',()=>selectSticker(sticker));stickerTrayList.appendChild(button);stickerButtons.set(sticker.id,button)}
+const attachSurface=document.createElement('div'),attachStatus=document.createElement('div');attachSurface.className='attachSurface';attachStatus.className='attachStatus';beautyCustomer.appendChild(attachSurface);beautyScreen.appendChild(attachStatus);
+const faceRegionBoxes=Object.fromEntries(GUEST.beauty.attachRegions.map(r=>[r.key,{...r,left:r.x,top:r.y,width:r.w,height:r.h}]));
+for(const [key,box] of Object.entries(faceRegionBoxes)){const region=document.createElement('div');region.className=`faceRegion ${key==='UnderNose'?'underNose':key.toLowerCase()}`;region.dataset.region=key;region.textContent=box.label;region.style.cssText+=`;left:${box.left}px;top:${box.top}px;width:${box.width}px;height:${box.height}px`;beautyCustomer.appendChild(region)}
+function syncRegionVisibility(){document.querySelectorAll('.hairZoneOverlay').forEach(el=>el.style.display=zonesVisible&&beautyPhase==='cut'?'block':'none');document.querySelectorAll('.faceRegion').forEach(el=>el.style.display=zonesVisible&&beautyPhase==='attach'?'grid':'none');document.querySelectorAll('.drawRegionOverlay').forEach(el=>el.style.display=zonesVisible&&beautyPhase==='draw'?'grid':'none')}
+function selectSticker(sticker){if(beautyPhase!=='attach'||placements.length>=5)return;selectedSticker=sticker;for(const [id,button] of stickerButtons)button.classList.toggle('selected',id===sticker.id);updateAttachStatus()}
+function attachmentRegion(x,y){return GUEST.beauty.attachRegions.find(r=>insideBox(x,y,r))?.key||'Other';}
+function updateAttachStatus(){stickerTrayTitle.innerHTML='스티커 <b>'+placements.length+'/5</b><small>'+safeText(GUEST.beauty.attachHint)+'</small>';attachStatus.textContent='붙이기 '+placements.length+'/5 · '+attachScore+'/30';for(const b of stickerButtons.values())b.disabled=placements.length>=5;}
+function recalculateAttachScore(){let good=0,bad=0;const seen=new Set();for(const p of placements){const r=GUEST.beauty.attachRegions.find(r=>r.key===p.region);if(!seen.has(p.sticker.id)&&r?.stickerIDs.includes(p.sticker.id))good++;else bad++;seen.add(p.sticker.id);}attachScore=Math.max(0,Math.min(30,good*30-bad*10));updateAttachStatus();updateOverallSatisfaction();}
+function reactToAttachment(correct){clearTimeout(attachReactionTimer);setMood(correct?'satisfied':'angry');attachReactionTimer=setTimeout(()=>{if(beautyPhase==='attach')updateOverallSatisfaction()},800)}
+function placeSticker(sticker,x,y){if(beautyPhase!=='attach'||placements.length>=5)return;const duplicate=placements.some(item=>item.sticker.id===sticker.id),region=attachmentRegion(x,y),image=document.createElement('img'),displayW=sticker.w*1.5,displayH=sticker.h*1.5;image.className='placedSticker';image.src=sticker.src;image.alt=sticker.name;image.title=`${sticker.name} · 클릭해서 떼기`;image.style.width=displayW+'px';image.style.height=displayH+'px';image.style.left=x+'px';image.style.top=y+'px';const placed={sticker,region,el:image};image.addEventListener('click',event=>{event.stopPropagation();placements=placements.filter(item=>item!==placed);image.remove();recalculateAttachScore()});placements.push(placed);beautyCustomer.appendChild(image);recalculateAttachScore();reactToAttachment(!duplicate&&!!GUEST.beauty.attachRegions.find(r=>r.key===region)?.stickerIDs.includes(sticker.id))}
+attachSurface.addEventListener('click',event=>{if(!selectedSticker||beautyPhase!=='attach')return;const rect=attachSurface.getBoundingClientRect(),x=(event.clientX-rect.left)/rect.width*320,y=(event.clientY-rect.top)/rect.height*350;placeSticker(selectedSticker,x,y)});
+const DRAW_COLORS=[
+{name:'연두색',hex:'#00DC0A',correct:true},{name:'초록색',hex:'#228947',correct:true},{name:'파란색',hex:'#3F4DF9'},{name:'노란색',hex:'#FFC000'},{name:'빨간색',hex:'#FF0000'},
+{name:'분홍색',hex:'#FF3CDD'},{name:'주황색',hex:'#FF5500'},{name:'보라색',hex:'#982EFA'},{name:'갈색',hex:'#B54F1C'},{name:'짙은 갈색',hex:'#462819'}
+];
+const drawPanel=document.createElement('section'),drawPanelTitle=document.createElement('div'),drawPalette=document.createElement('div'),drawTools=document.createElement('div'),drawSizes=document.createElement('div'),brushButton=document.createElement('button'),eraserButton=document.createElement('button'),drawStatus=document.createElement('div');
+drawPanel.className='drawPanel';drawPanelTitle.className='drawPanelTitle';drawPanelTitle.textContent='색상 팔레트';drawPalette.className='drawPalette';drawTools.className='drawTools';drawSizes.className='drawSizes';drawStatus.className='drawStatus';brushButton.className='drawTool selected';brushButton.textContent='그리기';eraserButton.className='drawTool';eraserButton.textContent='지우기';drawTools.append(brushButton,eraserButton);drawPanel.append(drawPanelTitle,drawPalette,drawTools,drawSizes);beautyScreen.append(drawPanel,drawStatus);
+let drawColor=DRAW_COLORS[0].hex,drawTool='brush',drawBrushSize=2,drawPainting=false,drawLastPoint=null;
+const drawColorButtons=[];for(const color of DRAW_COLORS){const button=document.createElement('button');button.className='drawColor'+(color.hex===drawColor?' selected':'');button.type='button';button.title=`${color.name}${color.correct?' · 좀비 정답색':''}`;button.style.background=color.hex;button.addEventListener('click',()=>{drawColor=color.hex;drawTool='brush';brushButton.classList.add('selected');eraserButton.classList.remove('selected');for(const item of drawColorButtons)item.classList.toggle('selected',item===button);updateDrawStatus()});drawPalette.appendChild(button);drawColorButtons.push(button)}
+for(const size of [1,2,3]){const button=document.createElement('button');button.className='drawSize'+(size===drawBrushSize?' selected':'');button.innerHTML=`<i class="drawDot" style="width:${size*4+2}px;height:${size*4+2}px"></i>${size}PX`;button.addEventListener('click',()=>{drawBrushSize=size;for(const item of drawSizes.children)item.classList.toggle('selected',item===button);updateDrawStatus()});drawSizes.appendChild(button)}
+brushButton.addEventListener('click',()=>{drawTool='brush';brushButton.classList.add('selected');eraserButton.classList.remove('selected');updateDrawStatus()});eraserButton.addEventListener('click',()=>{drawTool='eraser';eraserButton.classList.add('selected');brushButton.classList.remove('selected');updateDrawStatus()});
+const drawCanvas=document.createElement('canvas'),drawInputSurface=document.createElement('div');drawCanvas.className='drawCanvas';drawCanvas.width=320;drawCanvas.height=350;drawInputSurface.className='drawInputSurface';beautyCustomer.appendChild(drawCanvas);const DRAW_REGION_OVERLAYS=[['faceAll','나머지 얼굴',88,38,144,156],['attire','의상',48,163,224,180],['brain','뇌 정답',150,53,68,50],['eye','왼쪽 눈',111,103,40,32],['eye','오른쪽 눈',170,103,40,32],['mouth','입 주변',131,136,58,30]];for(const [kind,label,left,top,width,height] of DRAW_REGION_OVERLAYS){const overlay=document.createElement('div');overlay.className=`drawRegionOverlay ${kind}`;overlay.textContent=label;overlay.style.cssText=`left:${left}px;top:${top}px;width:${width}px;height:${height}px`;beautyCustomer.appendChild(overlay)}beautyCustomer.appendChild(drawInputSurface);const drawContext=drawCanvas.getContext('2d');drawContext.imageSmoothingEnabled=false;
+function drawPoint(event){const rect=drawInputSurface.getBoundingClientRect();return{x:(event.clientX-rect.left)/rect.width*320,y:(event.clientY-rect.top)/rect.height*350}}
+function paintSegment(from,to){drawContext.save();drawContext.globalCompositeOperation=drawTool==='eraser'?'destination-out':'source-over';drawContext.strokeStyle=drawColor;drawContext.fillStyle=drawColor;drawContext.lineWidth=drawBrushSize*4;drawContext.lineCap='round';drawContext.lineJoin='round';drawContext.beginPath();drawContext.moveTo(from.x,from.y);drawContext.lineTo(to.x,to.y);drawContext.stroke();drawContext.beginPath();drawContext.arc(to.x,to.y,drawBrushSize*2,0,Math.PI*2);drawContext.fill();drawContext.restore()}
+function insideEllipse(x,y,cx,cy,rx,ry){return((x-cx)*(x-cx))/(rx*rx)+((y-cy)*(y-cy))/(ry*ry)<=1}
+function calculateDrawScore(){const px=drawContext.getImageData(0,0,320,350).data;let total=0,good=0,bad=0;const colors=GUEST.beauty.drawColors.map(h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)));for(let y=0;y<350;y++)for(let x=0;x<320;x++){const region=GUEST.beauty.drawRegions.find(r=>insideBox(x,y,r)),i=(y*320+x)*4;if(region?.kind==='good')total++;if(px[i+3]<=16)continue;if(region?.kind==='good'&&colors.some(c=>c.every((v,j)=>Math.abs(v-px[i+j])<10)))good++;else bad++;}drawScore=Math.max(0,Math.min(20,20*good/Math.max(1,total)-10*bad/Math.max(1,total)));updateDrawStatus();updateOverallSatisfaction();}
+function updateDrawStatus(){drawStatus.textContent=`그리기 ${Math.round(drawScore)}/20 · ${drawTool==='eraser'?'지우기':DRAW_COLORS.find(item=>item.hex===drawColor)?.name||'그리기'} · ${drawBrushSize}PX`}
+drawInputSurface.addEventListener('pointerdown',event=>{if(beautyPhase!=='draw')return;drawPainting=true;drawLastPoint=drawPoint(event);paintSegment(drawLastPoint,drawLastPoint);drawInputSurface.setPointerCapture(event.pointerId);event.preventDefault()});
+drawInputSurface.addEventListener('pointermove',event=>{if(!drawPainting)return;const point=drawPoint(event);paintSegment(drawLastPoint,point);drawLastPoint=point;event.preventDefault()});
+function finishDrawStroke(event){if(!drawPainting)return;drawPainting=false;drawLastPoint=null;if(drawInputSurface.hasPointerCapture(event.pointerId))drawInputSurface.releasePointerCapture(event.pointerId);calculateDrawScore()}
+drawInputSurface.addEventListener('pointerup',finishDrawStroke);drawInputSurface.addEventListener('pointercancel',finishDrawStroke);
+const drawComplete=document.createElement('div'),drawCompleteCard=document.createElement('div');drawComplete.className='drawComplete';drawCompleteCard.className='drawCompleteCard';drawComplete.appendChild(drawCompleteCard);beautyScreen.appendChild(drawComplete);
+const beautyResultSequence=document.createElement('div');beautyResultSequence.className='beautyResultSequence';beautyResultSequence.innerHTML=`<div class="beautyResultGifStage"><img alt="미용 결과 연출"><span class="beautyResultSkip">좌클릭 또는 F · 연출 넘기기</span></div><div class="beautyResultDialogueStage"><div class="beautyResultDialogueBox"><div class="beautyResultBadge"></div><div class="beautyResultSpeaker">더벅머리 좀비</div><div class="beautyResultText"></div><div class="beautyResultActions"></div><div class="beautyResultHint">좌클릭 또는 F · 다음 대사</div></div></div>`;beautyScreen.appendChild(beautyResultSequence);
+const resultGifStage=beautyResultSequence.querySelector('.beautyResultGifStage'),resultGif=beautyResultSequence.querySelector('img'),resultDialogueStage=beautyResultSequence.querySelector('.beautyResultDialogueStage'),resultDialogueBox=beautyResultSequence.querySelector('.beautyResultDialogueBox'),resultBadge=beautyResultSequence.querySelector('.beautyResultBadge'),resultText=beautyResultSequence.querySelector('.beautyResultText'),resultActions=beautyResultSequence.querySelector('.beautyResultActions');let beautyResultActive=false,resultShowingGif=false,resultLineIndex=0,resultFlow=null,resultTimer=0;
+const BEAUTY_RESULT_FLOWS={best:{label:'만족',gif:'YACHACHA_beauty_normal.gif',duration:11200,lines:['으어어...! 이제 앞이 아주 잘 보입니다. 내일 면접도 문제없겠어요!','면접 전에 기세를 시험해보고 싶습니다. 저와 연습 야차 한 판 어떠십니까?','저를 이기시면 보상은 두둑히 드릴게요...'],mandatory:false},normal:{label:'보통',gif:'YACHACHA_beauty_normal.gif',duration:11200,lines:['이 정도면... 면접관 얼굴은 볼 수 있겠네요. 나쁘지 않습니다.','면접 전에 기세를 시험해보고 싶습니다. 저와 연습 야차 한 판 어떠십니까?','저를 이기시면 미용 대금에 돈을 더 얹어드릴게요...'],mandatory:false},fail:{label:'불만족',gif:'YACHACHA_beauty_fail.gif',duration:9800,lines:['이게 지금 제 머리라고요...? 이 상태로 면접을 어떻게 봅니까!','미용대금은 못 내겠습니다.','마왕 법전 제 666조! 야차 룰로 정하죠. 제가 이기면... 배상하시는 겁니다!!!'],mandatory:true}};
+function beautyResultTier(score){return score>=80?'best':score>=40?'normal':'fail'}
+
+const yachaHost=document.getElementById('yachaHost'),yachaFrame=document.getElementById('yachaFrame'),yachaEnding=document.getElementById('yachaEnding'),yachaSettlement=document.getElementById('yachaSettlement');
+let yachaTier='',yachaOutcome='',yachaPortrait='';
+// Mirror the actual editable beauty layers. The hair canvas contains the cut, and
+// drawCanvas and placements carry the user's later edits.
+function captureBeautyCustomer(){
+  const canvas=document.createElement('canvas');canvas.width=320;canvas.height=350;
+  const ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;
+  function drawImage(img,x,y,w){if(!img||!img.complete||!img.naturalWidth)return;ctx.drawImage(img,x,y,w,w*img.naturalHeight/img.naturalWidth)}
+  drawImage(beautyCustomer.querySelector('.cape'),48,159,224);
+  if(GUEST.beauty.cutTool!=='hammer')drawImage(beautyCustomer.querySelector('.head'),86,28,148);
+  for(const layer of hairLayers){ctx.drawImage(layer.canvas,layer.left,layer.top,layer.width,layer.height)}
+  ctx.drawImage(drawCanvas,0,0,320,350);
+  for(const placed of placements){const el=placed.el;if(!el||!el.complete)continue;const x=parseFloat(el.style.left),y=parseFloat(el.style.top),w=parseFloat(el.style.width),h=parseFloat(el.style.height);ctx.drawImage(el,x-w/2,y-h/2,w,h)}
+  return canvas.toDataURL('image/png');
+}
+function launchYachaBattle(){
+  beautyResultActive=false;state.keys.clear();yachaTier=beautyResultTier(totalSatisfaction);
+  yachaPortrait=captureBeautyCustomer();
+  yachaHost.style.display='block';yachaHost.setAttribute('aria-hidden','false');
+  yachaEnding.style.display='none';yachaSettlement.style.display='none';yachaFrame.style.display='block';
+  const send=()=>{yachaFrame.contentWindow.postMessage({type:'yachacha-start',portrait:yachaPortrait,angry:yachaTier==='fail'},'*');yachaFrame.contentWindow.focus()};
+  send();yachaFrame.addEventListener('load',send,{once:true});
+}
+const YACHA_SETTLEMENT={best:{decline:['B0','미용대금 + 팁'],win:['B1','미용대금 + 팁 + 추가보상'],lose:['B2','미용대금 + 팁']},normal:{decline:['N0','미용대금'],win:['N1','미용대금 + 추가보상'],lose:['N2','미용대금']},fail:{win:['F1','미용대금'],lose:['F2','배상']}};
+function showYachaSettlement(outcome){
+  yachaOutcome=outcome;
+  const [code,payment]=YACHA_SETTLEMENT[yachaTier][outcome];
+  yachaHost.style.display='block';yachaHost.setAttribute('aria-hidden','false');
+  yachaFrame.style.display='none';yachaEnding.style.display='none';yachaSettlement.style.display='grid';
+  yachaSettlement.querySelector('h2').textContent=`${code} · 정산`;
+  yachaSettlement.querySelector('p').textContent=`${outcome==='decline'?'연습 야차 거절':outcome==='win'?'플레이어 승리':'플레이어 패배'} · ${payment}\n더벅머리 좀비가 미용실을 떠납니다.`;
+}
+yachaEnding.addEventListener('click',()=>showYachaSettlement(yachaOutcome));
+yachaSettlement.querySelector('button').addEventListener('click',()=>location.reload());
+addEventListener('message',event=>{
+  if(event.source!==yachaFrame.contentWindow||event.data?.type!=='yachacha-result')return;
+  yachaOutcome=event.data.outcome==='win'?'win':'lose';
+  yachaFrame.style.display='none';yachaEnding.style.display='grid';
+  yachaEnding.querySelector('img').src=yachaOutcome==='win'?'yacha_victory.png':'yacha_defeat.png';
+});
+
+function enterYachaPrelude(accepted){clearTimeout(resultTimer);resultGifStage.style.display='none';resultDialogueStage.style.display='flex';if(!accepted){yachaTier=beautyResultTier(totalSatisfaction);showYachaSettlement('decline');return}launchYachaBattle()}
+function renderBeautyResultLine(){resultText.textContent=resultFlow.lines[resultLineIndex];const last=resultLineIndex===resultFlow.lines.length-1;resultActions.innerHTML='';resultActions.style.display=last?'flex':'none';resultDialogueBox.querySelector('.beautyResultHint').style.display=last?'none':'block';if(!last)return;const accept=document.createElement('button');accept.textContent=resultFlow.mandatory?'야차 수락':'수락';accept.addEventListener('click',event=>{event.stopPropagation();enterYachaPrelude(true)});resultActions.appendChild(accept);if(!resultFlow.mandatory){const decline=document.createElement('button');decline.className='secondary';decline.textContent='거절';decline.addEventListener('click',event=>{event.stopPropagation();enterYachaPrelude(false)});resultActions.appendChild(decline)}}
+function showBeautyResultDialogue(){if(!beautyResultActive)return;clearTimeout(resultTimer);resultShowingGif=false;resultGifStage.style.display='none';resultDialogueStage.style.display='flex';resultLineIndex=0;renderBeautyResultLine()}
+function advanceBeautyResult(){if(!beautyResultActive)return;if(resultShowingGif){showBeautyResultDialogue();return}if(resultLineIndex<resultFlow.lines.length-1){resultLineIndex++;renderBeautyResultLine()}}
+function startBeautyResult(){if(beautyPhase==='result')return;calculateDrawScore();beautyPhase='result';stopCutInteraction();state.keys.clear();send('beauty-result',{score:totalSatisfaction,portrait:captureBeautyCustomer()});}
+resultGifStage.addEventListener('click',advanceBeautyResult);resultDialogueBox.addEventListener('click',advanceBeautyResult);const beautyFinish=document.querySelector('.beautyFinish');beautyFinish.addEventListener('click',startBeautyResult);
+const hairLayers=[];
+let cutMode=false,cutDrawing=false,cutPoints=[],cutAmount=0,cutScore=0,drawScore=0,totalSatisfaction=0,hasCutAction=false;
+function createHairCanvas(img,{left,top,width,z}){const canvas=document.createElement('canvas'),overlay=document.createElement('canvas');const draw=()=>{const height=Math.round(width*img.naturalHeight/img.naturalWidth);for(const el of [canvas,overlay]){el.width=width*2;el.height=height*2;el.style.left=left+'px';el.style.top=top+'px';el.style.width=width+'px';el.style.height=height+'px'}canvas.style.zIndex=z;canvas.className='hairCutCanvas';overlay.className='hairZoneOverlay';const ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;ctx.setTransform(2,0,0,2,0,0);ctx.drawImage(img,0,0,width,height);const source=ctx.getImageData(0,0,canvas.width,canvas.height),data=source.data,w=canvas.width,h=canvas.height,total=w*h,rootIndices=[],zoneMap=new Uint8Array(total),originalMask=new Uint8Array(total),zoneTotals=[0,0,0,0],zoneImage=overlay.getContext('2d').createImageData(w,h);let originalAlpha=0;for(let p=0;p<total;p++){const a=data[p*4+3];if(a<=20)continue;originalMask[p]=1;originalAlpha++;const x=p%w,y=(p/w)|0,nx=x/w,ny=y/h;const px=left+x/2,py=top+y/2;const region=GUEST.beauty.cutRegions.find(r=>insideBox(px,py,r));let zone=region?.kind==='good'?1:region?.kind==='bad'?3:2;zoneMap[p]=zone;zoneTotals[zone]++;const c=zone===1?[57,217,120,125]:zone===2?[255,212,71,110]:[255,84,84,125];zoneImage.data[p*4]=c[0];zoneImage.data[p*4+1]=c[1];zoneImage.data[p*4+2]=c[2];zoneImage.data[p*4+3]=Math.min(c[3],a);if(x>w*.22&&x<w*.78&&y>h*.44&&y<h*.54)rootIndices.push(p)}overlay.getContext('2d').putImageData(zoneImage,0,0);img.style.visibility='hidden';hairLayers.push({canvas,ctx,overlay,left,top,width,height,originalAlpha,rootIndices,zoneMap,originalMask,zoneTotals});beautyCustomer.append(canvas,overlay);updateMood()};img.complete&&img.naturalWidth?draw():img.addEventListener('load',draw,{once:true})}
+if(GUEST.beauty.steps.cut&&GUEST.beauty.cutTool!=='hammer')createHairCanvas(beautyCustomer.querySelector('.hairFront'),{left:57,top:-3,width:190,z:4});
+function keepRootConnected(layer){const {ctx,canvas,rootIndices}=layer,img=ctx.getImageData(0,0,canvas.width,canvas.height),data=img.data,w=canvas.width,h=canvas.height,total=w*h,seen=new Uint8Array(total),queue=new Int32Array(total);let head=0,tail=0,remaining=0;for(const p of rootIndices)if(data[p*4+3]>20&&!seen[p]){seen[p]=1;queue[tail++]=p}if(!tail){let fallback=-1,best=Infinity;for(let p=0;p<total;p++){if(data[p*4+3]<=20)continue;const x=p%w,y=(p/w)|0,d=Math.abs(y-h*.49)+Math.abs(x-w*.5)*.2;if(d<best){best=d;fallback=p}}if(fallback>=0){seen[fallback]=1;queue[tail++]=fallback}}while(head<tail){const p=queue[head++],x=p%w,y=(p/w)|0;remaining++;for(let oy=-1;oy<=1;oy++)for(let ox=-1;ox<=1;ox++){if(!ox&&!oy)continue;const nx=x+ox,ny=y+oy;if(nx<0||ny<0||nx>=w||ny>=h)continue;const n=ny*w+nx;if(!seen[n]&&data[n*4+3]>20){seen[n]=1;queue[tail++]=n}}}for(let p=0;p<total;p++)if(!seen[p])data[p*4+3]=0;ctx.putImageData(img,0,0);return remaining}
+function setMood(kind){beautyMood.dataset.mood=kind;if(kind==='satisfied'){beautyMood.innerHTML='<span class="moodEyes">● ●</span><span class="moodMouth">◡</span>'}else if(kind==='angry'){beautyMood.innerHTML='<span class="moodEyes">⌄ ⌄</span><span class="moodMouth">︵</span>'}else{beautyMood.innerHTML='<span class="moodEyes">● ●</span><span class="moodMouth">_</span>'}}
+function satisfactionGrade(score){return score>=80?'만족':score>=40?'보통':'불만족'}
+function updateOverallSatisfaction(){const steps=GUEST.beauty.steps,maximum=(steps.cut?50:0)+(steps.attach?30:0)+(steps.draw?20:0),score=(steps.cut?cutScore:0)+(steps.attach?attachScore:0)+(steps.draw?drawScore:0);totalSatisfaction=Math.max(0,Math.min(100,score/Math.max(1,maximum)*100-clarificationCount*10));const grade=satisfactionGrade(totalSatisfaction);satisfactionReadout.innerHTML='만족도 '+Math.round(totalSatisfaction)+'/100 · '+grade+'<small>'+safeText(GUEST.name)+' · '+safeText(GUEST.beauty.request)+'</small>';setMood(grade==='만족'?'satisfied':grade==='보통'?'neutral':'angry');}
+function updateMood(){if(!hairLayers.length)return;let original=0,remaining=0,goodTotal=0,goodCut=0,badTotal=0,badCut=0;for(const layer of hairLayers){original+=layer.originalAlpha;goodTotal+=layer.zoneTotals[1];badTotal+=layer.zoneTotals[3];const data=layer.ctx.getImageData(0,0,layer.canvas.width,layer.canvas.height).data;for(let p=0;p<layer.originalMask.length;p++){if(!layer.originalMask[p])continue;const exists=data[p*4+3]>20;if(exists)remaining++;else if(layer.zoneMap[p]===1)goodCut++;else if(layer.zoneMap[p]===3)badCut++}}cutAmount=Math.round((1-remaining/original)*100);const goodRatio=goodTotal?goodCut/goodTotal:0,badRatio=badTotal?badCut/badTotal:0;const targetProgress=Math.min(1,goodRatio/.55),base=targetProgress*50,tooShortPenalty=Math.max(0,Math.min(1,(goodRatio-.78)/.22))*22,protectedPenalty=Math.min(1,badRatio)*42,globalOvercutPenalty=Math.max(0,Math.min(1,(cutAmount-62)/25))*25;cutScore=Math.round(Math.max(0,Math.min(50,(base-tooShortPenalty-protectedPenalty-globalOvercutPenalty)*(activeCutTool===GUEST.beauty.cutTool?1:0.15))));updateOverallSatisfaction()}
+function surfacePoint(e){const r=hairCutSurface.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*210,y:(e.clientY-r.top)/r.height*175}}
+function drawCutPreview(){const ctx=hairCutPreview.getContext('2d');ctx.clearRect(0,0,420,350);if(cutPoints.length<2)return;ctx.save();ctx.scale(2,2);ctx.beginPath();ctx.moveTo(cutPoints[0].x,cutPoints[0].y);for(const p of cutPoints.slice(1))ctx.lineTo(p.x,p.y);ctx.strokeStyle='#ff784e';ctx.lineWidth=4;ctx.setLineDash([8,5]);ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();ctx.restore()}
+function createHairSnips(point){for(let i=0;i<7;i++){const bit=document.createElement('i');bit.className='hairSnip';bit.style.left=(55+point.x+(Math.random()-.5)*25)+'px';bit.style.top=(point.y+(Math.random()-.5)*14)+'px';bit.style.setProperty('--dx',((Math.random()-.5)*70)+'px');beautyCustomer.appendChild(bit);setTimeout(()=>bit.remove(),700)}}
+function hammerErase(point){const radius=14+4*(.5+.5*Math.sin(performance.now()*.008));for(const layer of hairLayers){const ctx=layer.ctx,x=point.x+55-layer.left,y=point.y-layer.top;ctx.save();ctx.globalCompositeOperation='destination-out';ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);ctx.fill();ctx.restore();keepRootConnected(layer)}hasCutAction=true;updateMood();const hit=document.createElement('i');hit.className='hammerHit';hit.style.left=(55+point.x)+'px';hit.style.top=point.y+'px';beautyCustomer.appendChild(hit);setTimeout(()=>hit.remove(),350);cutHint.textContent=`망치/정 타격 · 제거 ${cutAmount}% · 점수 ${cutScore}/50`;beautyStageTag.textContent=`자르기_망치/정 · ${cutScore}/50점`}
+function commitHairCut(){if(cutPoints.length<2){cutDrawing=false;cutPoints=[];drawCutPreview();return}const middle={x:(cutPoints[0].x+cutPoints[1].x)/2,y:(cutPoints[0].y+cutPoints[1].y)/2};for(const layer of hairLayers){const ctx=layer.ctx;ctx.save();ctx.globalCompositeOperation='destination-out';ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=18;ctx.beginPath();ctx.moveTo(cutPoints[0].x+55-layer.left,cutPoints[0].y-layer.top);ctx.lineTo(cutPoints[1].x+55-layer.left,cutPoints[1].y-layer.top);ctx.stroke();ctx.restore();keepRootConnected(layer)}hasCutAction=true;updateMood();createHairSnips(middle);cutDrawing=false;cutPoints=[];drawCutPreview();cutHint.textContent=`잘린 영역 ${cutAmount}% · 자르기 ${cutScore}/50점 · 다시 클릭해 다음 직선 절단 시작`;beautyStageTag.textContent=`자르기_가위 · ${cutScore}/50점`}
+function selectCutTool(kind,button){if(beautyPhase!=='cut'||cutBriefingActive)return;activeCutTool=kind;cutMode=true;cutDrawing=false;cutPoints=[];drawCutPreview();scissorsTool.classList.toggle('selected',kind==='scissors');hammerTool.classList.toggle('selected',kind==='hammer');hairCutSurface.style.pointerEvents='auto';cutCursor.src=button.querySelector('img').src;cutCursor.classList.toggle('hammer',kind==='hammer');cutCursor.style.display='block';cutHint.style.display='block';cutHint.textContent=kind==='hammer'?'망치/정 선택 · 딱딱한 외피를 클릭해 타격':'가위 선택 · 시작점과 끝점을 차례로 클릭';beautyStageTag.textContent=kind==='hammer'?'자르기_망치/정 · 타격 지점을 선택하세요':'자르기_가위 · 절단 경로를 지정하세요'}
+scissorsTool.addEventListener('click',()=>selectCutTool('scissors',scissorsTool));hammerTool.addEventListener('click',()=>selectCutTool('hammer',hammerTool));
+hairCutSurface.addEventListener('click',e=>{if(!cutMode||beautyPhase!=='cut')return;const p=surfacePoint(e);if(activeCutTool==='hammer'){hammerErase(p)}else if(activeCutTool==='scissors'){if(!cutDrawing){cutDrawing=true;cutPoints=[p,p];cutHint.textContent='끝점을 정한 뒤 다시 클릭하면 직선으로 잘립니다'}else{cutPoints=[cutPoints[0],p];commitHairCut()}}e.stopPropagation()});
+hairCutSurface.addEventListener('pointermove',e=>{if(activeCutTool!=='scissors'||!cutDrawing)return;cutPoints=[cutPoints[0],surfacePoint(e)];drawCutPreview()});
+beautyScreen.addEventListener('pointermove',e=>{if(!cutMode)return;const r=beautyScreen.getBoundingClientRect();cutCursor.style.left=((e.clientX-r.left)/r.width*950)+'px';cutCursor.style.top=((e.clientY-r.top)/r.height*531)+'px'});
+function stopCutInteraction(){cutMode=false;activeCutTool='none';cutDrawing=false;cutPoints=[];drawCutPreview();hairCutSurface.style.pointerEvents='none';cutCursor.style.display='none';cutHint.style.display='none';scissorsTool.classList.remove('selected');hammerTool.classList.remove('selected')}
+function enterAttachPhase(){beautyPhase='attach';stopCutInteraction();cutBriefing.style.display='none';beautyPanel.style.display='none';stickerTray.style.display='block';attachSurface.style.pointerEvents='auto';attachStatus.style.display='block';beautyStageTag.textContent='붙이기 · '+GUEST.beauty.attachHint;beautyNext.disabled=false;beautyNext.textContent='다음 단계';phaseNotice.style.display='none';updateAttachStatus();syncRegionVisibility();send('stage-request',{stage:'attach'});}
+function enterDrawPhase(){beautyPhase='draw';stopCutInteraction();cutBriefing.style.display='none';beautyPanel.style.display='none';stickerTray.style.display='none';attachSurface.style.pointerEvents='none';attachStatus.style.display='none';drawPanel.style.display='block';drawInputSurface.style.pointerEvents='auto';drawStatus.style.display='block';beautyStageTag.textContent='그리기 · '+GUEST.beauty.drawHint;phaseNotice.style.display='none';beautyNext.disabled=true;beautyNext.style.display='none';beautyFinish.style.display='block';updateDrawStatus();syncRegionVisibility();send('stage-request',{stage:'draw'});}
+beautyNext.addEventListener('click',()=>{if(beautyPhase==='cut'&&GUEST.beauty.steps.attach)enterAttachPhase();else if(GUEST.beauty.steps.draw)enterDrawPhase();else startBeautyResult();});
+let beautyActive=false;
+customerBody.style.backgroundImage=`url("${ZOMBIE_WALK.body}")`;customerHead.style.backgroundImage=`url("${ZOMBIE_WALK.head}")`;customerHair.style.backgroundImage=`url("${ZOMBIE_WALK.hair}")`;
+function startBusiness(){if(customerState.phase!=='closed')return;customerState.phase='door';customerState.wait=.85;openShopBtn.disabled=true;openShopBtn.textContent='영업 중';hudTop.textContent='영업 시작 · 첫 손님을 기다리는 중';doorSignal.classList.add('open')}
+openShopBtn.onclick=startBusiness;
+function updateCustomer(dt){if(customerState.phase==='closed'||customerState.phase==='seated')return;if(customerState.phase==='door'){customerState.wait-=dt;if(customerState.wait<=0){customerState.phase='walking';customer.style.display='block';customerShadow.style.display='block';hudTop.textContent='문이 열렸습니다 · 좀비 손님 입장'}return}const target=customerState.path[customerState.target],dx=target.x-customerState.x,dy=target.y-customerState.y,dist=Math.hypot(dx,dy),step=112*dt;if(dist<=step){customerState.x=target.x;customerState.y=target.y;customerState.target++;if(customerState.target>=customerState.path.length){customerState.phase='seated';customer.style.display='none';customerShadow.style.display='none';seatedCustomer.style.display='block';doorSignal.classList.remove('open');hudTop.textContent='영업 중 · 좀비 손님 착석 완료';return}}else{customerState.x+=dx/dist*step;customerState.y+=dy/dist*step}customerState.animClock+=dt;if(customerState.animClock>=.14){customerState.animClock=0;customerState.frame=(customerState.frame+1)%4}const pos=`${-customerState.frame*78}px 0`;customerBody.style.backgroundPosition=pos;customerHead.style.backgroundPosition=pos;customerHair.style.backgroundPosition=pos;customer.style.left=(customerState.x/state.nativeW*100)+'%';customer.style.top=(customerState.y/state.nativeH*100)+'%';customer.style.zIndex=String(22+Math.floor(customerState.y/16));customerShadow.style.left=(customerState.x/state.nativeW*100)+'%';customerShadow.style.top=((customerState.y+2)/state.nativeH*100)+'%'}
+function loadDialogueLine(){const line=DIALOGUES[dialogueState.index];dialogueState.tokens=line.text.match(/\S+\s*/g)||[line.text];dialogueState.shown=0;dialogueState.clock=0;dialogueState.complete=false;dialogueText.textContent='';dialogueSpeaker.textContent=line.name;const zombieActive=line.speaker==='zombie';zombiePortrait.className='dialoguePortrait '+(zombieActive?'active':'inactive');playerPortrait.className='dialoguePortrait '+(zombieActive?'inactive':'active')}
+function startDialogue(){if(dialogueState.active)return;dialogueState.active=true;state.keys.clear();interactPrompt.style.display='none';send('arrival');}
+function finishTyping(){dialogueText.textContent=DIALOGUES[dialogueState.index].text;dialogueState.shown=dialogueState.tokens.length;dialogueState.complete=true}
+function enterBeauty(){dialogueState.active=false;beautyActive=true;state.keys.clear();interactionAvailable=false;interactPrompt.style.display='none';beautyScreen.style.display='block';beautyScreen.setAttribute('aria-hidden','false');cutBriefingActive=false;cutBriefing.style.display='none';beautyPanel.classList.remove('briefingLocked');scissorsTool.disabled=false;hammerTool.disabled=false;beautyNext.disabled=false;updateOverallSatisfaction();requestAnimationFrame(()=>beautyScreen.classList.add('active'));if(!GUEST.beauty.steps.cut){if(GUEST.beauty.steps.attach)enterAttachPhase();else enterDrawPhase();}else{beautyStageTag.textContent='자르기 · '+GUEST.beauty.request;send('stage-request',{stage:'cut'});}}
+function advanceDialogue(){send('dialogue-next');}
+function updateDialogue(dt){}
+dialogueOverlay.addEventListener('click',advanceDialogue);
+addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(k==='f'&&beautyResultActive){e.preventDefault();advanceBeautyResult();return}if(k==='f'&&dialogueState.active){e.preventDefault();advanceDialogue();return}if(e.key==='Escape'){e.preventDefault();if(inGame()){settingsOpen()?closeSettings():openSettings();return}if(settingsOpen()){closeSettings();return}}if(k==='f'&&interactionAvailable){e.preventDefault();startDialogue();return}if(['w','a','s','d'].includes(k)){state.keys.add(k);e.preventDefault()}});
+addEventListener('keyup',e=>state.keys.delete(e.key.toLowerCase()));
+addEventListener('blur',()=>state.keys.clear());
+function render(moving){const scale=1.32;player.style.left=(state.x/state.nativeW*100)+'%';player.style.top=(state.y/state.nativeH*100)+'%';player.style.transform=`translate(-50%,-100%) scale(${scale})`;shadow.style.left=(state.x/state.nativeW*100)+'%';shadow.style.top=((state.y+2)/state.nativeH*100)+'%';shadow.style.width='52px';shadow.style.height='15px';player.style.backgroundImage=`url("${SPRITES[state.direction]}")`;const f=moving?state.frame:0,col=f%3,row=Math.floor(f/3);player.style.backgroundPosition=`${-col*219}px ${-row*162}px`;player.style.zIndex=String(20+Math.floor(state.y/16))}
+function updateInteraction(){interactionAvailable=customerState.phase==='seated'&&inGame()&&!settingsOpen()&&!dialogueState.active&&!beautyActive&&Math.hypot(state.x-505,state.y-392)<=118;interactPrompt.style.display=interactionAvailable?'flex':'none'}
+function loop(now){const dt=Math.min((now-state.last)/1000,.035);state.last=now;let dx=0,dy=0;if(inGame()&&!settingsOpen()&&!dialogueState.active&&!beautyActive){if(state.keys.has('a'))dx-=state.speed*dt;if(state.keys.has('d'))dx+=state.speed*dt;if(state.keys.has('w'))dy-=state.speed*dt;if(state.keys.has('s'))dy+=state.speed*dt;if(dx&&dy){dx*=.7071;dy*=.7071}state.x=Math.max(90,Math.min(860,state.x+dx));state.y=Math.max(300,Math.min(487,state.y+dy));if(Math.abs(dx)>Math.abs(dy))state.direction=dx<0?'left':'right';else if(dy)state.direction=dy<0?'back':'front';if(dx||dy){state.animClock+=dt;if(state.animClock>=.12){state.animClock=0;state.frame=(state.frame+1)%6}}else{state.frame=0;state.animClock=0}updateCustomer(dt)}updateDialogue(dt);render(Boolean(dx||dy));updateInteraction();requestAnimationFrame(loop)}
+render(false);requestAnimationFrame(loop);
+
+// Same score functions power the editable configuration and the v35 salon canvas.
+function recalculateAttachScore(){attachScore=beautyAttachScore(placements,GUEST.beauty);updateAttachStatus();updateOverallSatisfaction();}
+function updateAttachStatus(){stickerTrayTitle.innerHTML='스티커 <b>'+placements.length+'/5</b><small>'+safeText(GUEST.beauty.attachHint)+'</small>';attachStatus.textContent='붙이기 '+placements.length+'/5 · '+attachScore+'/'+GUEST.beauty.weights.attach;for(const b of stickerButtons.values())b.disabled=placements.length>=5;}
+function calculateDrawScore(){drawScore=beautyDrawScore(drawContext.getImageData(0,0,320,350).data,GUEST.beauty);updateDrawStatus();updateOverallSatisfaction();}
+function updateOverallSatisfaction(){totalSatisfaction=beautyTotal({cut:cutScore,attach:attachScore,draw:drawScore},GUEST.beauty);const grade=totalSatisfaction>=80?'매우 만족':totalSatisfaction>=40?'만족':'불만족';satisfactionReadout.innerHTML='만족도 '+Math.round(totalSatisfaction)+'/100 · '+grade+'<small>손질 '+Math.round(cutScore)+' · 붙이기 '+Math.round(attachScore)+' · 그리기 '+Math.round(drawScore)+'</small>';setMood(totalSatisfaction>=80?'satisfied':totalSatisfaction>=40?'neutral':'angry');}
+function hammerErase(point){const b=GUEST.beauty;GUEST.hammerHits??=new Set();const x=point.x+55,y=point.y,r=b.cutRegions.find(r=>beautyInside(x,y,r)),goods=b.cutRegions.filter(r=>r.kind==='good');if(b.cutTool==='hammer'&&r?.kind==='good')GUEST.hammerHits.add(r.key);cutScore=b.cutTool==='hammer'?b.weights.cut*GUEST.hammerHits.size/Math.max(1,goods.length):0;hasCutAction=true;updateOverallSatisfaction();const hit=document.createElement('i');hit.className='hammerHit';hit.style.left=x+'px';hit.style.top=y+'px';beautyCustomer.append(hit);setTimeout(()=>hit.remove(),350);cutHint.textContent=r?.kind==='good'?'테두리 손질 '+GUEST.hammerHits.size+'/'+goods.length:'얼굴 안쪽이 아니라 테두리를 톡톡 두드려 주세요.';document.querySelectorAll('.hammerTarget').forEach(e=>{const done=GUEST.hammerHits.has(e.dataset.key);e.style.background=done?'#65e0b68a':'#ffd06630';e.textContent=done?'✓':e.dataset.label;});}
+// Model coordinates are in the original 320 × 350 portrait, so authored regions align with play.
+if(GUEST.beauty.cutTool==='hammer'){
+ hairCutSurface.style.cssText='left:0;top:0;width:320px;height:350px;pointer-events:none';
+ for(const r of GUEST.beauty.cutRegions.filter(r=>r.kind==='good')){const el=document.createElement('div');el.className='hammerTarget';el.dataset.key=r.key;el.dataset.label=r.label;el.textContent=r.label;el.style.cssText=`position:absolute;pointer-events:none;z-index:10;left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;border:1px dashed #ffde8d;background:#ffd06630;font:8px sans-serif;color:#263744;text-align:center;box-sizing:border-box`;beautyCustomer.append(el);}
+}
+function surfacePoint(e){const r=beautyCustomer.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*320-55,y:(e.clientY-r.top)/r.height*350};}
+beautyFinish.style.display='none';
+const originalEnterAttach=enterAttachPhase;enterAttachPhase=()=>{document.querySelectorAll('.hammerTarget').forEach(e=>e.hidden=true);originalEnterAttach();beautyNext.textContent=GUEST.beauty.steps.draw?'다음 단계':'미용 완성';};
+const originalEnterDraw=enterDrawPhase;enterDrawPhase=()=>{for(const p of placements)p.el.style.pointerEvents='none';originalEnterDraw();};
+const originalUpdateMood=updateMood;updateMood=()=>{originalUpdateMood();if(GUEST.beauty.cutTool==='scissors'){cutScore=cutScore/50*GUEST.beauty.weights.cut;updateOverallSatisfaction();}};
+const originalStartBeautyResult=startBeautyResult;startBeautyResult=()=>{drawInputSurface.style.pointerEvents='none';beautyNext.disabled=true;beautyFinish.disabled=true;originalStartBeautyResult();};
+
+function insideBox(x,y,r){return x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h;}
+function safeText(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function send(type,extra={}){parent.postMessage({source:'yachacha-salon',token:GUEST.token,type,...extra},'*');}
+if(GUEST.skin?.full&&GUEST.id!==10001){const img=document.createElement('img');img.className='guestWalk';img.src=GUEST.skin.full;customer.append(img);for(const e of [customerBody,customerHead,customerHair])e.style.visibility='hidden';}
+if(!GUEST.beauty.enabled){for(const e of [...seatedCustomer.children])e.style.visibility='hidden';const img=document.createElement('img');img.src=GUEST.skin.full;img.style.cssText='position:absolute;left:24px;top:0;width:180px;height:300px;object-fit:contain;image-rendering:pixelated';seatedCustomer.append(img);}
+document.querySelectorAll('.drawRegionOverlay').forEach(e=>e.remove());
+for(const r of GUEST.beauty.drawRegions){const e=document.createElement('div');e.className='drawRegionOverlay '+(r.kind==='good'?'brain':'faceAll');e.textContent=r.label;e.style.cssText=`left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px`;beautyCustomer.append(e);}
+document.querySelector('.beautyMoney').textContent=(GUEST.money||0)+' G';document.querySelector('.beautyDay').innerHTML='DAY '+GUEST.day+'<br><small>'+safeText(GUEST.name)+'</small>';
+document.querySelector('.phone').textContent='DAY '+GUEST.day;beautyCustomer.setAttribute('aria-label',GUEST.name+' 미용');
+document.getElementById('backToTitle').onclick=()=>send('home');
+const interact=document.createElement('button');interact.className='childExit';interact.textContent='손님에게 말 걸기 · F';interact.style.display='none';gameWorld.append(interact);interact.onclick=()=>{if(customerState.phase==='seated')startDialogue();};
+const oldInteraction=updateInteraction;updateInteraction=()=>{oldInteraction();interact.style.display=customerState.phase==='seated'&&!beautyActive&&!dialogueState.active?'block':'none';};
+let departure=false;addEventListener('message',e=>{if(e.source!==parent||e.data?.token!==GUEST.token)return;const c=e.data;
+ if(c.type==='beauty-start')enterBeauty();
+ if(c.type==='salon-return'){beautyActive=false;dialogueState.active=false;beautyScreen.style.display='none';interact.style.display='none';}
+ if(c.type==='depart'&&!departure){departure=true;beautyActive=false;dialogueState.active=false;beautyScreen.style.display='none';seatedCustomer.style.display='none';customerState.phase='closed';interact.style.display='none';openShopBtn.style.display='none';const img=document.createElement('img');img.className='departingGuest';img.src=c.portrait||GUEST.skin?.full||document.querySelector('#zombiePortrait img').src;gameWorld.append(img);setTimeout(()=>send('departed'),2250);}
+ if(c.type==='pause'){state.keys.clear();openSettings();}
+ if(c.type==='resume')closeSettings();
+});
+show('gameScreen');if(GUEST.mode==='backdrop'){document.body.classList.add('backdrop');player.style.opacity='.6';}else if(GUEST.mode==='preview'){customerState.phase='seated';seatedCustomer.style.display='block';openShopBtn.style.display='none';enterBeauty();}else{openShopBtn.textContent=GUEST.day===1&&GUEST.id===10001?'영업 시작 · 첫 손님 맞이':'다음 손님 맞이';}
+window.salonLab={get phase(){return beautyPhase;},get score(){return totalSatisfaction;},startBusiness,startDialogue,enterBeauty,enterAttachPhase,enterDrawPhase,startBeautyResult,placeSticker,calculateDrawScore,get customerPhase(){return customerState.phase;}};
+send('ready');
+
+// A face made from independent shapes cannot wrap its eyes at small widths.
+function setMood(kind){beautyMood.dataset.mood=kind;beautyMood.innerHTML='<span class="faceEyes"><i></i><i></i></span><span class="faceMouth"></span>';beautyMood.setAttribute('aria-label',kind==='satisfied'?'매우 만족한 표정':kind==='angry'?'불만족한 표정':'만족한 표정');}
+let hammerLast=null,hammerHeld=false,lastHammerSound=-1000;
+function shellScore(){let goodTotal=0,goodCut=0,wrongCut=0,original=0,removed=0;for(const layer of hairLayers){const pixels=layer.ctx.getImageData(0,0,layer.canvas.width,layer.canvas.height).data;for(let n=0;n<layer.originalMask.length;n++){if(!layer.originalMask[n])continue;original++;const gone=pixels[n*4+3]<=20;if(gone){removed++;if(layer.zoneMap[n]===1)goodCut++;else wrongCut++;}if(layer.zoneMap[n]===1)goodTotal++;}}cutAmount=Math.round(removed/Math.max(1,original)*100);cutScore=Math.max(0,Math.min(GUEST.beauty.weights.cut,GUEST.beauty.weights.cut*(goodCut-wrongCut)/Math.max(1,goodTotal)))*(activeCutTool==='hammer'?1:0);updateOverallSatisfaction();return {goodCut,goodTotal,wrongCut,removed};}
+function hammerErase(point,from=null){if(!hairLayers.length)return;const x=point.x+55,y=point.y,radius=9,ax=(from?.x??point.x)+55,ay=from?.y??point.y,dx=x-ax,dy=y-ay,length2=dx*dx+dy*dy;let before=0,after=0;
+ for(const layer of hairLayers){const ctx=layer.ctx,img=ctx.getImageData(0,0,layer.canvas.width,layer.canvas.height),pixels=img.data,sx=layer.canvas.width/layer.width,sy=layer.canvas.height/layer.height;
+  const left=Math.max(0,Math.floor((Math.min(ax,x)-radius-layer.left)*sx)),right=Math.min(layer.canvas.width-1,Math.ceil((Math.max(ax,x)+radius-layer.left)*sx)),top=Math.max(0,Math.floor((Math.min(ay,y)-radius-layer.top)*sy)),bottom=Math.min(layer.canvas.height-1,Math.ceil((Math.max(ay,y)+radius-layer.top)*sy));
+  for(let py=top;py<=bottom;py++)for(let px=left;px<=right;px++){const n=(py*layer.canvas.width+px)*4+3;if(!pixels[n])continue;const gx=layer.left+(px+.5)/sx,gy=layer.top+(py+.5)/sy,u=length2?Math.max(0,Math.min(1,((gx-ax)*dx+(gy-ay)*dy)/length2)):0;if((gx-ax-u*dx)**2+(gy-ay-u*dy)**2<=radius*radius){before++;pixels[n]=0;}}
+  ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.putImageData(img,0,0);ctx.restore();
+ }
+ hasCutAction=true;if(GUEST.beauty.cutTool==='hammer')shellScore();else updateMood();
+ cutHint.textContent='눌러서 드래그 · 손질 '+Math.round(cutScore)+'/'+GUEST.beauty.weights.cut+' · 지운 부분 '+cutAmount+'%';beautyStageTag.textContent='망치·정 · 테두리를 조금씩 깎아 주세요';
+ if(before>after&&performance.now()-lastHammerSound>90){lastHammerSound=performance.now();send('sound',{key:'hammer'});createHairSnips(point);const hit=document.createElement('i');hit.className='hammerHit';hit.style.left=x+'px';hit.style.top=y+'px';beautyCustomer.append(hit);setTimeout(()=>hit.remove(),260);}
+}
+const scoredMood=updateMood;updateMood=()=>{if(GUEST.beauty.cutTool==='hammer')shellScore();else scoredMood();};
+document.querySelectorAll('.hammerTarget').forEach(e=>e.remove());
+if(GUEST.beauty.cutTool==='hammer')createHairCanvas(beautyCustomer.querySelector('.head'),{left:86,top:28,width:148,z:3});
+hairCutSurface.style.touchAction='none';
+hairCutSurface.addEventListener('pointerdown',e=>{if(!cutMode||activeCutTool!=='hammer'||beautyPhase!=='cut')return;e.preventDefault();hammerHeld=true;hammerLast=surfacePoint(e);hairCutSurface.setPointerCapture(e.pointerId);hammerErase(hammerLast);});
+hairCutSurface.addEventListener('pointermove',e=>{if(!hammerHeld||activeCutTool!=='hammer'||beautyPhase!=='cut')return;e.preventDefault();const point=surfacePoint(e);hammerErase(point,hammerLast);hammerLast=point;});
+for(const name of ['pointerup','pointercancel','lostpointercapture'])hairCutSurface.addEventListener(name,()=>{hammerHeld=false;hammerLast=null;});
+hairCutSurface.addEventListener('click',e=>{if(activeCutTool==='hammer'){e.preventDefault();e.stopImmediatePropagation();if(e.detail===0&&cutMode)hammerErase(surfacePoint(e));}},true);
+const polishStop=stopCutInteraction;stopCutInteraction=()=>{hammerHeld=false;hammerLast=null;polishStop();};
+setMood('neutral');
+
+// Presentation-only entrance, following the Monster Soul storyboard.
+// The agreed Day 1 guest order is independent of the storyboard's old Day 2 note.
+const DRUNK_ENTRANCE=[
+ {at:0,pose:'outside',text:''},
+ {at:1500,pose:'surprise',text:'!!!'},
+ {at:2400,text:'딸꾹… 미스터 제이…!'},
+ {at:4200,text:'자, 자네…! 미스터 제이 자네인가…!'},
+ {at:5600,pose:'rush',sound:'foot0'},
+ {at:5800,sound:'foot1'},{at:5990,sound:'foot2'},{at:6170,sound:'foot3'},
+ {at:6350,pose:'fall',sound:'crash',text:'콰당!!!!!'},
+ {at:6650,sound:'glass'},
+ {at:7500,text:'……'},
+ {at:8900,text:'끄으어억… 딸꾹.'},
+ {at:10300,pose:'stand',text:'100년 만이야!! 100년!!!'},
+ {at:12000,pose:'door',sound:'door',text:'제이… 미스터 제이…! 딸꾹…'},
+ {at:13700,pose:'inside',sound:'foot0'},
+ {at:14000,sound:'foot1'},{at:14300,sound:'foot2'},
+ {at:15600,pose:'done'}
+];
+let entrance=null;
+function entranceEvent(event){const c=entrance;if(!c)return;if(event.sound)send('sound',{key:event.sound});if(event.text!==undefined){c.caption.textContent=event.text;c.caption.hidden=!event.text;}
+ if(event.pose){c.pose=event.pose;c.poseAt=c.time;
+  if(event.pose==='rush'){c.caption.hidden=true;}
+  if(event.pose==='fall'){c.bang.hidden=false;for(let i=0;i<14;i++){const e=document.createElement('i');e.className='bottleShard';document.querySelector('.windowScene').append(e);c.shards.push({el:e,vx:Math.cos(i*2.399)*80,vy:-40-(i%4)*12,spin:i*43});}}
+  if(event.pose==='stand')c.bang.hidden=true;
+  if(event.pose==='door'){doorSignal.classList.add('open');c.guest.style.opacity=0;}
+  if(event.pose==='inside'){gameWorld.append(c.guest);c.guest.style.opacity=1;c.caption.hidden=true;}
+  if(event.pose==='done')finishEntrance();
+ }
+}
+function finishEntrance(){const c=entrance;if(!c)return;for(const e of [c.guest,c.caption,c.bang,c.label,...c.shards.map(s=>s.el)])e.remove();entrance=null;document.body.classList.remove('cutscene');dialogueState.active=false;state.keys.clear();customerState.phase='seated';seatedCustomer.style.cssText='display:block;left:73%;top:84%;width:120px;height:160px;transform:translate(-50%,-100%) scale(1.15)';const art=seatedCustomer.querySelector('img:last-child');if(art)art.style.cssText='position:absolute;inset:0;width:120px;height:160px;object-fit:contain;image-rendering:pixelated';interactPrompt.style.left='73%';interactPrompt.style.top='48%';doorSignal.classList.remove('open');send('cutscene-end');updateInteraction();}
+function advanceEntrance(ms){const c=entrance;if(!c)return;c.time+=ms;while(c.next<DRUNK_ENTRANCE.length&&DRUNK_ENTRANCE[c.next].at<=c.time){entranceEvent(DRUNK_ENTRANCE[c.next++]);if(!entrance)return;}
+ const age=c.time-c.poseAt,guest=c.guest;
+ if(c.pose==='outside'||c.pose==='surprise'){guest.style.cssText='position:absolute;width:106px;height:130px;left:'+Math.min(96,-80+c.time*.085)+'px;bottom:-12px;z-index:1;image-rendering:pixelated;object-fit:contain;';guest.style.transform=c.pose==='surprise'?'translateY('+(-Math.sin(Math.min(1,age/550)*Math.PI)*28)+'px)':'translateY('+(-Math.abs(Math.sin(age/110))*3)+'px)';}
+ if(c.pose==='rush'){const t=Math.min(1,age/750);guest.style.cssText=`position:absolute;left:${96+t*86}px;bottom:-12px;width:106px;height:130px;opacity:1;transform:rotate(${Math.sin(age/42)*8}deg)`;}
+ if(c.pose==='fall'||c.pose==='stand'){guest.style.cssText=`position:absolute;left:130px;bottom:-14px;width:106px;height:130px;transform:rotate(${c.pose==='fall'?Math.min(1,age/190)*82:82*Math.max(0,1-age/650)}deg)`;if(c.pose==='fall'&&age<350)gameWorld.style.marginLeft=Math.sin(age*.15)*(1-age/350)*8+'px';else gameWorld.style.marginLeft='0';}
+ if(c.pose==='inside'){const t=Math.min(1,age/1500);guest.style.cssText=`left:${805-t*112}px;top:${540-t*94}px;width:138px;height:184px;transform:translate(-50%,-100%) rotate(${Math.sin(age/150)*3}deg)`;}
+ for(const s of c.shards){const t=Math.min(1,(c.time-6350)/650);s.el.style.cssText=`left:${170+s.vx*t}px;top:${202+s.vy*t+60*t*t}px;transform:rotate(${s.spin+t*300}deg);opacity:${c.time>11100?0:1}`;}
+}
+function startEntrance(){if(entrance||GUEST.id!==10002||GUEST.mode!=='story')return;document.body.classList.add('cutscene');state.keys.clear();dialogueState.active=true;customerState.phase='cutscene';openShopBtn.style.display='none';customer.style.display='none';seatedCustomer.style.display='none';const guest=document.createElement('img');guest.className='cutsceneGuest';guest.src=GUEST.skin.full;document.querySelector('.windowScene').append(guest);const caption=document.createElement('div');caption.className='cutsceneCaption';const bang=document.createElement('div');bang.className='cutsceneBang';bang.style.cssText='left:6%;top:28%';bang.textContent='콰당!!';bang.hidden=true;const label=document.createElement('div');label.className='cutsceneLabel';label.textContent='뜻밖의 손님';gameWorld.append(caption,bang,label);entrance={time:0,next:0,pose:'outside',poseAt:0,guest,caption,bang,label,shards:[],last:performance.now()};send('cutscene-start');advanceEntrance(0);requestAnimationFrame(entranceFrame);}
+function entranceFrame(now){if(!entrance)return;const delta=Math.max(0,Math.min(60,now-entrance.last));entrance.last=now;if(!document.hidden&&!settingsOpen())advanceEntrance(delta);if(entrance)requestAnimationFrame(entranceFrame);}
+addEventListener('keydown',e=>{if(entrance&&['f','enter',' ','w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'].includes(e.key.toLowerCase())){e.preventDefault();e.stopImmediatePropagation();}},true);
+const normalStartDialogue=startDialogue;startDialogue=()=>{if(!entrance)normalStartDialogue();};
+startEntrance();
+
+const cinematicInteraction=updateInteraction;updateInteraction=()=>{cinematicInteraction();if(GUEST.id===10002&&customerState.phase==='seated'&&!entrance){interactionAvailable=inGame()&&!settingsOpen()&&!dialogueState.active&&!beautyActive&&Math.hypot(state.x-693,state.y-446)<=135;interactPrompt.style.display=interactionAvailable?'flex':'none';}};
+</script>
+</body>
+</html>

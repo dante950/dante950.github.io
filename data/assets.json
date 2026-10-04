@@ -1,0 +1,707 @@
+{
+  "zombieHead": "./media/c9848def3d0f1d985df36f6a.png",
+  "zombieHair": "./media/08dfafdc62df074b0937e8fa.png",
+  "cape": "./media/1605da332e79debabd5b6fcb.png",
+  "sansHead": "./media/d55e976cfea1ce19c5095be2.png",
+  "sansBody": "./media/0a1b13badb23ce0a5a795bb5.png",
+  "drunk": {
+    "src": "./media/178998216c1b70b5c05655ce.png",
+    "fw": 680,
+    "fh": 630,
+    "count": 1,
+    "cols": 2,
+    "crop": [
+      0,
+      0,
+      680,
+      630
+    ],
+    "chroma": true,
+    "file": "취객2.png"
+  },
+  "sans": "./media/b749b05d33003554c844eab2.png",
+  "zombie": "./media/5b433c40abe0135346bc3d4a.png",
+  "phone": "./media/ab309a51ce8627b275e31dd5.png",
+  "phoneAlarm": "./media/439a3a115c8f6d06715eb37b.png",
+  "stickers": [
+    {
+      "id": "ST-GENTLE-GLASSES-HORN",
+      "name": "뿔테안경",
+      "tag": "Tag_Gentle",
+      "region": "Eye",
+      "src": "./media/dccca78caf700f0bfd06372c.png",
+      "w": 82,
+      "h": 42
+    },
+    {
+      "id": "ST-GENTLE-MOUSTACHE",
+      "name": "콧수염",
+      "tag": "Tag_Gentle",
+      "region": "UnderNose",
+      "src": "./media/3b5333952446137687059bfa.png",
+      "w": 58,
+      "h": 34
+    },
+    {
+      "id": "ST-GENTLE-BOWTIE-BLACK",
+      "name": "검정 나비넥타이",
+      "tag": "Tag_Gentle",
+      "region": "Neck",
+      "src": "./media/96c0454ac3b7ae0b90eac8b1.png",
+      "w": 56,
+      "h": 36
+    },
+    {
+      "id": "ST-CUTE-RIBBON-PINK",
+      "name": "분홍 리본",
+      "tag": "Tag_Cute",
+      "region": "HeadTop",
+      "src": "./media/2ecb913d3e273f1b5a7ac912.png",
+      "w": 52,
+      "h": 40
+    },
+    {
+      "id": "ST-CUTE-HEART-PINK",
+      "name": "하트",
+      "tag": "Tag_Cute",
+      "region": "Cheek",
+      "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAGCAYAAAAPDoR2AAAAAXNSR0IArs4c6QAAADhJREFUCJljYGBgYPhfc+j//5pD/9HZjDAGNsCES4KBgYGBEWYUhkSLHSMjjIOsgLHFjhFdMYYJAPVfG25I4zo0AAAAAElFTkSuQmCC",
+      "w": 38,
+      "h": 34
+    },
+    {
+      "id": "ST-CUTE-FLOWER-RED",
+      "name": "빨간 꽃",
+      "tag": "Tag_Cute",
+      "region": "Hair",
+      "src": "./media/fa5d3bb10cafe4c731a7125e.png",
+      "w": 42,
+      "h": 42
+    },
+    {
+      "id": "ST-CUTE-FLOWER-BLUE",
+      "name": "파란 꽃",
+      "tag": "Tag_Cute",
+      "region": "Hair",
+      "src": "./media/5296fc0adb2f010b53e52d07.png",
+      "w": 42,
+      "h": 42
+    },
+    {
+      "id": "ST-STRONG-FLAME-BLUE",
+      "name": "푸른 불꽃",
+      "tag": "Tag_Strong",
+      "region": "HeadTop",
+      "src": "./media/30383902a18f70046e3dfbf8.png",
+      "w": 40,
+      "h": 54
+    },
+    {
+      "id": "ST-STRONG-SCAR-01",
+      "name": "흉터 1",
+      "tag": "Tag_Strong",
+      "region": "CheekLeft",
+      "src": "./media/7599b4fb70ade4248d5e9c05.png",
+      "w": 26,
+      "h": 58
+    },
+    {
+      "id": "ST-STRONG-SCAR-02",
+      "name": "흉터 2",
+      "tag": "Tag_Strong",
+      "region": "CheekRight",
+      "src": "./media/6f6611ef70469594e96b1bab.png",
+      "w": 26,
+      "h": 58
+    },
+    {
+      "id": "ST-STRONG-CROWN-01",
+      "name": "왕관 1",
+      "tag": "Tag_Strong",
+      "region": "HeadTop",
+      "src": "./media/37312c3349ce9f6ed776d274.png",
+      "w": 46,
+      "h": 38
+    },
+    {
+      "id": "ST-STRONG-CROWN-02",
+      "name": "왕관 2",
+      "tag": "Tag_Strong",
+      "region": "HeadTop",
+      "src": "./media/229ac3e6b6c1898b3a4a87d3.png",
+      "w": 46,
+      "h": 50
+    },
+    {
+      "id": "ST-HIP-SUNGLASSES-BLACK",
+      "name": "검정 선글라스",
+      "tag": "Tag_Hip",
+      "region": "Eye",
+      "src": "./media/c1b8b254050dd656ac3c6435.png",
+      "w": 84,
+      "h": 34
+    },
+    {
+      "id": "ST-HIP-SUNGLASSES-RED",
+      "name": "빨간 선글라스",
+      "tag": "Tag_Hip",
+      "region": "Eye",
+      "src": "./media/e2ae1bb46f83e667cf1dce0e.png",
+      "w": 84,
+      "h": 38
+    },
+    {
+      "id": "ST-FUN-POOP",
+      "name": "똥",
+      "tag": "Tag_Fun",
+      "region": "HeadTop",
+      "src": "./media/5771eb357b11a76580e6fa65.png",
+      "w": 46,
+      "h": 38
+    },
+    {
+      "id": "ST-FUN-NOSE-RED",
+      "name": "빨간 코 장식",
+      "tag": "Tag_Fun",
+      "region": "Nose",
+      "src": "./media/bf3eb786d67b326665e8dcb7.png",
+      "w": 38,
+      "h": 36
+    }
+  ],
+  "room": {
+    "layers": [
+      {
+        "name": "prop windowFrame",
+        "src": "./media/693ab2b33ed2ce1dbe080851.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "left": "-1%",
+          "top": "7%",
+          "width": "26%",
+          "height": "49%",
+          "z-index": "11"
+        }
+      },
+      {
+        "name": "prop windowLight",
+        "src": "./media/1ec8c1e132f7d7e45286cdd4.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "left": "15%",
+          "top": "13%",
+          "width": "7%",
+          "z-index": "12",
+          "opacity": ".7"
+        }
+      },
+      {
+        "name": "prop awning one",
+        "src": "./media/2f3ff3cb56ea4c9fd42bfcde.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "left": "0",
+          "top": "8%",
+          "width": "25%",
+          "height": "7%",
+          "z-index": "12"
+        }
+      },
+      {
+        "name": "prop awning two",
+        "src": "./media/b81cd7b4023e2e1ed051b765.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "left": "0",
+          "top": "15%",
+          "width": "22%",
+          "height": "6%",
+          "z-index": "12"
+        }
+      },
+      {
+        "name": "prop carpet",
+        "src": "./media/6e6611eead1d4c3f9a53bb09.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "left": "17%",
+          "bottom": "-2%",
+          "width": "68%",
+          "height": "44%",
+          "z-index": "9",
+          "filter": "saturate(.72) brightness(.72) hue-rotate(320deg)"
+        }
+      },
+      {
+        "name": "prop station main",
+        "src": "./media/1c0bf2dab1e7eb72213eb794.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "left": "38%",
+          "top": "10%",
+          "width": "27%",
+          "height": "39%",
+          "z-index": "10",
+          "filter": "drop-shadow(0 7px 3px #0005)"
+        }
+      },
+      {
+        "name": "prop stationSide",
+        "src": "./media/74df1bbe4cad4d8967fe1c69.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "left": "63%",
+          "top": "22%",
+          "width": "5%",
+          "height": "24%",
+          "z-index": "11"
+        }
+      },
+      {
+        "name": "prop stationTop",
+        "src": "./media/77f48a8f36cbb9a7c5b2494a.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "left": "38%",
+          "top": "8%",
+          "width": "27%",
+          "height": "9%",
+          "z-index": "12"
+        }
+      },
+      {
+        "name": "prop chair main",
+        "src": "./media/1eabfa9e853838719fb57873.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "left": "48%",
+          "top": "31%",
+          "width": "9.5%",
+          "height": "37%",
+          "z-index": "16",
+          "filter": "drop-shadow(0 6px 3px #0008)"
+        }
+      },
+      {
+        "name": "prop counter",
+        "src": "./media/59e4b90cafa571c1bb6c2b97.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "left": "37%",
+          "top": "43%",
+          "width": "30%",
+          "height": "17%",
+          "z-index": "14",
+          "filter": "drop-shadow(0 5px 3px #0007)"
+        }
+      },
+      {
+        "name": "prop counterSide",
+        "src": "./media/19de6fd7067883e63ccf0f77.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "left": "64%",
+          "top": "46%",
+          "width": "7%",
+          "height": "16%",
+          "z-index": "14"
+        }
+      },
+      {
+        "name": "prop counterTop",
+        "src": "./media/04a398ab2db789e1c8dc8749.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "left": "36%",
+          "top": "42%",
+          "width": "33%",
+          "height": "7%",
+          "z-index": "15"
+        }
+      },
+      {
+        "name": "prop sofa",
+        "src": "./media/757eae4c5e60882a89bfc292.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "left": "1%",
+          "top": "45%",
+          "width": "28%",
+          "height": "22%",
+          "z-index": "15",
+          "filter": "drop-shadow(0 5px 3px #0007)"
+        }
+      },
+      {
+        "name": "prop sofaSide",
+        "src": "./media/4570ed84873a60e3f09dfcbd.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "left": "25%",
+          "top": "45%",
+          "width": "7%",
+          "height": "22%",
+          "z-index": "16"
+        }
+      },
+      {
+        "name": "prop sofaTop",
+        "src": "./media/30371ae2976c51fd76b65387.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "left": "1%",
+          "top": "43%",
+          "width": "29%",
+          "height": "10%",
+          "z-index": "16"
+        }
+      },
+      {
+        "name": "prop cabinet left",
+        "src": "./media/98daa865bb40b81502ba0805.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "left": "22%",
+          "top": "14%",
+          "width": "14%",
+          "height": "32%",
+          "z-index": "11"
+        }
+      },
+      {
+        "name": "prop cabinet right",
+        "src": "./media/eab30d2eb0bd9e92caf4abb4.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "right": "8%",
+          "top": "20%",
+          "width": "18%",
+          "height": "27%",
+          "z-index": "11"
+        }
+      },
+      {
+        "name": "prop plant",
+        "src": "./media/457fe4c0ffdbf5169d0b0b08.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "left": "25%",
+          "top": "35%",
+          "width": "7%",
+          "height": "23%",
+          "z-index": "13"
+        }
+      },
+      {
+        "name": "prop barberPole",
+        "src": "./media/c4bc67659ee8a068ef068a1c.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "right": "27%",
+          "top": "11%",
+          "width": "4.4%",
+          "height": "31%",
+          "z-index": "12"
+        }
+      },
+      {
+        "name": "prop lp",
+        "src": "./media/b4acaf6657bf9096c6dcda54.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "right": "2.5%",
+          "top": "43%",
+          "width": "7%",
+          "height": "22%",
+          "z-index": "14"
+        }
+      },
+      {
+        "name": "prop salonProps",
+        "src": "./media/7fe2b4c7942d8007ce3d6fc8.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "left": "39%",
+          "top": "39%",
+          "width": "26%",
+          "height": "11%",
+          "z-index": "15"
+        }
+      },
+      {
+        "name": "prop salonProps leftShelf",
+        "src": "./media/7fe2b4c7942d8007ce3d6fc8.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "left": "22%",
+          "top": "24%",
+          "width": "14%",
+          "height": "10%",
+          "z-index": "13"
+        }
+      },
+      {
+        "name": "prop salonProps rightShelf",
+        "src": "./media/7fe2b4c7942d8007ce3d6fc8.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "left": "auto",
+          "top": "28%",
+          "width": "18%",
+          "height": "11%",
+          "z-index": "13",
+          "right": "8%"
+        }
+      },
+      {
+        "name": "prop magazines one",
+        "src": "./media/7cf480f33a0c902d4b9cd8d1.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "left": "3%",
+          "bottom": "4%",
+          "width": "10%",
+          "z-index": "18",
+          "transform": "rotate(-6deg)"
+        }
+      },
+      {
+        "name": "prop magazines two",
+        "src": "./media/7cf480f33a0c902d4b9cd8d1.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "right": "4%",
+          "bottom": "2%",
+          "width": "11%",
+          "z-index": "18",
+          "transform": "rotate(8deg)"
+        }
+      },
+      {
+        "name": "prop poster one",
+        "src": "./media/407d9a4e7630eb10b394ce22.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "left": "29%",
+          "top": "6%",
+          "width": "7%",
+          "height": "17%",
+          "z-index": "12"
+        }
+      },
+      {
+        "name": "prop poster two",
+        "src": "./media/10af3a1191c1eaefb377ad37.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "right": "31%",
+          "top": "3%",
+          "width": "7%",
+          "height": "17%",
+          "z-index": "12"
+        }
+      },
+      {
+        "name": "prop poster three",
+        "src": "./media/20b58b34e37654f642b5395a.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "right": "22%",
+          "top": "4%",
+          "width": "6.5%",
+          "height": "16%",
+          "z-index": "12"
+        }
+      },
+      {
+        "name": "prop barbersSign",
+        "src": "./media/8ac5813abe11ee0a5f7e76eb.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "left": "4%",
+          "top": "4%",
+          "width": "15%",
+          "height": "11%",
+          "z-index": "13"
+        }
+      },
+      {
+        "name": "prop radio",
+        "src": "./media/02fa1dc9f9ae51f810f6eb9d.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "right": "9%",
+          "top": "11%",
+          "width": "9%",
+          "height": "13%",
+          "z-index": "13"
+        }
+      },
+      {
+        "name": "prop towel",
+        "src": "./media/88287764c6d7580ae4f63201.png",
+        "style": {
+          "position": "absolute",
+          "image-rendering": "pixelated",
+          "user-select": "none",
+          "pointer-events": "none",
+          "object-fit": "contain",
+          "left": "28%",
+          "top": "46%",
+          "width": "6%",
+          "height": "14%",
+          "z-index": "15"
+        }
+      }
+    ],
+    "wall": "./media/15aed42dfd86a90df043fc67.png",
+    "floor": "./media/8ee64bf83a9eaa83fcd4e9f4.png",
+    "carpet": "./media/6e6611eead1d4c3f9a53bb09.png",
+    "bars": {
+      "monstergegauge": "./media/1febb28f14ae662740651dfd.png",
+      "monstergegaugefull": "./media/0f1250309d2ccff294e1a042.png",
+      "playergegauge": "./media/1febb28f14ae662740651dfd.png",
+      "playergegaugefull": "./media/81f5f7eecf69e8175fbdd6db.png",
+      "Leakagegauge": "./media/fa7e1926b930fbe02b2e9bd9.png",
+      "Leakagegaugefull": "./media/e7a6d01a5b9694baa992806c.png"
+    }
+  },
+  "monstagramSuccess": "./media/51e1a320f21fd4fcfad6d5f8.png",
+  "monstagramFailure": "./media/aa162d72155051deb63dd039.png",
+  "audio": {
+    "salon": "./media/cc2cd35fadd81890c69a3d3a.ogg",
+    "battle": "./media/b014d9a91037733c60a12a44.ogg",
+    "sans": "./media/680aa5b2e1474ca1efeb7bbc.ogg",
+    "hammer": "./media/cff45008355d1a0ba7997a26.ogg",
+    "hammerGood": "./media/1559e8b7f981c64056e71f93.ogg",
+    "door": "./media/2bc4dc8d40f23b937ed81d5b.ogg",
+    "sit": "./media/a3eea8512fa03de48703b11c.ogg",
+    "prep": "./media/92e0abdd87b2c7ae3fa854ad.ogg",
+    "clash": "./media/8dcb67eb9ece55307ba74aac.ogg",
+    "settlement": "./media/326284381756e032b93f067b.ogg",
+    "foot0": "./media/c0b08d0e6456704770800acb.ogg",
+    "foot1": "./media/919377047b8a4357ee09b209.ogg",
+    "foot2": "./media/0fef1f0b458877d000918b00.ogg",
+    "foot3": "./media/7d74d45195cb183d3fa820af.ogg"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "yachacha-integrated-playtest",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "import-project": "node scripts/import-project.mjs"
+  },
+  "engines": { "node": ">=22" }
+}
