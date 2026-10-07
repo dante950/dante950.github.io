@@ -26,7 +26,7 @@ async function bundle(prefix,names){return (await Promise.all(names.map(f=>read(
 
 let combat=await read('src/combat/index.html');
 const css=(await Promise.all(['style.css','story.css','story-stage.css'].map(f=>read('src/combat/'+f)))).join('\n');
-const combatScript=await bundle('src/combat/',['../media.js','text-effects.js','dialogue.js','engine.js','workbook.js','versions.js','scene.js','story-scene.js','app.js','bridge.js']);
+const combatScript=await bundle('src/combat/',['../media.js','text-effects.js','dialogue.js','engine.js','workbook-xml.js','workbook.js','versions.js','scene.js','story-scene.js','app.js','bridge.js']);
 const wb=(await fs.readFile(path.join(root,'data/source.xlsx'))).toString('base64');
 const au=(await fs.readFile(path.join(root,'data/source-authoring.xlsm'))).toString('base64');
 const schema=await read('data/schema.json'),assets=await read('src/combat/assets.json');

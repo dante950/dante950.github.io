@@ -1,7 +1,8 @@
+import {parseWorkbookXml} from './workbook-xml.js';
 // Only edited worksheet XML is changed; VBA, notes, styles and metadata stay in the source ZIP.
 function createOfflineBook(){
  const NS='http://schemas.openxmlformats.org/spreadsheetml/2006/main';
- const parse=(s,part='worksheet')=>{const d=new DOMParser().parseFromString(s,'application/xml');const error=d.getElementsByTagName('parsererror')[0];if(error)throw Error(`엑셀 XML을 읽을 수 없습니다 (${part}): ${error.textContent.trim().slice(0,300)}`);return d;};
+ const parse=parseWorkbookXml;
  const all=(d,n)=>[...d.getElementsByTagNameNS('*',n)],direct=(d,n)=>[...d.children].filter(e=>e.localName===n),xml=d=>new XMLSerializer().serializeToString(d);
  const element=(doc,name)=>{const rootName=doc.documentElement.nodeName,prefix=rootName.includes(':')?rootName.split(':')[0]+':':'';return doc.createElementNS(NS,prefix+name);};
  const normalize=p=>{const a=[];for(const s of p.split('/')){if(s==='..')a.pop();else if(s&&s!=='.')a.push(s);}return a.join('/');};
