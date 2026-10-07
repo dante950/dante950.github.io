@@ -67,7 +67,8 @@ try{
    await page.waitForFunction(hp=>window.lab.battle?.monster.MaxHP===hp,imported);
    await page.locator('#exportZip').click();
    // The status appears after both files have been serialized and validated, before the download click.
-   await page.locator('#notice').filter({hasText:'두 엑셀과 변경 이력을 ZIP으로'}).waitFor({timeout:180000});
+   await page.waitForFunction(()=>document.getElementById('notice').classList.contains('error')||document.getElementById('notice').textContent.includes('두 엑셀과 변경 이력을 ZIP으로'),null,{timeout:180000});
+   assert.equal(await page.locator('#notice').evaluate(e=>e.classList.contains('error')),false,await page.locator('#notice').textContent());
    await page.waitForFunction(()=>document.getElementById('changeIntent').value==='');
    assert.equal(await page.evaluate(()=>window.lab.data.sheets.find(s=>s.name==='몬스터 페이즈').rows.find(r=>r.MonsterID===10001&&r.PhaseID===1).MaxHP),imported);
    const pair=await page.evaluate(async()=>{
