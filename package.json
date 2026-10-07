@@ -5,7 +5,13 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "test": "node --test tests/*.test.mjs",
-    "import-project": "node scripts/import-project.mjs"
+    "import-project": "node scripts/import-project.mjs",
+    "test:browser": "node scripts/check-browsers.mjs"
   },
-  "engines": { "node": ">=22" }
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
 }

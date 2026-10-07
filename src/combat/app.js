@@ -31,7 +31,16 @@ function updateInfo(){if(!data)return;updatePoolInfo();const m=selectedMonster()
 async function start(){dialoguePreview=null;if(JSON.parse($('host-data').textContent).mode==='story')scene.unlock();else await scene.unlock();scene.volume($('sound').checked,+$('volume').value);try{const next=new Battle(data);next.start($('monster').value,+$('phase').value,mode==='pattern'?{patternID:+$('pattern').value,damage:$('testDamage').value===''?null:+$('testDamage').value,beauty:$('beauty').value}:{beauty:$('beauty').value});battle=next;$('pause').textContent=battle.paused?'계속하기':'일시정지';$('battleArea').focus();notice(mode==='pattern'?'패턴 시험 시작. 현재 선택한 패턴을 반복하며 시험 피해는 엑셀에 저장하지 않습니다.':'전투 시작. 예고가 모두 나온 뒤 타격합니다. 방향키 이동 · F 패링/가드 · SPACE 빈틈공격');if(scene.audioError)notice('전투는 시작했지만 소리 재생에 실패했어요: '+scene.audioError,true);}catch(e){notice(e.message,true);updateInfo();}}
 function setMode(next){pauseBattle();mode=next;$('modeBattle').classList.toggle('active',mode==='battle');$('modePattern').classList.toggle('active',mode==='pattern');$('previewOptions').hidden=mode!=='pattern';updateInfo();}
 function download(bytes,name){const url=URL.createObjectURL(new Blob([bytes],{type:OfflineBook.macro?'application/vnd.ms-excel.sheet.macroEnabled.12':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);}
-let versionRoot=null,versionBusy=false;
+let versionRoot=null,versionBusy=false,versionTemplates=null,pendingWorkbook=null;
+// Play uses the host's validated data. Excel templates are only needed for a version export.
+async function prepareVersionTables(){
+ if(!versionTemplates){
+  const decode=id=>Uint8Array.from(atob($(id).textContent.trim()),c=>c.charCodeAt(0));
+  versionTemplates=TableVersions.init(decode('embedded-authoring'),decode('embedded-workbook'),JSON.parse($('embedded-schema').textContent)).catch(e=>{versionTemplates=null;throw e;});
+ }
+ await versionTemplates;
+ if(pendingWorkbook){await TableVersions.adopt(pendingWorkbook.bytes,pendingWorkbook.data);pendingWorkbook=null;}
+}
 async function chooseVersionFolder(){
  if(!await requireCombatOwner())return null;
  if(!window.showDirectoryPicker){notice('이 브라우저는 폴더에 직접 저장할 수 없어요. 버전 ZIP 받기로 내려받아 바탕화면 데이터테이블 폴더에 압축을 풀어 주세요.');return null;}
@@ -44,13 +53,13 @@ async function exportBook(asZip=false){
  try{
   if(!asZip&&!window.showDirectoryPicker)asZip=true;
   if(!asZip&&!versionRoot&&!(await chooseVersionFolder()))return;
-  if(!await requireCombatOwner())return;const version=asZip?TableVersions.stamp():await TableVersions.uniqueVersion(versionRoot),result=await TableVersions.prepare(data,intent,version);
+  if(!await requireCombatOwner())return;notice('엑셀 버전을 준비하고 있어요. 잠시 기다려 주세요.');await prepareVersionTables();const version=asZip?TableVersions.stamp():await TableVersions.uniqueVersion(versionRoot),result=await TableVersions.prepare(data,intent,version);
   if(!await requireCombatOwner())return;if(asZip){const bytes=await TableVersions.zip(result),url=URL.createObjectURL(new Blob([bytes],{type:'application/zip'})),a=document.createElement('a');a.href=url;a.download=version+'_데이터테이블.zip';a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);notice('두 엑셀과 변경 이력을 ZIP으로 내려받습니다. 바탕화면 데이터테이블 폴더에 압축을 풀어 주세요. 버전: '+version);}
   else{await TableVersions.writeDirectory(versionRoot,result);notice('두 엑셀과 변경 이력을 저장했어요: '+versionRoot.name+' / '+version);}
   await TableVersions.commit(result);$('savedVersion').textContent='기준 버전: '+version;baseline=clone(data);history=[];persist();table();$('changeIntent').value='';
  }catch(e){notice(e.message,true);}finally{versionBusy=false;applyCombatOwnerControls();}
 }
-async function loadBook(file){if(!await requireCombatOwner())return;if(!file||versionBusy)return;pauseBattle();dialoguePreview=null;try{const bytes=await file.arrayBuffer(),next=await OfflineBook.load(bytes,file.name);if(next.sheets.length===12)await TableVersions.adopt(bytes,next);data=next;baseline=clone(data);battle=null;history=[];sheet='공격 만들기';$('sourceName').textContent=file.name+(data.macro?' · 매크로 보존':'');$('savedVersion').textContent='기준 버전: '+(TableVersions.version||'기존 원본');populate();tabs();table();persist();notice(file.name+' 불러오기 완료. 수정 후 변경 의도를 적고 버전 저장을 누르세요.');}catch(e){notice(e.message,true);}}
+async function loadBook(file){if(!await requireCombatOwner())return;if(!file||versionBusy)return;pauseBattle();dialoguePreview=null;try{const bytes=await file.arrayBuffer(),next=await OfflineBook.load(bytes,file.name);pendingWorkbook={bytes,data:clone(next)};data=next;baseline=clone(data);battle=null;history=[];sheet='공격 만들기';$('sourceName').textContent=file.name+(data.macro?' · 매크로 보존':'');$('savedVersion').textContent='기준 버전: 불러온 엑셀 · 저장 시 이력 확인';populate();tabs();table();persist();notice(file.name+' 불러오기 완료. 수정 후 변경 의도를 적고 버전 저장을 누르세요.');}catch(e){notice(e.message,true);}}
 function draw(){if(!data)return;drawDialogue();updatePoolInfo();scene.volume($('sound').checked,+$('volume').value);scene.render(battle,character(),renderIdle);if(!battle)return;const b=battle,m=b.monster;$('enemyName').textContent=m.Name;$('phaseBadge').textContent=`${m.PhaseID}페이즈 · ${Number(b.pattern?.AttackSpeed??m.AttackSpeed).toFixed(2)}×`;
  for(const[id,txt,v,max]of [['enemyHP','enemyHPText',b.enemyHP,m.MaxHP],['gaugeBar','gaugeText',b.gauge,m.GaugeMax],['hpBar','hpText',b.hp,b.player.MaxHP],['guardBar','guardText',b.guard,b.player.GuardMax]]){$(id).style.width=Math.max(0,Math.min(100,v/max*100))+'%';$(txt).textContent=`${Math.ceil(v)} / ${max}`;}
  const plan=b.planInfo,next=b.queue[0];let state={recover:'다음 공격 준비',attack:b.forcedMoving?'강제 이동 중 → 끝나면 방향키로 탈출':!on(b.pattern?.CanDefend)?'방어 불가 · 위험 타일을 벗어나세요':'예고를 보고 이동하거나 F로 패링하세요',opening:(b.opportunities<=m.PlayerDodgeMissCount?'이번 빈틈 기회는 MISS · ':b.pending?'마무리 연타! 빈틈 종료 후 대사 · ':'빈틈! SPACE 연타 · ')+`${b.openingResult?.attempts||0}타`,openingResult:'연타 종료 · 대사를 마친 뒤 전환',victory:'승리 · 모든 페이즈 완료',defeat:'패배 · 값을 바꾸고 다시 시험하세요'}[b.state]||'준비';if(b.dialogueBlocking)state=b.dialogues?.active?.leadMs>0?'부활 연출 중 · 끝난 뒤 대사 시작':'대화 중 · 전투 시간 정지';if(b.paused)state='일시정지';$('battleState').textContent=state;$('patternText').textContent=b.pattern?`${b.pattern.PatternID} · ${b.pattern.Name} · 피해 ${b.pattern.HitDamage}`:'공격 대기';$('countdown').textContent=next?`타격까지 ${Math.max(0,Math.ceil(next.due-b.time))} ms`:b.state==='recover'?`대기 ${Math.max(0,Math.ceil(b.next-b.time))} ms`:b.state==='opening'?`빈틈 ${(b.gauge/b.rule('GroggyDrainPerSec')).toFixed(1)}초`:'—';$('beatFill').style.width=next?Math.min(100,Math.max(0,(b.time-next.previewAt)/(next.due-next.previewAt||1)*100))+'%':'0%';
@@ -75,5 +84,24 @@ async function loadDefault(){if(!await requireCombatOwner())return;if(!confirm('
 $('beauty').onchange=()=>{pauseBattle();notice('다음 전투부터 선택한 미용 결과의 대사를 사용합니다. 적용 후 시작을 누르세요.');};
 $('previewDialogue').onclick=previewDialogue;$('nextDialogue').onclick=()=>{(dialoguePreview||battle?.dialogues)?.advance();drawDialogue();};$('stopDialogue').onclick=()=>{dialoguePreview=null;drawDialogue();};$('loadDefault').onclick=loadDefault;
 
-async function init(){try{const bytes=Uint8Array.from(atob($('embedded-workbook').textContent.trim()),c=>c.charCodeAt(0));const authorBytes=Uint8Array.from(atob($('embedded-authoring').textContent.trim()),c=>c.charCodeAt(0));await TableVersions.init(authorBytes,bytes,JSON.parse($('embedded-schema').textContent));data=await OfflineBook.load(authorBytes,'야차차_마스터테이블_작업용.xlsm');baseline=clone(data);$('savedVersion').textContent='기준 버전: '+(TableVersions.version||'기존 원본');try{const saved=JSON.parse(localStorage.getItem(draftKey));if(combatOwnerAllowed()&&saved?.source===JSON.stringify(baseline))data=saved.data;else if(combatOwnerAllowed()&&saved?.data)localStorage.setItem(draftKey+'-previous',JSON.stringify(saved));}catch{}await scene.load();$('sourceName').textContent='내장본: 한글 작업용 마스터 · 매크로 보존' ;populate();tabs();table();persist();notice('한글 작업용 XLSM과 Unity용 XLSX를 같은 버전으로 저장합니다. 엑셀에서 수정한 파일은 먼저 불러오세요. 변경 의도를 적으면 실제 값의 전후 비교가 함께 기록됩니다.');await hostReady();requestAnimationFrame(frame);}catch(e){notice('불러오기 실패: '+e.message,true);}}
-init();
+let initializing=null,frameStarted=false;
+async function init(){
+ if(initializing)return initializing;
+ initializing=Promise.resolve().then(async()=>{
+  try{
+   if(!data){data=clone(JSON.parse($('host-data').textContent).data);baseline=clone(data);}
+   $('sourceName').textContent='통합 프로젝트의 전투 데이터';
+   $('savedVersion').textContent='엑셀 기준 버전은 버전 저장 시 확인합니다';
+   populate();tabs();table();persist();
+   await scene.load();await hostReady();
+   if(!frameStarted){frameStarted=true;requestAnimationFrame(frame);}
+   $('retryCombat')?.remove();
+   notice('전투 준비 완료. 엑셀을 불러와 수정하거나 현재 데이터를 버전으로 저장할 수 있어요.');
+  }catch(e){
+   notice('전투 준비 실패: '+e.message,true);notifyHost('load-error',{message:e.message});
+   if(!$('retryCombat')){const retry=document.createElement('button');retry.id='retryCombat';retry.textContent='전투 화면 다시 준비';retry.onclick=()=>init();$('notice').after(retry);}
+  }
+ }).finally(()=>{initializing=null;});return initializing;
+}
+// The host bridge in the combined module must exist before initialization runs.
+queueMicrotask(init);
