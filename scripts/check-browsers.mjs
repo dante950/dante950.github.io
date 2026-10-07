@@ -1,3 +1,4 @@
+import {checkStoryStarts} from './check-story-starts.mjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import http from 'node:http';
@@ -101,6 +102,7 @@ try{
    // aria-disabled is intentional: a real click opens the password prompt.
    await child.locator('#importBook').click({force:true});await page.locator('#passwordDialog').waitFor();
    await page.locator('#passwordCancel').click();assert.equal(await page.locator('#ownerStatus').textContent(),'저장 기능 잠김');
+   await checkStoryStarts(page,{checkContinuation:true,screenshotPath:name==='webkit'?process.env.YACHA_START_SCREENSHOT:undefined});
    assert.deepEqual(errors,[]);
    console.log(name+': image retry and integrated visitor lock pass');
   }finally{await browser.close();}

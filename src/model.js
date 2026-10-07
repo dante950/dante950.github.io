@@ -1,4 +1,4 @@
-export const FLOW_VERSION='통합 플레이 0.5 · 브라우저 호환 개선';
+export const FLOW_VERSION='통합 플레이 0.6 · 시작 손님 선택';
 export const SALON_EVENTS=[['arrival','손님 등장'],['cut','손질 요청'],['attach','스티커 요청'],['draw','그리기 요청'],['best','미용 매우 만족'],['normal','미용 만족'],['fail','미용 불만족'],['proposal','야차 제안'],['afterWin','야차 승리 후 미용실'],['afterLoss','야차 패배 후 미용실'],['leave','손님 퇴장']];
 export function modelRows(p,name){return p.combat.sheets.find(s=>s.name===name)?.rows||[];}
 export function defaultProject(combat,assets){
@@ -36,3 +36,20 @@ export function projectProblems(p){const errors=[];if(p?.format!=='YACHACHA_FULL
  return errors;
 }
 export function stageForGuest(g){return g.beauty.enabled?'beauty':'battle';}
+
+// Start positions come from the same schedule used when a guest leaves.
+export function storyStartOptions(project){
+ const options=[];
+ for(const [dayIndex,ids] of project.schedule.entries()){
+  for(const [index,id] of ids.entries()){
+   const guest=project.guests.find(g=>g.id===id);
+   if(guest&&!options.some(x=>x.guest.id===id))options.push({guest,day:dayIndex+1,index});
+  }
+ }
+ return options;
+}
+export function createStoryState(project,guestID){
+ const start=storyStartOptions(project).find(x=>x.guest.id===guestID);
+ if(!start)throw new Error('선택한 손님이 영업 순서에 없습니다.');
+ return {project,day:start.day,index:start.index,money:0,records:[],guest:null,lastScore:0,portrait:null,soulUnlocked:false,preview:false};
+}

@@ -14,3 +14,15 @@ body.playing #talkSpeaker{color:#ffcf93}body.playing #talkText{color:#f0eee3}bod
 
 button[data-owner-only][aria-disabled="true"]{opacity:.43;cursor:help;filter:grayscale(.75);box-shadow:none}#ownerStatus{font-size:12px;color:#a8bec5}button[data-owner-only][aria-disabled="true"]::after{content:" 🔒";font-size:.8em}#ownerLogin{border-color:#bba578}#ownerLogout{font-size:12px}
 dialog#passwordDialog{width:min(440px,calc(100vw - 40px));box-sizing:border-box;padding:30px;background:#11232c;color:#eef2ed;border:1px solid #547984;border-radius:14px;box-shadow:0 24px 90px #0008}#passwordDialog::backdrop{background:#040c14b8;backdrop-filter:blur(5px)}#passwordDialog h2{margin:10px 0 14px;font-size:25px}#passwordDialog p{line-height:1.7;color:#c5d4d8}#passwordDialog label{display:block;margin:22px 0 8px;font-weight:700}#passwordDialog input{box-sizing:border-box;width:100%;padding:13px 15px;background:#091820;border:1px solid #78939a;border-radius:7px;color:#fff;font:18px system-ui}#passwordDialog input:focus{outline:2px solid #e5c588;outline-offset:2px}#passwordDialog #passwordError{color:#ffb4a7;min-height:25px;margin:8px 0}#passwordDialog small{color:#aac0c6;line-height:1.6}#passwordDialog .actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px}#passwordDialog button{min-height:43px}#passwordDialog button:disabled{opacity:.5}#passwordDialog [type=submit]{min-width:120px}
+
+/* Story entry uses existing customer art and schedule, without editing game data. */
+.storyStartModal{width:min(850px,100%)}
+.startGuests{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:24px 0}
+.startGuest{text-align:left;padding:20px 18px;background:#102630;border-radius:8px;display:flex;flex-direction:column}
+.startGuest:hover,.startGuest:focus-visible{background:#1b3940;border-color:var(--gold)}
+.startDay{font-size:11px;letter-spacing:1px;color:var(--mint)}
+.startPortrait{display:flex;align-items:end;justify-content:center;height:150px;margin:15px 0 20px;background:radial-gradient(ellipse at bottom,#b6ddca18,transparent 70%)}
+.startPortrait img{max-width:100%;max-height:145px;object-fit:contain;image-rendering:pixelated}
+.startGuest strong{font-size:22px;color:var(--ink)}.startGuest strong span{float:right;color:var(--gold)}
+.startRoute{font-size:12px;color:var(--muted);margin-top:6px}
+@media(max-width:600px){.startGuests{grid-template-columns:1fr;gap:10px}.startGuest{display:grid;grid-template-columns:70px 1fr;column-gap:15px;padding:13px}.startPortrait{grid-column:1;grid-row:1/4;height:80px;margin:0}.startPortrait img{max-height:80px}.startDay,.startGuest strong,.startRoute{grid-column:2}.startGuest strong{font-size:20px}.storyStartModal h2{font-size:24px}}

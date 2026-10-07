@@ -84,6 +84,6 @@ test('page entry and all versioned boot assets exist',async()=>{
  assert.ok(html.includes('내 작업본으로 시험 플레이'));
  for(const filename of Object.values(version.files))assert.ok((await fs.stat(path.join(root,'dist',filename))).size>0);
  const app=await read('dist/'+version.files.app);
- assert.ok(app.includes("el('play').onclick=()=>startStory(false)"));
- assert.ok(app.includes("el('playSaved').onclick=()=>startStory(true)"));
+ assert.ok(app.includes("el('play').onclick=()=>chooseStoryStart(false)"));
+ assert.ok(app.includes("el('playSaved').onclick=()=>chooseStoryStart(true)"));
 });
