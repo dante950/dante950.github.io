@@ -49,9 +49,11 @@ export function detachedByBeautyCut(before,after,width,height,anchors=new Uint8A
  }
  return removed;
 }
+// A request check means a sufficient trim, while the existing score still rewards precision.
+const BONE_TRIM_COMPLETION=.70,BONE_PRESERVE_TOLERANCE=.05;
 export function scoreShape(current,original,b,width=160,height=175,masks={}){
  if(!b.designVersion)return scoreLegacyShape(current,original,b,width,height);
- let points=0,interiorIntact=true;const details=[];
+ let points=0,interiorIntact=true,interiorLossRatio=0,eyeCoverRatio=0;const details=[];
  for(const r of b.cutRegions){
   let total=0,met=0;
   for(let y=0;y<height;y++)for(let x=0;x<width;x++){
@@ -74,20 +76,24 @@ export function scoreShape(current,original,b,width=160,height=175,masks={}){
    if(b.cutRegions.some(r=>(r.rule==='trim'||!r.rule&&r.kind==='good')&&inBeautyRegion((x+.5)*2,(y+.5)*2,r)))continue;
    keep++;if(!current[n])lost++;
   }
-  points-=b.weights.cut*Math.min(1,lost/Math.max(1,keep)*3);
+  interiorLossRatio=lost/Math.max(1,keep);
+  points-=b.weights.cut*Math.min(1,interiorLossRatio*3);
   const eyes=masks.eyes;let eyeTotal=0,eyeCover=0;
   if(eyes)for(let n=0;n<eyes.length;n++)if(eyes[n]){eyeTotal++;if(current[n]===2)eyeCover++;}
-  points-=b.weights.cut*eyeCover/Math.max(1,eyeTotal);
-  interiorIntact=lost===0&&eyeCover===0;
+  eyeCoverRatio=eyeCover/Math.max(1,eyeTotal);
+  points-=b.weights.cut*eyeCoverRatio;
+  interiorIntact=interiorLossRatio<=BONE_PRESERVE_TOLERANCE&&eyeCoverRatio<=BONE_PRESERVE_TOLERANCE;
  }
- return {score:Math.max(0,Math.min(b.weights.cut,points)),details,interiorIntact};
+ return {score:Math.max(0,Math.min(b.weights.cut,points)),details,interiorIntact,interiorLossRatio,eyeCoverRatio};
 }
 // Memo completion follows existing requirements, never the number of strokes.
 export function beautyRequirementChecks(b,phase,shape,scores,placementCount){
  if(phase==='cut'){
   const groups=[...new Set(shape.details.filter(r=>r.rule!=='free').map(r=>r.rule))];
-  const checks=groups.map(rule=>shape.details.filter(r=>r.rule===rule).every(r=>r.fulfilled>=1-1e-9));
-  if(b.growth?.material==='bone')checks.push(shape.interiorIntact===true);
+  const bone=b.designVersion&&b.growth?.material==='bone';
+  const checks=groups.map(rule=>shape.details.filter(r=>r.rule===rule).every(r=>
+   r.fulfilled>=1-1e-9||bone&&rule==='trim'&&r.ratio>=BONE_TRIM_COMPLETION));
+  if(bone)checks.push(shape.interiorIntact===true);
   return checks.length?checks:[scores.cut>=b.weights.cut-1e-9];
  }
  if(phase==='attach')return [placementCount===1&&scores.attach>=b.weights.attach-1e-9];

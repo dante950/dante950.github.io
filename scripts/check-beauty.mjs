@@ -212,6 +212,27 @@ try{
    await page.keyboard.press('Control+z');assert.deepEqual(await material(salon),finishedShape,'returning to shape never enables undo');
    await revisit(page,salon,'attach');await salon.locator('#undoBeauty').click();
    assert.deepEqual(await material(salon),finishedShape,'sticker Undo never changes the shape');
+
+   // A normal small-brush trim can fulfill Sans without pixel-perfect interior preservation.
+   salon=await startPreview(page,10003);
+   await salon.locator('#sculptSize').selectOption('5');
+   const regions=await salon.evaluate(()=>JSON.parse(document.getElementById('guest-data').textContent).beauty.cutRegions);
+   for(const r of regions){
+    const ys=[];for(let y=r.y+4;y<r.y+r.h-4;y+=4)ys.push(y);ys.push(r.y+r.h-4);
+    for(const y of ys)await stroke(page,salon,[r.x+4,y],[r.x+r.w-4,y]);
+   }
+   assert.equal(await salon.locator('.requestItem.complete').count(),1,'the brief combined request checks off after ordinary trimming');
+   const shape=await salon.evaluate(()=>scoreShape(beautyDebug.material,beautyDebug.original,JSON.parse(document.getElementById('guest-data').textContent).beauty,160,175,beautyDebug.masks));
+   assert(shape.interiorLossRatio>0&&shape.interiorLossRatio<=.05,'the test includes real brush overshoot');
+   const label=salon.locator('.requestItem.complete .requestLabel');
+   assert((await label.evaluate(e=>getComputedStyle(e).textDecorationLine)).includes('line-through'));
+   if(output)await page.screenshot({path:path.join(output,name+'-sans-trim-fulfilled.png')});
+   await salon.locator('#repeatBeautyRequest').click();await finishRequest(page,salon);
+   assert.equal(await salon.locator('.requestItem.complete').count(),2,'both detailed checks agree with the brief request');
+   await salon.locator('#sculptSize').selectOption('18');
+   await stroke(page,salon,[125,120],[200,150]);
+   assert.equal(await salon.locator('.requestItem').last().evaluate(e=>e.classList.contains('complete')),false,'major inner damage still revokes the check');
+
    assert.deepEqual(errors,[]);
    console.log(name+': speech → note, visible mouth animation, seamless zombie growth, irreversible cuts, dye/sticker undo, masks, both guests pass');
   }finally{await browser.close();}
