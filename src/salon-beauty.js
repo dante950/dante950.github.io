@@ -8,9 +8,9 @@ let brushRadius=10,paintColor='#75452D',expression='neutral',talking=false,mouth
 let touched={cut:false,draw:false,attach:false},zonesVisible=false,history={draw:[],attach:[]},briefing=false,requestSerial=0;
 const current=new Uint8Array(W*H),original=new Uint8Array(W*H),paint=new Uint8ClampedArray(W*H*4);
 const sourcePixels=new Uint8ClampedArray(W*H*4),originalBorder=new Uint8Array(W*H);
-const masks={eyes:new Uint8Array(W*H),brain:new Uint8Array(W*H),face:new Uint8Array(W*H),roots:new Uint8Array(W*H)};
-let fallingPieces=[],fallingFrame=0;
-const heardDetails={};
+const masks={eyes:new Uint8Array(W*H),brain:new Uint8Array(W*H)};
+const heardDetails={},heardRequests={};
+let liveSatisfaction=50,shapeProgress={details:[]};
 const faceImage=new Image(),hairImage=new Image(),capeImage=new Image();
 faceImage.src=GUEST.skin.head;hairImage.src=GUEST.skin.hair;
 capeImage.src=beautyCustomer.querySelector('.cape').src;
@@ -24,7 +24,7 @@ const panel=document.querySelector('.beautyPanel');
 panel.innerHTML='<div class="sculptTools"><h3>형태 만들기</h3><div id="shapeTools"></div><label class="brushLabel">도구 크기 <select id="sculptSize"><option value="5">작게</option><option value="10" selected>보통</option><option value="18">넓게</option></select></label><div id="paintTools" hidden></div><div id="decorationTools" hidden></div></div>';
 document.querySelector('.beautyMood').remove();
 const status=document.createElement('section');status.className='sculptStatus'+(bone?' bone':'');
-status.innerHTML='<span class="requestCaption">손님의 부탁</span><p class="requestText"></p><button id="repeatBeautyRequest" aria-label="손님의 부탁 다시 듣기">다시 듣기 ↻</button>';status.hidden=true;
+status.innerHTML='<span class="requestCaption">손님의 부탁</span><div class="requestText"></div><div class="requestSatisfaction"><span>손님 만족도</span><output aria-live="polite">50/100</output></div><button id="repeatBeautyRequest" aria-label="손님의 부탁 다시 듣기">다시 듣기 ↻</button>';status.hidden=true;
 beautyScreen.append(status);
 const nav=document.createElement('div');nav.className='sculptNav';beautyScreen.append(nav);
 const actions=document.createElement('div');actions.className='sculptActions';
@@ -74,9 +74,6 @@ async function prepareBeauty(){
  for(let n=0;n<W*H;n++){
   const i=n*4,x=(n%W+.5)*PIX,y=(Math.floor(n/W)+.5)*PIX,r=head[i],g=head[i+1],bl=head[i+2],a=head[i+3];
   if(!a)continue;
-  // Scalp is rooted above the brow. The bone face has an immutable inner core.
-  masks.face[n]=bone?+(x>104&&x<216&&y>=78&&y<180):+(y>=88);
-  masks.roots[n]=bone?masks.face[n]:+(y<88&&x>108&&x<216);
   if(!bone&&y<90&&r>120&&bl>60&&g<150&&r>g*1.3)masks.brain[n]=1;
   if(y>88&&y<136&&x>103&&x<215){
    if(bone?(r<100&&g<110&&bl<130):(r>170&&bl<160&&g>140||r>180&&g<100&&bl<150))masks.eyes[n]=1;
@@ -111,14 +108,13 @@ function applyStroke(points,kind){
   const x=(n%W+.5)*PIX,y=(Math.floor(n/W)+.5)*PIX,i=n*4,previous=current[n],previousPaint=paint.slice(i,i+4);
   if(kind==='grow'){
    if(!inBeautyRegion(x,y,growthRegion))continue;
-   if(!beautyToolAllowed(kind,n,bone,original,masks.face))continue;
-   // New material joins the scalp/outer bone while the face stays intact.
+   // Growth can cover facial features and remain separate from the original material.
    if(!bone){current[n]=2;paint.fill(0,i,i+4);}
    else if(!current[n]){current[n]=original[n]?1:2;paint.fill(0,i,i+4);}
    else if(!originalBorder[n])current[n]=2;
-  }else if(kind==='scissors'||kind==='hammer'){if(!beautyToolAllowed(kind,n,bone,original,masks.face))continue;current[n]=0;paint.fill(0,i,i+4);}
+  }else if(kind==='scissors'||kind==='hammer'){current[n]=0;paint.fill(0,i,i+4);}
   else if(kind==='erase')paint.fill(0,i,i+4);
-  else if(kind==='paint'&&beautyToolAllowed(kind,n,bone,original,masks.face)&&(current[n]||!B.designVersion)){paint.set([...rgb(paintColor),255],i);}
+  else if(kind==='paint'&&(current[n]||!B.designVersion)){paint.set([...rgb(paintColor),255],i);}
   if(current[n]!==previous||previousPaint.some((v,k)=>v!==paint[i+k]))changed=true;
  }
  if(!changed)return;
@@ -148,18 +144,10 @@ portrait.addEventListener('pointerup',e=>{
  if(g.kind==='scissors'){applyStroke([g.from,g.to],'scissors');}
  gesture=null;
  if(portrait.hasPointerCapture(e.pointerId))portrait.releasePointerCapture(e.pointerId);
- if(beautyPhase==='cut'){dropDetachedMaterial();history.draw=[];history.attach=[];syncUndo();}
+ if(beautyPhase==='cut'){history.draw=[];history.attach=[];syncUndo();}
  if(g.kind==='hammer')send('sound',{key:'hammer'});
  updateBeautyScore();renderPortrait();
 });
-function dropDetachedMaterial(){
- const removed=detachedBeautyCells(current,masks.roots,W,H);if(!removed.length)return;
- renderPortrait(false);const before=materialCanvas.getContext('2d').getImageData(0,0,W,H),piece=offscreen(),pc=piece.getContext('2d'),pixels=pc.createImageData(W,H);
- for(const n of removed){const i=n*4;pixels.data.set(before.data.subarray(i,i+4),i);current[n]=0;paint.fill(0,i,i+4);}
- pc.putImageData(pixels,0,0);fallingPieces.push({canvas:piece,start:performance.now()});
- if(!fallingFrame)fallingFrame=requestAnimationFrame(animateFalling);
-}
-function animateFalling(t){fallingPieces=fallingPieces.filter(p=>t-p.start<420);renderPortrait();fallingFrame=fallingPieces.length?requestAnimationFrame(animateFalling):0;}
 function cancelGesture(){
  if(!gesture)return;const g=gesture;gesture=null;current.set(g.snapshot);paint.set(g.paint);touched=g.touched;if(g.undoAdded)history[beautyPhase].pop();
  if(portrait.hasPointerCapture(g.pointerId))portrait.releasePointerCapture(g.pointerId);
@@ -175,13 +163,15 @@ function placeSticker(sticker,x,y){
 }
 function updateBeautyScore(){
  if(!ready)return;
- const shape=scoreShape(current,original,B,W,H,masks);cutScore=shape.score;
+ const shape=scoreShape(current,original,B,W,H,masks);shapeProgress=shape;cutScore=shape.score;
  attachScore=beautyAttachScore(placements,B);
  if(B.weights.draw){const full=new Uint8ClampedArray(320*350*4);for(let y=0;y<350;y++)for(let x=0;x<320;x++){const n=(Math.floor(y/2)*W+Math.floor(x/2))*4;full.set(paint.subarray(n,n+4),(y*320+x)*4);}drawScore=beautyDrawScore(full,B);}else drawScore=0;
  totalSatisfaction=beautyTotal({cut:cutScore,draw:drawScore,attach:attachScore},B);
  const scores={cut:cutScore,draw:drawScore,attach:attachScore};
  const live=BEAUTY_STAGES.reduce((s,k)=>s+(B.steps[k]?(touched[k]?scores[k]:B.weights[k]*.5):0),0);
+ liveSatisfaction=Math.round(Math.max(0,Math.min(100,live)));
  expression=liveBeautyMood(live,expression,Object.values(touched).some(Boolean));
+ renderRequestStatus();
  beautyCustomer.dataset.expression=expression;beautyCustomer.dataset.talking=String(talking);
 }
 function paintFace(){
@@ -212,7 +202,6 @@ function renderPortrait(includeGuides=true,target=ctx){
  const materialCtx=materialCanvas.getContext('2d'),data=materialCtx.createImageData(W,H),face=faceCanvas.getContext('2d').getImageData(0,0,W,H).data;
  for(let n=0;n<W*H;n++){
   if(!current[n])continue;const i=n*4;
-  if(bone&&masks.face[n]){data.data.set(face.subarray(i,i+4),i);continue;}
   const edge=emptyNeighbor(current,n),joining=originalBorder[n]&&!edge;
   const sourceDark=!bone&&sourcePixels[i+1]<140;
   const nearGrowth=!bone&&sourceDark&&[-2*W,-W,-2,-1,1,2,W,2*W].some(d=>current[n+d]===2);
@@ -220,9 +209,8 @@ function renderPortrait(includeGuides=true,target=ctx){
   if(color)data.data.set([...color,255],i);else data.data.set((bone?face:sourcePixels).subarray(i,i+4),i);
   if(paint[i+3])data.data.set(paint.subarray(i,i+4),i);
  }
- if(!B.designVersion)for(let n=0;n<W*H;n++){const i=n*4;if(paint[i+3]&&!(bone&&masks.face[n]))data.data.set(paint.subarray(i,i+4),i);}
+ if(!B.designVersion)for(let n=0;n<W*H;n++){const i=n*4;if(paint[i+3])data.data.set(paint.subarray(i,i+4),i);}
  materialCtx.putImageData(data,0,0);target.drawImage(materialCanvas,0,0);
- if(includeGuides)for(const p of fallingPieces){const age=Math.max(0,(performance.now()-p.start)/420);target.save();target.globalAlpha=Math.max(0,1-age);target.drawImage(p.canvas,0,5+50*age*age);target.restore();}
  for(const p of placements){const image=stickerImages.get(p.sticker.id);if(image?.complete&&image.naturalWidth)target.drawImage(image,p.x/2-p.sticker.w*.375,p.y/2-p.sticker.h*.375,p.sticker.w*.75,p.sticker.h*.75);}
  if(includeGuides&&zonesVisible){
   target.save();target.lineWidth=.8;target.font='5px sans-serif';
@@ -244,6 +232,19 @@ function refreshTools(){
  for(const b of decorations.querySelectorAll('[data-sticker]'))b.classList.toggle('selected',b.dataset.sticker===selectedSticker?.id);
  hint.textContent=beautyPhase==='attach'?'붙인 장식은 눌러 떼기':beautyPhase==='draw'?'머리 위에 쓱쓱':activeTool==='grow'?'누른 채 발라 주세요':activeTool==='scissors'?'드래그 후 놓으면 싹둑':'누른 채 조금씩 다듬기';
 }
+function renderRequestStatus(){
+ if(!BEAUTY_STAGES.includes(beautyPhase))return;
+ const notes=heardDetails[beautyPhase]?B.requestNotes:B.requestBriefNotes;
+ const text=notes?.[beautyPhase]||B.requestNotes?.[beautyPhase]||({cut:bone?'얼굴 테두리 다듬기':'눈이 보이게 · 앞머리 손질',draw:B.weights.draw?'부탁한 색과 무늬로':'색·무늬는 자유롭게',attach:'손님에게 어울리는 장식'}[beautyPhase]);
+ const checks=beautyRequirementChecks(B,beautyPhase,shapeProgress,{cut:cutScore,draw:drawScore,attach:attachScore},placements.length);
+ const lines=beautyPhase==='cut'&&(!bone||heardDetails.cut)?text.split('\n').filter(Boolean):[text];
+ const markup=lines.map((label,i)=>{
+  const met=checks.length===lines.length?checks[i]:checks.every(Boolean),optional=beautyPhase==='draw'&&!B.weights.draw;
+  return '<div class="requestItem'+(optional?' optional':met?' complete':'')+'"><span class="requestCheck" aria-label="'+(optional?'선택 사항':met?'달성':'진행 중')+'">'+(optional?'◇':met?'✓':'○')+'</span><span class="requestLabel">'+safeText(label)+'</span></div>';
+ }).join('');
+ const list=status.querySelector('.requestText');if(list.innerHTML!==markup)list.innerHTML=markup;
+ const value=status.querySelector('.requestSatisfaction output'),score=liveSatisfaction+'/100';if(value.textContent!==score)value.textContent=score;
+}
 function setBeautyPhase(phase,announce=true){
  if(finishing||briefing)return;cancelGesture();beautyPhase=phase;
  const names={cut:'형태 만들기',draw:'색·무늬 꾸미기',attach:'장식 붙이기'},stages=beautyStageOrder(B);
@@ -251,11 +252,11 @@ function setBeautyPhase(phase,announce=true){
  panel.querySelector('h3').textContent=names[phase];
  shapeTools.hidden=phase!=='cut';paintTools.hidden=phase!=='draw';decorations.hidden=phase!=='attach';panel.querySelector('.brushLabel').hidden=phase==='attach';
  activeTool=phase==='cut'?(bone?'hammer':'scissors'):phase==='draw'?'paint':'sticker';
- status.querySelector('.requestText').textContent=B.requestNotes?.[phase]||({cut:bone?'얼굴 테두리 다듬기':'눈이 보이게 · 앞머리 손질',draw:B.weights.draw?'부탁한 색과 무늬로': '색·무늬는 자유롭게',attach:'손님에게 어울리는 장식'}[phase]);
+ renderRequestStatus();
  nav.innerHTML=stages.map((k,i)=>'<button data-phase="'+k+'" class="'+(phase===k?'selected':'')+'">'+(i+1)+'. '+names[k]+'</button>').join('');
  for(const button of nav.children)button.onclick=()=>setBeautyPhase(button.dataset.phase);
  next.textContent=stages.indexOf(phase)===stages.length-1?'미용 완성':phase==='draw'&&!B.weights.draw?'꾸미기 마치기':'다음 단계';
- next.disabled=!ready;syncUndo();refreshTools();updateBeautyScore();renderPortrait();if(announce)announceBeautyRequest();
+ next.disabled=!ready;syncUndo();refreshTools();updateBeautyScore();renderPortrait();if(announce&&!heardRequests[phase])announceBeautyRequest();else status.hidden=false;
 }
 function announceBeautyRequest(){
  if(finishing||briefing)return;cancelGesture();briefing=true;status.hidden=true;panel.inert=true;nav.inert=true;actions.inert=true;next.disabled=true;syncUndo();
@@ -263,9 +264,9 @@ function announceBeautyRequest(){
 }
 function finishBeautyRequest(id,detail=false){
  if(!briefing||id!==requestSerial)return;
+ heardRequests[beautyPhase]=true;
  heardDetails[beautyPhase]=heardDetails[beautyPhase]||detail;
- const notes=heardDetails[beautyPhase]?B.requestNotes:B.requestBriefNotes;
- if(notes?.[beautyPhase])status.querySelector('.requestText').textContent=notes[beautyPhase];
+ renderRequestStatus();
  briefing=false;talking=false;mouthFrame=false;beautyCustomer.dataset.talking='false';status.hidden=false;panel.inert=false;nav.inert=false;actions.inert=false;next.disabled=!ready;syncUndo();renderPortrait();
 }
 function enterAttachPhase(){setBeautyPhase('attach');}
@@ -286,5 +287,5 @@ function startBeautyResult(){
 }
 addEventListener('message',e=>{if(e.source!==parent||e.data?.token!==GUEST.token)return;if(e.data.type==='beauty-request-done'){finishBeautyRequest(e.data.requestId,e.data.detail);return;}if(e.data.type!=='beauty-speaking')return;talking=!!e.data.speaking;mouthFrame=!!e.data.open;beautyCustomer.dataset.talking=String(talking);renderPortrait();});
 prepareBeauty().catch(error=>{hint.textContent='미용 리소스를 불러오지 못했어요. 새로고침해 주세요.';console.error(error);});
-window.beautyDebug={get ready(){return ready;},get material(){return Array.from(current);},get paint(){return Array.from(paint);},get original(){return Array.from(original);},get masks(){return masks;},get expression(){return expression;},get scores(){return {cut:cutScore,draw:drawScore,attach:attachScore,total:totalSatisfaction};},get placements(){return placements.map(p=>({id:p.sticker.id,x:p.x,y:p.y}));},get historyLength(){return history[beautyPhase]?.length||0;},get briefing(){return briefing;},get mouthFrame(){return mouthFrame;}};
+window.beautyDebug={get ready(){return ready;},get material(){return Array.from(current);},get paint(){return Array.from(paint);},get original(){return Array.from(original);},get masks(){return masks;},get expression(){return expression;},get scores(){return {cut:cutScore,draw:drawScore,attach:attachScore,total:totalSatisfaction,live:liveSatisfaction};},get placements(){return placements.map(p=>({id:p.sticker.id,x:p.x,y:p.y}));},get historyLength(){return history[beautyPhase]?.length||0;},get briefing(){return briefing;},get mouthFrame(){return mouthFrame;}};
 

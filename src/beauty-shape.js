@@ -17,29 +17,9 @@ export function strokeCells(width,height,points,radius,scale=2){
  }
  return cells;
 }
-// Keep only material connected to a fixed scalp/core anchor. Diagonal pixel joins count.
-export function detachedBeautyCells(material,anchors,width,height){
- const seen=new Uint8Array(material.length),queue=[];
- for(let n=0;n<material.length;n++)if(material[n]&&anchors[n]){seen[n]=1;queue.push(n);}
- for(let i=0;i<queue.length;i++){
-  const n=queue[i],x=n%width,y=Math.floor(n/width);
-  for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
-   const xx=x+dx,yy=y+dy;if(xx<0||xx>=width||yy<0||yy>=height)continue;
-   const next=yy*width+xx;if(material[next]&&!seen[next]){seen[next]=1;queue.push(next);}
-  }
- }
- const detached=[];for(let n=0;n<material.length;n++)if(material[n]&&!seen[n])detached.push(n);
- return detached;
-}
-export function beautyToolAllowed(kind,n,bone,original,face){
- if(!face[n])return true;
- // Original bangs can still be cut and dyed; tools never edit the face underneath.
- if(!bone)return kind!=='grow';
- return !['hammer','scissors','grow','paint'].includes(kind);
-}
 export function scoreShape(current,original,b,width=160,height=175,masks={}){
  if(!b.designVersion)return scoreLegacyShape(current,original,b,width,height);
- let points=0;const details=[];
+ let points=0,interiorIntact=true;const details=[];
  for(const r of b.cutRegions){
   let total=0,met=0;
   for(let y=0;y<height;y++)for(let x=0;x<width;x++){
@@ -48,12 +28,11 @@ export function scoreShape(current,original,b,width=160,height=175,masks={}){
    if(r.mask&&masks[r.mask]&&!masks[r.mask][n])continue;
    const rule=r.rule||(r.kind==='bad'?'preserve':r.kind==='keep'?'free':'trim');
    if(rule==='free'||((rule==='trim'||rule==='preserve')&&!original[n]))continue;
-   if(b.growth?.material==='bone'&&masks.face?.[n]&&(rule==='trim'||rule==='preserve'))continue;
    total++;if(rule==='clear'||rule==='trim'?!current[n]:!!current[n])met++;
   }
   const ratio=total?met/total:0,fulfilled=total?Math.min(1,ratio/Math.max(.01,1-(r.tolerance??.05))):0;
   const value=fulfilled*(r.points||0);
-  points+=value;details.push({key:r.key,label:r.label,ratio,fulfilled,points:value,total});
+  points+=value;details.push({key:r.key,label:r.label,rule:r.rule||(r.kind==='bad'?'preserve':r.kind==='keep'?'free':'trim'),ratio,fulfilled,points:value,total});
  }
  // Bone additions may be freely sculpted; damage to the original interior lowers the result.
  if(b.growth?.material==='bone'){
@@ -67,8 +46,20 @@ export function scoreShape(current,original,b,width=160,height=175,masks={}){
   const eyes=masks.eyes;let eyeTotal=0,eyeCover=0;
   if(eyes)for(let n=0;n<eyes.length;n++)if(eyes[n]){eyeTotal++;if(current[n]===2)eyeCover++;}
   points-=b.weights.cut*eyeCover/Math.max(1,eyeTotal);
+  interiorIntact=lost===0&&eyeCover===0;
  }
- return {score:Math.max(0,Math.min(b.weights.cut,points)),details};
+ return {score:Math.max(0,Math.min(b.weights.cut,points)),details,interiorIntact};
+}
+// Memo completion follows existing requirements, never the number of strokes.
+export function beautyRequirementChecks(b,phase,shape,scores,placementCount){
+ if(phase==='cut'){
+  const groups=[...new Set(shape.details.filter(r=>r.rule!=='free').map(r=>r.rule))];
+  const checks=groups.map(rule=>shape.details.filter(r=>r.rule===rule).every(r=>r.fulfilled>=1-1e-9));
+  if(b.growth?.material==='bone')checks.push(shape.interiorIntact===true);
+  return checks.length?checks:[scores.cut>=b.weights.cut-1e-9];
+ }
+ if(phase==='attach')return [placementCount===1&&scores.attach>=b.weights.attach-1e-9];
+ return [!b.weights.draw||scores.draw>=b.weights.draw-1e-9];
 }
 export function liveBeautyMood(score,previous='neutral',touched=false){
  if(!touched)return 'neutral';

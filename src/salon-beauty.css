@@ -23,3 +23,14 @@
 #beautyScreen [hidden]{display:none!important}
 
 .sculptTools select{color-scheme:light}
+
+/* The short memo doubles as live feedback, without listing correct items. */
+.sculptStatus .requestText{margin:12px 0 14px;line-height:1.65}
+.requestItem{display:flex;align-items:flex-start;gap:6px;margin:8px 0}
+.requestCheck{flex:0 0 12px;font-size:12px;color:#A98B68}
+.requestLabel{white-space:pre-line}
+.requestItem.complete{color:#42784A}
+.requestItem.complete .requestCheck{color:#42784A;font-weight:900}
+.requestItem.complete .requestLabel{text-decoration:line-through;text-decoration-thickness:1px;text-decoration-color:#42784A99}
+.requestSatisfaction{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid #C9AF8C;padding-top:10px;font-size:10px;color:#72573F}
+.requestSatisfaction output{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;color:#493627}

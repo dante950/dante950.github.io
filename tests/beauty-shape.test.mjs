@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
-import {scoreShape,strokeCells,beautyStageOrder,liveBeautyMood,detachedBeautyCells,beautyToolAllowed} from '../src/beauty-shape.js';
+import {scoreShape,strokeCells,beautyStageOrder,liveBeautyMood,beautyRequirementChecks} from '../src/beauty-shape.js';
 import {defaultProject,projectProblems} from '../src/model.js';
 const project=JSON.parse(await fs.readFile(new URL('../data/project.json',import.meta.url),'utf8'));
 const assets=JSON.parse(await fs.readFile(new URL('../data/assets.json',import.meta.url),'utf8'));
@@ -52,20 +52,36 @@ test('older imported projects retain trim scoring without new rule fields',()=>{
  current[70]=0;assert(scoreShape(current,original,b,10,10).score<70);
 });
 
-test('detached strands fall, diagonal joins and rooted separate tufts stay',()=>{
- const a=new Uint8Array(25),m=new Uint8Array(25);a[1]=1;a[4]=1;for(const n of [1,4,7,12,17,22,20])m[n]=1;
- assert.deepEqual(detachedBeautyCells(m,a,5,5),[20]);m[12]=0;assert.deepEqual(detachedBeautyCells(m,a,5,5),[17,20,22]);
-});
-test('face protection leaves original bangs cuttable while the bone core is immutable',()=>{
- const original=Uint8Array.of(1,0),face=Uint8Array.of(1,1);
- assert.equal(beautyToolAllowed('scissors',0,false,original,face),true);
- assert.equal(beautyToolAllowed('grow',0,false,original,face),false);
- for(const kind of ['grow','hammer','paint'])assert.equal(beautyToolAllowed(kind,0,true,original,face),false);
-});
-test('protected bone pixels are excluded from the reachable trim target',()=>{
+
+test('every original trim pixel is reachable, including the former protected face',()=>{
  const original=Uint8Array.of(1,1),current=Uint8Array.of(1,0),face=Uint8Array.of(1,0);
  const b={designVersion:2,growth:{material:'bone'},weights:{cut:70},cutRegions:[{x:0,y:0,w:4,h:2,rule:'trim',points:70,tolerance:0}]};
- assert.equal(scoreShape(current,original,b,2,1,{face}).score,70);
+ assert.equal(scoreShape(current,original,b,2,1,{face}).score,35);
+ current[0]=0;assert.equal(scoreShape(current,original,b,2,1,{face}).score,70);
 });
+test('memo checks combine both eyes, track brain coverage, and revoke on regression',()=>{
+ const b=project.guests[0].beauty,details=[
+  {rule:'clear',fulfilled:1},{rule:'clear',fulfilled:.9},{rule:'cover',fulfilled:1}];
+ const check=()=>beautyRequirementChecks(b,'cut',{details},{cut:65},0);
+ assert.deepEqual(check(),[false,true]);details[1].fulfilled=1;assert.deepEqual(check(),[true,true]);
+ details[2].fulfilled=.8;assert.deepEqual(check(),[true,false]);
+ assert.deepEqual(beautyRequirementChecks(b,'attach',{}, {attach:30},1),[true]);
+ assert.deepEqual(beautyRequirementChecks(b,'attach',{}, {attach:15},2),[false]);
+ assert.deepEqual(beautyRequirementChecks(b,'attach',{}, {attach:30},2),[false]);
+ assert.deepEqual(beautyRequirementChecks(b,'draw',{}, {draw:0},0),[true]);
+});
+test('bone integrity feedback uses the existing interior and eye-cover rules',()=>{
+ const original=new Uint8Array(8).fill(1),current=original.slice(),eyes=new Uint8Array(8);eyes[2]=1;
+ const b={designVersion:2,growth:{material:'bone'},weights:{cut:70},cutRegions:[{x:0,y:0,w:2,h:4,rule:'trim',points:70,tolerance:0}]};
+ current[0]=current[4]=0;
+ let shape=scoreShape(current,original,b,4,2,{eyes});
+ assert.equal(shape.score,70);assert.deepEqual(beautyRequirementChecks(b,'cut',shape,{cut:70},0),[true,true]);
+ current[2]=2;shape=scoreShape(current,original,b,4,2,{eyes});
+ assert.equal(shape.score,0);assert.equal(shape.interiorIntact,false);
+ current[2]=1;current[3]=0;shape=scoreShape(current,original,b,4,2,{eyes});
+ assert.equal(shape.score,35);assert.equal(shape.interiorIntact,false);
+ current[3]=1;assert.equal(scoreShape(current,original,b,4,2,{eyes}).score,70);
+});
+
 import {parseDialogueText} from '../src/text-effects.js';
 test('both guests have valid highlighted initial and detailed requests for every stage',()=>{for(const id of [10001,10003]){const b=project.guests.find(g=>g.id===id).beauty;for(const stage of ['cut','draw','attach']){for(const text of [stage==='cut'?b.request:b[stage+'Hint'],b.requestDetails[stage]]){const rich=parseDialogueText(text);assert.deepEqual(rich.warnings,[]);assert(rich.glyphs.some(g=>g.style.color!=='#F0EEE3'));}assert(b.requestBriefNotes[stage]);}}});
