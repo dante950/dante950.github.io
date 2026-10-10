@@ -75,6 +75,7 @@ async function pointer(page,salon,x,y){
  const box=await salon.locator('.sculptCanvas').boundingBox();
  await page.mouse.move(box.x+x/320*box.width,box.y+y/350*box.height);
 }
+async function setRange(salon,id,value){await salon.locator(id).evaluate((e,v)=>{e.value=String(v);e.dispatchEvent(new Event('input',{bubbles:true}));},value);}
 async function stroke(page,salon,from,to){await pointer(page,salon,...from);await page.mouse.down();await pointer(page,salon,...to);await page.mouse.up();}
 const material=s=>s.evaluate(()=>beautyDebug.material);
 const scores=s=>s.evaluate(()=>beautyDebug.scores);
@@ -90,7 +91,7 @@ try{
    if(output)await page.screenshot({path:path.join(output,name+'-zombie-start.png')});
    // Reproduce the reported floating fragments on the untouched zombie sprite.
    await salon.locator('[data-tool="grow"]').click();await stroke(page,salon,[270,270],[270,280]);
-   await salon.locator('[data-tool="scissors"]').click();await salon.locator('#sculptSize').selectOption('5');
+   await salon.locator('[data-tool="scissors"]').click();await setRange(salon,'#sculptSize',5);
    await stroke(page,salon,[45,100],[275,100]);
    assert(await salon.evaluate(()=>beautyDebug.material.every((v,n)=>!beautyDebug.original[n]||Math.floor(n/160)*2<=106||!v)),'original bangs severed from the scalp do not remain on the face');
    assert.equal((await material(salon))[135*160+135],2,'an independent growth stroke survives cutting elsewhere');
@@ -120,7 +121,7 @@ try{
    await salon.locator('[data-tool="scissors"]').click();await stroke(page,salon,[160,152],[160,170]);
    assert.equal((await material(salon))[80*160+80],0,'growth over the face can be removed again');
    // Complete the zombie request through real drags.
-   await salon.locator('[data-tool="grow"]').click();await salon.locator('#sculptSize').selectOption('18');
+   await salon.locator('[data-tool="grow"]').click();await setRange(salon,'#sculptSize',18);
    for(const y of [20,45,70,95])await stroke(page,salon,[90,y],[225,y]);
    const merged=await salon.evaluate(()=>{
     const m=beautyDebug.material,o=beautyDebug.original,data=document.querySelector('.sculptCanvas').getContext('2d').getImageData(0,0,160,175).data;
@@ -153,6 +154,17 @@ try{
    assert.deepEqual(await material(salon),beforeDye,'color Undo never restores a cut');
    await stroke(page,salon,[165,42],[211,70]);
    await stroke(page,salon,[12,260],[12,295]);assert.deepEqual(await salon.evaluate(()=>beautyDebug.paint),painted,'paint is clipped to the material');
+
+   // Opacity uses one blend per gesture, then builds up on another stroke.
+   await setRange(salon,'#paintOpacity',35);
+   await salon.locator('[data-color="#FF3024"]').click();
+   await stroke(page,salon,[100,25],[110,25]);
+   const alpha=await salon.evaluate(()=>beautyDebug.paint[(12*160+52)*4+3]);assert.equal(alpha,89);
+   const once=await salon.evaluate(()=>beautyDebug.paint);
+   await stroke(page,salon,[100,25],[110,25]);
+   assert.equal(await salon.evaluate(()=>beautyDebug.paint[(12*160+52)*4+3]),147);
+   await salon.locator('#undoBeauty').click();assert.deepEqual(await salon.evaluate(()=>beautyDebug.paint),once);
+   await setRange(salon,'#paintOpacity',100);
    await nextStage(page,salon);assert.equal(await salon.evaluate(()=>salonLab.phase),'attach');
    await salon.locator('[data-sticker="ST-GENTLE-GLASSES-HORN"]').click();await stroke(page,salon,[116,105],[116,105]);
    assert.equal((await scores(salon)).attach,30);assert.equal(await salon.locator('.requestItem.complete').count(),1);
@@ -178,18 +190,19 @@ try{
    await salon.locator('#repeatBeautyRequest').click();await finishRequest(page,salon);
    assert.equal(await salon.locator('.requestItem').count(),2,'clarifying reveals the separate trim and preservation requirements');
    const sansInitial=await material(salon);
-   const faceIndices=[...Array(35)].map((_,y)=>[...Array(42)].map((_,x)=>(y+44)*160+x+58)).flat();
-   const faceShape=(await material(salon)).filter((v,n)=>faceIndices.includes(n));
+   const protectedMask=await salon.evaluate(()=>Array.from(beautyDebug.masks.protectedFace));
+   assert(protectedMask.some(Boolean),'provided feature art creates a fixed protection mask');
+   const protectedCells=()=>salon.evaluate(()=>beautyDebug.material.filter((v,n)=>beautyDebug.masks.protectedFace[n]));
+   const protectedBefore=await protectedCells();
    await salon.locator('[data-tool="hammer"]').click();await stroke(page,salon,[120,105],[200,156]);
-   assert.notDeepEqual((await material(salon)).filter((v,n)=>faceIndices.includes(n)),faceShape,'hammer can sculpt the inner bone face');
-   assert.equal((await material(salon))[65*160+80],0,'hammer opens a hole in the face');
+   assert.deepEqual(await protectedCells(),protectedBefore,'hammer leaves eyes, nose and mouth untouched');
+   await stroke(page,salon,[150,42],[180,44]);
+   assert.equal((await material(salon))[21*160+80],0,'the surrounding forehead remains editable');
    await salon.locator('[data-tool="grow"]').click();await stroke(page,salon,[120,105],[200,156]);
-   assert.equal((await material(salon))[65*160+80],1,'growth restores original face material');
    await stroke(page,salon,[120,105],[200,156]);
-   assert.equal((await material(salon))[65*160+80],2,'growth may cover the original features');
-   // Restore the original face before checking the next spoken request.
-   await salon.locator('[data-tool="hammer"]').click();await stroke(page,salon,[120,105],[200,156]);
-   await salon.locator('[data-tool="grow"]').click();await stroke(page,salon,[120,105],[200,156]);
+   assert.deepEqual(await protectedCells(),protectedBefore,'growth cannot hide or recolor the face features');
+   await stroke(page,salon,[150,42],[180,44]);
+   assert.equal((await material(salon))[21*160+80],1,'growth still restores editable original bone');
    await stroke(page,salon,[147,36],[147,6]);
    const bone=await material(salon);assert(bone[5*160+73]>0);
    await salon.locator('[data-tool="hammer"]').click();await stroke(page,salon,[147,8],[147,19]);
@@ -202,7 +215,8 @@ try{
    if(output)await page.screenshot({path:path.join(output,name+'-sans-bone.png')});
    await nextStage(page,salon);assert.equal(await salon.evaluate(()=>salonLab.phase),'draw');
    await salon.locator('[data-color="#FF3024"]').click();await stroke(page,salon,[120,105],[200,156]);
-   assert.equal(await salon.evaluate(()=>beautyDebug.paint[(65*160+80)*4+3]),255,'dye can color existing face material');
+   assert(await salon.evaluate(()=>beautyDebug.material.every((v,n)=>!beautyDebug.masks.protectedFace[n]||beautyDebug.paint[n*4+3]===0)),'dye skips all protected feature pixels');
+   await stroke(page,salon,[145,40],[190,45]);assert((await salon.evaluate(()=>beautyDebug.paint)).some(v=>v>0),'editable bone can still be dyed');
    if(output)await page.screenshot({path:path.join(output,name+'-sans-face-dye.png')});
    await salon.locator('#undoBeauty').click();
    await nextStage(page,salon);assert.equal(await salon.evaluate(()=>salonLab.phase),'attach');
@@ -215,7 +229,7 @@ try{
 
    // A normal small-brush trim can fulfill Sans without pixel-perfect interior preservation.
    salon=await startPreview(page,10003);
-   await salon.locator('#sculptSize').selectOption('5');
+   await setRange(salon,'#sculptSize',5);
    const regions=await salon.evaluate(()=>JSON.parse(document.getElementById('guest-data').textContent).beauty.cutRegions);
    for(const r of regions){
     const ys=[];for(let y=r.y+4;y<r.y+r.h-4;y+=4)ys.push(y);ys.push(r.y+r.h-4);
@@ -229,8 +243,8 @@ try{
    if(output)await page.screenshot({path:path.join(output,name+'-sans-trim-fulfilled.png')});
    await salon.locator('#repeatBeautyRequest').click();await finishRequest(page,salon);
    assert.equal(await salon.locator('.requestItem.complete').count(),2,'both detailed checks agree with the brief request');
-   await salon.locator('#sculptSize').selectOption('18');
-   await stroke(page,salon,[125,120],[200,150]);
+   await setRange(salon,'#sculptSize',18);
+   await stroke(page,salon,[120,60],[210,60]);
    assert.equal(await salon.locator('.requestItem').last().evaluate(e=>e.classList.contains('complete')),false,'major inner damage still revokes the check');
 
    assert.deepEqual(errors,[]);

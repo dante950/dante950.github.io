@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
-import {scoreShape,strokeCells,beautyStageOrder,liveBeautyMood,beautyRequirementChecks,detachedByBeautyCut} from '../src/beauty-shape.js';
+import {scoreShape,strokeCells,beautyStageOrder,liveBeautyMood,beautyRequirementChecks,detachedByBeautyCut,blendBeautyRGBA} from '../src/beauty-shape.js';
 import {defaultProject,projectProblems} from '../src/model.js';
 const project=JSON.parse(await fs.readFile(new URL('../data/project.json',import.meta.url),'utf8'));
 const assets=JSON.parse(await fs.readFile(new URL('../data/assets.json',import.meta.url),'utf8'));
@@ -137,4 +137,34 @@ test('bone trim requires every region and still honors a more forgiving configur
  details[5].ratio=0;details[5].fulfilled=0;assert.deepEqual(check(),[false,true],'five finished targets cannot hide an untouched sixth');
  details[5].ratio=.69;details[5].fulfilled=.69/.85;assert.deepEqual(check(),[false,true]);
  details[5].ratio=.5;details[5].fulfilled=1;assert.deepEqual(check(),[true,true],'a looser full-score target takes precedence');
+});
+
+test('translucent paint mixes over material without making the underlying material transparent',()=>{
+ const half=blendBeautyRGBA([0,0,0,0],[255,0,0],.5);assert.deepEqual(half,[255,0,0,128]);
+ assert.deepEqual(blendBeautyRGBA([100,200,240,255],half,half[3]/255),[178,100,120,255]);
+ assert.deepEqual(blendBeautyRGBA(half,[255,0,0],.5),[255,0,0,192]);
+ assert.deepEqual(blendBeautyRGBA(half,[0,0,255],1),[0,0,255,255]);
+ assert.deepEqual(blendBeautyRGBA([0,0,0,0],[255,0,0],0),[0,0,0,0]);
+});
+test('protected face pixels cannot make trim targets impossible or cause a damage penalty',()=>{
+ const original=Uint8Array.of(1,1,1,1),current=Uint8Array.of(0,1,0,1),protectedFace=Uint8Array.of(0,1,1,1),eyes=Uint8Array.of(0,1,1,1);
+ const b={designVersion:2,growth:{material:'bone'},weights:{cut:70},cutRegions:[{x:0,y:0,w:4,h:2,rule:'trim',points:70,tolerance:0}]};
+ let shape=scoreShape(current,original,b,4,1,{protectedFace,eyes});
+ assert.equal(shape.score,70);assert.equal(shape.details[0].total,1);assert.equal(shape.details[0].protectedTotal,1);
+ assert.deepEqual(beautyRequirementChecks(b,'cut',shape,{cut:70},0),[true,true]);
+ current[0]=1;assert.equal(scoreShape(current,original,b,4,1,{protectedFace,eyes}).score,0,'an editable target must still be trimmed');
+ b.cutRegions[0].x=2;b.cutRegions[0].w=4;
+ shape=scoreShape(current,original,b,4,1,{protectedFace,eyes});
+ assert.equal(shape.details[0].total,0);assert.equal(shape.score,70,'a target entirely inside immutable artwork does not block completion');
+ b.cutRegions[0].x=20;assert.equal(scoreShape(current,original,b,4,1,{protectedFace,eyes}).score,0,'an invalid empty target does not gain points');
+});
+test('the five supplied Sans feature assets have valid placement data and ship as PNGs',async()=>{
+ for(const [part,states] of Object.entries(assets.sansFace)){
+  for(const frame of Object.values(states)){
+   assert(frame.x>=0&&frame.y>=0&&frame.x+frame.w<=29&&frame.y+frame.h<=31,part);
+   const png=await fs.readFile(new URL('../public/'+frame.src,import.meta.url));
+   assert.equal(png.subarray(1,4).toString(),'PNG');
+  }
+ }
+ assert.equal(Object.keys(assets.sansFace.eyes).length,3);assert.equal(Object.keys(assets.sansFace.mouth).length,2);
 });

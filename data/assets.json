@@ -703,5 +703,46 @@
     "foot1": "./media/919377047b8a4357ee09b209.ogg",
     "foot2": "./media/0fef1f0b458877d000918b00.ogg",
     "foot3": "./media/7d74d45195cb183d3fa820af.ogg"
+  },
+  "sansFace": {
+    "eyes": {
+      "neutral": {
+        "src": "./media/sans-eyes-neutral-v1.png",
+        "x": 4,
+        "y": 7,
+        "w": 21,
+        "h": 9
+      },
+      "satisfied": {
+        "src": "./media/sans-eyes-satisfied-v1.png",
+        "x": 4,
+        "y": 7,
+        "w": 21,
+        "h": 9
+      },
+      "angry": {
+        "src": "./media/sans-eyes-angry-v1.png",
+        "x": 4,
+        "y": 7,
+        "w": 21,
+        "h": 9
+      }
+    },
+    "mouth": {
+      "open": {
+        "src": "./media/sans-mouth-open-v1.png",
+        "x": 4,
+        "y": 17,
+        "w": 21,
+        "h": 13
+      },
+      "closed": {
+        "src": "./media/sans-mouth-closed-v1.png",
+        "x": 4,
+        "y": 22,
+        "w": 21,
+        "h": 4
+      }
+    }
   }
 }

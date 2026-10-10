@@ -1,5 +1,11 @@
 // Shared by the salon runtime and tests. Coordinates use the 320 × 350 portrait.
 export const BEAUTY_STAGES=['cut','draw','attach'];
+// Source-over blending keeps the material opaque and preserves translucent paint for Undo.
+export function blendBeautyRGBA(base,color,opacity){
+ const a=Math.max(0,Math.min(1,opacity)),under=(base[3]||0)/255,alpha=a+under*(1-a);
+ if(!alpha)return [0,0,0,0];
+ return [...[0,1,2].map(i=>Math.round((color[i]*a+base[i]*under*(1-a))/alpha)),Math.round(alpha*255)];
+}
 export function inBeautyRegion(x,y,r){
  if(r.shape==='ellipse')return ((x-r.x-r.w/2)/(r.w/2))**2+((y-r.y-r.h/2)/(r.h/2))**2<=1;
  return x>=r.x&&x<r.x+r.w&&y>=r.y&&y<r.y+r.h;
@@ -52,21 +58,22 @@ export function detachedByBeautyCut(before,after,width,height,anchors=new Uint8A
 // A request check means a sufficient trim, while the existing score still rewards precision.
 const BONE_TRIM_COMPLETION=.70,BONE_PRESERVE_TOLERANCE=.05;
 export function scoreShape(current,original,b,width=160,height=175,masks={}){
- if(!b.designVersion)return scoreLegacyShape(current,original,b,width,height);
+ if(!b.designVersion)return scoreLegacyShape(current,original,b,width,height,masks);
  let points=0,interiorIntact=true,interiorLossRatio=0,eyeCoverRatio=0;const details=[];
  for(const r of b.cutRegions){
-  let total=0,met=0;
+  let total=0,met=0,protectedTotal=0;
   for(let y=0;y<height;y++)for(let x=0;x<width;x++){
    const n=y*width+x;
    if(!inBeautyRegion((x+.5)*2,(y+.5)*2,r))continue;
    if(r.mask&&masks[r.mask]&&!masks[r.mask][n])continue;
    const rule=r.rule||(r.kind==='bad'?'preserve':r.kind==='keep'?'free':'trim');
+   if(masks.protectedFace?.[n]){if(original[n])protectedTotal++;continue;}
    if(rule==='free'||((rule==='trim'||rule==='preserve')&&!original[n]))continue;
    total++;if(rule==='clear'||rule==='trim'?!current[n]:!!current[n])met++;
   }
-  const ratio=total?met/total:0,fulfilled=total?Math.min(1,ratio/Math.max(.01,1-(r.tolerance??.05))):0;
+  const excluded=!total&&protectedTotal>0,ratio=total?met/total:excluded?1:0,fulfilled=total?Math.min(1,ratio/Math.max(.01,1-(r.tolerance??.05))):excluded?1:0;
   const value=fulfilled*(r.points||0);
-  points+=value;details.push({key:r.key,label:r.label,rule:r.rule||(r.kind==='bad'?'preserve':r.kind==='keep'?'free':'trim'),ratio,fulfilled,points:value,total});
+  points+=value;details.push({key:r.key,label:r.label,rule:r.rule||(r.kind==='bad'?'preserve':r.kind==='keep'?'free':'trim'),ratio,fulfilled,points:value,total,protectedTotal});
  }
  // Bone additions may be freely sculpted; damage to the original interior lowers the result.
  if(b.growth?.material==='bone'){
@@ -74,12 +81,12 @@ export function scoreShape(current,original,b,width=160,height=175,masks={}){
   for(let y=0;y<height;y++)for(let x=0;x<width;x++){
    const n=y*width+x;if(!original[n])continue;
    if(b.cutRegions.some(r=>(r.rule==='trim'||!r.rule&&r.kind==='good')&&inBeautyRegion((x+.5)*2,(y+.5)*2,r)))continue;
-   keep++;if(!current[n])lost++;
+   keep++;if(!masks.protectedFace?.[n]&&!current[n])lost++;
   }
   interiorLossRatio=lost/Math.max(1,keep);
   points-=b.weights.cut*Math.min(1,interiorLossRatio*3);
   const eyes=masks.eyes;let eyeTotal=0,eyeCover=0;
-  if(eyes)for(let n=0;n<eyes.length;n++)if(eyes[n]){eyeTotal++;if(current[n]===2)eyeCover++;}
+  if(eyes)for(let n=0;n<eyes.length;n++)if(eyes[n]&&!masks.protectedFace?.[n]){eyeTotal++;if(current[n]===2)eyeCover++;}
   eyeCoverRatio=eyeCover/Math.max(1,eyeTotal);
   points-=b.weights.cut*eyeCoverRatio;
   interiorIntact=interiorLossRatio<=BONE_PRESERVE_TOLERANCE&&eyeCoverRatio<=BONE_PRESERVE_TOLERANCE;
@@ -108,10 +115,10 @@ export function liveBeautyMood(score,previous='neutral',touched=false){
 export function beautyStageOrder(b){return BEAUTY_STAGES.filter(k=>b.steps[k]);}
 
 
-function scoreLegacyShape(current,original,b,width,height){
+function scoreLegacyShape(current,original,b,width,height,masks={}){
  let total=0,removed=0,goodTotal=0,goodCut=0,badTotal=0,badCut=0,wrongCut=0;
  for(let y=0;y<height;y++)for(let x=0;x<width;x++){
-  const n=y*width+x;if(!original[n])continue;total++;
+  const n=y*width+x;if(!original[n]||masks.protectedFace?.[n])continue;total++;
   const r=b.cutRegions.find(r=>inBeautyRegion((x+.5)*2,(y+.5)*2,r)),gone=!current[n];
   if(r?.kind==='good'){goodTotal++;if(gone)goodCut++;}
   if(r?.kind==='bad'){badTotal++;if(gone)badCut++;}

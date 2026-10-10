@@ -4,7 +4,12 @@
 .sculptTools button,.sculptTools select,.sculptActions button,.sculptNav button{border:2px solid #795843;border-radius:9px;background:#FFF4E4;color:#473529;padding:8px;font-weight:bold;cursor:pointer;font-size:12px}
 .sculptTools button.selected,.sculptNav button.selected{background:#FEC36C;box-shadow:inset 0 0 0 2px #F59A40}
 #shapeTools{display:grid;gap:12px}.sculptTool{min-height:65px}
-.brushLabel{display:block;margin:18px 0;font-size:11px}.brushLabel select{width:100%;margin-top:5px}
+.brushLabel,.opacityLabel{display:block;margin:18px 0;font-size:11px}
+.brushLabel span,.opacityLabel span{display:flex;align-items:center;justify-content:space-between}
+.brushLabel output,.opacityLabel output{font-weight:bold;font-variant-numeric:tabular-nums;color:#75452D}
+.sculptTools input[type=range]{display:block;width:100%;height:22px;margin:8px 0 0;padding:0;accent-color:#DD8540;cursor:ew-resize;touch-action:pan-y}
+.sculptTools input[type=range]:focus-visible{outline:2px solid #75452D;outline-offset:3px;border-radius:4px}
+.opacityLabel{margin:4px 0 16px}
 .sculptPalette{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:10px 0 18px}
 .sculptPalette button{height:30px;padding:0}.sculptPalette button.selected{box-shadow:0 0 0 3px #453329}
 #erasePaint{width:100%}
