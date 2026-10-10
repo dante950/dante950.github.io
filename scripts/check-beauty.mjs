@@ -7,7 +7,7 @@ await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const base=process.env.YACHA_BEAUTY_URL||'http://127.0.0.1:'+server.address().port;
 const output=process.env.YACHA_BEAUTY_SCREENSHOTS;
 if(output)await fs.mkdir(output,{recursive:true});
-async function finishRequest(page,salon,{screenshot}={}){
+async function finishRequest(page,salon,{screenshot,clarify=true}={}){
  await page.locator('#talkLayer').waitFor();
  assert.equal(await salon.locator('.sculptStatus').isVisible(),false,'the note waits until the request has ended');
  assert(await salon.locator('.beautyNext').isDisabled(),'no stage skipping during a request');
@@ -20,20 +20,35 @@ async function finishRequest(page,salon,{screenshot}={}){
  assert.equal(frames.size,2,'the mouth cycles while the guest speaks');
  assert(mouths.size>1,'the mouth pixels visibly animate');
  assert.deepEqual(await material(salon),shape,'speaking cannot edit hair or scoring masks');
- await page.locator('#talkNext').click();await page.waitForTimeout(100);
+ await page.locator('#beautyChoices').waitFor();
+ const briefText=await page.locator('#talkText').textContent();
+ const highlighted=await page.locator('#talkText .glyph').evaluateAll(gs=>gs.some(g=>getComputedStyle(g).color!=='rgb(73, 54, 39)'));assert(highlighted,'request keywords use the existing color markup');
+ const hasQuestion=await page.locator('#beautyAsk').isVisible();
+ if(screenshot&&output)await page.screenshot({path:path.join(output,'initial-'+screenshot)});
+ assert.equal(await page.locator('.talkbox').evaluate(b=>getComputedStyle(b).backgroundColor),'rgb(255, 248, 233)');
+ if(clarify&&hasQuestion){
+  await page.locator('#beautyAsk').click();await page.waitForTimeout(650);
+  assert(await salon.locator('.beautyNext').isDisabled());
+  await page.locator('#beautyChoices').waitFor();
+  assert.notEqual(await page.locator('#talkText').textContent(),briefText);assert.equal(await page.locator('#beautyAsk').isVisible(),false);
+ }
+ const bubble=await page.locator('.talkbox').boundingBox(),room=await salon.locator('#beautyScreen').boundingBox();
+ assert(bubble.y>room.y+room.height*.7&&bubble.y+bubble.height<room.y+room.height,'speech stays on the counter');
  if(screenshot&&output)await page.screenshot({path:path.join(output,screenshot)});
- if(await page.locator('#talkNext').isVisible())await page.keyboard.press('Enter');
- await page.locator('#talkLayer').waitFor({state:'hidden'});
- await salon.waitForFunction(()=>!beautyDebug.briefing);
+ await page.locator('#beautyAccept').click();
+ await page.locator('#talkLayer').waitFor({state:'hidden'});await salon.waitForFunction(()=>!beautyDebug.briefing);
  assert(await salon.locator('.sculptStatus').isVisible());
- await salon.locator('#repeatBeautyRequest').click();await page.locator('#talkLayer').waitFor();await page.waitForFunction(()=>{const glyph=document.querySelector('#talkText .glyph');return glyph&&getComputedStyle(glyph).color==='rgb(73, 54, 39)';});
- for(let i=0;i<6&&await page.locator('#talkLayer').isVisible();i++){await page.keyboard.press('Enter');await page.waitForTimeout(150);}
- await salon.waitForFunction(()=>!beautyDebug.briefing);
+ const noteBefore=await salon.locator('.requestText').textContent();
+ await salon.locator('#repeatBeautyRequest').click();await page.locator('#talkLayer').waitFor();
+ await page.waitForTimeout(200);await page.locator('#beautyChoices').waitFor();
+ if(clarify)assert.equal(await page.locator('#beautyAsk').isVisible(),false,'repeat keeps the detailed request already heard');
+ await page.locator('#beautyAccept').click();await salon.waitForFunction(()=>!beautyDebug.briefing);
+ assert.equal(await salon.locator('.requestText').textContent(),noteBefore,'repeat does not change the accepted memo');
  const note=await salon.locator('.sculptStatus').textContent();
  assert(!/Tag_|현재 만족도|점수|안경|콧수염|나비넥타이|장식 \d\/5/.test(note));
  assert.equal(await salon.locator('.goalList,.scoreText,.moodLabel').count(),0);
 }
-async function nextStage(page,salon){await salon.locator('.beautyNext').click();await finishRequest(page,salon);}
+async function nextStage(page,salon){await salon.locator('.beautyNext').click();await finishRequest(page,salon,{clarify:false});}
 async function startPreview(page,id){
  await page.goto(base);await page.locator('#siteLoading').waitFor({state:'detached'});
  await page.locator('#developer').click();await page.locator('#updateOK').click();
@@ -80,8 +95,11 @@ try{
    await stroke(page,salon,[78,85],[78,295]);
    const longHair=await material(salon);assert(longHair[Math.floor(280/2)*160+39]>0,'growth extends toward cape');
    await salon.locator('[data-tool="scissors"]').click();await stroke(page,salon,[78,240],[78,270]);
-   assert.equal((await material(salon))[130*160+39],0,'new material can be cut');assert((await material(salon))[110*160+39]>0,'uncut upper hair remains');
-   await salon.locator('[data-tool="grow"]').click();await stroke(page,salon,[78,240],[78,270]);assert((await material(salon))[130*160+39]>0,'growth repairs a cut without Undo');
+   assert.equal((await material(salon))[140*160+39],0,'a disconnected lower strand drops too');assert.equal((await material(salon))[130*160+39],0,'new material can be cut');assert((await material(salon))[110*160+39]>0,'uncut upper hair remains');
+   await salon.locator('[data-tool="grow"]').click();await stroke(page,salon,[78,224],[78,270]);assert((await material(salon))[130*160+39]>0,'growth repairs a cut without Undo');
+   // A new brush dab in empty space cannot float; growth on the exposed face is blocked.
+   const attached=await material(salon);await stroke(page,salon,[270,270],[270,280]);assert.deepEqual(await material(salon),attached);
+   await stroke(page,salon,[160,152],[160,170]);assert.deepEqual(await material(salon),attached,'growth cannot cover the zombie face');
    // Complete the zombie request through real drags.
    await salon.locator('[data-tool="grow"]').click();await salon.locator('#sculptSize').selectOption('18');
    for(const y of [20,45,70,95])await stroke(page,salon,[90,y],[225,y]);
@@ -122,18 +140,27 @@ try{
    await salon.locator('.beautyNext').click();await page.locator('#modalCard').filter({hasText:'미용 시험 ·'}).waitFor();
    console.log(name+': zombie speech, note, growth and undo checks passed');
    salon=await startPreview(page,10003);
-   const sansInitial=await material(salon);await salon.locator('[data-tool="grow"]').click();
+   const sansInitial=await material(salon);
+   const protectedShape=()=>salon.evaluate(()=>beautyDebug.material.filter((v,n)=>beautyDebug.masks.face[n]));
+   const faceShape=await protectedShape(),faceMood=await salon.evaluate(()=>beautyDebug.expression);
+   await salon.locator('[data-tool="hammer"]').click();await stroke(page,salon,[120,105],[200,156]);
+   assert.deepEqual(await protectedShape(),faceShape,'hammer preserves the inner bone face');
+   await salon.locator('[data-tool="grow"]').click();await stroke(page,salon,[120,105],[200,156]);
+   assert.deepEqual(await protectedShape(),faceShape,'growth preserves the inner bone face');
+   assert.equal(await salon.evaluate(()=>beautyDebug.expression),faceMood,'blocked face strokes do not change the guest mood');
    await stroke(page,salon,[147,36],[147,6]);
    const bone=await material(salon);assert(bone[5*160+73]>0);
    await salon.locator('[data-tool="hammer"]').click();await stroke(page,salon,[147,8],[147,19]);
    assert.equal((await material(salon))[5*160+73],0);
-   assert.equal(await salon.locator('#undoBeauty').isVisible(),false);await salon.locator('[data-tool="grow"]').click();await stroke(page,salon,[147,8],[147,19]);assert((await material(salon))[5*160+73]>0);await salon.locator('[data-tool="hammer"]').click();
+   assert.equal(await salon.locator('#undoBeauty').isVisible(),false);await salon.locator('[data-tool="grow"]').click();await stroke(page,salon,[147,36],[147,8]);assert((await material(salon))[5*160+73]>0);await salon.locator('[data-tool="hammer"]').click();
    const before=await scores(salon);await stroke(page,salon,[105,48],[105,67]);assert((await scores(salon)).cut>before.cut);
    const trimmed=await material(salon);await page.keyboard.press('Control+z');assert.deepEqual(await material(salon),trimmed);
    await salon.locator('[data-tool="grow"]').click();
    for(const x of [119,148,180,211])await stroke(page,salon,[x,42],[x-5,8]);
    if(output)await page.screenshot({path:path.join(output,name+'-sans-bone.png')});
    await nextStage(page,salon);assert.equal(await salon.evaluate(()=>salonLab.phase),'draw');
+   await salon.locator('[data-color="#FF3024"]').click();await stroke(page,salon,[120,105],[200,156]);
+   assert(await salon.evaluate(()=>beautyDebug.material.every((v,n)=>!beautyDebug.masks.face[n]||v===1)&&beautyDebug.paint.every((v,i)=>!beautyDebug.masks.face[Math.floor(i/4)]||v===0)),'dye cannot paint the bone face');
    await nextStage(page,salon);assert.equal(await salon.evaluate(()=>salonLab.phase),'attach');
    await salon.locator('[data-sticker="ST-STRONG-SCAR-01"]').click();await stroke(page,salon,[190,135],[190,135]);assert.equal((await scores(salon)).attach,30);
    const finishedShape=await material(salon);

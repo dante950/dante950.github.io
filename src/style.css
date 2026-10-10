@@ -27,14 +27,16 @@ dialog#passwordDialog{width:min(440px,calc(100vw - 40px));box-sizing:border-box;
 .startRoute{font-size:12px;color:var(--muted);margin-top:6px}
 @media(max-width:600px){.startGuests{grid-template-columns:1fr;gap:10px}.startGuest{display:grid;grid-template-columns:70px 1fr;column-gap:15px;padding:13px}.startPortrait{grid-column:1;grid-row:1/4;height:80px;margin:0}.startPortrait img{max-height:80px}.startDay,.startGuest strong,.startRoute{grid-column:2}.startGuest strong{font-size:20px}.storyStartModal h2{font-size:24px}}
 
-/* The beauty request sits beside the guest; other story dialogue keeps its own layout. */
+/* Beauty dialogue rests on the counter; the request memo remains beside the guest. */
+#talkLayer.beautyRequest .talkbox{background:#FFF8E9;border:2px solid #795843;color:#493627}
+#talkLayer.beautyRequest #talkSpeaker{color:#805137;font-size:11px}
+#talkLayer.beautyRequest #talkCount{display:none}
+#talkLayer.beautyRequest #talkText{color:#493627;font-size:13px;line-height:1.85;min-height:48px;margin:5px 0;white-space:pre-wrap}
+#talkLayer.beautyRequest #talkNext{background:transparent;border:0;color:#8E6645;font-size:10px;padding:4px}
+#beautyChoices{display:flex;justify-content:flex-end;gap:8px;margin-top:5px}
+#beautyChoices button{background:#FFF2DB;border:1px solid #AA8464;border-radius:7px;color:#684632;font-size:11px;padding:5px 17px}
+#beautyChoices #beautyAccept{background:#F8CC87;border-color:#BA8147;font-weight:bold}
 body.playing #talkLayer.beautyRequest{background:none;padding:0}
-body.playing #talkLayer.beautyRequest .talkbox{position:fixed;left:var(--speech-x,5vw);top:var(--speech-y,35vh);width:225px;margin:0;padding:16px;transform:scale(var(--speech-scale,1));transform-origin:top left;background:#FFF8E9;border:2px solid #795843;border-radius:17px;color:#493627;box-shadow:0 4px 0 #79584335}
-body.playing #talkLayer.beautyRequest .talkbox:after{content:'';position:absolute;right:-12px;top:46px;width:20px;height:20px;transform:rotate(-45deg);background:#FFF8E9;border-right:2px solid #795843;border-bottom:2px solid #795843}
-body.playing #talkLayer.beautyRequest #talkSpeaker{color:#805137;font-size:11px}
-body.playing #talkLayer.beautyRequest #talkCount{display:none}
-body.playing #talkLayer.beautyRequest #talkText{color:#493627;font-size:13px;line-height:1.85;min-height:68px;margin:12px 0}
-body.playing #talkLayer.beautyRequest .glyph{font-size:13px!important}
-body.playing #talkLayer.beautyRequest #talkNext{color:#8E6645;font-size:10px;padding:2px}
-
-body.playing #talkLayer.beautyRequest #talkNext{background:transparent;border:0}
+body.playing #talkLayer.beautyRequest .talkbox{position:fixed;left:var(--speech-x);top:var(--speech-y);background:#FFF8E9;border:2px solid #795843;color:#493627;width:530px;max-width:none;min-height:112px;margin:0;padding:11px 18px;transform:scale(var(--speech-scale,1));transform-origin:top left;border-radius:14px;box-shadow:0 4px 0 #79584335}
+body.playing #talkLayer.beautyRequest .talkbox:after{content:"";position:absolute;left:58%;top:-9px;width:15px;height:15px;transform:rotate(-45deg);background:#FFF8E9;border-right:2px solid #795843;border-top:2px solid #795843}
+#dialogueEditor:has(#beautyRequestText) #richPreview{background:#FFF8E9}

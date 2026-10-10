@@ -17,6 +17,26 @@ export function strokeCells(width,height,points,radius,scale=2){
  }
  return cells;
 }
+// Keep only material connected to a fixed scalp/core anchor. Diagonal pixel joins count.
+export function detachedBeautyCells(material,anchors,width,height){
+ const seen=new Uint8Array(material.length),queue=[];
+ for(let n=0;n<material.length;n++)if(material[n]&&anchors[n]){seen[n]=1;queue.push(n);}
+ for(let i=0;i<queue.length;i++){
+  const n=queue[i],x=n%width,y=Math.floor(n/width);
+  for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
+   const xx=x+dx,yy=y+dy;if(xx<0||xx>=width||yy<0||yy>=height)continue;
+   const next=yy*width+xx;if(material[next]&&!seen[next]){seen[next]=1;queue.push(next);}
+  }
+ }
+ const detached=[];for(let n=0;n<material.length;n++)if(material[n]&&!seen[n])detached.push(n);
+ return detached;
+}
+export function beautyToolAllowed(kind,n,bone,original,face){
+ if(!face[n])return true;
+ // Original bangs can still be cut and dyed; tools never edit the face underneath.
+ if(!bone)return kind!=='grow';
+ return !['hammer','scissors','grow','paint'].includes(kind);
+}
 export function scoreShape(current,original,b,width=160,height=175,masks={}){
  if(!b.designVersion)return scoreLegacyShape(current,original,b,width,height);
  let points=0;const details=[];
@@ -28,6 +48,7 @@ export function scoreShape(current,original,b,width=160,height=175,masks={}){
    if(r.mask&&masks[r.mask]&&!masks[r.mask][n])continue;
    const rule=r.rule||(r.kind==='bad'?'preserve':r.kind==='keep'?'free':'trim');
    if(rule==='free'||((rule==='trim'||rule==='preserve')&&!original[n]))continue;
+   if(b.growth?.material==='bone'&&masks.face?.[n]&&(rule==='trim'||rule==='preserve'))continue;
    total++;if(rule==='clear'||rule==='trim'?!current[n]:!!current[n])met++;
   }
   const ratio=total?met/total:0,fulfilled=total?Math.min(1,ratio/Math.max(.01,1-(r.tolerance??.05))):0;

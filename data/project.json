@@ -1,8 +1,8 @@
 {
   "format": "YACHACHA_FULLFLOW",
   "schemaVersion": 1,
-  "version": 3,
-  "updatedAt": "2026-10-10T06:39:49.012Z",
+  "version": 4,
+  "updatedAt": "2026-10-10T07:22:25.816Z",
   "combat": {
     "version": 4,
     "layout": "legacy",
@@ -4605,14 +4605,14 @@
           "attach": 30
         },
         "cutTool": "scissors",
-        "request": "으어어... 면접을 보러 가는데요... 눈이 잘 보이게 앞머리를 잘라 주세요. 튀어나온 뇌도... 머리카락으로 가려 주시겠어요...?",
+        "request": "으어어... 내일 면접인데... <color=#266B4D>앞이 좀 환해지고</color>,\n<color=#9A4935>민망한 곳은 안 보였으면</color> 좋겠어요...",
         "attachTag": "Tag_Gentle",
         "attachFirst": 30,
         "attachExtra": 15,
         "attachMisplaced": 10,
         "attachWrong": 15,
-        "attachHint": "면접에는... 첫인상이 중요하다고 하더군요. 단정해 보이게... 장식 하나만 부탁드립니다...",
-        "drawHint": "염색이요...? 어떤 색이든 상관없어요... 지금 머리 색도 괜찮아서... 자유롭게 부탁드립니다...",
+        "attachHint": "면접에선... 첫인상이 중요하다던데요...\n<color=#9A5B22><pulse=1.06>단정한 인상</pulse></color>이면... 덜 긴장할 것 같아요...",
+        "drawHint": "염색이요...? <wave=1.2><color=#71508F>자유롭게</color></wave> 부탁드려요...\n<color=#266B4D>지금 머리 색도</color> 저는 좋은데...",
         "drawColors": [
           "#75452D"
         ],
@@ -4727,6 +4727,16 @@
           "cut": "눈은 잘 보이게\n뇌는 머리로 가리기",
           "draw": "지금 색도 좋아요\n색·무늬는 자유롭게",
           "attach": "면접에 어울리게\n단정한 장식 하나"
+        },
+        "requestDetails": {
+          "cut": "<color=#266B4D>두 눈이 잘 보이게</color> 앞머리를 잘라 주세요...\n아, <color=#9A4935>튀어나온 뇌는 머리카락으로 가려</color> 주시고요... <wave=1.2>부탁드립니다...</wave>",
+          "draw": "<color=#71508F>어떤 색이나 무늬든</color> 괜찮아요...\n<color=#266B4D>염색하지 않아도 좋아요.</color> 머리는 지금도 마음에 들어서...",
+          "attach": "면접장에서 <color=#9A5B22>단정하고 점잖아 보일 장식</color>으로...\n<color=#9A5B22>하나만</color> 골라 주시겠어요...? <wave=1.2>너무 요란하진 않게요...</wave>"
+        },
+        "requestBriefNotes": {
+          "cut": "앞은 환하게\n민망한 곳은 감춰서",
+          "draw": "지금 색도 좋아요\n자유롭게 꾸며 주세요",
+          "attach": "면접을 앞둔 손님\n단정한 첫인상으로"
         }
       },
       "bindings": {
@@ -4803,14 +4813,14 @@
           "attach": 30
         },
         "cutTool": "hammer",
-        "request": "헤. 얼굴 테두리만 조금 다듬어 줘. 망치랑 정으로 톡톡... 속까지 시원해질 필요는 없거든.",
+        "request": "헤. 오늘은 <color=#52609B>인상 좀 다듬으러</color> 왔어.\n<color=#52609B>각진 데만 가볍게.</color> <wave=1.3>뼈대는 괜찮잖아?</wave>",
         "attachTag": "Tag_Strong",
         "attachFirst": 30,
         "attachExtra": 15,
         "attachMisplaced": 10,
         "attachWrong": 15,
-        "attachHint": "이번엔 좀 강해 보이고 싶거든. 만만하게 보이지 않을 만한 장식... 네가 골라 줄래?",
-        "drawHint": "색? 지금도 나쁘지 않지. 바꾸고 싶으면 네 감각에 맡길게. 꽤 뼈대 있는 색으로... 헤.",
+        "attachHint": "이번엔 좀 <color=#9A4935><shake=0.6>만만하지 않은 인상</shake></color>이면 좋겠어.\n<color=#9A4935>장식</color>으로 한 수 보여 줄래?",
+        "drawHint": "색은 <color=#71508F>네 감각에 맡길게.</color>\n<color=#52609B>원래 뼈 색</color>도 꽤 멋지거든. <wave=1.2>뼈가 있는 색이지.</wave>",
         "drawColors": [
           "#E9E2D6"
         ],
@@ -4940,6 +4950,16 @@
           "cut": "얼굴 테두리만 살짝\n안쪽은 조심조심",
           "draw": "지금 색도 좋아\n색·무늬는 자유롭게",
           "attach": "만만해 보이지 않게\n강렬한 인상"
+        },
+        "requestDetails": {
+          "cut": "<color=#52609B>얼굴 바깥 테두리만</color> 망치랑 정으로 톡톡 다듬어 줘.\n<color=#9A4935>눈코입은 그대로.</color> <wave=1.2>속까지 시원해질 필요는 없거든.</wave>",
+          "draw": "<color=#71508F>더한 뼈와 바깥 테두리</color>에 마음 가는 색을 칠해 봐.\n<color=#52609B>그대로 둬도 좋아.</color> 취향엔 정답이 없으니까. 헤.",
+          "attach": "<color=#9A4935>강해 보이는 장식 하나</color>를 <color=#52609B>얼굴이나 머리 쪽</color>에 부탁해.\n딱 봤을 때 <shake=0.6>쉽게 덤비지는 못하겠다</shake> 싶은 걸로."
+        },
+        "requestBriefNotes": {
+          "cut": "각진 인상을\n가볍게 다듬기",
+          "draw": "원래 뼈 색도 좋아\n색·무늬는 자유롭게",
+          "attach": "만만하지 않은 인상\n장식으로 표현하기"
         }
       },
       "bindings": {
