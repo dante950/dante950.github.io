@@ -6,7 +6,8 @@
     "build": "node scripts/build.mjs",
     "test": "node --test tests/*.test.mjs",
     "import-project": "node scripts/import-project.mjs",
-    "test:browser": "node scripts/check-browsers.mjs && node scripts/check-beauty.mjs"
+    "test:browser": "node scripts/check-browsers.mjs && node scripts/check-beauty.mjs",
+    "test:beauty-result": "node scripts/check-beauty-result.mjs"
   },
   "engines": {
     "node": ">=22"

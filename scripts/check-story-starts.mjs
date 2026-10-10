@@ -45,12 +45,13 @@ export async function checkStoryStarts(page,{screenshotPath,checkContinuation=fa
   await page.keyboard.press('f');await page.locator('#talkLayer').waitFor();await advanceTalk(page);
   if(steps){
    await salon.locator('#beautyScreen').waitFor();
+   assert.equal(await salon.locator('#showBeautyZones').innerText(),'손질 가이드','the guide is available in public story play');
    for(let i=0;i<steps;i++){
     await salon.locator('.beautyNext').click();await page.waitForTimeout(250);await advanceTalk(page);
    }
    if(await salon.locator('.beautyFinish').isVisible())await salon.locator('.beautyFinish').click();
    else await salon.locator('.beautyNext').click(); // Sans ends after stickers.
-   await page.waitForTimeout(250);await advanceTalk(page);
+   await page.locator('#talkLayer').waitFor();await advanceTalk(page);
    assert(!/만족도|\d+\s*\/\s*100/.test(await page.locator('#modalCard').innerText()),'the player sees no satisfaction score after beauty');
    await page.locator('#acceptBattle').click();
   }else assert.equal(await salon.locator('#beautyScreen').isVisible(),false);

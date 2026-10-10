@@ -116,27 +116,35 @@ test('bone request checks accept a sufficient trim with small slips without chan
  const read=()=>scoreShape(current,original,b,100,3,{eyes});
  const checks=()=>beautyRequirementChecks(b,'cut',read(),{cut:70,attach:30,total:100},1);
  assert.deepEqual(checks(),[false,true],'a sticker or high total cannot complete untouched trim');
- current.fill(0,0,69);assert.deepEqual(checks(),[false,true]);
- current[69]=0;assert.deepEqual(checks(),[true,true],'70% is sufficient, below the 85% full-score target');
- assert(Math.abs(read().score-70*.7/.85)<1e-9);
- current.fill(0,70,100);assert.equal(read().score,70);
+ current.fill(0,0,49);assert.deepEqual(checks(),[false,true]);
+ current[49]=0;assert.deepEqual(checks(),[true,true],'50% is sufficient, below the 85% full-score target');
+ assert(Math.abs(read().score-70*.5/.85)<1e-9);
+ current.fill(0,50,100);assert.equal(read().score,70);
  current.fill(0,290,300);assert.equal(read().interiorLossRatio,.05);assert.deepEqual(checks(),[true,true]);
  assert.equal(read().score,59.5,'the pre-existing proportional damage penalty is unchanged');
- current[289]=0;assert.deepEqual(checks(),[true,false],'larger damage still revokes preservation');
- current.fill(1,289,300);assert.deepEqual(checks(),[true,true],'repair regains completion');
+ current.fill(0,275,290);assert.deepEqual(checks(),[true,false],'larger damage still revokes preservation');
+ current.fill(1,275,300);assert.deepEqual(checks(),[true,true],'repair regains completion');
  current.fill(2,100,105);assert.equal(read().eyeCoverRatio,.05);assert.deepEqual(checks(),[true,true]);
- current[105]=2;assert.deepEqual(checks(),[true,false],'significant covered eyes still fail');
- current.fill(1,100,106);assert.deepEqual(checks(),[true,true]);
+ current.fill(2,105,113);assert.deepEqual(checks(),[true,false],'significant covered eyes still fail');
+ current.fill(1,100,113);assert.deepEqual(checks(),[true,true]);
  current.fill(0);assert.deepEqual(checks(),[true,false],'removing the whole face cannot fulfill the request');
 });
-test('bone trim requires every region and still honors a more forgiving configured tolerance',()=>{
+test('bone checks reward a balanced silhouette without requiring every tiny target',()=>{
  const b=project.guests.find(g=>g.id===10003).beauty;
- const details=b.cutRegions.map(()=>({rule:'trim',ratio:.7,fulfilled:.7/.85}));
+ const details=b.cutRegions.map(()=>({rule:'trim',ratio:0,fulfilled:0,total:100}));
  const check=()=>beautyRequirementChecks(b,'cut',{details,interiorIntact:true},{cut:70,attach:30,total:100},1);
- assert.deepEqual(check(),[true,true]);
- details[5].ratio=0;details[5].fulfilled=0;assert.deepEqual(check(),[false,true],'five finished targets cannot hide an untouched sixth');
- details[5].ratio=.69;details[5].fulfilled=.69/.85;assert.deepEqual(check(),[false,true]);
- details[5].ratio=.5;details[5].fulfilled=1;assert.deepEqual(check(),[true,true],'a looser full-score target takes precedence');
+ const set=(i,ratio)=>Object.assign(details[i],{ratio,fulfilled:ratio/.85});
+ assert.deepEqual(check(),[false,true]);
+ for(let i=0;i<4;i++)set(i,.75);
+ assert.deepEqual(check(),[true,true],'four of six trimmed targets with 50% total removal is enough');
+ set(3,.74);assert.deepEqual(check(),[false,true],'overall removal is still required');
+ for(let i=0;i<6;i++)set(i,i<3?1:0);
+ assert.deepEqual(check(),[false,true],'one-sided work cannot pass just from total pixels');
+ for(let i=0;i<6;i++)set(i,.5);
+ details[5].total=2;set(5,0);set(0,.52);
+ assert.deepEqual(check(),[true,true],'a tiny untouched chin region cannot veto the rest');
+ for(const d of details){d.ratio=.1;d.fulfilled=1;}
+ assert.deepEqual(check(),[true,true],'configured easier targets still take precedence');
 });
 
 test('translucent paint mixes over material without making the underlying material transparent',()=>{

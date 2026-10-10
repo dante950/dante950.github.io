@@ -41,7 +41,7 @@ status.innerHTML='<span class="requestCaption">손님의 부탁</span><div class
 beautyScreen.append(status);
 const nav=document.createElement('div');nav.className='sculptNav';beautyScreen.append(nav);
 const actions=document.createElement('div');actions.className='sculptActions';
-actions.innerHTML='<button id="undoBeauty" disabled>되돌리기</button>';if(GUEST.mode==='preview')actions.insertAdjacentHTML('beforeend','<button id="showBeautyZones" class="devGuide" aria-pressed="false">판정 영역</button>');
+actions.innerHTML='<button id="undoBeauty" disabled>되돌리기</button>';actions.insertAdjacentHTML('beforeend','<button id="showBeautyZones" class="beautyGuide" aria-pressed="false" title="손님의 부탁에 맞춰 손질할 곳을 살펴봐요">손질 가이드</button>');
 beautyScreen.append(actions);
 const hint=document.createElement('div');hint.className='sculptHint';panel.querySelector('.sculptTools').append(hint);
 const next=document.querySelector('.beautyNext'),finish=document.querySelector('.beautyFinish'),stageTag=document.querySelector('.beautyStageTag');
@@ -227,7 +227,12 @@ function paintFace(){
  if(faceFeatures){
   f.drawImage(boneBase,43,14,74,74*31/29);
   overlay.drawImage(featureLayers.eyes[expression],43,14,74,74*31/29);
-  overlay.drawImage(featureLayers.mouth[talking&&!mouthFrame?'closed':'open'],43,14,74,74*31/29);
+  if(finishing&&!talking&&expression!=='satisfied'){
+   overlay.save();overlay.translate(43,14);overlay.scale(74/29,74/29);overlay.fillStyle='#203F4B';
+   if(expression==='neutral')overlay.fillRect(7,24,15,1);
+   else{overlay.fillRect(10,23,9,1);overlay.fillRect(8,24,2,1);overlay.fillRect(19,24,2,1);overlay.fillRect(7,25,1,1);overlay.fillRect(21,25,1,1);}
+   overlay.restore();
+  }else overlay.drawImage(featureLayers.mouth[talking&&!mouthFrame?'closed':'open'],43,14,74,74*31/29);
   return;
  }
  f.save();f.translate(43,14);f.scale(74/29,74/29);f.drawImage(faceImage,0,0,29,31);
@@ -239,16 +244,22 @@ function paintFace(){
   else {f.fillRect(5,13,6,2);f.fillRect(19,13,5,2);f.fillRect(6,18,4,1);f.fillRect(20,18,4,1);}
  }
  if(!bone){
+  if(finishing&&expression==='satisfied'&&!talking){
+   f.fillStyle=skin;f.fillRect(4,13,9,8);f.fillRect(17,13,9,8);f.fillStyle=dark;
+   for(const x of [5,18]){f.fillRect(x,16,2,1);f.fillRect(x+2,15,4,1);f.fillRect(x+6,16,1,1);}
+  }
   f.fillStyle=skin;f.fillRect(10,25,9,4);f.fillStyle=dark;
   if(talking){if(mouthFrame){f.fillRect(10,25,9,4);f.fillStyle='#FDFF81';f.fillRect(11,25,2,1);f.fillRect(15,25,2,1);}else f.fillRect(10,27,9,1);}
   else if(expression==='angry'){f.fillRect(11,26,6,1);f.fillRect(10,27,1,1);f.fillRect(17,27,1,1);}
   else if(expression==='satisfied'){f.fillRect(10,26,1,1);f.fillRect(18,26,1,1);f.fillRect(11,27,7,1);}
+  else if(finishing){f.fillRect(10,27,9,1);}
   else {f.fillRect(10,25,9,4);f.fillStyle='#FDFF81';f.fillRect(11,26,2,2);f.fillRect(15,26,2,1);}
  }else if(talking&&mouthFrame){f.fillStyle=dark;f.fillRect(7,24,15,2);}
  f.restore();
 }
 function renderPortrait(includeGuides=true,target=ctx){
  if(!ready)return;
+ if(finishing)includeGuides=false;
  target.imageSmoothingEnabled=false;target.clearRect(0,0,W,H);
  target.drawImage(capeImage,24,79.5,112,112*capeImage.naturalHeight/capeImage.naturalWidth);
  paintFace();
@@ -343,14 +354,8 @@ function enterBeauty(){
  requestAnimationFrame(()=>beautyScreen.classList.add('active'));
  setBeautyPhase(beautyStageOrder(B)[0]);
 }
-function advanceBeautyResult(){}
-function startBeautyResult(){
- if(!ready||finishing||briefing)return;cancelGesture();updateBeautyScore();finishing=true;beautyPhase='result';
- expression=totalSatisfaction>=80?'satisfied':totalSatisfaction>=40?'neutral':'angry';renderPortrait();
- next.disabled=true;finish.disabled=true;state.keys.clear();
- send('beauty-result',{score:totalSatisfaction,portrait:captureBeautyCustomer()});
-}
+/*__BEAUTY_RESULT__*/
 addEventListener('message',e=>{if(e.source!==parent||e.data?.token!==GUEST.token)return;if(e.data.type==='beauty-request-done'){finishBeautyRequest(e.data.requestId,e.data.detail);return;}if(e.data.type!=='beauty-speaking')return;talking=!!e.data.speaking;mouthFrame=!!e.data.open;beautyCustomer.dataset.talking=String(talking);renderPortrait();});
 prepareBeauty().catch(error=>{hint.textContent='미용 리소스를 불러오지 못했어요. 새로고침해 주세요.';console.error(error);});
-window.beautyDebug={get ready(){return ready;},get material(){return Array.from(current);},get paint(){return Array.from(paint);},get original(){return Array.from(original);},get toolSize(){return brushRadius;},get opacity(){return paintOpacity;},get masks(){return masks;},get expression(){return expression;},get scores(){return {cut:cutScore,draw:drawScore,attach:attachScore,total:totalSatisfaction,live:liveSatisfaction};},get placements(){return placements.map(p=>({id:p.sticker.id,x:p.x,y:p.y}));},get historyLength(){return history[beautyPhase]?.length||0;},get briefing(){return briefing;},get mouthFrame(){return mouthFrame;}};
+window.beautyDebug={get result(){return {active:beautyResultActive,revealed:resultRevealed,mood:resultMood};},get ready(){return ready;},get material(){return Array.from(current);},get paint(){return Array.from(paint);},get original(){return Array.from(original);},get toolSize(){return brushRadius;},get opacity(){return paintOpacity;},get masks(){return masks;},get expression(){return expression;},get scores(){return {cut:cutScore,draw:drawScore,attach:attachScore,total:totalSatisfaction,live:liveSatisfaction};},get placements(){return placements.map(p=>({id:p.sticker.id,x:p.x,y:p.y}));},get historyLength(){return history[beautyPhase]?.length||0;},get briefing(){return briefing;},get mouthFrame(){return mouthFrame;}};
 

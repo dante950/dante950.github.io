@@ -21,7 +21,7 @@
 .sculptStatus .requestText{font-size:14px;font-weight:bold;line-height:1.9;margin:12px 0;white-space:pre-line;overflow-wrap:anywhere}
 #repeatBeautyRequest{display:block;margin:4px 0 0 auto;border:0;background:none;color:#876B51;font-size:10px;padding:4px;cursor:pointer}
 .sculptNav{position:absolute;left:250px;right:230px;top:30px;display:flex;gap:5px;justify-content:center;z-index:315}.sculptNav button{font-size:10px;padding:7px 8px}
-.sculptActions{position:absolute;left:25px;bottom:27px;z-index:315;display:flex;gap:7px}.sculptActions button{font-size:11px}.sculptActions .devGuide{font-size:9px;background:transparent;border:1px dashed #795843;color:#5D4438;padding:7px}.devGuide[aria-pressed=true]{background:#FFF4E4}
+.sculptActions{position:absolute;left:25px;bottom:27px;z-index:315;display:flex;gap:7px}.sculptActions button{font-size:11px}.sculptActions .beautyGuide{font-size:11px;background:#FFF4E4;border:2px solid #795843;color:#5D4438;padding:8px}.beautyGuide[aria-pressed=true]{background:#FEC36C;box-shadow:inset 0 0 0 2px #F59A40}
 .sculptHint{margin-top:14px;text-align:center;font-size:10px;line-height:1.6;color:#806957}
 .beautyCustomer{bottom:87px}
 .beautyNext{width:172px;right:23px;bottom:25px;cursor:pointer}
@@ -37,3 +37,29 @@
 .requestItem.complete{color:#42784A}
 .requestItem.complete .requestCheck{color:#42784A;font-weight:900}
 .requestItem.complete .requestLabel{text-decoration:line-through;text-decoration-thickness:1px;text-decoration-color:#42784A99}
+
+/* The camera stays on the actual styled customer during the reaction. */
+.beautyResultCamera{position:absolute;inset:0;transform-origin:50% 33%;transition:transform 2.6s cubic-bezier(.22,.6,.35,1)}
+.resultPlaying .beautyResultCamera{transform:scale(1.24)}
+.resultPlaying .beautyPanel,.resultPlaying .sculptNav,.resultPlaying .sculptStatus,.resultPlaying .sculptActions,.resultPlaying .beautyNext,.resultPlaying .beautyFinish,.resultPlaying .beautyStatus{visibility:hidden;pointer-events:none}
+.beautyResultEffects{position:absolute;inset:0;z-index:309;pointer-events:none;opacity:0;transition:opacity .7s ease}
+.resultRevealed .beautyResultEffects{opacity:1}
+.resultGlow{position:absolute;inset:0;transition:background .7s}
+[data-result-mood=satisfied] .resultGlow{background:radial-gradient(ellipse at 50% 35%,#FFE69B00 24%,#FFD36C40 63%,#FFD77390 100%);box-shadow:inset 0 0 85px #FFF6BE66}
+[data-result-mood=angry] .resultGlow{background:radial-gradient(ellipse at 50% 42%,#8D121000 24%,#BB251847 65%,#850909BC 100%)}
+[data-result-mood=neutral] .resultGlow{background:radial-gradient(ellipse at 50% 38%,transparent 40%,#4D53671A 100%)}
+.beautyResultHand{position:absolute;left:51px;top:212px;width:56px;height:80px;z-index:14;image-rendering:pixelated;opacity:0;transform:translateY(45px) rotate(-12deg);transform-origin:50% 100%;transition:opacity .35s .35s,transform .7s .35s cubic-bezier(.2,1.4,.4,1)}
+.resultRevealed[data-result-mood=satisfied] .beautyResultHand{opacity:1;transform:translateY(0) rotate(-5deg)}
+.resultFlowers{display:none}.resultRevealed[data-result-mood=satisfied] .resultFlowers{display:block}
+.resultFlower{position:absolute;width:var(--flower-size);height:var(--flower-size);opacity:0;animation:beautyFlower 1.1s var(--delay) ease-out forwards;filter:drop-shadow(0 2px 0 #B78F6233)}
+.resultFlower i{position:absolute;width:62%;height:62%;background:var(--petal);border-radius:45%;left:19%;top:-13%}
+.resultFlower i:nth-child(2){left:51%;top:19%}.resultFlower i:nth-child(3){top:51%}.resultFlower i:nth-child(4){left:-13%;top:19%}
+.resultFlower b{position:absolute;inset:31%;background:#FFCA4C;border-radius:30%}
+@keyframes beautyFlower{0%{opacity:0;transform:translateY(22px) rotate(-30deg) scale(.2)}60%{opacity:1;transform:translateY(-4px) rotate(var(--turn)) scale(1.12)}100%{opacity:1;transform:translateY(0) rotate(var(--turn)) scale(1)}}
+.beautyResultCaption{position:absolute;z-index:320;left:25%;right:25%;bottom:29px;text-align:center;font-size:21px;font-weight:bold;color:#493627;opacity:0;text-shadow:0 2px #FFF3D9;transform:translateY(6px);transition:opacity .45s,transform .45s}
+.resultRevealed .beautyResultCaption{opacity:1;transform:translateY(0)}
+[data-result-mood=angry] .beautyResultCaption{color:#682A24}
+.beautyResultContinue{position:absolute;z-index:330;right:26px;bottom:28px;padding:9px 13px;border:1px solid #80644B;border-radius:8px;background:#FFF3DDED;color:#5B4333;font-size:11px;cursor:pointer}
+.resultSettled .beautyResultCamera{transform:scale(1.12);transition-duration:.65s}
+.resultSettled .beautyResultCaption{opacity:0}
+@media(prefers-reduced-motion:reduce){.beautyResultCamera,.beautyResultHand,.beautyResultEffects,.beautyResultCaption{transition:none!important}.resultFlower{animation:none;opacity:1}.resultPlaying .beautyResultCamera,.resultSettled .beautyResultCamera{transform:none}}

@@ -40,3 +40,8 @@ body.playing #talkLayer.beautyRequest{background:none;padding:0}
 body.playing #talkLayer.beautyRequest .talkbox{position:fixed;left:var(--speech-x);top:var(--speech-y);background:#FFF8E9;border:2px solid #795843;color:#493627;width:530px;max-width:none;min-height:112px;margin:0;padding:11px 18px;transform:scale(var(--speech-scale,1));transform-origin:top left;border-radius:14px;box-shadow:0 4px 0 #79584335}
 body.playing #talkLayer.beautyRequest .talkbox:after{content:"";position:absolute;left:58%;top:-9px;width:15px;height:15px;transform:rotate(-45deg);background:#FFF8E9;border-right:2px solid #795843;border-top:2px solid #795843}
 #dialogueEditor:has(#beautyRequestText) #richPreview{background:#FFF8E9}
+
+/* Keep the finished customer visible behind the preview's return action. */
+#modal:has(.beautyPreviewComplete){background:transparent;backdrop-filter:none;align-items:flex-end;justify-content:flex-end;pointer-events:none;padding:24px}
+.beautyPreviewComplete{pointer-events:auto;width:min(370px,92vw);padding:18px 22px;background:#FFF2DF;color:#503B2C;border:2px solid #92715B;box-shadow:0 5px 0 #573C3926}
+.beautyPreviewComplete .eyebrow{display:none}.beautyPreviewComplete h2{font-size:19px;margin:0 0 4px}.beautyPreviewComplete p{font-size:12px;margin:0 0 10px;color:#816951}.beautyPreviewComplete .actions{margin:0}

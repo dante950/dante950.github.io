@@ -56,7 +56,7 @@ export function detachedByBeautyCut(before,after,width,height,anchors=new Uint8A
  return removed;
 }
 // A request check means a sufficient trim, while the existing score still rewards precision.
-const BONE_TRIM_COMPLETION=.70,BONE_PRESERVE_TOLERANCE=.05;
+const BONE_TRIM_COMPLETION=.50,BONE_REGION_COMPLETION=.30,BONE_PRESERVE_TOLERANCE=.12;
 export function scoreShape(current,original,b,width=160,height=175,masks={}){
  if(!b.designVersion)return scoreLegacyShape(current,original,b,width,height,masks);
  let points=0,interiorIntact=true,interiorLossRatio=0,eyeCoverRatio=0;const details=[];
@@ -98,8 +98,18 @@ export function beautyRequirementChecks(b,phase,shape,scores,placementCount){
  if(phase==='cut'){
   const groups=[...new Set(shape.details.filter(r=>r.rule!=='free').map(r=>r.rule))];
   const bone=b.designVersion&&b.growth?.material==='bone';
-  const checks=groups.map(rule=>shape.details.filter(r=>r.rule===rule).every(r=>
-   r.fulfilled>=1-1e-9||bone&&rule==='trim'&&r.ratio>=BONE_TRIM_COMPLETION));
+  const checks=groups.map(rule=>{
+   const regions=shape.details.filter(r=>r.rule===rule);
+   if(!bone||rule!=='trim')return regions.every(r=>r.fulfilled>=1-1e-9);
+   if(regions.every(r=>r.fulfilled>=1-1e-9))return true;
+   const editable=regions.filter(r=>r.total>0);
+   if(!editable.length)return false;
+   const total=editable.reduce((sum,r)=>sum+r.total,0);
+   const removed=editable.reduce((sum,r)=>sum+r.ratio*r.total,0);
+   const trimmed=editable.filter(r=>r.ratio>=BONE_REGION_COMPLETION||r.fulfilled>=1-1e-9).length;
+   // Judge the silhouette as a whole; tiny chin targets cannot veto a balanced trim.
+   return removed/total>=BONE_TRIM_COMPLETION&&trimmed>=Math.ceil(editable.length*2/3);
+  });
   if(bone)checks.push(shape.interiorIntact===true);
   return checks.length?checks:[scores.cut>=b.weights.cut-1e-9];
  }
