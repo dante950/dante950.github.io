@@ -245,8 +245,8 @@ function paintFace(){
  }
  if(!bone){
   if(finishing&&expression==='satisfied'&&!talking){
-   f.fillStyle=skin;f.fillRect(4,13,9,8);f.fillRect(17,13,9,8);f.fillStyle=dark;
-   for(const x of [5,18]){f.fillRect(x,16,2,1);f.fillRect(x+2,15,4,1);f.fillRect(x+6,16,1,1);}
+   f.fillStyle=skin;f.fillRect(4,13,9,8);f.fillRect(16,13,10,8);f.fillStyle=dark;
+   for(const x of [5,17]){f.fillRect(x,16,2,1);f.fillRect(x+2,15,4,1);f.fillRect(x+6,16,1,1);}
   }
   f.fillStyle=skin;f.fillRect(10,25,9,4);f.fillStyle=dark;
   if(talking){if(mouthFrame){f.fillRect(10,25,9,4);f.fillStyle='#FDFF81';f.fillRect(11,25,2,1);f.fillRect(15,25,2,1);}else f.fillRect(10,27,9,1);}
