@@ -37,5 +37,3 @@
 .requestItem.complete{color:#42784A}
 .requestItem.complete .requestCheck{color:#42784A;font-weight:900}
 .requestItem.complete .requestLabel{text-decoration:line-through;text-decoration-thickness:1px;text-decoration-color:#42784A99}
-.requestSatisfaction{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid #C9AF8C;padding-top:10px;font-size:10px;color:#72573F}
-.requestSatisfaction output{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;color:#493627}

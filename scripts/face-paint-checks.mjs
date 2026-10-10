@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+export async function checkFacePaint(page,salon,point,{screenshot}={}){
+ const saved={size:await salon.locator('#sculptSize').inputValue(),opacity:await salon.locator('#paintOpacity').inputValue()};
+ const set=async(id,v)=>salon.locator(id).evaluate((e,v)=>{e.value=String(v);e.dispatchEvent(new Event('input',{bubbles:true}));},v);
+ const pixel=()=>salon.evaluate(([x,y])=>Array.from(document.querySelector('.sculptCanvas').getContext('2d').getImageData(Math.floor(x/2),Math.floor(y/2),1,1).data),point);
+ const stroke=async(p=point)=>{const b=await salon.locator('.sculptCanvas').boundingBox();await page.mouse.move(b.x+p[0]/320*b.width,b.y+p[1]/350*b.height);await page.mouse.down();await page.mouse.up();};
+ const before=await salon.evaluate(()=>({material:beautyDebug.material,paint:beautyDebug.paint,cut:beautyDebug.scores.cut,mask:Array.from(beautyDebug.masks.protectedFace)})),bare=await pixel();
+ await set('#sculptSize',3);await set('#paintOpacity',35);await salon.locator('[data-color="#FF3024"]').click();
+ await stroke();const tinted=await pixel(),expected=bare.slice(0,3).map((v,i)=>Math.round([255,48,36][i]*89/255+v*(1-89/255)));
+ assert.equal(tinted[3],255);assert(tinted.slice(0,3).every((v,i)=>Math.abs(v-expected[i])<=1),'face color blends once over the original animated face (canvas rounding ±1)');
+ assert.equal(await salon.evaluate(([x,y])=>beautyDebug.paint[(Math.floor(y/2)*160+Math.floor(x/2))*4+3],point),89);
+ const first=await salon.evaluate(()=>beautyDebug.paint);await stroke();
+ assert.equal(await salon.evaluate(([x,y])=>beautyDebug.paint[(Math.floor(y/2)*160+Math.floor(x/2))*4+3],point),147);
+ await salon.locator('#undoBeauty').click();assert.deepEqual(await pixel(),tinted);assert.deepEqual(await salon.evaluate(()=>beautyDebug.paint),first);
+ await salon.locator('#erasePaint').click();await stroke();assert.deepEqual(await pixel(),bare,'erase restores the underlying expression');
+ await salon.locator('#undoBeauty').click();assert.deepEqual(await pixel(),tinted,'undo also restores erased face paint');
+ await salon.locator('#undoBeauty').click();assert.deepEqual(await salon.evaluate(()=>beautyDebug.paint),before.paint);
+ await set('#paintOpacity',100);await salon.locator('[data-color="#FF3024"]').click();await stroke();assert.deepEqual(await pixel(),[255,48,36,255],'opaque ink can cover eye/nose/mouth artwork');
+ const captured=await salon.evaluate(async([x,y])=>{const img=new Image();img.src=captureBeautyCustomer();await img.decode();const c=document.createElement('canvas');c.width=160;c.height=175;const ctx=c.getContext('2d');ctx.drawImage(img,0,0);return Array.from(ctx.getImageData(Math.floor(x/2),Math.floor(y/2),1,1).data);},point);
+ assert.deepEqual(captured,[255,48,36,255],'the completed portrait includes face paint');
+ if(screenshot)await page.screenshot({path:screenshot});
+ const painted=await salon.evaluate(()=>beautyDebug.paint);await stroke([20,290]);assert.deepEqual(await salon.evaluate(()=>beautyDebug.paint),painted,'the room and cape are outside the paint boundary');
+ await salon.locator('#undoBeauty').click();await salon.locator('#undoBeauty').click();
+ assert.deepEqual(await salon.evaluate(()=>beautyDebug.paint),before.paint);
+ assert.deepEqual(await salon.evaluate(()=>beautyDebug.material),before.material);assert.deepEqual(await salon.evaluate(()=>Array.from(beautyDebug.masks.protectedFace)),before.mask);
+ assert.equal(await salon.evaluate(()=>beautyDebug.scores.cut),before.cut,'face decoration does not alter shape evaluation');
+ await set('#sculptSize',saved.size);await set('#paintOpacity',saved.opacity);
+ assert.equal(await salon.locator('.requestSatisfaction,.satisfactionReadout').count(),0);
+ assert(!/만족도|\d+\s*\/\s*100/.test(await salon.locator('.sculptStatus').innerText()));
+}

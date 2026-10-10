@@ -8,7 +8,7 @@ let brushRadius=10,paintOpacity=1,paintColor='#75452D',expression='neutral',talk
 let touched={cut:false,draw:false,attach:false},zonesVisible=false,history={draw:[],attach:[]},briefing=false,requestSerial=0;
 const current=new Uint8Array(W*H),original=new Uint8Array(W*H),paint=new Uint8ClampedArray(W*H*4);
 const sourcePixels=new Uint8ClampedArray(W*H*4),originalBorder=new Uint8Array(W*H);
-const masks={eyes:new Uint8Array(W*H),brain:new Uint8Array(W*H),protectedFace:new Uint8Array(W*H)};
+const masks={eyes:new Uint8Array(W*H),brain:new Uint8Array(W*H),face:new Uint8Array(W*H),protectedFace:new Uint8Array(W*H)};
 const sculptAnchors=new Uint8Array(W*H);
 let fallingPieces=[],fallingFrame=0;
 const heardDetails={},heardRequests={};
@@ -17,7 +17,7 @@ const faceImage=new Image(),hairImage=new Image(),capeImage=new Image();
 faceImage.src=GUEST.skin.head;hairImage.src=GUEST.skin.hair;
 capeImage.src=beautyCustomer.querySelector('.cape').src;
 const offscreen=()=>{const c=document.createElement('canvas');c.width=W;c.height=H;return c;};
-const portrait=offscreen(),materialCanvas=offscreen(),faceCanvas=offscreen(),featureOverlay=offscreen();
+const portrait=offscreen(),materialCanvas=offscreen(),faceCanvas=offscreen(),featureOverlay=offscreen(),facePaintCanvas=offscreen();
 const faceFeatures=bone?GUEST.skin.features:null,featureLayers={eyes:{},mouth:{}};
 const boneBase=document.createElement('canvas');boneBase.width=29;boneBase.height=31;
 const featureLoads=[];
@@ -37,7 +37,7 @@ const panel=document.querySelector('.beautyPanel');
 panel.innerHTML='<div class="sculptTools"><h3>형태 만들기</h3><div id="shapeTools"></div><label class="brushLabel" for="sculptSize"><span>도구 크기 <output id="sculptSizeValue">10</output></span><input id="sculptSize" type="range" min="1" max="30" step="1" value="10"></label><div id="paintTools" hidden></div><div id="decorationTools" hidden></div></div>';
 document.querySelector('.beautyMood').remove();
 const status=document.createElement('section');status.className='sculptStatus'+(bone?' bone':'');
-status.innerHTML='<span class="requestCaption">손님의 부탁</span><div class="requestText"></div><div class="requestSatisfaction"><span>손님 만족도</span><output aria-live="polite">50/100</output></div><button id="repeatBeautyRequest" aria-label="손님의 부탁 다시 듣기">다시 듣기 ↻</button>';status.hidden=true;
+status.innerHTML='<span class="requestCaption">손님의 부탁</span><div class="requestText"></div><button id="repeatBeautyRequest" aria-label="손님의 부탁 다시 듣기">다시 듣기 ↻</button>';status.hidden=true;
 beautyScreen.append(status);
 const nav=document.createElement('div');nav.className='sculptNav';beautyScreen.append(nav);
 const actions=document.createElement('div');actions.className='sculptActions';
@@ -102,6 +102,7 @@ async function prepareBeauty(){
  for(let n=0;n<W*H;n++){
   const i=n*4,x=(n%W+.5)*PIX,y=(Math.floor(n/W)+.5)*PIX,r=head[i],g=head[i+1],bl=head[i+2],a=head[i+3];
   if(!a)continue;
+  masks.face[n]=a>100?1:0;
   // Attachment preference only; immutable feature pixels are tracked separately.
   sculptAnchors[n]=bone?+(x>104&&x<216&&y>=78&&y<180):+(y<88&&x>108&&x<216);
   if(!bone&&y<90&&r>120&&bl>60&&g<150&&r>g*1.3)masks.brain[n]=1;
@@ -120,6 +121,8 @@ async function prepareBeauty(){
  for(let n=0;n<W*H;n++)originalBorder[n]=original[n]&&emptyNeighbor(original,n)?1:0;
  ready=true;next.disabled=briefing;updateBeautyScore();refreshTools();renderPortrait();
 }
+// Paint follows visible hair/bone or the zombie's separate face; empty space stays clipped.
+function canPaintAt(n){return !!(current[n]||!bone&&masks.face[n]||!B.designVersion);}
 function syncUndo(){const button=document.getElementById('undoBeauty');button.hidden=beautyPhase==='cut';button.disabled=briefing||!history[beautyPhase]?.length;}
 function pushUndo(){
  if(beautyPhase==='cut')return false;
@@ -127,7 +130,7 @@ function pushUndo(){
 }
 function undoBeauty(){
  if(beautyPhase==='cut'||briefing||finishing)return;cancelGesture();const old=history[beautyPhase]?.pop();if(!old)return;
- if(beautyPhase==='draw'){paint.set(old.paint);for(let n=0;n<current.length;n++)if(!current[n]&&B.designVersion)paint.fill(0,n*4,n*4+4);touched.draw=old.touched;}
+ if(beautyPhase==='draw'){paint.set(old.paint);for(let n=0;n<current.length;n++)if(!canPaintAt(n))paint.fill(0,n*4,n*4+4);touched.draw=old.touched;}
  else {placements=old.placements;touched.attach=old.touched;}
  syncUndo();updateBeautyScore();renderPortrait();
 }
@@ -135,7 +138,7 @@ function point(e){const r=portrait.getBoundingClientRect();return{x:(e.clientX-r
 function applyStroke(points,kind){
  const cells=strokeCells(W,H,points,brushRadius);let changed=false;
  for(const n of cells){
-  if(masks.protectedFace[n])continue;
+  if(masks.protectedFace[n]&&kind!=='paint'&&kind!=='erase')continue;
   const x=(n%W+.5)*PIX,y=(Math.floor(n/W)+.5)*PIX,i=n*4,previous=current[n],previousPaint=paint.slice(i,i+4);
   if(kind==='grow'){
    if(!inBeautyRegion(x,y,growthRegion))continue;
@@ -143,9 +146,9 @@ function applyStroke(points,kind){
    if(!bone){current[n]=2;paint.fill(0,i,i+4);}
    else if(!current[n]){current[n]=original[n]?1:2;paint.fill(0,i,i+4);}
    else if(!originalBorder[n])current[n]=2;
-  }else if(kind==='scissors'||kind==='hammer'){current[n]=0;paint.fill(0,i,i+4);}
+  }else if(kind==='scissors'||kind==='hammer'){if(current[n])paint.fill(0,i,i+4);current[n]=0;}
   else if(kind==='erase')paint.fill(0,i,i+4);
-  else if(kind==='paint'&&(current[n]||!B.designVersion)){paint.set(blendBeautyRGBA(gesture.paint.subarray(i,i+4),rgb(paintColor),paintOpacity),i);}
+  else if(kind==='paint'&&canPaintAt(n)){paint.set(blendBeautyRGBA(gesture.paint.subarray(i,i+4),rgb(paintColor),paintOpacity),i);}
   if(current[n]!==previous||previousPaint.some((v,k)=>v!==paint[i+k]))changed=true;
  }
  if(!changed)return;
@@ -258,12 +261,16 @@ function renderPortrait(includeGuides=true,target=ctx){
   const nearGrowth=!bone&&sourceDark&&[-2*W,-W,-2,-1,1,2,W,2*W].some(d=>current[n+d]===2);
   const color=edge?outlineColor:current[n]===2||joining||nearGrowth?materialColor:null;
   if(color)data.data.set([...color,255],i);else data.data.set((bone?face:sourcePixels).subarray(i,i+4),i);
-  if(paint[i+3])data.data.set(blendBeautyRGBA(data.data.subarray(i,i+4),paint.subarray(i,i+3),paint[i+3]/255),i);
+  if(paint[i+3]&&!masks.protectedFace[n])data.data.set(blendBeautyRGBA(data.data.subarray(i,i+4),paint.subarray(i,i+3),paint[i+3]/255),i);
  }
- if(!B.designVersion)for(let n=0;n<W*H;n++){const i=n*4;if(paint[i+3]&&!current[n])data.data.set(paint.subarray(i,i+4),i);}
+ if(!B.designVersion)for(let n=0;n<W*H;n++){const i=n*4;if(paint[i+3]&&!current[n]&&(bone||!masks.face[n]))data.data.set(paint.subarray(i,i+4),i);}
  materialCtx.putImageData(data,0,0);target.drawImage(materialCanvas,0,0);
  if(includeGuides)for(const p of fallingPieces){const age=Math.max(0,(performance.now()-p.start)/320);target.save();target.globalAlpha=Math.max(0,1-age);target.drawImage(p.canvas,0,4+40*age*age);target.restore();}
  if(faceFeatures)target.drawImage(featureOverlay,0,0);
+ // Face color sits over the animated artwork without modifying its source or cut mask.
+ const facePaint=facePaintCanvas.getContext('2d'),tint=facePaint.createImageData(W,H);
+ for(let n=0;n<W*H;n++)if(masks.protectedFace[n]||!bone&&!current[n]&&masks.face[n]){const i=n*4;tint.data.set(paint.subarray(i,i+4),i);}
+ facePaint.putImageData(tint,0,0);target.drawImage(facePaintCanvas,0,0);
  for(const p of placements){const image=stickerImages.get(p.sticker.id);if(image?.complete&&image.naturalWidth)target.drawImage(image,p.x/2-p.sticker.w*.375,p.y/2-p.sticker.h*.375,p.sticker.w*.75,p.sticker.h*.75);}
  if(includeGuides&&zonesVisible){
   target.save();target.lineWidth=.8;target.font='5px sans-serif';
@@ -289,7 +296,7 @@ function refreshTools(){
  for(const b of paintTools.querySelectorAll('[data-color]'))b.classList.toggle('selected',activeTool==='paint'&&b.dataset.color===paintColor);
  document.getElementById('erasePaint').classList.toggle('selected',activeTool==='erase');
  for(const b of decorations.querySelectorAll('[data-sticker]'))b.classList.toggle('selected',b.dataset.sticker===selectedSticker?.id);
- hint.textContent=beautyPhase==='attach'?'붙인 장식은 눌러 떼기':beautyPhase==='draw'?'머리 위에 쓱쓱':activeTool==='grow'?'누른 채 발라 주세요':activeTool==='scissors'?'드래그 후 놓으면 싹둑':'누른 채 조금씩 다듬기';
+ hint.textContent=beautyPhase==='attach'?'붙인 장식은 눌러 떼기':beautyPhase==='draw'?'머리와 얼굴 위에 쓱쓱':activeTool==='grow'?'누른 채 발라 주세요':activeTool==='scissors'?'드래그 후 놓으면 싹둑':'누른 채 조금씩 다듬기';
 }
 function renderRequestStatus(){
  if(!BEAUTY_STAGES.includes(beautyPhase))return;
@@ -302,7 +309,6 @@ function renderRequestStatus(){
   return '<div class="requestItem'+(optional?' optional':met?' complete':'')+'"><span class="requestCheck" aria-label="'+(optional?'선택 사항':met?'달성':'진행 중')+'">'+(optional?'◇':met?'✓':'○')+'</span><span class="requestLabel">'+safeText(label)+'</span></div>';
  }).join('');
  const list=status.querySelector('.requestText');if(list.innerHTML!==markup)list.innerHTML=markup;
- const value=status.querySelector('.requestSatisfaction output'),score=liveSatisfaction+'/100';if(value.textContent!==score)value.textContent=score;
 }
 function setBeautyPhase(phase,announce=true){
  if(finishing||briefing)return;cancelGesture();beautyPhase=phase;

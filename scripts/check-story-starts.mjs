@@ -51,6 +51,7 @@ export async function checkStoryStarts(page,{screenshotPath,checkContinuation=fa
    if(await salon.locator('.beautyFinish').isVisible())await salon.locator('.beautyFinish').click();
    else await salon.locator('.beautyNext').click(); // Sans ends after stickers.
    await page.waitForTimeout(250);await advanceTalk(page);
+   assert(!/만족도|\d+\s*\/\s*100/.test(await page.locator('#modalCard').innerText()),'the player sees no satisfaction score after beauty');
    await page.locator('#acceptBattle').click();
   }else assert.equal(await salon.locator('#beautyScreen').isVisible(),false);
   const combat=page.frameLocator('#storyBattle');
@@ -64,6 +65,7 @@ export async function checkStoryStarts(page,{screenshotPath,checkContinuation=fa
    await page.locator('#talkLayer').waitFor();await advanceTalk(page);
    await page.locator('#soulDone').click();await advanceTalk(page);
    await page.locator('#settleDone').waitFor();
+   assert(!/만족도|\d+\s*점|\d+\s*\/\s*100/.test(await page.locator('#modalCard').innerText()),'settlement hides customer scores');
    assert.deepEqual(await page.evaluate(()=>window.fullflow.story.records.map(r=>r.id)),[10002]);
    await page.locator('#settleDone').click();await page.locator('#phoneButton').click();
    assert.equal(await page.locator('.post').filter({hasText:'@zombie_jobseeker'}).count(),0);
