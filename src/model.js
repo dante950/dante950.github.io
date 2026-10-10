@@ -1,4 +1,4 @@
-export const FLOW_VERSION='통합 플레이 0.7 · 형태 만들기';
+export const FLOW_VERSION='통합 플레이 0.8 · 손님의 부탁';
 export const SALON_EVENTS=[['arrival','손님 등장'],['cut','형태 만들기 요청'],['draw','색·무늬 요청'],['attach','장식 요청'],['best','미용 매우 만족'],['normal','미용 만족'],['fail','미용 불만족'],['proposal','야차 제안'],['afterWin','야차 승리 후 미용실'],['afterLoss','야차 패배 후 미용실'],['leave','손님 퇴장']];
 export function modelRows(p,name){return p.combat.sheets.find(s=>s.name===name)?.rows||[];}
 export function defaultProject(combat,assets){
@@ -71,14 +71,14 @@ const BEAUTY_PRESETS={
         "attach": 30
       },
       "cutTool": "scissors",
-      "request": "눈이 잘 보이게 앞머리를 자르고, 드러난 뇌는 발모제로 머리카락을 더해 가려 주세요.",
+      "request": "으어어... 면접을 보러 가는데요... 눈이 잘 보이게 앞머리를 잘라 주세요. 튀어나온 뇌도... 머리카락으로 가려 주시겠어요...?",
       "attachTag": "Tag_Gentle",
       "attachFirst": 30,
       "attachExtra": 15,
       "attachMisplaced": 10,
       "attachWrong": 15,
-      "attachHint": "면접에 어울리는 단정한 장식 하나면 충분해요. 안경·콧수염·나비넥타이 중 골라 주세요.",
-      "drawHint": "원래 색 그대로여도 좋아요. 원하면 색·무늬를 자유롭게 꾸며 보세요. 이번 손님은 염색 점수를 매기지 않아요.",
+      "attachHint": "면접에는... 첫인상이 중요하다고 하더군요. 단정해 보이게... 장식 하나만 부탁드립니다...",
+      "drawHint": "염색이요...? 어떤 색이든 상관없어요... 지금 머리 색도 괜찮아서... 자유롭게 부탁드립니다...",
       "drawColors": [
         "#75452D"
       ],
@@ -180,14 +180,19 @@ const BEAUTY_PRESETS={
       "growth": {
         "enabled": true,
         "material": "hair",
-        "color": "#62CB70",
-        "outline": "#416333",
+        "color": "#71EE8C",
+        "outline": "#045112",
         "region": {
           "x": 40,
           "y": 0,
           "w": 240,
           "h": 330
         }
+      },
+      "requestNotes": {
+        "cut": "눈은 잘 보이게\n뇌는 머리로 가리기",
+        "draw": "지금 색도 좋아요\n색·무늬는 자유롭게",
+        "attach": "면접에 어울리게\n단정한 장식 하나"
       }
     },
     "note": "첫 손님: 눈 드러내기 + 뇌를 머리카락으로 가리기 + 젠틀 장식. 염색은 자유 체험. 영역·허용 오차·배점은 시험값이며 Unity 미용 계약은 미정입니다. 표정은 기존 얼굴을 이용한 임시 눈·입 표현입니다."
@@ -206,14 +211,14 @@ const BEAUTY_PRESETS={
         "attach": 30
       },
       "cutTool": "hammer",
-      "request": "망치·정으로 얼굴 테두리를 조금씩 다듬어 주세요. 발모제를 바르면 머리 위에 뼈를 이어 만들 수 있어요.",
+      "request": "헤. 얼굴 테두리만 조금 다듬어 줘. 망치랑 정으로 톡톡... 속까지 시원해질 필요는 없거든.",
       "attachTag": "Tag_Strong",
       "attachFirst": 30,
       "attachExtra": 15,
       "attachMisplaced": 10,
       "attachWrong": 15,
-      "attachHint": "강해 보이는 Tag_Strong 스티커를 붙여 주세요.",
-      "drawHint": "원래 색 그대로여도 좋아요. 원하면 색·무늬를 자유롭게 꾸며 보세요. 이번 손님은 염색 점수를 매기지 않아요.",
+      "attachHint": "이번엔 좀 강해 보이고 싶거든. 만만하게 보이지 않을 만한 장식... 네가 골라 줄래?",
+      "drawHint": "색? 지금도 나쁘지 않지. 바꾸고 싶으면 네 감각에 맡길게. 꽤 뼈대 있는 색으로... 헤.",
       "drawColors": [
         "#E9E2D6"
       ],
@@ -338,6 +343,11 @@ const BEAUTY_PRESETS={
           "w": 240,
           "h": 210
         }
+      },
+      "requestNotes": {
+        "cut": "얼굴 테두리만 살짝\n안쪽은 조심조심",
+        "draw": "지금 색도 좋아\n색·무늬는 자유롭게",
+        "attach": "만만해 보이지 않게\n강렬한 인상"
       }
     },
     "note": "망치·정 / 얼굴 테두리 / Tag_Strong. 발모제는 기존 두개골과 이어지는 뼈 재료. 형태 목표·배점은 기존 임시값을 유지한 시험 설정입니다. 눈·입 표현도 임시입니다."

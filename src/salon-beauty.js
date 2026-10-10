@@ -5,7 +5,7 @@ let beautyActive=false,beautyResultActive=false,beautyPhase='cut',totalSatisfact
 let cutScore=0,attachScore=0,drawScore=0,placements=[],selectedSticker=null;
 let ready=false,finishing=false,gesture=null,activeTool=bone?'hammer':'scissors';
 let brushRadius=10,paintColor='#75452D',expression='neutral',talking=false,mouthFrame=false;
-let touched={cut:false,draw:false,attach:false},zonesVisible=false,history=[];
+let touched={cut:false,draw:false,attach:false},zonesVisible=false,history={draw:[],attach:[]},briefing=false,requestSerial=0;
 const current=new Uint8Array(W*H),original=new Uint8Array(W*H),paint=new Uint8ClampedArray(W*H*4);
 const sourcePixels=new Uint8ClampedArray(W*H*4),originalBorder=new Uint8Array(W*H);
 const masks={eyes:new Uint8Array(W*H),brain:new Uint8Array(W*H)};
@@ -22,13 +22,13 @@ const panel=document.querySelector('.beautyPanel');
 panel.innerHTML='<div class="sculptTools"><h3>형태 만들기</h3><div id="shapeTools"></div><label class="brushLabel">도구 크기 <select id="sculptSize"><option value="5">작게</option><option value="10" selected>보통</option><option value="18">넓게</option></select></label><div id="paintTools" hidden></div><div id="decorationTools" hidden></div></div>';
 document.querySelector('.beautyMood').remove();
 const status=document.createElement('section');status.className='sculptStatus'+(bone?' bone':'');
-status.innerHTML='<b class="moodLabel">보통</b><p class="requestText"></p><div class="goalList"></div><small class="scoreText"></small>';
+status.innerHTML='<span class="requestCaption">손님의 부탁</span><p class="requestText"></p><button id="repeatBeautyRequest" aria-label="손님의 부탁 다시 듣기">다시 듣기 ↻</button>';status.hidden=true;
 beautyScreen.append(status);
 const nav=document.createElement('div');nav.className='sculptNav';beautyScreen.append(nav);
 const actions=document.createElement('div');actions.className='sculptActions';
-actions.innerHTML='<button id="undoBeauty" disabled>되돌리기</button><button id="showBeautyZones">영역 보기</button>';
+actions.innerHTML='<button id="undoBeauty" disabled>되돌리기</button>';if(GUEST.mode==='preview')actions.insertAdjacentHTML('beforeend','<button id="showBeautyZones" class="devGuide" aria-pressed="false">판정 영역</button>');
 beautyScreen.append(actions);
-const hint=document.createElement('div');hint.className='sculptHint';beautyScreen.append(hint);
+const hint=document.createElement('div');hint.className='sculptHint';panel.querySelector('.sculptTools').append(hint);
 const next=document.querySelector('.beautyNext'),finish=document.querySelector('.beautyFinish'),stageTag=document.querySelector('.beautyStageTag');
 finish.style.display='none';next.disabled=true;
 next.addEventListener('click',()=>{const stages=beautyStageOrder(B),n=stages.indexOf(beautyPhase);if(n===stages.length-1)startBeautyResult();else setBeautyPhase(stages[n+1]);});
@@ -42,12 +42,12 @@ for(const [key,name] of [[bone?'hammer':'scissors',bone?'망치·정':'가위'],
 document.getElementById('sculptSize').onchange=e=>{cancelGesture();brushRadius=+e.target.value;};
 const colors=['#FF3024','#FF8800','#FFD342','#00DC0A','#228947','#75452D','#4A2C26','#483ADF','#A439F4','#FF67A7','#E9E2D6','#FFFFFF'];
 const paintTools=document.getElementById('paintTools');
-paintTools.innerHTML='<p>머리 위에 색·무늬를 그려요.</p><div class="sculptPalette"></div><button id="erasePaint">색만 지우기</button>';
+paintTools.innerHTML='<div class="sculptPalette"></div><button id="erasePaint">색만 지우기</button>';
 for(const color of colors){const button=document.createElement('button');button.style.background=color;button.dataset.color=color;button.title=color;button.setAttribute('aria-label','색상 '+color);button.onclick=()=>{activeTool='paint';paintColor=color;refreshTools();};paintTools.querySelector('.sculptPalette').append(button);}
 document.getElementById('erasePaint').onclick=()=>{activeTool='erase';refreshTools();};
 const stickerImages=new Map(),STICKERS=GUEST.stickers||[];
 const decorations=document.getElementById('decorationTools');
-decorations.innerHTML='<p>장식을 고른 뒤 손님을 눌러 붙여요. 붙인 장식은 다시 눌러 떼세요.</p><div class="sculptStickers"></div>';
+decorations.innerHTML='<div class="sculptStickers"></div>';
 for(const sticker of STICKERS){
  const img=new Image();img.src=sticker.src;stickerImages.set(sticker.id,img);
  const button=document.createElement('button');button.dataset.sticker=sticker.id;button.title=sticker.name;
@@ -55,7 +55,8 @@ for(const sticker of STICKERS){
  button.onclick=()=>{selectedSticker=sticker;refreshTools();};decorations.querySelector('.sculptStickers').append(button);
  img.onload=()=>{if(ready)renderPortrait();};
 }
-document.getElementById('showBeautyZones').onclick=()=>{zonesVisible=!zonesVisible;document.getElementById('showBeautyZones').textContent=zonesVisible?'영역 숨기기':'영역 보기';renderPortrait();};
+const guideButton=document.getElementById('showBeautyZones');if(guideButton)guideButton.onclick=()=>{zonesVisible=!zonesVisible;guideButton.setAttribute('aria-pressed',String(zonesVisible));renderPortrait();};
+document.getElementById('repeatBeautyRequest').onclick=()=>announceBeautyRequest();
 document.getElementById('undoBeauty').onclick=undoBeauty;
 const rgb=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
 const materialColor=rgb(B.growth?.color||(bone?'#E9E2D6':'#62CB70'));
@@ -85,12 +86,18 @@ async function prepareBeauty(){
   current[n]=original[n]=1;sourcePixels.set(src.subarray(i,i+4),i);
  }
  for(let n=0;n<W*H;n++)originalBorder[n]=original[n]&&emptyNeighbor(original,n)?1:0;
- ready=true;next.disabled=false;updateBeautyScore();refreshTools();renderPortrait();
+ ready=true;next.disabled=briefing;updateBeautyScore();refreshTools();renderPortrait();
 }
-function pushUndo(){history.push({current:current.slice(),paint:paint.slice(),placements:placements.map(p=>({...p})),touched:{...touched}});if(history.length>30)history.shift();document.getElementById('undoBeauty').disabled=false;}
+function syncUndo(){const button=document.getElementById('undoBeauty');button.hidden=beautyPhase==='cut';button.disabled=briefing||!history[beautyPhase]?.length;}
+function pushUndo(){
+ if(beautyPhase==='cut')return false;
+ const stack=history[beautyPhase];stack.push(beautyPhase==='draw'?{paint:paint.slice(),touched:touched.draw}:{placements:placements.map(p=>({...p})),touched:touched.attach});if(stack.length>30)stack.shift();syncUndo();return true;
+}
 function undoBeauty(){
- if(!history.length||finishing)return;cancelGesture();const old=history.pop();current.set(old.current);paint.set(old.paint);placements=old.placements;touched=old.touched;
- document.getElementById('undoBeauty').disabled=!history.length;updateBeautyScore();renderPortrait();
+ if(beautyPhase==='cut'||briefing||finishing)return;cancelGesture();const old=history[beautyPhase]?.pop();if(!old)return;
+ if(beautyPhase==='draw'){paint.set(old.paint);for(let n=0;n<current.length;n++)if(!current[n]&&B.designVersion)paint.fill(0,n*4,n*4+4);touched.draw=old.touched;}
+ else {placements=old.placements;touched.attach=old.touched;}
+ syncUndo();updateBeautyScore();renderPortrait();
 }
 function point(e){const r=portrait.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*320,y:(e.clientY-r.top)/r.height*350};}
 function applyStroke(points,kind){
@@ -100,8 +107,9 @@ function applyStroke(points,kind){
   if(kind==='grow'){
    if(!inBeautyRegion(x,y,growthRegion))continue;
    // Existing facial features are covered only when growth is deliberately painted over them.
-   if(!current[n]){current[n]=original[n]?1:2;paint.fill(0,i,i+4);}
-   else if(bone&&!originalBorder[n])current[n]=2;
+   if(!bone){current[n]=2;paint.fill(0,i,i+4);}
+   else if(!current[n]){current[n]=original[n]?1:2;paint.fill(0,i,i+4);}
+   else if(!originalBorder[n])current[n]=2;
   }else if(kind==='scissors'||kind==='hammer'){current[n]=0;paint.fill(0,i,i+4);}
   else if(kind==='erase')paint.fill(0,i,i+4);
   else if(kind==='paint'&&(current[n]||!B.designVersion)){paint.set([...rgb(paintColor),255],i);}
@@ -109,14 +117,14 @@ function applyStroke(points,kind){
  if(kind==='grow'&&bone&&!touched.cut){touched.cut=[...cells].some(n=>masks.eyes[n]&&current[n]===2);}else touched[beautyPhase]=true;
 }
 portrait.addEventListener('pointerdown',e=>{
- if(!ready||finishing||e.button!==0)return;e.preventDefault();const p=point(e);
+ if(!ready||finishing||briefing||e.button!==0)return;e.preventDefault();const p=point(e);
  if(beautyPhase==='attach'){
   const hit=[...placements].reverse().find(q=>Math.abs(p.x-q.x)<q.sticker.w*.75&&Math.abs(p.y-q.y)<q.sticker.h*.75);
   if(hit){pushUndo();placements=placements.filter(q=>q!==hit);touched.attach=true;updateBeautyScore();renderPortrait();}
   else if(selectedSticker)placeSticker(selectedSticker,p.x,p.y);
   return;
  }
- pushUndo();gesture={pointerId:e.pointerId,from:p,to:p,last:p,kind:activeTool,snapshot:current.slice(),paint:paint.slice(),touched:{...touched}};
+ const undoAdded=pushUndo();gesture={undoAdded,pointerId:e.pointerId,from:p,to:p,last:p,kind:activeTool,snapshot:current.slice(),paint:paint.slice(),touched:{...touched}};
  portrait.setPointerCapture(e.pointerId);
  if(activeTool!=='scissors'){applyStroke([p],activeTool);updateBeautyScore();}
  renderPortrait();
@@ -132,19 +140,20 @@ portrait.addEventListener('pointerup',e=>{
  if(g.kind==='scissors'){applyStroke([g.from,g.to],'scissors');}
  gesture=null;
  if(portrait.hasPointerCapture(e.pointerId))portrait.releasePointerCapture(e.pointerId);
+ if(beautyPhase==='cut'){history.draw=[];history.attach=[];syncUndo();}
  if(g.kind==='hammer')send('sound',{key:'hammer'});
  updateBeautyScore();renderPortrait();
 });
 function cancelGesture(){
- if(!gesture)return;const g=gesture;gesture=null;current.set(g.snapshot);paint.set(g.paint);touched=g.touched;history.pop();
+ if(!gesture)return;const g=gesture;gesture=null;current.set(g.snapshot);paint.set(g.paint);touched=g.touched;if(g.undoAdded)history[beautyPhase].pop();
  if(portrait.hasPointerCapture(g.pointerId))portrait.releasePointerCapture(g.pointerId);
- document.getElementById('undoBeauty').disabled=!history.length;updateBeautyScore();renderPortrait();
+ syncUndo();updateBeautyScore();renderPortrait();
 }
 portrait.addEventListener('pointercancel',cancelGesture);portrait.addEventListener('lostpointercapture',()=>{if(gesture)cancelGesture();});
 addEventListener('blur',cancelGesture);
 addEventListener('keydown',e=>{if(!beautyActive)return;if(e.key==='Escape')cancelGesture();if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();undoBeauty();}},true);
 function placeSticker(sticker,x,y){
- if(!ready||finishing||beautyPhase!=='attach'||placements.length>=5)return;
+ if(!ready||finishing||briefing||beautyPhase!=='attach'||placements.length>=5)return;
  pushUndo();const region=B.attachRegions.find(r=>inBeautyRegion(x,y,r))?.key||'Other';
  placements.push({sticker,region,x,y});touched.attach=true;updateBeautyScore();renderPortrait();
 }
@@ -157,10 +166,6 @@ function updateBeautyScore(){
  const scores={cut:cutScore,draw:drawScore,attach:attachScore};
  const live=BEAUTY_STAGES.reduce((s,k)=>s+(B.steps[k]?(touched[k]?scores[k]:B.weights[k]*.5):0),0);
  expression=liveBeautyMood(live,expression,Object.values(touched).some(Boolean));
- const label=expression==='satisfied'?'만족':expression==='angry'?'불만족':'보통';
- status.querySelector('.moodLabel').textContent=label;status.dataset.mood=expression;
- status.querySelector('.scoreText').textContent='현재 만족도 '+Math.round(live)+'/100';
- status.querySelector('.goalList').innerHTML=beautyPhase==='cut'?shape.details.map(d=>'<div class="'+(d.fulfilled>=.99?'met':'')+'">'+(d.fulfilled>=.99?'✓ ':'· ')+safeText(d.label)+'</div>').join(''):beautyPhase==='draw'?'<div>'+(B.weights.draw?'색·무늬 '+Math.round(drawScore)+'/'+B.weights.draw:'자유 꾸미기 · 점수에 영향 없음')+'</div>':'<div>장식 '+placements.length+'/5 · '+Math.round(attachScore)+'/'+B.weights.attach+'</div>';
  beautyCustomer.dataset.expression=expression;beautyCustomer.dataset.talking=String(talking);
 }
 function paintFace(){
@@ -175,7 +180,7 @@ function paintFace(){
  }
  if(!bone){
   f.fillStyle=skin;f.fillRect(10,25,9,4);f.fillStyle=dark;
-  if(talking&&mouthFrame){f.fillRect(10,25,9,4);f.fillStyle='#FDFF81';f.fillRect(11,25,2,1);f.fillRect(15,25,2,1);}
+  if(talking){if(mouthFrame){f.fillRect(10,25,9,4);f.fillStyle='#FDFF81';f.fillRect(11,25,2,1);f.fillRect(15,25,2,1);}else f.fillRect(10,27,9,1);}
   else if(expression==='angry'){f.fillRect(11,26,6,1);f.fillRect(10,27,1,1);f.fillRect(17,27,1,1);}
   else if(expression==='satisfied'){f.fillRect(10,26,1,1);f.fillRect(18,26,1,1);f.fillRect(11,27,7,1);}
   else {f.fillRect(10,25,9,4);f.fillStyle='#FDFF81';f.fillRect(11,26,2,2);f.fillRect(15,26,2,1);}
@@ -192,7 +197,9 @@ function renderPortrait(includeGuides=true,target=ctx){
  for(let n=0;n<W*H;n++){
   if(!current[n])continue;const i=n*4;
   const edge=emptyNeighbor(current,n),joining=originalBorder[n]&&!edge;
-  const color=edge?outlineColor:current[n]===2||joining?materialColor:null;
+  const sourceDark=!bone&&sourcePixels[i+1]<140;
+  const nearGrowth=!bone&&sourceDark&&[-2*W,-W,-2,-1,1,2,W,2*W].some(d=>current[n+d]===2);
+  const color=edge?outlineColor:current[n]===2||joining||nearGrowth?materialColor:null;
   if(color)data.data.set([...color,255],i);else data.data.set((bone?face:sourcePixels).subarray(i,i+4),i);
   if(paint[i+3])data.data.set(paint.subarray(i,i+4),i);
  }
@@ -217,20 +224,27 @@ function refreshTools(){
  for(const b of paintTools.querySelectorAll('[data-color]'))b.classList.toggle('selected',activeTool==='paint'&&b.dataset.color===paintColor);
  document.getElementById('erasePaint').classList.toggle('selected',activeTool==='erase');
  for(const b of decorations.querySelectorAll('[data-sticker]'))b.classList.toggle('selected',b.dataset.sticker===selectedSticker?.id);
- hint.textContent=beautyPhase==='attach'?'장식 선택 → 붙이기 · 붙인 장식 누르면 떼기':beautyPhase==='draw'?'머리·뼈 위에만 색칠 · 모양은 그대로 유지':activeTool==='grow'?(bone?'바른 자리에 뼈가 이어져요 · 망치·정으로 다시 다듬기':'바른 자리에 머리가 자라요 · 가위로 다시 다듬기'):activeTool==='scissors'?'꾹 누르기 → 드래그 → 놓으면 자르기':'누른 채 드래그해서 뼈를 조금씩 다듬기';
+ hint.textContent=beautyPhase==='attach'?'붙인 장식은 눌러 떼기':beautyPhase==='draw'?'머리 위에 쓱쓱':activeTool==='grow'?'누른 채 발라 주세요':activeTool==='scissors'?'드래그 후 놓으면 싹둑':'누른 채 조금씩 다듬기';
 }
 function setBeautyPhase(phase,announce=true){
- if(finishing)return;cancelGesture();beautyPhase=phase;
+ if(finishing||briefing)return;cancelGesture();beautyPhase=phase;
  const names={cut:'형태 만들기',draw:'색·무늬 꾸미기',attach:'장식 붙이기'},stages=beautyStageOrder(B);
  stageTag.textContent=(stages.indexOf(phase)+1)+'. '+names[phase];
  panel.querySelector('h3').textContent=names[phase];
  shapeTools.hidden=phase!=='cut';paintTools.hidden=phase!=='draw';decorations.hidden=phase!=='attach';panel.querySelector('.brushLabel').hidden=phase==='attach';
  activeTool=phase==='cut'?(bone?'hammer':'scissors'):phase==='draw'?'paint':'sticker';
- status.querySelector('.requestText').textContent=phase==='cut'?B.request:phase==='draw'?B.drawHint:B.attachHint;
+ status.querySelector('.requestText').textContent=B.requestNotes?.[phase]||({cut:bone?'얼굴 테두리 다듬기':'눈이 보이게 · 앞머리 손질',draw:B.weights.draw?'부탁한 색과 무늬로': '색·무늬는 자유롭게',attach:'손님에게 어울리는 장식'}[phase]);
  nav.innerHTML=stages.map((k,i)=>'<button data-phase="'+k+'" class="'+(phase===k?'selected':'')+'">'+(i+1)+'. '+names[k]+'</button>').join('');
  for(const button of nav.children)button.onclick=()=>setBeautyPhase(button.dataset.phase);
  next.textContent=stages.indexOf(phase)===stages.length-1?'미용 완성':phase==='draw'&&!B.weights.draw?'꾸미기 마치기':'다음 단계';
- next.disabled=!ready;refreshTools();updateBeautyScore();renderPortrait();if(announce)send('stage-request',{stage:phase});
+ next.disabled=!ready;syncUndo();refreshTools();updateBeautyScore();renderPortrait();if(announce)announceBeautyRequest();
+}
+function announceBeautyRequest(){
+ if(finishing||briefing)return;cancelGesture();briefing=true;status.hidden=true;panel.inert=true;nav.inert=true;actions.inert=true;next.disabled=true;syncUndo();
+ send('stage-request',{stage:beautyPhase,requestId:++requestSerial});
+}
+function finishBeautyRequest(id){
+ if(!briefing||id!==requestSerial)return;briefing=false;talking=false;mouthFrame=false;beautyCustomer.dataset.talking='false';status.hidden=false;panel.inert=false;nav.inert=false;actions.inert=false;next.disabled=!ready;syncUndo();renderPortrait();
 }
 function enterAttachPhase(){setBeautyPhase('attach');}
 function enterDrawPhase(){setBeautyPhase('draw');}
@@ -243,12 +257,12 @@ function enterBeauty(){
 }
 function advanceBeautyResult(){}
 function startBeautyResult(){
- if(!ready||finishing)return;cancelGesture();updateBeautyScore();finishing=true;beautyPhase='result';
+ if(!ready||finishing||briefing)return;cancelGesture();updateBeautyScore();finishing=true;beautyPhase='result';
  expression=totalSatisfaction>=80?'satisfied':totalSatisfaction>=40?'neutral':'angry';renderPortrait();
  next.disabled=true;finish.disabled=true;state.keys.clear();
  send('beauty-result',{score:totalSatisfaction,portrait:captureBeautyCustomer()});
 }
-addEventListener('message',e=>{if(e.source!==parent||e.data?.token!==GUEST.token||e.data.type!=='beauty-speaking')return;talking=!!e.data.speaking;mouthFrame=!!e.data.open;beautyCustomer.dataset.talking=String(talking);renderPortrait();});
+addEventListener('message',e=>{if(e.source!==parent||e.data?.token!==GUEST.token)return;if(e.data.type==='beauty-request-done'){finishBeautyRequest(e.data.requestId);return;}if(e.data.type!=='beauty-speaking')return;talking=!!e.data.speaking;mouthFrame=!!e.data.open;beautyCustomer.dataset.talking=String(talking);renderPortrait();});
 prepareBeauty().catch(error=>{hint.textContent='미용 리소스를 불러오지 못했어요. 새로고침해 주세요.';console.error(error);});
-window.beautyDebug={get ready(){return ready;},get material(){return Array.from(current);},get paint(){return Array.from(paint);},get original(){return Array.from(original);},get masks(){return masks;},get expression(){return expression;},get scores(){return {cut:cutScore,draw:drawScore,attach:attachScore,total:totalSatisfaction};},get placements(){return placements.map(p=>({id:p.sticker.id,x:p.x,y:p.y}));},get historyLength(){return history.length;}};
+window.beautyDebug={get ready(){return ready;},get material(){return Array.from(current);},get paint(){return Array.from(paint);},get original(){return Array.from(original);},get masks(){return masks;},get expression(){return expression;},get scores(){return {cut:cutScore,draw:drawScore,attach:attachScore,total:totalSatisfaction};},get placements(){return placements.map(p=>({id:p.sticker.id,x:p.x,y:p.y}));},get historyLength(){return history[beautyPhase]?.length||0;},get briefing(){return briefing;},get mouthFrame(){return mouthFrame;}};
 
