@@ -1,0 +1,60 @@
+변경 의도: 발모제로 형태를 더하고 다시 손질하는 재미와, 형태·색·장식의 역할 차이를 좀비와 샌즈에서 확인한다.
+통합 웹판 0.7 · 2026-10-10
+
+수정 요약: 가위 누름→드래그→놓기 확정 / 발모제 머리·뼈 재료 / 선택 염색 / 장식 마지막 / 되돌리기 / 얼굴의 임시 눈·입 표현.
+전투 수치·패턴·대사 데이터 및 원본 XLSX/XLSM 값 변경 없음.
+전투 JSON SHA-256: d37c32c5928e1dd812c0ee38b2a11659365411b8c51dca641f09a8d51ecd45e1
+미용 판정과 표정은 시뮬레이터 시험값이다. Unity 연동 시트나 엔진 실행은 검증하지 않았다.
+
+guests[10001].beauty.weights.cut: 50 → 70
+guests[10001].beauty.weights.draw: 20 → 0
+guests[10001].beauty.request: "눈이 보이게 앞머리를 단정하게 잘라 주세요." → "눈이 잘 보이게 앞머리를 자르고, 드러난 뇌는 발모제로 머리카락을 더해 가려 주세요."
+guests[10001].beauty.attachHint: "단정한 인상으로 부탁드려요." → "면접에 어울리는 단정한 장식 하나면 충분해요. 안경·콧수염·나비넥타이 중 골라 주세요."
+guests[10001].beauty.drawHint: "노출된 뇌를 연두색이나 초록색으로 가려 주세요." → "원래 색 그대로여도 좋아요. 원하면 색·무늬를 자유롭게 꾸며 보세요. 이번 손님은 염색 점수를 매기지 않아요."
+guests[10001].beauty.drawColors: ["#00DC0A","#228947"] → ["#75452D"]
+guests[10001].beauty.cutRegions.protect: {"key":"protect","label":"보존할 윗머리","x":58,"y":0,"w":189,"h":65,"kind":"bad","shape":"rect","points":0,"stickerIDs":[]} → (삭제)
+guests[10001].beauty.cutRegions.bang: {"key":"bang","label":"자를 앞머리","x":95,"y":78,"w":116,"h":60,"kind":"good","shape":"rect","points":0,"stickerIDs":[]} → (삭제)
+guests[10001].beauty.cutRegions.side: {"key":"side","label":"자유 손질","x":57,"y":64,"w":190,"h":80,"kind":"keep","shape":"rect","points":0,"stickerIDs":[]} → (삭제)
+guests[10001].beauty.cutRegions.EyeL: (없음) → {"key":"EyeL","label":"왼쪽 눈 드러내기","x":105,"y":90,"w":50,"h":47,"kind":"bad","shape":"rect","points":20,"stickerIDs":[],"rule":"clear","tolerance":0.08,"mask":"eyes"}
+guests[10001].beauty.cutRegions.EyeR: (없음) → {"key":"EyeR","label":"오른쪽 눈 드러내기","x":169,"y":90,"w":48,"h":47,"kind":"bad","shape":"rect","points":20,"stickerIDs":[],"rule":"clear","tolerance":0.08,"mask":"eyes"}
+guests[10001].beauty.cutRegions.Brain: (없음) → {"key":"Brain","label":"뇌를 머리카락으로 덮기","x":155,"y":25,"w":73,"h":68,"kind":"good","shape":"rect","points":30,"stickerIDs":[],"rule":"cover","tolerance":0.08,"mask":"brain"}
+guests[10001].beauty.drawRegions.Brain: {"key":"Brain","label":"노출된 뇌","x":150,"y":53,"w":68,"h":50,"kind":"good","shape":"ellipse","points":20,"stickerIDs":[]} → (삭제)
+guests[10001].beauty.drawRegions.EyeL: {"key":"EyeL","label":"왼쪽 눈","x":111,"y":103,"w":40,"h":32,"kind":"bad","shape":"ellipse","points":5,"stickerIDs":[]} → (삭제)
+guests[10001].beauty.drawRegions.EyeR: {"key":"EyeR","label":"오른쪽 눈","x":170,"y":103,"w":40,"h":32,"kind":"bad","shape":"ellipse","points":5,"stickerIDs":[]} → (삭제)
+guests[10001].beauty.drawRegions.Mouth: {"key":"Mouth","label":"입","x":131,"y":136,"w":58,"h":30,"kind":"bad","shape":"ellipse","points":5,"stickerIDs":[]} → (삭제)
+guests[10001].beauty.drawRegions.Face: {"key":"Face","label":"나머지 얼굴","x":88,"y":38,"w":144,"h":156,"kind":"bad","shape":"ellipse","points":5,"stickerIDs":[]} → (삭제)
+guests[10001].beauty.drawRegions.Clothes: {"key":"Clothes","label":"의상","x":48,"y":163,"w":224,"h":180,"kind":"bad","shape":"ellipse","points":3,"stickerIDs":[]} → (삭제)
+guests[10001].beauty.designVersion: (없음) → 2
+guests[10001].beauty.growth: (없음) → {"enabled":true,"material":"hair","color":"#62CB70","outline":"#416333","region":{"x":40,"y":0,"w":240,"h":330}}
+guests[10001].note: "좀비 기획서와 v35 기준. 정답 영역 좌표는 프로토타입 좌표이며 편집할 수 있습니다." → "첫 손님: 눈 드러내기 + 뇌를 머리카락으로 가리기 + 젠틀 장식. 염색은 자유 체험. 영역·허용 오차·배점은 시험값이며 Unity 미용 계약은 미정입니다. 표정은 기존 얼굴을 이용한 임시 눈·입 표현입니다."
+guests[10003].beauty.steps.draw: false → true
+guests[10003].beauty.request: "망치·정으로 얼굴 테두리를 망치·정으로 조금씩 깎아 주세요." → "망치·정으로 얼굴 테두리를 조금씩 다듬어 주세요. 발모제를 바르면 머리 위에 뼈를 이어 만들 수 있어요."
+guests[10003].beauty.drawHint: "이번 손님은 그리기를 진행하지 않습니다." → "원래 색 그대로여도 좋아요. 원하면 색·무늬를 자유롭게 꾸며 보세요. 이번 손님은 염색 점수를 매기지 않아요."
+guests[10003].beauty.drawColors: ["#00DC0A","#228947"] → ["#E9E2D6"]
+guests[10003].beauty.cutRegions.outline1.label: "①" → "왼쪽 윗테두리"
+guests[10003].beauty.cutRegions.outline1.points: 0 → 11.666666666666666
+guests[10003].beauty.cutRegions.outline1.rule: (없음) → "trim"
+guests[10003].beauty.cutRegions.outline1.tolerance: (없음) → 0.15
+guests[10003].beauty.cutRegions.outline2.label: "②" → "정수리 테두리"
+guests[10003].beauty.cutRegions.outline2.points: 0 → 11.666666666666666
+guests[10003].beauty.cutRegions.outline2.rule: (없음) → "trim"
+guests[10003].beauty.cutRegions.outline2.tolerance: (없음) → 0.15
+guests[10003].beauty.cutRegions.outline3.label: "③" → "오른쪽 윗테두리"
+guests[10003].beauty.cutRegions.outline3.points: 0 → 11.666666666666666
+guests[10003].beauty.cutRegions.outline3.rule: (없음) → "trim"
+guests[10003].beauty.cutRegions.outline3.tolerance: (없음) → 0.15
+guests[10003].beauty.cutRegions.outline4.label: "④" → "왼쪽 옆테두리"
+guests[10003].beauty.cutRegions.outline4.points: 0 → 11.666666666666666
+guests[10003].beauty.cutRegions.outline4.rule: (없음) → "trim"
+guests[10003].beauty.cutRegions.outline4.tolerance: (없음) → 0.15
+guests[10003].beauty.cutRegions.outline5.label: "⑤" → "오른쪽 옆테두리"
+guests[10003].beauty.cutRegions.outline5.points: 0 → 11.666666666666666
+guests[10003].beauty.cutRegions.outline5.rule: (없음) → "trim"
+guests[10003].beauty.cutRegions.outline5.tolerance: (없음) → 0.15
+guests[10003].beauty.cutRegions.outline6.label: "⑥" → "턱 테두리"
+guests[10003].beauty.cutRegions.outline6.points: 0 → 11.666666666666666
+guests[10003].beauty.cutRegions.outline6.rule: (없음) → "trim"
+guests[10003].beauty.cutRegions.outline6.tolerance: (없음) → 0.15
+guests[10003].beauty.designVersion: (없음) → 2
+guests[10003].beauty.growth: (없음) → {"enabled":true,"material":"bone","color":"#E9E2D6","outline":"#7478B6","region":{"x":40,"y":0,"w":240,"h":210}}
+guests[10003].note: "사용자 확정: 망치·정 / 얼굴 테두리 / Tag_Strong. 점수 70+30, 테두리 6곳과 스티커 얼굴 영역은 편집 가능한 임시값입니다." → "망치·정 / 얼굴 테두리 / Tag_Strong. 발모제는 기존 두개골과 이어지는 뼈 재료. 형태 목표·배점은 기존 임시값을 유지한 시험 설정입니다. 눈·입 표현도 임시입니다."

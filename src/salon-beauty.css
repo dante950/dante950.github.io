@@ -1,0 +1,26 @@
+
+/* Beauty 0.7: the portrait is the satisfaction display. */
+.beautyPanel{right:20px;top:62px;bottom:95px;width:188px;padding:14px;background:#F4E4D8;border:4px solid #63473F;border-radius:24px;display:block;color:#453229}
+.sculptTools h3{font-size:16px;margin:0 0 12px;text-align:center}
+.sculptTools button,.sculptTools select,.sculptActions button,.sculptNav button{border:2px solid #795843;border-radius:9px;background:#FFF4E4;color:#473529;padding:8px;font-weight:bold;cursor:pointer;font-size:12px}
+.sculptTools button.selected,.sculptNav button.selected{background:#FEC36C;box-shadow:inset 0 0 0 2px #F59A40}
+#shapeTools{display:grid;gap:12px}.sculptTool{min-height:65px}
+.brushLabel{display:block;margin:15px 0;font-size:12px}.brushLabel select{width:100%;margin-top:5px}
+.sculptTools p{font-size:10px;line-height:1.6;margin:8px 0}
+.sculptPalette{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:10px 0}
+.sculptPalette button{height:28px;padding:0}.sculptPalette button.selected{box-shadow:0 0 0 3px #453329}
+#erasePaint{width:100%}
+.sculptStickers{display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:235px;overflow:auto}
+.sculptStickers button{padding:5px;font-size:8px}.sculptStickers img{height:32px;width:50px;object-fit:contain;display:block;image-rendering:pixelated}
+.sculptStatus{position:absolute;left:25px;top:178px;width:180px;z-index:310;border-left:4px solid #9A785C;background:#FFF2DDE8;padding:13px;border-radius:5px 14px 14px 5px;color:#493627}
+.sculptStatus .moodLabel{font-size:19px}.sculptStatus[data-mood=satisfied]{border-color:#518951}.sculptStatus[data-mood=angry]{border-color:#BC5143}
+.sculptStatus p{font-size:12px;line-height:1.7;margin:8px 0}.goalList{font-size:11px;line-height:1.9}.goalList .met{color:#326B34;font-weight:bold}.scoreText{display:block;font-size:9px;border-top:1px solid #CDBCA4;padding-top:6px;margin-top:8px}
+.sculptNav{position:absolute;left:250px;right:230px;top:45px;display:flex;gap:5px;justify-content:center;z-index:315}.sculptNav button{font-size:10px;padding:5px 8px}
+.sculptActions{position:absolute;left:25px;bottom:27px;z-index:315;display:flex;gap:7px}.sculptActions button{font-size:11px}
+.sculptHint{position:absolute;left:250px;right:225px;bottom:22px;text-align:center;z-index:312;font-size:11px;line-height:1.7;color:#302432;background:#FFF0DBC9;border-radius:8px;padding:8px}
+.beautyCustomer{bottom:87px}
+.beautyNext{width:172px;right:23px;bottom:25px;cursor:pointer}
+#beautyScreen [hidden]{display:none!important}
+
+
+.bone .goalList{display:grid;grid-template-columns:1fr 1fr;gap:3px;font-size:9px}

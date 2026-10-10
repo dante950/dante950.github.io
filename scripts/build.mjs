@@ -35,10 +35,12 @@ combat=combat.replace('<link rel="stylesheet" href="style.css">',()=>`<style>${c
  .replace('<script type="module" src="app.js"></script>',()=>`<script id="host-data" type="application/json">__HOST_JSON__</script><script id="embedded-workbook" type="application/octet-stream">${wb}</script><script id="embedded-authoring" type="application/octet-stream">${au}</script><script id="embedded-schema" type="application/json">${safe(schema)}</script><script id="embedded-assets" type="application/json">${safe(assets)}</script><script>${safe(zip)}</script><script type="module">${safe(combatScript)}</script><script type="text/plain">${safe(license)}</script>`);
 const parentBundle=await bundle('src/',['text-effects.js','combat/dialogue.js','combat/engine.js','model.js','publishing.js','owner-access.js','media.js','audio.js','app.js']);
 const appURL=await emit('app','js',parentBundle),styleURL=await emit('style','css',await read('src/style.css'));
+const beautyRules=await read('src/beauty-shape.js'),beautyRuntime=await read('src/salon-beauty.js');
+const salonStyle=await read('src/salon-beauty.css');
 const inputs={
  'flow-assets':[await emit('assets','json',await read('data/assets.json')),'json'],
  'flow-default':[await emit('project','json',JSON.stringify(project)),'json'],
- 'flow-salon':[await emit('salon','html',await read('src/salon.html')),'text'],
+ 'flow-salon':[await emit('salon','html',(await read('src/salon.html')).replace('</style>',()=>salonStyle+'</style>').replace('/*__BEAUTY_RUNTIME__*/',()=>code(beautyRules)+'\n'+beautyRuntime)),'text'],
  'flow-combat':[await emit('combat','html',combat),'text']
 };
 const releaseId=hash(JSON.stringify(files));

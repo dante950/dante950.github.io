@@ -1,5 +1,5 @@
-export const FLOW_VERSION='통합 플레이 0.6 · 시작 손님 선택';
-export const SALON_EVENTS=[['arrival','손님 등장'],['cut','손질 요청'],['attach','스티커 요청'],['draw','그리기 요청'],['best','미용 매우 만족'],['normal','미용 만족'],['fail','미용 불만족'],['proposal','야차 제안'],['afterWin','야차 승리 후 미용실'],['afterLoss','야차 패배 후 미용실'],['leave','손님 퇴장']];
+export const FLOW_VERSION='통합 플레이 0.7 · 형태 만들기';
+export const SALON_EVENTS=[['arrival','손님 등장'],['cut','형태 만들기 요청'],['draw','색·무늬 요청'],['attach','장식 요청'],['best','미용 매우 만족'],['normal','미용 만족'],['fail','미용 불만족'],['proposal','야차 제안'],['afterWin','야차 승리 후 미용실'],['afterLoss','야차 패배 후 미용실'],['leave','손님 퇴장']];
 export function modelRows(p,name){return p.combat.sheets.find(s=>s.name===name)?.rows||[];}
 export function defaultProject(combat,assets){
  const p={format:'YACHACHA_FULLFLOW',schemaVersion:1,version:1,updatedAt:null,combat:structuredClone(combat),guests:[],schedule:[[10001,10002],[10003]]};
@@ -30,9 +30,11 @@ export function defaultProject(combat,assets){
  add(s,'fail','샌즈 · 미용 실패',['...친구, 이건 좀 뼈아픈데. 잠깐 밖에서 얘기할까?']);
  add(s,'afterWin','샌즈 · 야차가 끝난 미용실',['미용실로 돌아오자, 문에 달린 종이 작게 울렸다. 오늘의 마지막 손님과의 야차가 끝났다.']);
 modelRows(p,'대사').filter(l=>l.GroupID===s.bindings.afterWin).forEach(l=>l.Speaker='나레이션');
+ for(const g of p.guests){const preset=BEAUTY_PRESETS[g.id];if(preset){g.beauty=structuredClone(preset.beauty);g.note=preset.note;}}
  return p;
 }
 export function projectProblems(p){const errors=[];if(p?.format!=='YACHACHA_FULLFLOW'||p.schemaVersion!==1||!p.combat?.sheets||!Array.isArray(p.guests))return ['이 통합 개발실에서 저장한 프로젝트 파일이 아닙니다.'];for(const name of ['대사','대화 그룹','몬스터 페이즈'])if(!p.combat.sheets.some(s=>s.name===name))errors.push(name+' 시트가 없습니다.');if(p.guests.length!==3||p.guests.some(g=>![10001,10002,10003].includes(g.id)))errors.push('이번 버전은 좀비·취객·샌즈 세 손님을 사용합니다.');for(const g of p.guests){const b=g.beauty;if(!b?.steps||!b.weights||!b.cutRegions||!b.attachRegions||!b.drawRegions){errors.push(g.name+' 미용 설정 누락');continue;}if(b.enabled){if(!Object.values(b.steps).some(Boolean))errors.push(g.name+' 미용 단계를 하나 이상 켜 주세요.');if(Object.keys(b.steps).reduce((s,k)=>s+(b.steps[k]?+b.weights[k]:0),0)!==100)errors.push(g.name+' 켜진 단계의 점수 합계는 100이어야 합니다.');for(const r of [...b.cutRegions,...b.attachRegions,...b.drawRegions])if(![r.x,r.y,r.w,r.h].every(Number.isFinite)||r.w<=0||r.h<=0||r.x<0||r.y<0||r.x+r.w>320||r.y+r.h>350)errors.push(g.name+' 영역 '+r.label+'이 얼굴 편집판을 벗어났습니다.');if(!b.drawColors.every(c=>/^#[0-9a-f]{6}$/i.test(c)))errors.push(g.name+' 색상 형식 확인');}}
+ for(const g of p.guests){const b=g.beauty;if(b?.designVersion>=2){for(const r of b.cutRegions){if(!['clear','cover','trim','preserve','free'].includes(r.rule)||!Number.isFinite(r.points)||r.points<0||!Number.isFinite(r.tolerance)||r.tolerance<0||r.tolerance>=1)errors.push(g.name+' 형태 판정 설정 확인');}if(b.steps.cut&&Math.abs(b.cutRegions.reduce((s,r)=>s+r.points,0)-b.weights.cut)>.01)errors.push(g.name+' 형태 조건 배점 합계가 단계 점수와 다릅니다.');const growth=b.growth;if(growth){const r=growth.region;if(!/^#[0-9a-f]{6}$/i.test(growth.color)||!/^#[0-9a-f]{6}$/i.test(growth.outline))errors.push(g.name+' 발모제 색상 확인');if(!r||![r.x,r.y,r.w,r.h].every(Number.isFinite)||r.x<0||r.y<0||r.w<=0||r.h<=0||r.x+r.w>320||r.y+r.h>350)errors.push(g.name+' 발모제 범위 확인');}}}
  return errors;
 }
 export function stageForGuest(g){return g.beauty.enabled?'beauty':'battle';}
@@ -53,3 +55,291 @@ export function createStoryState(project,guestID){
  if(!start)throw new Error('선택한 손님이 영업 순서에 없습니다.');
  return {project,day:start.day,index:start.index,money:0,records:[],guest:null,lastScore:0,portrait:null,soulUnlocked:false,preview:false};
 }
+
+const BEAUTY_PRESETS={
+  "10001": {
+    "beauty": {
+      "enabled": true,
+      "steps": {
+        "cut": true,
+        "draw": true,
+        "attach": true
+      },
+      "weights": {
+        "cut": 70,
+        "draw": 0,
+        "attach": 30
+      },
+      "cutTool": "scissors",
+      "request": "눈이 잘 보이게 앞머리를 자르고, 드러난 뇌는 발모제로 머리카락을 더해 가려 주세요.",
+      "attachTag": "Tag_Gentle",
+      "attachFirst": 30,
+      "attachExtra": 15,
+      "attachMisplaced": 10,
+      "attachWrong": 15,
+      "attachHint": "면접에 어울리는 단정한 장식 하나면 충분해요. 안경·콧수염·나비넥타이 중 골라 주세요.",
+      "drawHint": "원래 색 그대로여도 좋아요. 원하면 색·무늬를 자유롭게 꾸며 보세요. 이번 손님은 염색 점수를 매기지 않아요.",
+      "drawColors": [
+        "#75452D"
+      ],
+      "cutRegions": [
+        {
+          "key": "EyeL",
+          "label": "왼쪽 눈 드러내기",
+          "x": 105,
+          "y": 90,
+          "w": 50,
+          "h": 47,
+          "kind": "bad",
+          "shape": "rect",
+          "points": 20,
+          "stickerIDs": [],
+          "rule": "clear",
+          "tolerance": 0.08,
+          "mask": "eyes"
+        },
+        {
+          "key": "EyeR",
+          "label": "오른쪽 눈 드러내기",
+          "x": 169,
+          "y": 90,
+          "w": 48,
+          "h": 47,
+          "kind": "bad",
+          "shape": "rect",
+          "points": 20,
+          "stickerIDs": [],
+          "rule": "clear",
+          "tolerance": 0.08,
+          "mask": "eyes"
+        },
+        {
+          "key": "Brain",
+          "label": "뇌를 머리카락으로 덮기",
+          "x": 155,
+          "y": 25,
+          "w": 73,
+          "h": 68,
+          "kind": "good",
+          "shape": "rect",
+          "points": 30,
+          "stickerIDs": [],
+          "rule": "cover",
+          "tolerance": 0.08,
+          "mask": "brain"
+        }
+      ],
+      "attachRegions": [
+        {
+          "key": "Eye",
+          "label": "눈",
+          "x": 112,
+          "y": 87,
+          "w": 96,
+          "h": 40,
+          "kind": "good",
+          "shape": "rect",
+          "points": 0,
+          "stickerIDs": [
+            "ST-GENTLE-GLASSES-HORN"
+          ]
+        },
+        {
+          "key": "UnderNose",
+          "label": "코 아래",
+          "x": 132,
+          "y": 127,
+          "w": 58,
+          "h": 30,
+          "kind": "good",
+          "shape": "rect",
+          "points": 0,
+          "stickerIDs": [
+            "ST-GENTLE-MOUSTACHE"
+          ]
+        },
+        {
+          "key": "Neck",
+          "label": "목",
+          "x": 120,
+          "y": 180,
+          "w": 82,
+          "h": 48,
+          "kind": "good",
+          "shape": "rect",
+          "points": 0,
+          "stickerIDs": [
+            "ST-GENTLE-BOWTIE-BLACK"
+          ]
+        }
+      ],
+      "drawRegions": [],
+      "basePay": 1000,
+      "tipRate": 0.3,
+      "designVersion": 2,
+      "growth": {
+        "enabled": true,
+        "material": "hair",
+        "color": "#62CB70",
+        "outline": "#416333",
+        "region": {
+          "x": 40,
+          "y": 0,
+          "w": 240,
+          "h": 330
+        }
+      }
+    },
+    "note": "첫 손님: 눈 드러내기 + 뇌를 머리카락으로 가리기 + 젠틀 장식. 염색은 자유 체험. 영역·허용 오차·배점은 시험값이며 Unity 미용 계약은 미정입니다. 표정은 기존 얼굴을 이용한 임시 눈·입 표현입니다."
+  },
+  "10003": {
+    "beauty": {
+      "enabled": true,
+      "steps": {
+        "cut": true,
+        "draw": true,
+        "attach": true
+      },
+      "weights": {
+        "cut": 70,
+        "draw": 0,
+        "attach": 30
+      },
+      "cutTool": "hammer",
+      "request": "망치·정으로 얼굴 테두리를 조금씩 다듬어 주세요. 발모제를 바르면 머리 위에 뼈를 이어 만들 수 있어요.",
+      "attachTag": "Tag_Strong",
+      "attachFirst": 30,
+      "attachExtra": 15,
+      "attachMisplaced": 10,
+      "attachWrong": 15,
+      "attachHint": "강해 보이는 Tag_Strong 스티커를 붙여 주세요.",
+      "drawHint": "원래 색 그대로여도 좋아요. 원하면 색·무늬를 자유롭게 꾸며 보세요. 이번 손님은 염색 점수를 매기지 않아요.",
+      "drawColors": [
+        "#E9E2D6"
+      ],
+      "cutRegions": [
+        {
+          "key": "outline1",
+          "label": "왼쪽 윗테두리",
+          "x": 92,
+          "y": 44,
+          "w": 25,
+          "h": 30,
+          "kind": "good",
+          "shape": "rect",
+          "points": 11.666666666666666,
+          "stickerIDs": [],
+          "rule": "trim",
+          "tolerance": 0.15
+        },
+        {
+          "key": "outline2",
+          "label": "정수리 테두리",
+          "x": 138,
+          "y": 28,
+          "w": 39,
+          "h": 22,
+          "kind": "good",
+          "shape": "rect",
+          "points": 11.666666666666666,
+          "stickerIDs": [],
+          "rule": "trim",
+          "tolerance": 0.15
+        },
+        {
+          "key": "outline3",
+          "label": "오른쪽 윗테두리",
+          "x": 205,
+          "y": 44,
+          "w": 25,
+          "h": 30,
+          "kind": "good",
+          "shape": "rect",
+          "points": 11.666666666666666,
+          "stickerIDs": [],
+          "rule": "trim",
+          "tolerance": 0.15
+        },
+        {
+          "key": "outline4",
+          "label": "왼쪽 옆테두리",
+          "x": 87,
+          "y": 103,
+          "w": 22,
+          "h": 39,
+          "kind": "good",
+          "shape": "rect",
+          "points": 11.666666666666666,
+          "stickerIDs": [],
+          "rule": "trim",
+          "tolerance": 0.15
+        },
+        {
+          "key": "outline5",
+          "label": "오른쪽 옆테두리",
+          "x": 211,
+          "y": 103,
+          "w": 22,
+          "h": 39,
+          "kind": "good",
+          "shape": "rect",
+          "points": 11.666666666666666,
+          "stickerIDs": [],
+          "rule": "trim",
+          "tolerance": 0.15
+        },
+        {
+          "key": "outline6",
+          "label": "턱 테두리",
+          "x": 132,
+          "y": 163,
+          "w": 56,
+          "h": 22,
+          "kind": "good",
+          "shape": "rect",
+          "points": 11.666666666666666,
+          "stickerIDs": [],
+          "rule": "trim",
+          "tolerance": 0.15
+        }
+      ],
+      "attachRegions": [
+        {
+          "key": "Face",
+          "label": "얼굴·머리",
+          "x": 80,
+          "y": 20,
+          "w": 160,
+          "h": 175,
+          "kind": "good",
+          "shape": "rect",
+          "points": 0,
+          "stickerIDs": [
+            "ST-STRONG-FLAME-BLUE",
+            "ST-STRONG-SCAR-01",
+            "ST-STRONG-SCAR-02",
+            "ST-STRONG-CROWN-01",
+            "ST-STRONG-CROWN-02"
+          ]
+        }
+      ],
+      "drawRegions": [],
+      "basePay": 1000,
+      "tipRate": 0.3,
+      "designVersion": 2,
+      "growth": {
+        "enabled": true,
+        "material": "bone",
+        "color": "#E9E2D6",
+        "outline": "#7478B6",
+        "region": {
+          "x": 40,
+          "y": 0,
+          "w": 240,
+          "h": 210
+        }
+      }
+    },
+    "note": "망치·정 / 얼굴 테두리 / Tag_Strong. 발모제는 기존 두개골과 이어지는 뼈 재료. 형태 목표·배점은 기존 임시값을 유지한 시험 설정입니다. 눈·입 표현도 임시입니다."
+  }
+};

@@ -27,7 +27,7 @@ export async function checkStoryStarts(page,{screenshotPath,checkContinuation=fa
  await page.locator('#cancelStoryStart').click();
  assert.equal(await page.evaluate(()=>window.fullflow.page),'dev');
  await page.locator('#home').click();
- for(const [id,day,index,steps] of [[10001,1,0,2],[10003,2,0,1],[10002,1,1,0]]){
+ for(const [id,day,index,steps] of [[10001,1,0,2],[10003,2,0,2],[10002,1,1,0]]){
   await page.locator('#play').click();
   await page.locator(`[data-start-guest="${id}"]`).click();
   await page.waitForFunction(id=>window.fullflow.story?.guest===id,id);
