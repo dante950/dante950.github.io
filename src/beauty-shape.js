@@ -17,6 +17,38 @@ export function strokeCells(width,height,points,radius,scale=2){
  }
  return cells;
 }
+// Compare each material island before/after one committed cut. Growth itself never detaches.
+export function detachedByBeautyCut(before,after,width,height,anchors=new Uint8Array(before.length)){
+ const label=new Int32Array(before.length).fill(-1),seen=new Uint8Array(before.length),groups=[];
+ const flood=(start,mask,visit)=>{
+  const cells=[start];visit(start);
+  for(let i=0;i<cells.length;i++){
+   const n=cells[i],x=n%width,y=Math.floor(n/width);
+   for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
+    const xx=x+dx,yy=y+dy;if(xx<0||xx>=width||yy<0||yy>=height)continue;
+    const q=yy*width+xx;if(mask(q)){visit(q);cells.push(q);}
+   }
+  }
+  return cells;
+ };
+ for(let n=0;n<before.length;n++)if(before[n]&&label[n]<0){
+  const id=groups.length;groups.push([]);
+  flood(n,q=>before[q]&&label[q]<0,q=>{label[q]=id;});
+ }
+ for(let n=0;n<after.length;n++)if(after[n]&&!seen[n]&&label[n]>=0){
+  const cells=flood(n,q=>after[q]&&!seen[q],q=>{seen[q]=1;});
+  groups[label[n]].push({cells,roots:cells.reduce((sum,q)=>sum+(anchors[q]?1:0),0)});
+ }
+ const removed=[];
+ for(const pieces of groups){
+  if(pieces.length<2)continue;
+  // Prefer the scalp/body side, then the largest remainder. Row order breaks equal-size ties.
+  let keep=pieces[0];
+  for(const p of pieces)if(p.roots>keep.roots||p.roots===keep.roots&&p.cells.length>keep.cells.length)keep=p;
+  for(const p of pieces)if(p!==keep)removed.push(...p.cells);
+ }
+ return removed;
+}
 export function scoreShape(current,original,b,width=160,height=175,masks={}){
  if(!b.designVersion)return scoreLegacyShape(current,original,b,width,height);
  let points=0,interiorIntact=true;const details=[];

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
-import {scoreShape,strokeCells,beautyStageOrder,liveBeautyMood,beautyRequirementChecks} from '../src/beauty-shape.js';
+import {scoreShape,strokeCells,beautyStageOrder,liveBeautyMood,beautyRequirementChecks,detachedByBeautyCut} from '../src/beauty-shape.js';
 import {defaultProject,projectProblems} from '../src/model.js';
 const project=JSON.parse(await fs.readFile(new URL('../data/project.json',import.meta.url),'utf8'));
 const assets=JSON.parse(await fs.readFile(new URL('../data/assets.json',import.meta.url),'utf8'));
@@ -85,3 +85,27 @@ test('bone integrity feedback uses the existing interior and eye-cover rules',()
 
 import {parseDialogueText} from '../src/text-effects.js';
 test('both guests have valid highlighted initial and detailed requests for every stage',()=>{for(const id of [10001,10003]){const b=project.guests.find(g=>g.id===id).beauty;for(const stage of ['cut','draw','attach']){for(const text of [stage==='cut'?b.request:b[stage+'Hint'],b.requestDetails[stage]]){const rich=parseDialogueText(text);assert.deepEqual(rich.warnings,[]);assert(rich.glyphs.some(g=>g.style.color!=='#F0EEE3'));}assert(b.requestBriefNotes[stage]);}}});
+
+test('a cut removes newly detached original and grown fragments but keeps independent growth',()=>{
+ const before=new Uint8Array(35),roots=new Uint8Array(35);
+ for(const n of [1,6,11,16,21,26,34])before[n]=n>=16?2:1;
+ roots[1]=1;const after=before.slice();after[11]=0;
+ assert.deepEqual(detachedByBeautyCut(before,after,5,7,roots).sort((a,b)=>a-b),[16,21,26]);
+ assert.equal(after[34],2,'the helper does not mutate existing independent material');
+});
+test('the anchored scalp side survives even if the loose piece is larger',()=>{
+ const before=Uint8Array.of(1,1,2,2,2,2,2),after=before.slice(),roots=Uint8Array.of(1,0,0,0,0,0,0);after[2]=0;
+ assert.deepEqual(detachedByBeautyCut(before,after,7,1,roots),[3,4,5,6]);
+});
+test('partial vertical cuts and diagonal connections do not detach material',()=>{
+ const before=new Uint8Array(25).fill(1),after=before.slice();for(const n of [12,17,22])after[n]=0;
+ assert.deepEqual(detachedByBeautyCut(before,after,5,5),[]);
+ const diagonal=new Uint8Array(25);for(const n of [0,6,12,18,24])diagonal[n]=1;
+ assert.deepEqual(detachedByBeautyCut(diagonal,diagonal.slice(),5,5),[]);
+ const split=diagonal.slice();split[12]=0;assert.deepEqual(detachedByBeautyCut(diagonal,split,5,5),[18,24]);
+});
+test('cutting a free-grown island keeps its main remainder and does not bridge row edges',()=>{
+ const before=Uint8Array.of(2,2,2,2,2,2,0,0,0,0,0,2,0,0,0),after=before.slice();after[2]=0;
+ assert.deepEqual(detachedByBeautyCut(before,after,5,3).sort((a,b)=>a-b),[3,4]);
+ assert.deepEqual(detachedByBeautyCut(before,before.slice(),5,3),[]);
+});

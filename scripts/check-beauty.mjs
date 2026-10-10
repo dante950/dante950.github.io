@@ -88,6 +88,15 @@ try{
    assert.equal(await salon.evaluate(()=>beautyDebug.expression),'neutral');
    assert.equal(await salon.locator('.beautyMood').count(),0);
    if(output)await page.screenshot({path:path.join(output,name+'-zombie-start.png')});
+   // Reproduce the reported floating fragments on the untouched zombie sprite.
+   await salon.locator('[data-tool="grow"]').click();await stroke(page,salon,[270,270],[270,280]);
+   await salon.locator('[data-tool="scissors"]').click();await salon.locator('#sculptSize').selectOption('5');
+   await stroke(page,salon,[45,100],[275,100]);
+   assert(await salon.evaluate(()=>beautyDebug.material.every((v,n)=>!beautyDebug.original[n]||Math.floor(n/160)*2<=106||!v)),'original bangs severed from the scalp do not remain on the face');
+   assert.equal((await material(salon))[135*160+135],2,'an independent growth stroke survives cutting elsewhere');
+   await page.waitForTimeout(350);if(output)await page.screenshot({path:path.join(output,name+'-zombie-detached-cleared.png')});
+   // Start afresh so the existing gesture and score regressions retain their fixture.
+   salon=await startPreview(page,10001);
    const initial=await material(salon);
    await pointer(page,salon,145,88);await page.mouse.down();await pointer(page,salon,145,126);
    assert.deepEqual(await material(salon),initial,'scissors are preview only while held');
@@ -102,7 +111,7 @@ try{
    await stroke(page,salon,[78,85],[78,295]);
    const longHair=await material(salon);assert(longHair[Math.floor(280/2)*160+39]>0,'growth extends toward cape');
    await salon.locator('[data-tool="scissors"]').click();await stroke(page,salon,[78,240],[78,270]);
-   assert((await material(salon))[140*160+39]>0,'a disconnected lower strand stays in place');assert.equal((await material(salon))[130*160+39],0,'new material can be cut');assert((await material(salon))[110*160+39]>0,'uncut upper hair remains');
+   assert.equal((await material(salon))[140*160+39],0,'cutting off the lower strand makes it fall');assert.equal((await material(salon))[130*160+39],0,'new material can be cut');assert((await material(salon))[110*160+39]>0,'uncut upper hair remains');
    await salon.locator('[data-tool="grow"]').click();await stroke(page,salon,[78,224],[78,270]);assert((await material(salon))[130*160+39]>0,'growth repairs a cut without Undo');
    // Independent tufts and material on the face are allowed.
    await stroke(page,salon,[270,270],[270,280]);assert.equal((await material(salon))[135*160+135],2);

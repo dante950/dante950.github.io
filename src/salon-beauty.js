@@ -9,6 +9,8 @@ let touched={cut:false,draw:false,attach:false},zonesVisible=false,history={draw
 const current=new Uint8Array(W*H),original=new Uint8Array(W*H),paint=new Uint8ClampedArray(W*H*4);
 const sourcePixels=new Uint8ClampedArray(W*H*4),originalBorder=new Uint8Array(W*H);
 const masks={eyes:new Uint8Array(W*H),brain:new Uint8Array(W*H)};
+const sculptAnchors=new Uint8Array(W*H);
+let fallingPieces=[],fallingFrame=0;
 const heardDetails={},heardRequests={};
 let liveSatisfaction=50,shapeProgress={details:[]};
 const faceImage=new Image(),hairImage=new Image(),capeImage=new Image();
@@ -74,6 +76,8 @@ async function prepareBeauty(){
  for(let n=0;n<W*H;n++){
   const i=n*4,x=(n%W+.5)*PIX,y=(Math.floor(n/W)+.5)*PIX,r=head[i],g=head[i+1],bl=head[i+2],a=head[i+3];
   if(!a)continue;
+  // Attachment preference only: these pixels remain fully editable.
+  sculptAnchors[n]=bone?+(x>104&&x<216&&y>=78&&y<180):+(y<88&&x>108&&x<216);
   if(!bone&&y<90&&r>120&&bl>60&&g<150&&r>g*1.3)masks.brain[n]=1;
   if(y>88&&y<136&&x>103&&x<215){
    if(bone?(r<100&&g<110&&bl<130):(r>170&&bl<160&&g>140||r>180&&g<100&&bl<150))masks.eyes[n]=1;
@@ -144,10 +148,23 @@ portrait.addEventListener('pointerup',e=>{
  if(g.kind==='scissors'){applyStroke([g.from,g.to],'scissors');}
  gesture=null;
  if(portrait.hasPointerCapture(e.pointerId))portrait.releasePointerCapture(e.pointerId);
+ if(g.kind==='scissors'||g.kind==='hammer')removeCutFragments(g.snapshot);
  if(beautyPhase==='cut'){history.draw=[];history.attach=[];syncUndo();}
  if(g.kind==='hammer')send('sound',{key:'hammer'});
  updateBeautyScore();renderPortrait();
 });
+function removeCutFragments(before){
+ const removed=detachedByBeautyCut(before,current,W,H,sculptAnchors);if(!removed.length)return;
+ renderPortrait(false);
+ const data=materialCanvas.getContext('2d').getImageData(0,0,W,H),piece=offscreen(),pc=piece.getContext('2d'),pixels=pc.createImageData(W,H);
+ for(const n of removed){const i=n*4;pixels.data.set(data.data.subarray(i,i+4),i);current[n]=0;paint.fill(0,i,i+4);}
+ pc.putImageData(pixels,0,0);fallingPieces.push({canvas:piece,start:performance.now()});
+ if(!fallingFrame)fallingFrame=requestAnimationFrame(animateFalling);
+}
+function animateFalling(t){
+ fallingPieces=fallingPieces.filter(p=>t-p.start<320);
+ renderPortrait();fallingFrame=fallingPieces.length?requestAnimationFrame(animateFalling):0;
+}
 function cancelGesture(){
  if(!gesture)return;const g=gesture;gesture=null;current.set(g.snapshot);paint.set(g.paint);touched=g.touched;if(g.undoAdded)history[beautyPhase].pop();
  if(portrait.hasPointerCapture(g.pointerId))portrait.releasePointerCapture(g.pointerId);
@@ -211,6 +228,7 @@ function renderPortrait(includeGuides=true,target=ctx){
  }
  if(!B.designVersion)for(let n=0;n<W*H;n++){const i=n*4;if(paint[i+3])data.data.set(paint.subarray(i,i+4),i);}
  materialCtx.putImageData(data,0,0);target.drawImage(materialCanvas,0,0);
+ if(includeGuides)for(const p of fallingPieces){const age=Math.max(0,(performance.now()-p.start)/320);target.save();target.globalAlpha=Math.max(0,1-age);target.drawImage(p.canvas,0,4+40*age*age);target.restore();}
  for(const p of placements){const image=stickerImages.get(p.sticker.id);if(image?.complete&&image.naturalWidth)target.drawImage(image,p.x/2-p.sticker.w*.375,p.y/2-p.sticker.h*.375,p.sticker.w*.75,p.sticker.h*.75);}
  if(includeGuides&&zonesVisible){
   target.save();target.lineWidth=.8;target.font='5px sans-serif';
