@@ -1,3 +1,4 @@
+import {salonDialogueText} from '../src/salon-dialogue.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -84,7 +85,7 @@ test('bone integrity feedback uses the existing interior and eye-cover rules',()
 });
 
 import {parseDialogueText} from '../src/text-effects.js';
-test('both guests have valid highlighted initial and detailed requests for every stage',()=>{for(const id of [10001,10003]){const b=project.guests.find(g=>g.id===id).beauty;for(const stage of ['cut','draw','attach']){for(const text of [stage==='cut'?b.request:b[stage+'Hint'],b.requestDetails[stage]]){const rich=parseDialogueText(text);assert.deepEqual(rich.warnings,[]);assert(rich.glyphs.some(g=>g.style.color!=='#F0EEE3'));}assert(b.requestBriefNotes[stage]);}}});
+test('both guests have valid highlighted initial and detailed requests for every stage',()=>{for(const id of [10001,10003]){const b=project.guests.find(g=>g.id===id).beauty;for(const stage of ['cut','draw','attach']){for(const text of [salonDialogueText(project,id,stage),salonDialogueText(project,id,stage,true)]){const rich=parseDialogueText(text);assert.deepEqual(rich.warnings,[]);assert(rich.glyphs.some(g=>g.style.color!=='#F0EEE3'));}assert(b.requestBriefNotes[stage]);}}});
 
 test('a cut removes newly detached original and grown fragments but keeps independent growth',()=>{
  const before=new Uint8Array(35),roots=new Uint8Array(35);

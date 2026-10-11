@@ -1,4 +1,5 @@
-export const FLOW_VERSION='통합 플레이 0.12 · 거울 속 손님의 반응';
+import {migrateSalonDialogues,salonDialogueProblems} from './salon-dialogue.js';
+export const FLOW_VERSION='통합 플레이 0.13 · 엑셀로 연결하는 미용 대화';
 export const SALON_EVENTS=[['arrival','손님 등장'],['cut','형태 만들기 요청'],['draw','색·무늬 요청'],['attach','장식 요청'],['best','미용 매우 만족'],['normal','미용 만족'],['fail','미용 불만족'],['proposal','야차 제안'],['afterWin','야차 승리 후 미용실'],['afterLoss','야차 패배 후 미용실'],['leave','손님 퇴장']];
 export function modelRows(p,name){return p.combat.sheets.find(s=>s.name===name)?.rows||[];}
 export function defaultProject(combat,assets){
@@ -31,10 +32,11 @@ export function defaultProject(combat,assets){
  add(s,'afterWin','샌즈 · 야차가 끝난 미용실',['미용실로 돌아오자, 문에 달린 종이 작게 울렸다. 오늘의 마지막 손님과의 야차가 끝났다.']);
 modelRows(p,'대사').filter(l=>l.GroupID===s.bindings.afterWin).forEach(l=>l.Speaker='나레이션');
  for(const g of p.guests){const preset=BEAUTY_PRESETS[g.id];if(preset){g.beauty=structuredClone(preset.beauty);g.note=preset.note;}}
- return p;
+ return migrateSalonDialogues(p);
 }
 export function projectProblems(p){const errors=[];if(p?.format!=='YACHACHA_FULLFLOW'||p.schemaVersion!==1||!p.combat?.sheets||!Array.isArray(p.guests))return ['이 통합 개발실에서 저장한 프로젝트 파일이 아닙니다.'];for(const name of ['대사','대화 그룹','몬스터 페이즈'])if(!p.combat.sheets.some(s=>s.name===name))errors.push(name+' 시트가 없습니다.');if(p.guests.length!==3||p.guests.some(g=>![10001,10002,10003].includes(g.id)))errors.push('이번 버전은 좀비·취객·샌즈 세 손님을 사용합니다.');for(const g of p.guests){const b=g.beauty;if(!b?.steps||!b.weights||!b.cutRegions||!b.attachRegions||!b.drawRegions){errors.push(g.name+' 미용 설정 누락');continue;}if(b.enabled){if(!Object.values(b.steps).some(Boolean))errors.push(g.name+' 미용 단계를 하나 이상 켜 주세요.');if(Object.keys(b.steps).reduce((s,k)=>s+(b.steps[k]?+b.weights[k]:0),0)!==100)errors.push(g.name+' 켜진 단계의 점수 합계는 100이어야 합니다.');for(const r of [...b.cutRegions,...b.attachRegions,...b.drawRegions])if(![r.x,r.y,r.w,r.h].every(Number.isFinite)||r.w<=0||r.h<=0||r.x<0||r.y<0||r.x+r.w>320||r.y+r.h>350)errors.push(g.name+' 영역 '+r.label+'이 얼굴 편집판을 벗어났습니다.');if(!b.drawColors.every(c=>/^#[0-9a-f]{6}$/i.test(c)))errors.push(g.name+' 색상 형식 확인');}}
  for(const g of p.guests){const b=g.beauty;if(b?.designVersion>=2){for(const r of b.cutRegions){if(!['clear','cover','trim','preserve','free'].includes(r.rule)||!Number.isFinite(r.points)||r.points<0||!Number.isFinite(r.tolerance)||r.tolerance<0||r.tolerance>=1)errors.push(g.name+' 형태 판정 설정 확인');}if(b.steps.cut&&Math.abs(b.cutRegions.reduce((s,r)=>s+r.points,0)-b.weights.cut)>.01)errors.push(g.name+' 형태 조건 배점 합계가 단계 점수와 다릅니다.');const growth=b.growth;if(growth){const r=growth.region;if(!/^#[0-9a-f]{6}$/i.test(growth.color)||!/^#[0-9a-f]{6}$/i.test(growth.outline))errors.push(g.name+' 발모제 색상 확인');if(!r||![r.x,r.y,r.w,r.h].every(Number.isFinite)||r.x<0||r.y<0||r.w<=0||r.h<=0||r.x+r.w>320||r.y+r.h>350)errors.push(g.name+' 발모제 범위 확인');}}}
+ errors.push(...salonDialogueProblems(p));
  return errors;
 }
 export function stageForGuest(g){return g.beauty.enabled?'beauty':'battle';}

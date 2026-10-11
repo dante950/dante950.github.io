@@ -610,6 +610,33 @@
           "label": "몇 번째 빈틈 결과일까"
         }
       ]
+    },
+    {
+      "name": "SalonDialogue",
+      "label": "미용 대사 연결",
+      "key": "MonsterID + Stage",
+      "columns": [
+        {
+          "name": "MonsterID",
+          "type": "int",
+          "label": "손님 ID"
+        },
+        {
+          "name": "Stage",
+          "type": "string",
+          "label": "미용 단계"
+        },
+        {
+          "name": "RequestGroupID",
+          "type": "int",
+          "label": "처음 부탁 그룹 ID"
+        },
+        {
+          "name": "DetailGroupID",
+          "type": "int",
+          "label": "자세한 부탁 그룹 ID"
+        }
+      ]
     }
   ]
 }

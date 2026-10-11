@@ -10,7 +10,7 @@ function createOfflineBook(){
  const col=n=>{let s='';for(n++;n;n=Math.floor((n-1)/26))s=String.fromCharCode(65+(n-1)%26)+s;return s;};
  const colNum=r=>{let n=0;for(const c of r.replace(/[0-9$]/g,''))n=n*26+c.charCodeAt(0)-64;return n-1;};
  const required={'공격 만들기':['PatternID','RangeMode','ShapePoolID','TilePath','HitMin','HitMax','ResponseMs','CanDefend','BreakTiles'],'이동·연출':['PatternID','MoveType','Effect','PushDirection'],'몬스터 사용 패턴':['MonsterID','PhaseID','PatternID','HitDamage','Weight','Enabled'],'몬스터 페이즈':['MonsterID','PhaseID','MaxHP','RecoveryMs','AttackSpeed','PlayerDodgeMissCount'],'범위 풀':['ShapePoolID','Candidate','SelectMode','Tiles','Weight'],'플레이어':['MaxHP','DodgeDamage','GuardMax'],'공통 규칙':['RuleID','Value']};
- const aliases={AttackPattern:'공격 만들기',PatternPresentation:'이동·연출',MonsterPattern:'몬스터 사용 패턴',MonsterPhase:'몬스터 페이즈',ShapePool:'범위 풀',PlayerStatus:'플레이어',CombatRule:'공통 규칙',Guide:'작성 안내',Dialogue:'대사',DialogueGroup:'대화 그룹',CombatDialogue:'전투 대사 연결',TextEffectGuide:'문자 효과 규칙'};
+ const aliases={AttackPattern:'공격 만들기',PatternPresentation:'이동·연출',MonsterPattern:'몬스터 사용 패턴',MonsterPhase:'몬스터 페이즈',ShapePool:'범위 풀',PlayerStatus:'플레이어',CombatRule:'공통 규칙',Guide:'작성 안내',Dialogue:'대사',DialogueGroup:'대화 그룹',CombatDialogue:'전투 대사 연결',TextEffectGuide:'문자 효과 규칙',SalonDialogue:'미용 대사 연결'};
  let current;
  async function load(bytes,name='야차차_마스터테이블.xlsm'){
   const zip=await JSZip.loadAsync(bytes);if(!zip.file('xl/workbook.xml'))throw Error('xlsx 또는 xlsm 파일을 선택하세요.');

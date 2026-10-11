@@ -1,4 +1,5 @@
 import {parseWorkbookXml} from './workbook-xml.js';
+import {salonDialogueProblems} from '../salon-dialogue.js';
 // Two workbook presentations share one set of game values and one version snapshot.
 const TableVersions=(()=>{
  const authorFolder='내 작업용 데이터 테이블',unityFolder='유니티 임포트용 데이터 테이블';
@@ -84,7 +85,9 @@ const TableVersions=(()=>{
  }
  async function prepare(input,intent,version=stamp()){
   if(!intent?.trim())throw Error('변경 의도를 적어 주세요. 예: 취객이 술에서 깨는 느낌을 주려고 후반 공격을 빠르게 조정.');
-  const a=authorFrom(input),{u,drafts}=unityFrom(a);assertKeys(a);assertKeys(u);const check=validate(u);if(check.errors.length)throw Error('저장 전 데이터를 확인하세요:\n'+check.errors.join('\n'));
+  const a=authorFrom(input),{u,drafts}=unityFrom(a);assertKeys(a);assertKeys(u);const check=validate(u);
+  if(sheet(u,'미용 대사 연결'))check.errors.push(...salonDialogueProblems({combat:u,guests:[...new Set(sheet(a,'몬스터 페이즈').rows.map(r=>r.MonsterID))].map(id=>({id}))}));
+  if(check.errors.length)throw Error('저장 전 데이터를 확인하세요:\n'+check.errors.join('\n'));
   checkPair(a,u,drafts);const changes=diff(baseSnapshot,snapshot(a)),meta={format:1,version,parentVersion,intent:intent.trim(),snapshot:snapshot(a),drafts:drafts.map(r=>({MonsterID:r.MonsterID,PhaseID:r.PhaseID}))};
   const aBytes=await stampBook(await authorBook.save(a),meta),uBytes=await stampBook(await unityBook.save(u),meta);
   // Reload both outputs before delivering, checking the serialized data as well as the in-memory projection.
