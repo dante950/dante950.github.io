@@ -52,13 +52,13 @@ async function reviewReady(page) {
   await page.locator('#nextReview:enabled').waitFor({ state: 'visible' });
 }
 
-async function start(page, { day = 1, manual = false, choices = {}, threshold } = {}) {
+async function start(page, { day = 1, manual = false, choices = {}, threshold, speed = 2 } = {}) {
   await page.goto(url);
   await phase(page, 'salon');
   await page.locator('#settingsOpen').click();
   await page.locator('#settings[open]').waitFor();
   await page.locator('#startDay').selectOption(String(day));
-  await page.locator('#speed').selectOption('2');
+  await page.locator('#speed').selectOption(String(speed));
   for (const [guest, result] of Object.entries(choices)) {
     await page.locator(`#result-${guest}`).selectOption(result);
   }
@@ -236,6 +236,89 @@ async function belowThreshold(page, engine) {
   return { scenario: 'threshold not reached', actual: current.actual, stars: current.stars };
 }
 
+async function normalMotionSequence(page, engine) {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await start(page, { speed: 1, choices: { zombie: 'beauty', sans: 'forcedWin', minion: 'offerWin' } });
+  assert.equal(await page.locator('#salonCaption, .salon-caption, .follower-chip, .day-chip, .salon-name').count(), 0,
+    'the retired salon caption and separate header chips should not remain in the scene');
+  assert.equal(await page.locator('#hudTotal').isVisible(), true);
+  const cashier = page.locator('img#cashierSprite');
+  assert.equal(await cashier.getAttribute('src'), './media/closing-cashier.png');
+  assert.equal(await cashier.evaluate(image => image.complete && image.naturalWidth > 0), true,
+    'the original cashier sprite must load');
+  assert.equal(await cashier.evaluate(image => getComputedStyle(image).imageRendering), 'pixelated');
+  const cashierBox = await cashier.boundingBox();
+  const bubbleBox = await page.locator('#closeShop').boundingBox();
+  assert(cashierBox && bubbleBox);
+  const overlaps = Math.min(cashierBox.x + cashierBox.width, bubbleBox.x + bubbleBox.width)
+      > Math.max(cashierBox.x, bubbleBox.x)
+    && Math.min(cashierBox.y + cashierBox.height, bubbleBox.y + bubbleBox.height)
+      > Math.max(cashierBox.y, bubbleBox.y);
+  assert.equal(overlaps, false, 'the closing button must leave the cashier visible');
+  await capture(page, engine, 'original-hud-and-cashier');
+  await page.locator('#closeShop').click();
+  await phase(page, 'review');
+  await page.waitForFunction(() => Number(document.querySelector('#stage').dataset.displayedFollowers) > 0);
+  const countingObserved = Date.now();
+  await page.waitForTimeout(2000);
+  const countSample = await page.evaluate(() => ({
+    displayed: Number(document.querySelector('#stage').dataset.displayedFollowers),
+    percent: parseInt(document.querySelector('#starPercent').textContent, 10),
+    disabled: document.querySelector('#nextReview').disabled,
+  }));
+  assert(countSample.displayed > 0 && countSample.displayed < 1200,
+    `the default six-second count must still be visibly progressing after two seconds: ${countSample.displayed}`);
+  assert.equal(countSample.disabled, true);
+  assert.equal(countSample.percent, Math.floor(countSample.displayed / 5000 * 100),
+    'star progress should follow the partial follower count');
+  await capture(page, engine, 'normal-count-in-progress');
+  const beforeFiveSeconds = Math.max(0, 4800 - (Date.now() - countingObserved));
+  if (beforeFiveSeconds) await page.waitForTimeout(beforeFiveSeconds);
+  assert.equal(await page.locator('#nextReview').isDisabled(), true,
+    'the default count must not finish before the six-second pacing window');
+  await reviewReady(page);
+  assert(Date.now() - countingObserved >= 5500, 'the first count must retain the full default pacing');
+  assert.equal((await state(page)).displayed, 1500);
+  assert.equal((await state(page)).actual, 3000);
+
+  await page.locator('#nextReview').click();
+  const sampleHandle = await page.waitForFunction(() => {
+    const feed = document.querySelector('#feed');
+    const y = new DOMMatrixReadOnly(getComputedStyle(feed).transform).m42;
+    if (y >= -140 || y <= -300) return false;
+    const viewport = document.querySelector('.feed-viewport').getBoundingClientRect();
+    const visibleHeights = [...feed.querySelectorAll('.post')].map(post => {
+      const rectangle = post.getBoundingClientRect();
+      return Math.max(0, Math.min(viewport.bottom, rectangle.bottom) - Math.max(viewport.top, rectangle.top));
+    });
+    return {
+      y,
+      visibleHeights,
+      displayed: Number(document.querySelector('#stage').dataset.displayedFollowers),
+      disabled: document.querySelector('#nextReview').disabled,
+    };
+  }, null, { timeout: 6000 });
+  const scrollSample = await sampleHandle.jsonValue();
+  await sampleHandle.dispose();
+  assert(scrollSample.y < 0 && scrollSample.y > -443, 'the feed must pass through an intermediate scroll position');
+  assert(scrollSample.visibleHeights[0] > 5 && scrollSample.visibleHeights[1] > 5,
+    'both outgoing and incoming posts must be partially visible while scrolling');
+  assert.equal(scrollSample.displayed, 1500, 'the next reward count must wait until the feed has arrived');
+  assert.equal(scrollSample.disabled, true);
+  await capture(page, engine, 'normal-feed-mid-scroll');
+  await page.waitForFunction(() => Math.abs(new DOMMatrixReadOnly(
+    getComputedStyle(document.querySelector('#feed')).transform).m42 + 443) < 0.5);
+  assert.equal((await state(page)).displayed, 1500);
+  await page.waitForFunction(() => Number(document.querySelector('#stage').dataset.displayedFollowers) > 1500);
+  assert.equal(await page.locator('#nextReview').isDisabled(), true);
+  await reviewReady(page);
+  assert.equal((await state(page)).displayed, 3000);
+  assert.equal((await state(page)).actual, 3000);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  return { scenario: 'normal-motion count and visible feed scrolling',
+    twoSecondFollowers: countSample.displayed, scrollOffset: scrollSample.y, actual: 3000 };
+}
+
 try {
   for (const [name, engine] of Object.entries({ chromium, webkit })) {
     if (process.env.YACHA_CLOSING_ENGINE && process.env.YACHA_CLOSING_ENGINE !== name) continue;
@@ -245,7 +328,7 @@ try {
       page.setDefaultTimeout(45000);
       const errors = [];
       page.on('pageerror', error => errors.push(error.message));
-      for (const scenario of [fullSequence, retrySequence, belowThreshold]) {
+      for (const scenario of [fullSequence, retrySequence, belowThreshold, normalMotionSequence]) {
         try {
           const result = await scenario(page, name);
           report.push({ engine: name, ...result });
