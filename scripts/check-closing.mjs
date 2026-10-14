@@ -57,6 +57,7 @@ async function start(page, { day = 1, manual = false, choices = {}, threshold, s
   await phase(page, 'salon');
   await page.locator('#settingsOpen').click();
   await page.locator('#settings[open]').waitFor();
+  assert.equal(await page.locator('#speed').inputValue(), '1.5', 'a fresh scene should default to 1.5× speed');
   await page.locator('#startDay').selectOption(String(day));
   await page.locator('#speed').selectOption(String(speed));
   for (const [guest, result] of Object.entries(choices)) {
@@ -117,7 +118,7 @@ async function checkUnappliedSettings(page, { emptyThreshold = false } = {}) {
   }
   await page.locator('#defaults').click();
   assert.equal(await page.locator('#threshold').inputValue(), '5000');
-  assert.equal(await page.locator('#speed').inputValue(), '1');
+  assert.equal(await page.locator('#speed').inputValue(), '1.5');
   assert.deepEqual(await state(page), before, 'restoring the form defaults must not restart the scene');
   await page.locator('#settingsClose').click();
   await page.locator('#settings').waitFor({ state: 'hidden' });
@@ -142,6 +143,39 @@ async function checkBlackout(page) {
   }));
   assert.equal(blackout.active, true);
   assert(blackout.opacity >= 0.99, 'the actual blackout CSS must become opaque before the next day');
+}
+
+async function checkUpgradeLoading(page, engine) {
+  await phase(page, 'calendar', 2);
+  await phase(page, 'upgrading', 3);
+  await page.locator('#upgradeLoading').waitFor({ state: 'visible' });
+  const loading = await page.evaluate(() => {
+    const overlay = document.querySelector('#upgradeLoading');
+    const text = document.querySelector('#upgradeLoadingText');
+    const style = getComputedStyle(overlay);
+    const rectangle = overlay.getBoundingClientRect();
+    const stage = document.querySelector('#stage').getBoundingClientRect();
+    const letters = [...text.querySelectorAll('span.upgrade-letter')].map(letter => ({
+      text: letter.textContent,
+      animation: getComputedStyle(letter).animationName,
+      delay: getComputedStyle(letter).animationDelay,
+    }));
+    return { text: text.textContent.replace(/\u00a0/g, ' '), letters,
+      color: style.backgroundColor, opacity: Number(style.opacity),
+      coversStage: rectangle.width >= stage.width - 1 && rectangle.height >= stage.height - 1,
+      background: getComputedStyle(document.querySelector('#salonBackground')).backgroundImage };
+  });
+  assert.equal(loading.text, '미용실 업그레이드 중...');
+  assert.equal(loading.color, 'rgb(0, 0, 0)');
+  assert(loading.opacity >= 0.99 && loading.coversStage, 'upgrade loading must cover the salon in black');
+  assert(!loading.background.includes('closing-upgrade.png'), 'the pink salon must not appear before loading finishes');
+  assert.equal(await page.locator('#ending').isVisible(), false);
+  assert.equal(await page.locator('#upgradeSign').isVisible(), false);
+  assert(loading.letters.length > 5 && loading.letters.every(letter => letter.text.length <= 1));
+  assert(loading.letters.every(letter => letter.animation === 'upgradeWave'));
+  assert(new Set(loading.letters.map(letter => letter.delay)).size > 1,
+    'the loading letters must jump in sequence rather than simultaneously');
+  await capture(page, engine, 'upgrade-loading-wave');
 }
 
 async function fullSequence(page, engine) {
@@ -182,8 +216,12 @@ async function fullSequence(page, engine) {
   assert.equal(current.displayed, 5200);
   await capture(page, engine, 'day2-bonus-review');
   await page.locator('#nextReview').click();
+  await checkUpgradeLoading(page, engine);
   await phase(page, 'ending', 3);
   await page.locator('#ending').waitFor({ state: 'visible' });
+  assert.equal(await page.locator('#upgradeLoading').isVisible(), false);
+  assert.match(await page.locator('#salonBackground').evaluate(element => getComputedStyle(element).backgroundImage),
+    /closing-upgrade\.png/, 'the pink salon is revealed after upgrade loading');
   current = await state(page);
   assert.equal(current.actual, 5200);
   assert.equal(current.stars, 1);
@@ -242,6 +280,12 @@ async function normalMotionSequence(page, engine) {
   assert.equal(await page.locator('#salonCaption, .salon-caption, .follower-chip, .day-chip, .salon-name').count(), 0,
     'the retired salon caption and separate header chips should not remain in the scene');
   assert.equal(await page.locator('#hudTotal').isVisible(), true);
+  const hudImages = await page.locator('#hud img').evaluateAll(images => images.map(image => ({
+    src: image.getAttribute('src'), loaded: image.complete && image.naturalWidth > 0,
+  })));
+  assert.deepEqual(hudImages.map(image => image.src).sort(),
+    ['morning', 'night', 'hands', 'center', 'frame'].map(name => `./media/closing-hud-${name}.png`).sort());
+  assert(hudImages.every(image => image.loaded), 'all five original HUD graphics must load');
   const cashier = page.locator('img#cashierSprite');
   assert.equal(await cashier.getAttribute('src'), './media/closing-cashier.png');
   assert.equal(await cashier.evaluate(image => image.complete && image.naturalWidth > 0), true,

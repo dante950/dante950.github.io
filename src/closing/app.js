@@ -9,7 +9,8 @@ const DEFAULT_COPY={
  minion:{beauty:'마왕님께 보고하겠습니다.\n이 미용실… 솜씨가 보통이 아니라고!\n다음 방문도 기대하겠습니다.',battle:'제 패배를 인정합니다.\n이 정도 실력이라면\n마왕님도 관심을 가지시겠군요.'}
 };
 let choices={...DEFAULT_CHOICES},copies=structuredClone(DEFAULT_COPY),settings=structuredClone(DEFAULT_SETTINGS);
-let run=createRun(),summary=null,index=0,epoch=0,busy=false,quick=true,startDay=1,speed=1,sound=false,audio=null;
+const DEFAULT_SPEED=1.5;
+let run=createRun(),summary=null,index=0,epoch=0,busy=false,quick=true,startDay=1,speed=DEFAULT_SPEED,sound=false,audio=null;
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
 const stage=$('stage'),star=$('starCanvas').getContext('2d'),fx=$('particles').getContext('2d');
 const cancelled=Symbol('cancelled');
@@ -67,7 +68,7 @@ function scrollFeed(which,token){
 function escape(text){return String(text).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function post(visit){const portrait=ART[visit.guestId],photo=visit.guestId==='zombie'&&visit.reviewKind==='beauty';return `<article class="post" data-visit="${visit.id}"><div class="post-person">${portrait?`<img class="avatar" src="${portrait}" alt="">`:'<span class="avatar">?</span>'}<div><b>${escape(visit.name)}</b><small>DAY ${visit.day} · 방금 전</small></div></div><div class="post-picture ${photo?'photo':'portrait'}">${portrait?`<img src="${photo?ART.zombiePost:portrait}" alt="${escape(visit.name)} ${photo?'미용 후기':'캐릭터'} 이미지">`:'<div class="missing-portrait" aria-label="마왕 부하 임시 실루엣"></div>'}<span class="photo-label">${!portrait?'임시 실루엣 · 원화 준비 중':visit.reviewKind==='beauty'?'오늘의 새로운 나':'기억에 남는 한 판'}</span></div><div class="post-actions"><span>♥ ♡ ↗</span><span>▱</span></div><p class="post-copy">${escape(copies[visit.guestId][visit.reviewKind])}<strong>#야차차 #${visit.reviewKind==='beauty'?'오늘의미용':'야차한판'}</strong></p></article>`;}
 function hud(){$('hudDay').textContent=String(run.day).padStart(2,'0');$('hudTotal').textContent=fmt(run.total);$('hudStar').textContent=run.stars;$('hudStar').setAttribute('aria-label',`${run.stars}스타`);stage.dataset.actualFollowers=run.total;stage.dataset.stars=run.stars;}
-function clearScene(){for(const id of ['settlement','closeBanner','finishBanner','calendarScreen','ending','retryPanel','visitPanel','closeShop','upgradeSign'])show(id,false);$('blackout').classList.remove('dark');$('receipt').classList.remove('visible');$('salonBackground').style.backgroundImage=`url('${ART.salon}')`;$('calendarLeaf').classList.remove('flip');fx.clearRect(0,0,320,180);}
+function clearScene(){for(const id of ['settlement','closeBanner','finishBanner','calendarScreen','upgradeLoading','ending','retryPanel','visitPanel','closeShop','upgradeSign'])show(id,false);$('blackout').classList.remove('dark');$('receipt').classList.remove('visible');$('salonBackground').style.backgroundImage=`url('${ART.salon}')`;$('calendarLeaf').classList.remove('flip');fx.clearRect(0,0,320,180);}
 function renderSalon(){phase('salon');hud();const ready=canClose(run),guest=nextGuest(run);show('closeShop',ready);show('visitPanel',!ready&&!!guest);show('retryPanel',false);if(guest){$('visitName').textContent=guest.name;$('visitOutcome').textContent=OUTCOMES[choices[guest.id]];}$('completeGuest').disabled=false;setStatus(ready?`DAY ${run.day} · 영업 종료를 눌러 오늘의 후기를 확인하세요.`:`DAY ${run.day} · ${guest?.name||''}의 결과를 시험해 보세요.`);}
 function applyGuest(outcome){const guest=nextGuest(run);if(!guest)return false;const result=completeVisit(run,guest.id,outcome||choices[guest.id]);run=result.run;hud();if(result.reason==='retry'){show('retryPanel');show('visitPanel',false);phase('retry');setStatus(`${guest.name} · 강제 야차 패배. 팔로워 지급 없이 재도전합니다.`);return false;}beep(650,.13,'triangle',.04);return !!result.visit;}
 function prepareDay(){renderSalon();if(quick){while(nextGuest(run)){if(!applyGuest())return;}renderSalon();}}
@@ -97,7 +98,32 @@ async function review(which,token,first=false){
 }
 async function close(){if(busy||!canClose(run))return;busy=true;const token=epoch;summary=closingSummary(run);run=closeDay(run);phase('closing');show('closeShop',false);show('visitPanel',false);$('closedDay').textContent=run.day;show('closeBanner');setStatus('오늘의 영업이 끝났습니다.');beep(220,.2,'triangle',.07);await pause(1600,token);await openReview(token);}
 async function finish(token){busy=true;phase('finish');const awarded=summary.eligibleForStar;$('finishBanner').classList.toggle('award',awarded);$('finishEyebrow').textContent=awarded?'YOUR FIRST STAR':'TODAY’S FOLLOWERS';$('finishTitle').textContent=awarded?'★ 첫 번째 스타 획득!':'오늘도 한 걸음 더!';$('finishMessage').textContent=awarded?`누적 ${fmt(run.total)}명 · 미용실의 새로운 모습이 기다려요.`:`오늘 +${fmt(summary.gain)}명 · 내일도 만나자구요.`;show('finishBanner');if(awarded)chord();else beep(700,.3,'triangle',.06);setStatus(awarded?'첫 번째 별을 획득했어요!':'오늘의 정산을 마쳤어요.');await pause(1900,token);$('blackout').classList.add('dark');await pause(750,token);show('settlement',false);show('finishBanner',false);phase('calendar');$('oldDay').textContent=run.day;$('newDay').textContent=run.day+1;show('calendarScreen');$('calendarLeaf').classList.remove('flip');await pause(500,token);$('calendarLeaf').classList.add('flip');beep(150,.1,'triangle',.08);await pause(1700,token);run=nextDay(run);show('calendarScreen',false);if(run.status==='ending'){await ending(token);}else{clearScene();prepareDay();busy=false;}}
-async function ending(token){phase('ending');hud();show('closeShop',false);show('visitPanel',false);const award=run.stars>0;$('salonBackground').style.backgroundImage=`url('${award?ART.upgrade:ART.salon}')`;show('upgradeSign',award);$('ending').querySelector('h2').innerHTML=award?'우리 미용실에<br>첫 번째 별이 떴어요.':'오늘의 이야기를<br>함께해 주셔서 감사해요.';$('ending').querySelector('.ending-star').textContent=award?'★':'☆';$('ending').querySelector('small').textContent=award?'YOUR FIRST STAR, YOUR NEXT CHAPTER':'THANK YOU FOR PLAYING';$('ending').querySelector('span').textContent=award?'미용실의 다음 모습, 곧 만나요.':`1스타까지 ${fmt(settings.threshold-run.total)}명 · 설정을 바꿔 다시 시험할 수 있어요.`;$('blackout').classList.remove('dark');setStatus(award?'DAY 3 · 업그레이드 미리보기. 이 장면은 감상만 할 수 있어요.':'정산 완료 · 이번 설정은 1스타 기준에 도달하지 않았어요.');await pause(2200,token);show('ending');if(award)chord();busy=false;}
+async function upgradeLoading(token){
+ phase('upgrading');
+ const message='미용실 업그레이드 중...',letters=Array.from(message),cycle=letters.length*240+720;
+ $('upgradeLoadingText').replaceChildren(...letters.map((letter,i)=>{
+  const span=document.createElement('span');span.className='upgrade-letter';span.textContent=letter;
+  span.style.animationDuration=(cycle/speed)+'ms';span.style.animationDelay=(i*240/speed)+'ms';
+  return span;
+ }));
+ show('upgradeLoading');setStatus(message);
+ await pause(4800,token);
+ show('upgradeLoading',false);
+}
+async function ending(token){
+ const award=run.stars>0;
+ if(award)await upgradeLoading(token);
+ phase('ending');hud();show('closeShop',false);show('visitPanel',false);
+ $('salonBackground').style.backgroundImage=`url('${award?ART.upgrade:ART.salon}')`;
+ show('upgradeSign',award);
+ $('ending').querySelector('h2').innerHTML=award?'우리 미용실에<br>첫 번째 별이 떴어요.':'오늘의 이야기를<br>함께해 주셔서 감사해요.';
+ $('ending').querySelector('.ending-star').textContent=award?'★':'☆';
+ $('ending').querySelector('small').textContent=award?'YOUR FIRST STAR, YOUR NEXT CHAPTER':'THANK YOU FOR PLAYING';
+ $('ending').querySelector('span').textContent=award?'미용실의 다음 모습, 곧 만나요.':`1스타까지 ${fmt(settings.threshold-run.total)}명 · 설정을 바꿔 다시 시험할 수 있어요.`;
+ $('blackout').classList.remove('dark');
+ setStatus(award?'DAY 3 · 업그레이드 미리보기. 이 장면은 감상만 할 수 있어요.':'정산 완료 · 이번 설정은 1스타 기준에 도달하지 않았어요.');
+ await pause(2200,token);show('ending');if(award)chord();busy=false;
+}
 function readForm(mode){if(!$('settingsForm').reportValidity())return;const nextChoices=Object.fromEntries(GUESTS.map(g=>[g.id,$('result-'+g.id).value])),day=Number($('startDay').value);if(day===2&&GUESTS.filter(g=>g.day===1).some(g=>nextChoices[g.id]==='forcedLoss')){$('settingsError').textContent='2일차부터 보려면 1일차 두 손님의 결과를 완료 상태로 바꿔 주세요. 강제 야차 패배는 재도전이 필요해요.';return;}settings={threshold:Number($('threshold').value),bonus:Number($('bonus').value),base:Object.fromEntries(GUESTS.map(g=>[g.id,Number($('base-'+g.id).value)]))};copies=Object.fromEntries(GUESTS.map(g=>[g.id,Object.fromEntries(['beauty','battle'].map(kind=>[kind,$('copy-'+g.id+'-'+kind).value]))]));choices=nextChoices;startDay=day;speed=Number($('speed').value);quick=mode;$('settings').close();begin();}
 function fillForm(values={settings,choices,copies,startDay,speed}){const {settings,choices,copies,startDay,speed}=values;$('startDay').value=startDay;$('speed').value=speed;$('threshold').value=settings.threshold;$('bonus').value=settings.bonus;$('settingsError').textContent='';$('guestSettings').innerHTML=GUESTS.map(g=>`<div class="guest-setting"><label>${g.name}<select id="result-${g.id}" aria-label="${g.name} 결과">${Object.entries(OUTCOMES).map(([key,label])=>`<option value="${key}" ${choices[g.id]===key?'selected':''}>${label}</option>`).join('')}</select></label><small>DAY ${g.day}${g.id==='minion'?' · 이미지: 임시 실루엣':''} · 시연용 결과 선택</small></div>`).join('');$('baseSettings').innerHTML=GUESTS.map(g=>`<label>${g.name}<input id="base-${g.id}" type="number" min="0" max="99999" required value="${settings.base[g.id]}"></label>`).join('');$('reviewSettings').innerHTML=GUESTS.map(g=>['beauty','battle'].map(kind=>`<label>${g.name} · ${kind==='beauty'?'미용':'야차'} 후기<textarea id="copy-${g.id}-${kind}" maxlength="220">${escape(copies[g.id][kind])}</textarea></label>`).join('')).join('');}
 $('closeShop').onclick=action(close);
@@ -107,7 +133,7 @@ $('retryBattle').onclick=()=>{if(stage.dataset.phase!=='retry')return;if(applyGu
 $('restart').onclick=()=>{if($('loading').hidden)begin();};
 $('settingsOpen').onclick=()=>{fillForm();$('settings').showModal();};$('settingsClose').onclick=()=>$('settings').close();
 $('settingsForm').onsubmit=e=>{e.preventDefault();readForm(true);};$('manualStart').onclick=()=>readForm(false);
-$('defaults').onclick=()=>fillForm({settings:DEFAULT_SETTINGS,choices:DEFAULT_CHOICES,copies:DEFAULT_COPY,startDay:1,speed:1});
+$('defaults').onclick=()=>fillForm({settings:DEFAULT_SETTINGS,choices:DEFAULT_CHOICES,copies:DEFAULT_COPY,startDay:1,speed:DEFAULT_SPEED});
 $('sound').onclick=()=>{sound=!sound;$('sound').setAttribute('aria-pressed',sound);$('sound').textContent=sound?'♪ 소리 끄기':'♪ 소리 켜기';if(sound)beep(660,.14,'triangle',.07);};
 $('fullscreen').onclick=action(async()=>{if(document.fullscreenElement)await document.exitFullscreen();else if(document.body.requestFullscreen)await document.body.requestFullscreen();else setStatus('이 브라우저에서는 전체 화면을 지원하지 않아요. 가로 화면으로 확인해 주세요.');});
 addEventListener('keydown',e=>{if($('settings').open||e.repeat||!['Enter',' '].includes(e.key)||/INPUT|SELECT|TEXTAREA|BUTTON|A/.test(document.activeElement?.tagName))return;e.preventDefault();if(!busy&&stage.dataset.phase==='review')$('nextReview').click();else if(stage.dataset.phase==='salon'&&canClose(run))$('closeShop').click();});
