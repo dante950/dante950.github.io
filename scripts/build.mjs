@@ -44,6 +44,11 @@ const inputs={
  'flow-salon':[await emit('salon','html',(await read('src/salon.html')).replace('</style>',()=>salonStyle+'</style>').replace('/*__BEAUTY_RUNTIME__*/',()=>code(beautyRules)+'\n'+beautyRuntime)),'text'],
  'flow-combat':[await emit('combat','html',combat),'text']
 };
+const closingModelURL=await emit('closing-model','js',await read('src/closing/model.js'));
+const closingAppURL=await emit('closing-app','js',(await read('src/closing/app.js')).replace("from './model.js'",`from '${closingModelURL}'`));
+const closingStyleURL=await emit('closing-style','css',await read('src/closing/style.css'));
+const closingHTML=(await read('src/closing/index.html')).replace('href="style.css"',`href="${closingStyleURL}"`).replace('src="app.js"',`src="${closingAppURL}"`);
+await fs.writeFile(path.join(dist,'closing.html'),closingHTML);
 const releaseId=hash(JSON.stringify(files));
 const boot=`const inputs=${JSON.stringify(inputs)};
 try {

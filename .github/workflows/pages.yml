@@ -24,6 +24,7 @@ jobs:
       - run: npx playwright install --with-deps chromium webkit
       - run: npm run test:browser
       - run: npm run test:salon-dialogue
+      - run: npm run test:closing
       - uses: actions/upload-pages-artifact@v4
         with:
           path: dist

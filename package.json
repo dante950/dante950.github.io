@@ -8,7 +8,8 @@
     "import-project": "node scripts/import-project.mjs",
     "test:browser": "node scripts/check-browsers.mjs && node scripts/check-beauty.mjs",
     "test:salon-dialogue": "node scripts/check-salon-dialogue.mjs",
-    "test:beauty-result": "node scripts/check-beauty-result.mjs"
+    "test:beauty-result": "node scripts/check-beauty-result.mjs",
+    "test:closing": "node scripts/check-closing.mjs"
   },
   "engines": {
     "node": ">=22"
