@@ -20,27 +20,39 @@ jobs:
           node-version: '22'
       - run: npm run build
       - run: npm test
-      # One-time 0.23 release: affected browser checks passed locally in both engines.
-      # This exact predecessor is consumed by this push; later pushes run all checks.
-      # Build and unit/data checks remain mandatory; PR/manual runs retain all checks.
-      - if: github.event_name != 'push' || github.event.before != '707cc48c453fa39544e186f34b967a088b103535' || github.event.head_commit.message != 'Publish verified 0.23 with one-time scoped validation'
-        run: npm ci --ignore-scripts --no-audit --no-fund
-      - if: github.event_name != 'push' || github.event.before != '707cc48c453fa39544e186f34b967a088b103535' || github.event.head_commit.message != 'Publish verified 0.23 with one-time scoped validation'
-        run: npx playwright install --with-deps chromium webkit
-      - if: github.event_name != 'push' || github.event.before != '707cc48c453fa39544e186f34b967a088b103535' || github.event.head_commit.message != 'Publish verified 0.23 with one-time scoped validation'
-        run: npm run test:browser
-      - if: github.event_name != 'push' || github.event.before != '707cc48c453fa39544e186f34b967a088b103535' || github.event.head_commit.message != 'Publish verified 0.23 with one-time scoped validation'
-        run: npm run test:salon-dialogue
-      - if: github.event_name != 'push' || github.event.before != '707cc48c453fa39544e186f34b967a088b103535' || github.event.head_commit.message != 'Publish verified 0.23 with one-time scoped validation'
-        run: npm run test:minion
-      - if: github.event_name != 'push' || github.event.before != '707cc48c453fa39544e186f34b967a088b103535' || github.event.head_commit.message != 'Publish verified 0.23 with one-time scoped validation'
-        run: npm run test:closing
       - uses: actions/upload-pages-artifact@v4
         with:
           path: dist
+  browser-checks:
+    name: Check ${{ matrix.suite }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - suite: browser compatibility
+            script: scripts/check-browsers.mjs
+          - suite: beauty controls
+            script: scripts/check-beauty.mjs
+          - suite: salon dialogue
+            script: scripts/check-salon-dialogue.mjs
+          - suite: minion
+            script: scripts/check-minion.mjs
+          - suite: closing
+            script: scripts/check-closing.mjs
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium webkit
+      - run: npm run build
+      - run: node ${{ matrix.script }}
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    needs: build
+    needs: [build, browser-checks]
     runs-on: ubuntu-latest
     permissions:
       pages: write
