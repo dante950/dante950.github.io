@@ -1,6 +1,6 @@
 // A convenience lock for the public static demo, not server-side authorization.
 // The shared password itself is never bundled or stored in browser storage.
-export const PASSWORD_CONFIG=Object.freeze({salt:'yachacha-workshop-v1-7ddf1c98-54e8-4e81-a7c3-03c2e7500aa9',iterations:210000,hash:'96688705ef9c66c20b2b351f6cd96ae7f264c8e04e4b9b9255346a1a358dafbc'});
+export const PASSWORD_CONFIG=Object.freeze({"salt":"yachacha-workshop-afc05edf-4663-4b91-b156-bf19e6e373fe","iterations":210000,"hash":"0280e1a2975c1e4e29a30c33734a201def2b5ac45d40456486cf58ffc99f7c85"});
 export async function verifyWorkshopPassword(password,config=PASSWORD_CONFIG){
  if(typeof password!=='string'||!password||password.length>256)return false;
  const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(password),'PBKDF2',false,['deriveBits']);
