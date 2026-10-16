@@ -1,5 +1,5 @@
 import {migrateSalonDialogues,salonDialogueProblems} from './salon-dialogue.js';
-export const FLOW_VERSION='통합 플레이 0.24 · 소환과 중간 점검';
+export const FLOW_VERSION='통합 플레이 0.25 · 화면에서 배우는 첫 손질과 야차';
 export const SALON_EVENTS=[['arrival','손님 등장'],['cut','형태 만들기 요청'],['draw','색·무늬 요청'],['attach','장식 요청'],['best','미용 매우 만족'],['normal','미용 만족'],['fail','미용 불만족'],['proposal','야차 제안'],['afterWin','야차 승리 후 미용실'],['afterLoss','야차 패배 후 미용실'],['leave','손님 퇴장']];
 export function modelRows(p,name){return p.combat.sheets.find(s=>s.name===name)?.rows||[];}
 export function defaultProject(combat,assets){

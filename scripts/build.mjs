@@ -26,18 +26,18 @@ async function bundle(prefix,names){return (await Promise.all(names.map(f=>read(
 
 let combat=await read('src/combat/index.html');
 const css=(await Promise.all(['style.css','story.css','story-stage.css'].map(f=>read('src/combat/'+f)))).join('\n');
-const combatScript=await bundle('src/combat/',['../media.js','text-effects.js','dialogue.js','engine.js','cursor-engine.js','../salon-dialogue.js','workbook-xml.js','workbook.js','versions.js','scene.js','story-scene.js','cursor-scene.js','cursor-ui.js','app.js','bridge.js']);
+const combatScript=await bundle('src/combat/',['../media.js','text-effects.js','dialogue.js','engine.js','cursor-engine.js','../salon-dialogue.js','workbook-xml.js','workbook.js','versions.js','scene.js','story-scene.js','cursor-scene.js','cursor-ui.js','app.js','tutorial.js','bridge.js']);
 const wb=(await fs.readFile(path.join(root,'data/source.xlsx'))).toString('base64');
 const au=(await fs.readFile(path.join(root,'data/source-authoring.xlsm'))).toString('base64');
 const schema=await read('data/schema.json'),assets=await read('src/combat/assets.json');
 const zip=await read('vendor/jszip.min.js'),license=await read('vendor/JSZip-LICENSE.txt');
 combat=combat.replace('<link rel="stylesheet" href="style.css">',()=>`<style>${css}</style>`)
  .replace('<script type="module" src="app.js"></script>',()=>`<script id="host-data" type="application/json">__HOST_JSON__</script><script id="embedded-workbook" type="application/octet-stream">${wb}</script><script id="embedded-authoring" type="application/octet-stream">${au}</script><script id="embedded-schema" type="application/json">${safe(schema)}</script><script id="embedded-assets" type="application/json">${safe(assets)}</script><script>${safe(zip)}</script><script type="module">${safe(combatScript)}</script><script type="text/plain">${safe(license)}</script>`);
-const parentBundle=await bundle('src/',['text-effects.js','combat/dialogue.js','combat/engine.js','salon-dialogue.js','model.js','story-progress.js','play-guides.js','workshop-dialogue.js','publishing.js','owner-access.js','media.js','audio.js','app.js']);
+const parentBundle=await bundle('src/',['text-effects.js','combat/dialogue.js','combat/engine.js','salon-dialogue.js','model.js','story-progress.js','workshop-dialogue.js','publishing.js','owner-access.js','media.js','audio.js','app.js']);
 const reactionStyle=await read('src/beauty-reaction.css');
 const appURL=await emit('app','js',parentBundle),styleURL=await emit('style','css',reactionStyle+'\n'+await read('src/style.css'));
-const beautyResultRuntime=await read('src/salon-beauty-result.js');
-const beautyRules=await bundle('src/',['beauty-rules.js','beauty-shape.js']),beautyRuntime=(await read('src/salon-beauty.js')).replace('/*__BEAUTY_RESULT__*/',()=>beautyResultRuntime);
+const beautyResultRuntime=await read('src/salon-beauty-result.js'),beautyTutorialRuntime=await read('src/salon-tutorial.js');
+const beautyRules=await bundle('src/',['beauty-rules.js','beauty-shape.js']),beautyRuntime=(await read('src/salon-beauty.js')).replace('/*__BEAUTY_RESULT__*/',()=>beautyResultRuntime).replace('/*__BEAUTY_TUTORIAL__*/',()=>beautyTutorialRuntime);
 const salonStyle=await read('src/salon-beauty.css')+'\n'+reactionStyle;
 const inputs={
  'flow-assets':[await emit('assets','json',await read('data/assets.json')),'json'],

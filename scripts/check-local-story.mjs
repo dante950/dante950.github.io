@@ -26,6 +26,7 @@ async function meet(id){
  return frame;
 }
 async function finishBeauty(frame){
+ if(await frame.locator('#beautyTutorialSkip').isVisible())await frame.locator('#beautyTutorialSkip').click();
  for(let i=0;i<5;i++){
   await talk();
   if(await frame.evaluate(()=>beautyDebug.result.active))break;

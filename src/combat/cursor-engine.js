@@ -204,7 +204,7 @@ export class CursorBattle extends Battle {
  tick(ms){
   if(this.paused)return;
   let left=ms;
-  while(left>0){const dt=Math.min(10,left);left-=dt;
+  while(left>0&&!this.paused){const dt=Math.min(10,left);left-=dt;
    if(this.state==='staggerBreak'){
     // Reveal time does not consume pattern, cooldown, or the actual drag window.
     const blocked=this.dialogueBlocking;this.visualTime+=dt;this.dialogues?.tick(dt);

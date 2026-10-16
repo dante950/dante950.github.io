@@ -47,6 +47,7 @@ export async function checkStoryStarts(page,{screenshotPath,checkContinuation=fa
   if(await page.locator('#playGuideDone').isVisible()){await page.locator('#playGuideDone').click();await page.locator('#talkLayer').waitFor();await advanceTalk(page);}
   if(steps){
    await salon.locator('#beautyScreen').waitFor();
+   if(await salon.locator('#beautyTutorialSkip').isVisible())await salon.locator('#beautyTutorialSkip').click();
    assert.equal(await salon.locator('#showBeautyZones').innerText(),'손질 가이드','the guide is available in public story play');
    for(let i=0;i<steps;i++){
     await salon.locator('.beautyNext').click();await page.waitForTimeout(250);await advanceTalk(page);

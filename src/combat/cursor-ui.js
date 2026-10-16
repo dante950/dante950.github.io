@@ -36,9 +36,10 @@ class IntegratedCursorScene extends CursorScene{
   if(b?.dialogueBlocking)message='대화 중 · Enter로 다음 대사';
   g.fillText(message,30,636);
   if(b&&!['opening','staggerBreak'].includes(b.state)){bar(1010,621,235,7,b.attackProgress,1,'#d5c5ff');g.font='12px Malgun Gothic';g.textAlign='right';g.fillText(b.attackReady?'클릭 준비 완료':'공격 준비 중',1244,644);}
-  if(b?.paused){g.fillStyle='#12131bbb';g.fillRect(0,0,1280,650);g.textAlign='center';g.fillStyle='#fff2da';g.font='bold 30px Malgun Gothic';g.fillText('잠시 쉬어가기',640,300);g.font='18px Malgun Gothic';g.fillText('계속하기 또는 Esc',640,340);}
+  if(b?.paused&&!combatLessonActive()){g.fillStyle='#12131bbb';g.fillRect(0,0,1280,650);g.textAlign='center';g.fillStyle='#fff2da';g.font='bold 30px Malgun Gothic';g.fillText('잠시 쉬어가기',640,300);g.font='18px Malgun Gothic';g.fillText('계속하기 또는 Esc',640,340);}
   const miss=b?.cues.filter(c=>c.kind==='miss').at(-1);if(miss&&b.visualTime-miss.visualTime<700){g.textAlign='center';g.fillStyle='#fff0b8';g.font='bold 38px monospace';g.fillText('MISS',this.enemy?.x??962,(this.enemy?.y??534)-280);}
-  if(this.pointer&&!b?.paused){const p=this.pointer,opening=b?.state==='opening',active=b&&!b.dialogueBlocking&&(opening||b.canPunch())&&insideBox(p,this.attackBox);g.globalAlpha=active?1:.4;g.font='34px sans-serif';g.textAlign='center';g.fillStyle=active?'#fff8d5':'#a7a0a3';g.fillText(opening?'✂':'✊',p.x,p.y+8);if(b&&!opening){g.strokeStyle=b.attackReady?'#b0f4cb':'#b5b0df';g.lineWidth=3;g.beginPath();g.arc(p.x,p.y,26,-Math.PI/2,-Math.PI/2+Math.PI*2*b.attackProgress);g.stroke();}}
+  drawCombatLesson(g,b,this);
+  if(this.pointer&&(!b?.paused||combatLessonActive())){const p=this.pointer,opening=b?.state==='opening',active=b&&!b.dialogueBlocking&&(opening||b.canPunch()||combatLessonActive())&&insideBox(p,this.attackBox);g.globalAlpha=active?1:.4;g.font='34px sans-serif';g.textAlign='center';g.fillStyle=active?'#fff8d5':'#a7a0a3';g.fillText(opening?'✂':'✊',p.x,p.y+8);if(b&&!opening){g.strokeStyle=b.attackReady?'#b0f4cb':'#b5b0df';g.lineWidth=3;g.beginPath();g.arc(p.x,p.y,26,-Math.PI/2,-Math.PI/2+Math.PI*2*b.attackProgress);g.stroke();}}
   g.restore();
  }
 }

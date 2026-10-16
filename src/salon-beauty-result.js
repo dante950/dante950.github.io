@@ -41,7 +41,7 @@ function advanceBeautyResult(){
  send('beauty-result',{score:totalSatisfaction,mood:resultMood,portrait:captureBeautyCustomer()});
 }
 function startBeautyResult(){
- if(!ready||finishing||briefing)return;cancelGesture();updateBeautyScore();finishing=true;beautyPhase='result';beautyResultActive=true;
+ if(!ready||finishing||briefing||!beautyLessonDone)return;cancelGesture();updateBeautyScore();finishing=true;beautyPhase='result';beautyResultActive=true;
  resultMood=beautyResultMood(B,shapeProgress,totalSatisfaction);
  eyeReaction.hidden=true;clearTimeout(reactionTimer);clearInterval(reactionTick);reactionOpen=false;
  expression='neutral';talking=false;mouthFrame=false;zonesVisible=false;fallingPieces=[];renderPortrait(false);

@@ -30,6 +30,19 @@
 
 .sculptTools select{color-scheme:light}
 
+/* Tutorial stays below the portrait; the real canvas and tools remain usable. */
+#beautyTutorial{position:absolute;left:233px;right:223px;bottom:8px;z-index:335;padding:10px 13px;background:#fff8eafa;border:2px solid #795843;border-radius:12px;box-shadow:0 4px 15px #35201c44;color:#493627}
+#beautyTutorial small{font-size:9px;color:#8b603d;font-weight:bold}
+#beautyTutorial h3{font-size:14px;line-height:1.4;margin:3px 0}
+#beautyTutorial p{font-size:11px;line-height:1.55;margin:4px 0}
+#beautyTutorial .lessonFeedback{font-size:10px;line-height:1.4;color:#42784a;min-height:14px}
+.lessonButtons{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:7px}
+#beautyTutorial button{border:1px solid #795843;border-radius:6px;padding:5px 10px;font:inherit;font-size:10px;cursor:pointer;background:#fff4e4;color:#493627}
+#beautyTutorialNext{background:#ffc36c!important;font-weight:bold!important}
+#beautyTutorial button:disabled{opacity:.45;cursor:default}
+.lessonTarget{outline:3px solid #f59b30!important;outline-offset:4px;box-shadow:0 0 0 6px #ffe09c80!important}
+.learningBeauty .beautyNext,.learningBeauty .beautyFinish{visibility:hidden}
+
 /* The short memo doubles as live feedback, without listing correct items. */
 .sculptStatus .requestText{margin:12px 0 14px;line-height:1.65}
 .requestItem{display:flex;align-items:flex-start;gap:6px;margin:8px 0}

@@ -11,6 +11,16 @@ function start(id=10001,options={}){
  const b=new CursorBattle(data,()=>0,{motionRng:()=>0});b.start(id,1,{gimmicks:false,...options});b.next=Infinity;return b;
 }
 function open(b){b.stagger=b.settings.staggerMax;assert(b.beginStagger());b.tick(650);assert.equal(b.state,'opening');}
+test('pausing at opening entry preserves the full window even inside a large tick',()=>{
+ const b=start(),open=b.open.bind(b);
+ b.open=()=>{const ok=open();if(ok)b.paused=true;return ok;};
+ b.stagger=b.settings.staggerMax;b.beginStagger();b.tick(1000);
+ assert.equal(b.state,'opening');assert.equal(b.groggyEnd-b.time,3330);
+ const time=b.time,visual=b.visualTime,hp=b.hp;b.tick(5000);
+ assert.equal(b.time,time);assert.equal(b.visualTime,visual);assert.equal(b.hp,hp);
+ assert.equal(b.scratchAttack(true),false);assert.equal(b.openingResult.attempts,0);
+ b.paused=false;b.tick(100);assert.equal(b.groggyEnd-b.time,3230);
+});
 test('click damage and stagger are separate; outside, cooldown, guard and SPACE give no extra attacks',()=>{
  const b=start();assert.equal(b.enemyHP,1000);assert.equal(b.staggerRemaining,100);
  assert.equal(b.basicAttack(false),false);assert.equal(b.attackCooldownLeft,0);
