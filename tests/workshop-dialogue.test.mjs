@@ -4,6 +4,8 @@ import fs from 'node:fs/promises';
 import {combatForWorkbook,mergeWorkshopDialogues} from '../src/workshop-dialogue.js';
 import {salonDialogueGroup,salonDialogueProblems} from '../src/salon-dialogue.js';
 const base=JSON.parse(await fs.readFile(new URL('../data/project.json',import.meta.url),'utf8'));
+const published=structuredClone(base);
+base.guests.find(g=>g.id===10004).workbookExcluded=true; // retain coverage of genuinely excluded preview guests
 const rows=(data,name)=>data.sheets.find(s=>s.name===name).rows;
 
 test('workbook roundtrip excludes only workshop dialogue and restores its edited content',()=>{
@@ -56,3 +58,27 @@ test('conflicting incoming workshop links fail without changing either input',()
  const expected=structuredClone(incoming);
  assert.throws(()=>mergeWorkshopDialogues(p,incoming),/충돌/);assert.deepEqual(incoming,expected);assert.deepEqual(p.combat,before);
 });
+
+ test('published minion dialogue is exported and Excel edits remain authoritative',()=>{
+ const p=structuredClone(published),g=p.guests.find(g=>g.id===10004),data=combatForWorkbook(p);
+ assert.equal(rows(data,'미용 대사 연결').filter(r=>r.MonsterID===g.id).length,3);
+ for(const id of Object.values(g.bindings))assert(rows(data,'대사').some(r=>r.GroupID===id));
+ const request=salonDialogueGroup({...p,combat:data},g.id,'cut').lines[0];request.Text='엑셀에서 수정한 부탁';
+ const reaction=rows(data,'대사').find(r=>r.GroupID===g.bindings.eyeContactLine);reaction.Text='엑셀에서 수정한 항의';
+ const arrival=rows(data,'대사').find(r=>r.GroupID===g.bindings.arrival);arrival.Text='엑셀에서 수정한 방문';
+ const merged=mergeWorkshopDialogues(p,data);
+ assert.equal(rows(merged,'대사').find(r=>r.DialogueID===request.DialogueID).Text,request.Text);
+ assert.equal(rows(merged,'대사').find(r=>r.DialogueID===reaction.DialogueID).Text,reaction.Text);
+ assert.equal(rows(merged,'대사').find(r=>r.DialogueID===arrival.DialogueID).Text,arrival.Text);
+ assert.deepEqual(combatForWorkbook({...p,combat:merged}),merged);
+ });
+ test('old workbook omissions are restored without overwriting existing rows; partial deletions fail',()=>{
+ const old=combatForWorkbook(base),merged=mergeWorkshopDialogues(published,old);
+ for(const sheet of published.combat.sheets){
+  const actual=rows(merged,sheet.name),expected=sheet.rows;
+  assert.deepEqual(actual.map(r=>JSON.stringify(r)).sort(),expected.map(r=>JSON.stringify(r)).sort());
+ }
+ const partial=structuredClone(published.combat),gid=published.guests.find(g=>g.id===10004).bindings.eyeContactLine;
+ partial.sheets.find(s=>s.name==='대화 그룹').rows=rows(partial,'대화 그룹').filter(r=>r.GroupID!==gid);
+ assert.throws(()=>mergeWorkshopDialogues(published,partial),/누락/);
+ });

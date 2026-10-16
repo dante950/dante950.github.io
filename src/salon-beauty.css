@@ -42,6 +42,16 @@
 #beautyTutorial button:disabled{opacity:.45;cursor:default}
 .lessonTarget{outline:3px solid #f59b30!important;outline-offset:4px;box-shadow:0 0 0 6px #ffe09c80!important}
 .learningBeauty .beautyNext,.learningBeauty .beautyFinish{visibility:hidden}
+#beautyLessonOverlay{position:absolute;inset:0;width:100%;height:100%;z-index:330;pointer-events:none;overflow:visible}
+.lessonRing{fill:none;stroke:#fff3aa;stroke-width:2;stroke-dasharray:5 3}
+.lessonTrail{fill:none;stroke:#fff3aa;stroke-width:2;stroke-dasharray:5 4}
+.lessonCursor{fill:#fff;stroke:#795843;stroke-width:2;animation:lessonGesture 2.4s ease-in-out infinite}
+.lessonMapLabel{text-anchor:middle;fill:#fff9df;stroke:#493627;stroke-width:3;paint-order:stroke;font:bold 11px sans-serif}
+@keyframes lessonGesture{0%,15%{transform:translate(var(--lx),var(--ly));opacity:.5}30%{opacity:1}75%,90%{transform:translate(calc(var(--lx) + var(--dx)),calc(var(--ly) + var(--dy)));opacity:1}100%{transform:translate(calc(var(--lx) + var(--dx)),calc(var(--ly) + var(--dy)));opacity:0}}
+.lessonButtons span{font-size:10px;color:#876B51}
+.sculptStickerGhost{position:absolute;z-index:340;width:48px;height:48px;object-fit:contain;image-rendering:pixelated;transform:translate(-50%,-50%);pointer-events:none;filter:drop-shadow(0 2px 2px #0009)}
+.sculptStickers button{touch-action:none;user-select:none}
+@media(prefers-reduced-motion:reduce){.lessonCursor{animation:none;transform:translate(var(--lx),var(--ly))}}
 
 /* The short memo doubles as live feedback, without listing correct items. */
 .sculptStatus .requestText{margin:12px 0 14px;line-height:1.65}

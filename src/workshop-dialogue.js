@@ -1,5 +1,5 @@
-// Workshop guests have no Unity monster contract yet. Keep their salon dialogue
-// in project JSON while the existing workbook editor handles established guests.
+// Only unfinished preview guests are excluded. Established beauty-only guests
+// keep their dialogue in workbooks without inventing combat phases.
 const workshopRows=(data,name)=>data.sheets.find(s=>s.name===name)?.rows||[];
 const workshopIDs=project=>new Set(project.guests.filter(g=>g.previewOnly===true||g.workbookExcluded===true).map(g=>g.id));
 const workshopLinkKey=row=>row.MonsterID+'/'+row.Stage;
@@ -32,7 +32,7 @@ export function combatForWorkbook(project){
  return data;
 }
 export function mergeWorkshopDialogues(project,newCombat){
- const data=structuredClone(newCombat),ids=workshopIDs(project);
+ const data=restoreMissingSalonDialogues(project,newCombat),ids=workshopIDs(project);
  const sourceLinks=workshopRows(project.combat,'미용 대사 연결').filter(r=>ids.has(r.MonsterID));
  if(!sourceLinks.length)return data;
  for(const name of ['미용 대사 연결','대화 그룹','대사'])if(!data.sheets.some(s=>s.name===name)){
@@ -76,6 +76,32 @@ export function mergeWorkshopDialogues(project,newCombat){
    if(usedLines.has(line.DialogueID))throw Error('임시 손님 문장 ID가 충돌합니다: '+line.DialogueID);
    lines.push(structuredClone(line));usedLines.add(line.DialogueID);
   }
+ }
+ return data;
+}
+
+// Older workbooks omitted beauty-only guests altogether. Restore that missing
+// subset, but when links exist the imported workbook text is authoritative.
+export function restoreMissingSalonDialogues(project,incoming){
+ const data=structuredClone(incoming),excluded=workshopIDs(project);
+ for(const guest of project.guests.filter(g=>g.battle==='none'&&!excluded.has(g.id))){
+  const sourceLinks=workshopRows(project.combat,'미용 대사 연결').filter(r=>r.MonsterID===guest.id);
+  const links=workshopRows(data,'미용 대사 연결'),groups=workshopRows(data,'대화 그룹'),lines=workshopRows(data,'대사');
+  const present=links.some(r=>r.MonsterID===guest.id);
+  const ids=new Set([...Object.values(guest.bindings||{}),...workshopGroupIDs(present?links.filter(r=>r.MonsterID===guest.id):sourceLinks)]);
+  for(const id of ids){
+   const target=groups.find(r=>r.GroupID===id),source=workshopRows(project.combat,'대화 그룹').find(r=>r.GroupID===id);
+   if(present&&target){if(!lines.some(r=>r.GroupID===id&&String(r.Text||'').trim()))throw Error('미용 대사 문장이 비어 있습니다: '+id);continue;}
+   if(target){if(workshopGroupContent(data,id)!==workshopGroupContent(project.combat,id))throw Error('이전 엑셀과 미용 대화 ID가 충돌합니다: '+id);continue;}
+   if(present)throw Error('미용 대화 그룹이 누락됐습니다: '+id);
+   if(!source)throw Error('보관할 미용 대화 그룹이 없습니다: '+id);
+   groups.push(structuredClone(source));
+   for(const line of workshopRows(project.combat,'대사').filter(r=>r.GroupID===id)){
+    if(lines.some(r=>r.DialogueID===line.DialogueID))throw Error('이전 엑셀과 미용 문장 ID가 충돌합니다: '+line.DialogueID);
+    lines.push(structuredClone(line));
+   }
+  }
+  if(!present)links.push(...structuredClone(sourceLinks));
  }
  return data;
 }

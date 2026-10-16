@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 async function advanceTalk(page){
  for(let i=0;i<120;i++){
+  if(await page.locator('#beautyChoiceSkip').isVisible())await page.locator('#beautyChoiceSkip').click();
+  if(await page.locator('#beautyChoices').isVisible()){await page.locator('#beautyAccept').click();await page.waitForTimeout(100);continue;}
   if(!await page.locator('#talkLayer').isVisible()){
    await page.waitForTimeout(350);
    if(!await page.locator('#talkLayer').isVisible())return;

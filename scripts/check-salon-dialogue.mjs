@@ -41,7 +41,7 @@ try{for(const [name,engine] of Object.entries({chromium,webkit})){
     const bytes=Uint8Array.from(atob(document.getElementById(id).textContent.trim()),c=>c.charCodeAt(0));const b=lab.OfflineBook.create(),d=await b.load(bytes,id==='embedded-authoring'?'source.xlsm':'source.xlsx');
     const sheet=d.sheets.find(s=>s.name==='미용 대사 연결');results.push(sheet.rows.map(r=>sheet.keys.map(k=>r[k])));
    }return results;
-  });assert.equal(parsed[0].length,6);assert.deepEqual(parsed[0],parsed[1]);
+  });assert.equal(parsed[0].length,9);assert.equal(parsed[0].filter(r=>r[0]===10004).length,3);assert.deepEqual(parsed[0],parsed[1]);
   await child.locator('[data-sheet="대사"]').click();await child.locator('#filter').fill('900014');
   const revised='엑셀 대사 연결 확인. 첫 번째 문장.';await child.locator('td[data-key="Text"] textarea').fill(revised);await child.locator('td[data-key="Text"] textarea').blur();
   await page.locator('#editorScreen [data-editor="dialogue"]').click();await page.locator('#dialogueEvent').selectOption('cut');assert.equal(await page.locator('#beautyRequestText').inputValue(),revised);

@@ -1,3 +1,4 @@
+import {migrateBeautyReactions} from './beauty-reaction-dialogue.js';
 // Beauty requests share the existing Dialogue/DialogueGroup tables with other dialogue.
 export const SALON_DIALOGUE_STAGES=['cut','draw','attach'];
 export const SALON_DIALOGUE_KEYS=['MonsterID','Stage','RequestGroupID','DetailGroupID'];
@@ -34,7 +35,7 @@ export function salonDialogueProblems(p){
 // Never regenerate a present table: imported Excel links and text are authoritative.
 export function migrateSalonDialogues(p){
  if(!p?.combat?.sheets||!Array.isArray(p.guests))return p;
- if(p.combat.sheets.some(s=>s.name==='미용 대사 연결')){clearLegacySalonText(p);return p;}
+ if(p.combat.sheets.some(s=>s.name==='미용 대사 연결')){clearLegacySalonText(p);return migrateBeautyReactions(p);}
  const groups=salonRows(p,'대화 그룹'),lines=salonRows(p,'대사');
  if(!groups.length||!lines.length)return p;
  const links={name:'미용 대사 연결',excelName:'미용 대사 연결',headerRow:3,description:'손님·미용 단계마다 처음 부탁과 네? 선택 후 자세한 부탁의 대화 그룹을 연결합니다.',keys:SALON_DIALOGUE_KEYS.slice(),labels:['손님 ID','미용 단계','처음 부탁 그룹 ID','자세한 부탁 그룹 ID'],notes:{Stage:'cut=형태 만들기,draw=색·무늬 꾸미기,attach=장식 붙이기'},fieldTypes:{MonsterID:'int',Stage:'string',RequestGroupID:'int',DetailGroupID:'int'},formulaKeys:[],rows:[]};
@@ -59,6 +60,6 @@ export function migrateSalonDialogues(p){
  }
  p.combat.sheets.push(links);
  clearLegacySalonText(p);
- return p;
+ return migrateBeautyReactions(p);
 }
 function clearLegacySalonText(p){for(const g of p.guests.filter(g=>g.beauty?.enabled)){for(const k of ['request','drawHint','attachHint','requestDetails'])delete g.beauty[k];for(const stage of SALON_DIALOGUE_STAGES)if(g.bindings)delete g.bindings[stage];}}

@@ -1,7 +1,7 @@
 {
   "format": "YACHACHA_FULLFLOW",
   "schemaVersion": 1,
-  "version": 14,
+  "version": 15,
   "updatedAt": "2026-10-16T12:52:04.029Z",
   "combat": {
     "version": 4,
@@ -2017,116 +2017,58 @@
         "formulaKeys": [],
         "rows": [
           {
-            "DialogueID": 900002,
+            "DialogueID": 900005,
             "GroupID": 80001,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "으어어...안녕하십니까...지원자 11번...아, 미용실이지...",
-            "Notes": "기존 좀비 원문"
-          },
-          {
-            "DialogueID": 900003,
-            "GroupID": 80001,
-            "Order": 2,
-            "Speaker": "플레이어",
-            "Text": "얏호―! 어서오세요. 그런데 거긴 거울이에요. 저는 옆에 있는데요?",
-            "Notes": "기존 좀비 원문"
-          },
-          {
-            "DialogueID": 900004,
-            "GroupID": 80001,
-            "Order": 3,
-            "Speaker": "몬스터",
-            "Text": "아… 어쩐지… 같이 인사를 해주시더라니...",
-            "Notes": "기존 좀비 원문"
-          },
-          {
-            "DialogueID": 900005,
-            "GroupID": 80001,
-            "Order": 4,
-            "Speaker": "몬스터",
-            "Text": "아무튼… 내일 좀비 보험회사 면접이 있어서요… 죽고 나서 처음 잡힌 면접이에요…",
-            "Notes": "기존 좀비 원문"
+            "Text": "<wave=1>으어... <wait=0.35>내, <wait=0.25>내일 언데드 보험회사?<wait=0.25> 면접이 있거든요...</wave>",
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900006,
             "GroupID": 80001,
-            "Order": 5,
+            "Order": 3,
             "Speaker": "플레이어",
-            "Text": "보험이요...? 좀비는 보험이 필요없지 않나?",
-            "Notes": "기존 좀비 원문"
+            "Text": "언데드가 보험? <pulse=1.15>이미 죽었는데 보험이 필요 있나?</pulse>",
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900007,
             "GroupID": 80001,
-            "Order": 6,
+            "Order": 4,
             "Speaker": "몬스터",
-            "Text": "어허, 그거 종족차별 발언입니다...! 요새 그런 말 하면... 큰일나요...",
-            "Notes": "기존 좀비 원문"
+            "Text": "<wave=1>어, 어허!<wait=0.25> 그건</wave> <shake=1>종족차별,<wait=0.25> 발언</shake><wave=1>입니다...!</wave>",
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900008,
             "GroupID": 80001,
-            "Order": 7,
+            "Order": 5,
             "Speaker": "플레이어",
-            "Text": "(별 귀찮은 것도 다 있네~) 알았다구요~ 원하는 스타일은 있나요?",
-            "Notes": "기존 좀비 원문"
-          },
-          {
-            "DialogueID": 900009,
-            "GroupID": 80001,
-            "Order": 8,
-            "Speaker": "몬스터",
-            "Text": "지난번엔 면접관님 눈을 보고 대답하라길래… 한참 열심히 했거든요…",
-            "Notes": "기존 좀비 원문"
-          },
-          {
-            "DialogueID": 900010,
-            "GroupID": 80001,
-            "Order": 9,
-            "Speaker": "플레이어",
-            "Text": "그런데요?",
-            "Notes": "기존 좀비 원문"
-          },
-          {
-            "DialogueID": 900011,
-            "GroupID": 80001,
-            "Order": 10,
-            "Speaker": "몬스터",
-            "Text": "면접관님은 옆에 계셨대요… 저는 공기청정기한테… 입사 포부를…",
-            "Notes": "기존 좀비 원문"
-          },
-          {
-            "DialogueID": 900012,
-            "GroupID": 80001,
-            "Order": 11,
-            "Speaker": "플레이어",
-            "Text": "O.K~ 이해 완료! 앞이 보이게 해 드리면 되는 거죠?",
-            "Notes": "기존 좀비 원문"
-          },
-          {
-            "DialogueID": 900013,
-            "GroupID": 80001,
-            "Order": 12,
-            "Speaker": "몬스터",
-            "Text": "부탁드려요… 이번엔 정말… 산 사람처럼 살고 싶어서요…",
-            "Notes": "기존 좀비 원문"
+            "Text": "알았다구요~ 원하는 스타일은 있나요?",
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900014,
             "GroupID": 80002,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "으어어... 내일 면접인데... <color=#266B4D>앞이 좀 환해지고</color>,\n<color=#9A4935>민망한 곳은 안 보였으면</color> 좋겠어요...",
-            "Notes": "미용 요구 · 선택지 연결"
+            "Text": "으어어... 내,<wait=0.25> 내일 면접이니까... <color=#266B4D>앞이 좀 환해지고</color>,<wait=0.25>\n<color=#9A4935>미, <wait=0.25>민망한 곳은 안 보였으면</color> 좋겠어요...",
+            "Notes": "미용 요구 · 선택지 연결",
+            "__source": null
           },
           {
             "DialogueID": 900015,
             "GroupID": 80003,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "<color=#266B4D>두 눈이 잘 보이게</color> 앞머리를 잘라 주세요...\n아, <color=#9A4935>튀어나온 뇌는 머리카락으로 가려</color> 주시고요... <wave=1.2>부탁드립니다...</wave>",
-            "Notes": "미용 요구 · 선택지 연결"
+            "Text": "아, <wait=0.25>앞머리를 좀,<wait=0.25> 잘라서<wait=0.25> <color=#266B4D>두 눈이 잘 보이게</color>,<wait=0.25> 좀 해 주세요...\n<color=#9A4935>뇌,<wait=0.25> 뇌가 좀 튀어나와서...<wait=0.35> 머리카락으로 가려</color> 주시고요...<wait=0.35> <wave=1.2>부,<wait=0.25> 부탁드립니다,<wait=0.25> 으어...</wave>",
+            "Notes": "미용 요구 · 선택지 연결",
+            "__source": null
           },
           {
             "DialogueID": 900016,
@@ -2134,47 +2076,53 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "아니, 앞이 안 보인다고요! 당장 '가위'를 들어서 내 눈을 가리는 앞머리를 싹 다 잘라달란 말입니다!",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900017,
             "GroupID": 80005,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "으어어… 이게 제 눈이었군요…! 거울 속에 아주 준비된 인재가 한 명 서 있는데요…",
-            "Notes": "기존 좀비 원문"
+            "Text": "으어어…<wait=0.35> 제 눈을 직접 본 건...<wait=0.35> 죽은 뒤로 처음이에요,<wait=0.25> 으어...",
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900018,
             "GroupID": 80006,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "으어어… 일단 앞은 보이네요… 면접관이 한 분만 오시면 딱 좋겠어요…",
-            "Notes": "기존 좀비 원문"
+            "Text": "으어어…<wait=0.35> 이, <wait=0.25>일단 앞은 보이네요… <wait=0.35>이 정도면 면접관님은 보이겠어요...<wait=0.35>",
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900019,
             "GroupID": 80007,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "으어어어! 이게 머립니까?? 이 꼴을 하고 면접을 가라고요?! 안 되겠다, 이대론 돈 못 냅니다!",
-            "Notes": "기존 좀비 원문"
+            "Text": "<shake=1.4>으어... <wait=0.35>으어?<wait=0.35> 으어어어어!!!!!</shake>",
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900020,
             "GroupID": 80008,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "머리도 잘 됐겠다, 제 기세를 한 번 시험해 주시겠어요? 면접 때 자신있게 싸울... 아니 말할 수 있는지 봐주시면 됩니다.",
-            "Notes": "기존 좀비 원문"
+            "Text": "머,<wait=0.25> 머리도 잘 됐는데... <wait=0.35>하,<wait=0.25> 한 번 기세를, <wait=0.25>제 기세를 시험해 주시겠습니까...?<wait=0.35> 으어,<wait=0.25> 면접 때 잘 싸울 수,<wait=0.25> 아,<wait=0.25> 아니 말할 수 있는지......",
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900021,
             "GroupID": 80008,
             "Order": 2,
             "Speaker": "몬스터",
-            "Text": "연습 야차 상대를... 부탁드린다는 뜻입니다... 저를 이기시면... 보상은 두둑히 드릴게요...",
-            "Notes": "기존 좀비 원문"
+            "Text": "그, <wait=0.25>그니까 이게,<wait=0.25> 여,<wait=0.25> 연습 야차 상대를...<wait=0.35> 부탁드린다고요... <wait=0.35>이기면 호, <wait=0.25>홍보라도 해 드릴게요...<wait=0.35> 으어...",
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900022,
@@ -2182,7 +2130,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "머리도 됐으니... 제 기세를 한 번 시험해 주시겠어요? 면접 때 자신있게 싸울... 아니 말할 수 있는지 봐주시면 됩니다.",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900023,
@@ -2190,7 +2139,8 @@
             "Order": 2,
             "Speaker": "몬스터",
             "Text": "연습 야차 상대를... 부탁드린다는 뜻입니다...저를 이기시면... 돈은 더 드릴게요…",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900024,
@@ -2198,7 +2148,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "가위 내려놓으실래요? 제가 면접관이라 생각하고 대답해 보세요. 제 머리... 왜 이렇게 하셨죠?",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900025,
@@ -2206,7 +2157,8 @@
             "Order": 2,
             "Speaker": "몬스터",
             "Text": "마왕 법전 제 666조! 야차룰로 정하죠. 제가 이기면... 배상하시는 겁니다!!!",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900026,
@@ -2214,7 +2166,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "으어어... 제가 대인배라 넘어갑니다... 다른 손님에겐 이렇게 하지 마세요...",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900027,
@@ -2222,7 +2175,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "으... 어쩔 수 없죠. 저도 면접 볼 체력을 아끼는 걸로 할게요. 머리 잘 해주셔서 감사합니다...",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900028,
@@ -2230,7 +2184,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "으... 어쩔 수 없죠. 저도 면접 볼 체력을 아끼는 걸로 할게요. 감사합니다...",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900029,
@@ -2238,7 +2193,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "감사합니다…! 실수로 물어도 이해해주세요… 물고 늘어지는 건 제 장점이라...",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900030,
@@ -2246,143 +2202,134 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "감사합니다…! 실수로 물어도 이해해주세요… 물고 늘어지는 건 제 장점이라...",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900031,
             "GroupID": 80016,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "안녕하십니까…! 한번 맡은 일은 죽어서도 놓지 않는 지원자… 으어어… 실제로 죽어봤습니다!",
-            "Notes": "기존 좀비 원문"
+            "Text": "으어어...<wait=0.35> 안녕하십니까…!<wait=0.25> 하,<wait=0.25> 한번 맡은 일은 죽어서도 노, <wait=0.25>놓지 않는 지원자… <wait=0.35>으어어…<wait=0.35> 실제로 죽어봤습니다!",
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900032,
             "GroupID": 80017,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "변명은 됐습니다… 저도 이빨 좀 쓰겠습니다!",
-            "Notes": "기존 좀비 원문"
+            "Text": "변명은 됐습니다…<wait=0.35> 저도 이빨 좀 쓰겠습니다!",
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900033,
             "GroupID": 80018,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "제 강점은… 끈질긴 후속 연락입니다…!",
-            "Notes": "기존 좀비 원문"
+            "Text": "제, <wait=0.25>제 강점은… <wait=0.35>끈질긴 후속 연락입니다…!",
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900034,
             "GroupID": 80018,
             "Order": 2,
             "Speaker": "몬스터",
-            "Text": "정시 출근... 아니, 정시 타격입니다!",
-            "Notes": "기존 좀비 원문"
+            "Text": "정시 출근...<wait=0.35> 아니,<wait=0.25> 정시 타격입니다...!",
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900035,
             "GroupID": 80019,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "이건... 고객 피드백입니다...!",
-            "Notes": "기존 좀비 원문"
+            "Text": "이건...<wait=0.35> 고객 피드백입니다...!",
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900036,
             "GroupID": 80019,
             "Order": 2,
             "Speaker": "몬스터",
-            "Text": "서류 30번 떨어진 한... 받아라!!",
-            "Notes": "기존 좀비 원문"
+            "Text": "서류 30번 떨어진 한...<wait=0.35> 받아라!!",
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900037,
             "GroupID": 80020,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "으어어… 머리만은 건드리지 말아주세요…!",
-            "Notes": "기존 좀비 원문"
+            "Text": "으어어…<wait=0.35> 머리만은 건드리지 말아주세요…!",
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900038,
             "GroupID": 80021,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "커헉... 스펙이 너무 높아...",
-            "Notes": "기존 좀비 원문"
+            "Text": "커헉... <wait=0.35>스펙이 너무 높아...",
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900039,
             "GroupID": 80022,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "제 기세에 압도되셨군요...!",
-            "Notes": "기존 좀비 원문"
+            "Text": "제,<wait=0.25> 제 기세에,<wait=0.25> 압도되셨군요...!",
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900040,
             "GroupID": 80023,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "벌써 지치셨습니까? 감점 들어갑니다.",
-            "Notes": "기존 좀비 원문"
+            "Text": "버, <wait=0.25>벌써 지치셨,<wait=0.25> 습니까?<wait=0.35> 감점 들어갑니다.",
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900041,
             "GroupID": 80024,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "이럴 수가... 머리도 잃고 돈도 잃다니... 으어어...",
-            "Notes": "기존 좀비 원문"
+            "Text": "으어어... <wait=0.25>지, <wait=0.25>지금 보니 이 머리도 괜찮네요...",
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900042,
             "GroupID": 80025,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "약속대로... 돈은 돌려받겠습니다...",
-            "Notes": "기존 좀비 원문"
+            "Text": "약속대로...<wait=0.35> 돈은 돌려받겠습니다...",
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900043,
             "GroupID": 80026,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "역시 이 정도는 되어야... 취업 성공하는 거군요... 리스펙합니다.",
-            "Notes": "기존 좀비 원문"
+            "Text": "여, 역시 이 정도는 되어야... <wait=0.35>취업 성공하는 거군요...<wait=0.35> 리스펙합니다.",
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900044,
             "GroupID": 80027,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "으어어! 이 기세로 합격까지 갑니다!",
-            "Notes": "기존 좀비 원문"
-          },
-          {
-            "DialogueID": 900045,
-            "GroupID": 80028,
-            "Order": 1,
-            "Speaker": "몬스터",
-            "Text": "으어어… 머리도 단정하고… 두들겨 맞아서 어깨 힘도 빠졌네요… 면접 준비 끝났어요…",
-            "Notes": "기존 좀비 원문"
-          },
-          {
-            "DialogueID": 900046,
-            "GroupID": 80028,
-            "Order": 2,
-            "Speaker": "플레이어",
-            "Text": "긴장 덜고 웃음 MAX로 승부보는 거예요~! 얏호~!",
-            "Notes": "기존 좀비 원문"
-          },
-          {
-            "DialogueID": 900047,
-            "GroupID": 80028,
-            "Order": 3,
-            "Speaker": "몬스터",
-            "Text": "네… 계약서는 물지 않고… 서명받겠습니다…",
-            "Notes": "기존 좀비 원문"
+            "Text": "으어어어! <wait=0.35>이 기세로 합격까지,<wait=0.25> 갑니다!",
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900048,
@@ -2390,7 +2337,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "으어… 머리도 잘됐고… 태어나서 처음으로 자신감이 생겼어요… 죽은 뒤에 생기긴 했지만…",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900049,
@@ -2398,7 +2346,8 @@
             "Order": 2,
             "Speaker": "플레이어",
             "Text": "그 자신감으로 내일은 말로 설득 가보자고요~!!",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900050,
@@ -2406,7 +2355,8 @@
             "Order": 3,
             "Speaker": "몬스터",
             "Text": "네... 그럼 안녕히...",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900051,
@@ -2414,7 +2364,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "으어어…머리가 헝클어졌네... 내일도 이러면 어떡하죠…",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900052,
@@ -2422,7 +2373,8 @@
             "Order": 2,
             "Speaker": "플레이어",
             "Text": "초~ 큐트한 키라키라★리본 머리핀 있는데 드릴까요?",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900053,
@@ -2430,7 +2382,8 @@
             "Order": 3,
             "Speaker": "몬스터",
             "Text": "아니요... 친근한 인상으로 승부해볼게요...",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900054,
@@ -2438,7 +2391,8 @@
             "Order": 4,
             "Speaker": "몬스터",
             "Text": "그럼 안녕히…",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900055,
@@ -2446,7 +2400,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "으어어… 어찌저찌 이겼으니… 내일 면접도 어떻게든 되겠죠…",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900056,
@@ -2454,7 +2409,8 @@
             "Order": 2,
             "Speaker": "플레이어",
             "Text": "에에~ 면접이랑 싸움은 별개쟝~",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900057,
@@ -2462,7 +2418,8 @@
             "Order": 3,
             "Speaker": "몬스터",
             "Text": "그건 그렇죠... 어쨌든 감사합니다...",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900058,
@@ -2470,7 +2427,8 @@
             "Order": 4,
             "Speaker": "몬스터",
             "Text": "그럼 안녕히…",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900059,
@@ -2478,7 +2436,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "으어어… 내일 이 머리 얘기가 나오면… 뭐라고 해야 할까요…",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900060,
@@ -2486,7 +2445,8 @@
             "Order": 2,
             "Speaker": "플레이어",
             "Text": "초- 신선한 유행의 선두주자― 인데스케도 면접관이 사람 보는 눈이 없는 거네~",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900061,
@@ -2494,7 +2454,8 @@
             "Order": 3,
             "Speaker": "몬스터",
             "Text": "새로운 시도를 두려워하지 않는다는 거죠... 어떻게든 해볼게요...",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900062,
@@ -2502,7 +2463,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "으어어… 내일 이 머리 얘기가 나오면… 뭐라고 해야 하지…",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900063,
@@ -2510,7 +2472,8 @@
             "Order": 2,
             "Speaker": "플레이어",
             "Text": "초- 신선한 유행의 선두주자― 인데스케도 면접관이 사람 보는 눈이 없는 거네~",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900064,
@@ -2518,7 +2481,8 @@
             "Order": 3,
             "Speaker": "몬스터",
             "Text": "........상당히 뻔뻔하시네요… 으어어….어떻게든 되겠죠…",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900065,
@@ -2526,7 +2490,8 @@
             "Order": 4,
             "Speaker": "몬스터",
             "Text": "이번에도 탈락하면... 대체 언제.....하아…",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900066,
@@ -2534,7 +2499,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "으어... 취직했다... 앞머리도 방구석 생활도 해방됨...... 몇달만에 사람 얼굴 제대로 보는 느낌ㅠㅠ #몬스터헤어살롱 덕분에 붙은 것 같아요 감사합니다. 모두 기 받아가세요! #취업성공 #취준생 #화이팅",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900067,
@@ -2542,7 +2508,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "역시나 면접 떨어졌다….. #취준생 #절규 #미용실저주함 돈도 잃고 머리도 잃음",
-            "Notes": "기존 좀비 원문"
+            "Notes": "기존 좀비 원문",
+            "__source": null
           },
           {
             "DialogueID": 900068,
@@ -2550,7 +2517,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "<wave=3 speed=5><color=#FFD166><size=24>으하하하!</size></color> 오랜만이구먼, <color=#FFDA8A>제이!!</color></wave><wait=0.25> 미용실에 불이 켜졌길래... 드디어 돌아온 줄 알았지!",
-            "Notes": "취객의 가업·제이·몬스터 소울을 떠올리는 단서. 실제 해금·튜토리얼은 야차 이후 미용실에서 진행."
+            "Notes": "취객의 가업·제이·몬스터 소울을 떠올리는 단서. 실제 해금·튜토리얼은 야차 이후 미용실에서 진행.",
+            "__source": null
           },
           {
             "DialogueID": 900070,
@@ -2558,7 +2526,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "<shake=2 speed=15 dur=0.45>어이쿠!</shake><wait=0.3> 손맛 한번 여전하구먼.<wave=2 speed=4> 근데 제이, 자네... 원래 둘이었나?</wave>",
-            "Notes": "색·동작 태그는 문자 효과 규칙 시트 참고."
+            "Notes": "색·동작 태그는 문자 효과 규칙 시트 참고.",
+            "__source": null
           },
           {
             "DialogueID": 900071,
@@ -2566,7 +2535,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "어...<wait=0.4> <color=#A9E4DA>이제 한 명으로 보이네.</color> 제이가... 아니군.<wait=0.45> 미용실에 불이 들어왔길래, 그 녀석인 줄 알았어.",
-            "Notes": "취객의 가업·제이·몬스터 소울을 떠올리는 단서. 실제 해금·튜토리얼은 야차 이후 미용실에서 진행."
+            "Notes": "취객의 가업·제이·몬스터 소울을 떠올리는 단서. 실제 해금·튜토리얼은 야차 이후 미용실에서 진행.",
+            "__source": null
           },
           {
             "DialogueID": 900072,
@@ -2574,7 +2544,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "허... 막일할 때도 굳어 있던 손이...<wait=0.4> 이 감각, <color=#FFD166>소울을 벼리던 때</color>랑 닮았구먼.<wait=0.3> 제이가 봤으면 또 실실 웃었겠어!",
-            "Notes": "취객의 가업·제이·몬스터 소울을 떠올리는 단서. 실제 해금·튜토리얼은 야차 이후 미용실에서 진행."
+            "Notes": "취객의 가업·제이·몬스터 소울을 떠올리는 단서. 실제 해금·튜토리얼은 야차 이후 미용실에서 진행.",
+            "__source": null
           },
           {
             "DialogueID": 900073,
@@ -2582,7 +2553,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "<shake=2 speed=16 dur=0.4>크하!</shake> ...<wait=0.4><color=#B7F4D0>다 깼다, 다 깼어!</color>\n옛 솜씨도 술에 몽땅 절여진 줄 알았더니! <pulse=1.1 speed=7>아직 쓸 만하구먼! 으하하하!</pulse>",
-            "Notes": "취객의 가업·제이·몬스터 소울을 떠올리는 단서. 실제 해금·튜토리얼은 야차 이후 미용실에서 진행."
+            "Notes": "취객의 가업·제이·몬스터 소울을 떠올리는 단서. 실제 해금·튜토리얼은 야차 이후 미용실에서 진행.",
+            "__source": null
           },
           {
             "DialogueID": 900074,
@@ -2590,7 +2562,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "우리 집안은 <color=#FFD166>몬스터 소울을 장비와 기술로 벼렸지.</color> 세상은 바뀌고, 찾는 이도 줄고...<wait=0.4> 제이까지 사라지고 나니 더 붙들 이유가 없더군.",
-            "Notes": "취객의 가업·제이·몬스터 소울을 떠올리는 단서. 실제 해금·튜토리얼은 야차 이후 미용실에서 진행."
+            "Notes": "취객의 가업·제이·몬스터 소울을 떠올리는 단서. 실제 해금·튜토리얼은 야차 이후 미용실에서 진행.",
+            "__source": null
           },
           {
             "DialogueID": 900075,
@@ -2598,87 +2571,98 @@
             "Order": 2,
             "Speaker": "몬스터",
             "Text": "그런데 그 미용실에 <color=#B7F4D0>다시 불이 켜졌어.</color><wait=0.4> 내 손도 아직 기억하고 있고. 돌아가세. 자네한테 보여줄 게 떠올랐거든! <wave=2 speed=6><color=#FFD166>으하하하!</color></wave>",
-            "Notes": "취객의 가업·제이·몬스터 소울을 떠올리는 단서. 실제 해금·튜토리얼은 야차 이후 미용실에서 진행."
+            "Notes": "취객의 가업·제이·몬스터 소울을 떠올리는 단서. 실제 해금·튜토리얼은 야차 이후 미용실에서 진행.",
+            "__source": null
           },
           {
             "DialogueID": 900069,
             "GroupID": 80037,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "헤헤.<wait=0.35> 오늘은... <color=#8BE9FD>가볍게</color> 가자고, 친구.",
-            "Notes": "색·동작 태그는 문자 효과 규칙 시트 참고."
+            "Text": "헤.<wait=0.35> 오늘은... <wait=0.25><color=#8BE9FD>가볍게</color> 가자고,<wait=0.25> 친구. <wait=0.35> 내 <color=#1900d6>파란 공격</color>은 알고 있겠지?",
+            "Notes": "색·동작 태그는 문자 효과 규칙 시트 참고.",
+            "__source": null
           },
           {
             "DialogueID": 900076,
             "GroupID": 80043,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "...하하.. 친구..<wait=0.4> 나한텐 <color=#8BE9FD>무용지물</color>일 텐데..?",
-            "Notes": "색·동작 태그는 문자 효과 규칙 시트 참고."
+            "Text": "뭐야? <wait=0.35>그럼 내가 <wave=2>가만히 서서 맞아줄 줄 알았어?</wave>",
+            "Notes": "색·동작 태그는 문자 효과 규칙 시트 참고.",
+            "__source": null
           },
           {
             "DialogueID": 900077,
             "GroupID": 80044,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "이 정도는 맞아줄 수 있지.",
-            "Notes": "색·동작 태그는 문자 효과 규칙 시트 참고."
+            "Text": "어라? <wait=0.35><wave=1.4>여기서 맞으면 안 되지 않나?</wave>",
+            "Notes": "색·동작 태그는 문자 효과 규칙 시트 참고.",
+            "__source": null
           },
           {
             "DialogueID": 900078,
             "GroupID": 80045,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "헤헤... 같은 수는 두 번 안 통한다고.<wait=0.35> ...방금 건 <color=#8BE9FD>연습</color>이었지?",
-            "Notes": "색·동작 태그는 문자 효과 규칙 시트 참고."
+            "Text": "너, <wait=0.25>그, <wait=0.25><pulse=1.15>그거 휘두르는 거 진짜 좋아하는구나, <wait=0.25>응?</pulse>",
+            "Notes": "색·동작 태그는 문자 효과 규칙 시트 참고.",
+            "__source": null
           },
           {
             "DialogueID": 900079,
             "GroupID": 80046,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "<shake=0.7>쉬엄쉬엄 하자고, 친구.</shake>",
-            "Notes": "색·동작 태그는 문자 효과 규칙 시트 참고."
+            "Text": "<shake=2>으악!!</shake><wait=0.5> <wave=1>크흠, <wait=0.25>큼,<wait=0.25> 그러니까, </wave><wait=0.35>아무것도 아니었어, 헤.",
+            "Notes": "색·동작 태그는 문자 효과 규칙 시트 참고.",
+            "__source": null
           },
           {
             "DialogueID": 900080,
             "GroupID": 80047,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "잠깐..<wait=0.25> <shake=1.4>날 정말 죽일 셈이야?</shake>",
-            "Notes": "색·동작 태그는 문자 효과 규칙 시트 참고."
+            "Text": "<wave=1>잠깐... <wait=0.25>친구야,</wave><wait=0.25> <shake=1.4>나 기억 안 나?</shake><wait=0.5> <shake=1.4>그냥 다 잊어버리자고,<wait=0.25> 알겠지?</shake>",
+            "Notes": "색·동작 태그는 문자 효과 규칙 시트 참고.",
+            "__source": null
           },
           {
             "DialogueID": 900081,
             "GroupID": 80048,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "이래서..<wait=0.4> <shake=1.2><color=#FF9797>눈치 빠른 꼬맹이들이 정말 싫어.</color></shake>",
-            "Notes": "색·동작 태그는 문자 효과 규칙 시트 참고."
+            "Text": "그냥...<wait=0.4> <shake=1.2>닮지 않았다고만 하지 말아줘.</shake>",
+            "Notes": "색·동작 태그는 문자 효과 규칙 시트 참고.",
+            "__source": null
           },
           {
             "DialogueID": 900082,
             "GroupID": 80049,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "<wave=2 speed=5><color=#B7F4D0>으어어...</color></wave> 손 좀 빌려주세요.<wait=0.25> 아, <shake=2 dur=0.4>떼어드리진 말구요!</shake>",
-            "Notes": "전투 중 대사. 등장·미용 과정 대사는 보류."
+            "Text": "<wave=2 speed=5><color=#B7F4D0>으어어...<wait=0.35></color></wave> 손 좀 빌려주세요.<wait=0.35> 아, <wait=0.25><shake=2 dur=0.4>떼어주시진 말고...!</shake>",
+            "Notes": "전투 중 대사. 등장·미용 과정 대사는 보류.",
+            "__source": null
           },
           {
             "DialogueID": 900083,
             "GroupID": 80049,
             "Order": 2,
             "Speaker": "몬스터",
-            "Text": "<color=#FFD166>끈기</color> 하나는 자신 있습니다!<wait=0.3> <wave=2 speed=5>죽어서도 출근하잖아요...</wave>",
-            "Notes": "전투 중 대사. 등장·미용 과정 대사는 보류."
+            "Text": "<color=#FFD166>끈기<wait=0.25></color>, 하나는 자신 있습니다...!<wait=0.3> <wave=2 speed=5>죽어서도 출근하잖아요...</wave>",
+            "Notes": "전투 중 대사. 등장·미용 과정 대사는 보류.",
+            "__source": null
           },
           {
             "DialogueID": 900084,
             "GroupID": 80050,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "잠깐...<wait=0.25> <shake=2 speed=16 dur=0.5>뼈 때리시면!</shake> <color=#FFD166>진짜 뼈 맞는다구요!</color>",
-            "Notes": "전투 중 대사. 등장·미용 과정 대사는 보류."
+            "Text": "잠깐...<wait=0.25> <shake=2 speed=16 dur=0.5>뼈 때리시면...!<wait=0.25></shake> <color=#FFD166>지, <wait=0.25>진짜 뼈 맞는다고요...!</color>",
+            "Notes": "전투 중 대사. 등장·미용 과정 대사는 보류.",
+            "__source": null
           },
           {
             "DialogueID": 900085,
@@ -2686,7 +2670,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "<cps=15>끝난 줄... 아셨죠?</cps><wait=0.5> <color=#B7F4D0><size=23>좀비는 다시 부활한다구요!</size></color>\n<shake=3 speed=16 dur=0.8><wave=3 speed=5>으어어어..!</wave></shake>",
-            "Notes": "전투 중 대사. 등장·미용 과정 대사는 보류."
+            "Notes": "전투 중 대사. 등장·미용 과정 대사는 보류.",
+            "__source": null
           },
           {
             "DialogueID": 900086,
@@ -2694,7 +2679,8 @@
             "Order": 2,
             "Speaker": "몬스터",
             "Text": "<color=#FFD166>재도전</color>에는 자신 있습니다.<wait=0.35> 취업도...<wait=0.5> 이렇게 쉽게 부활하면 좋을 텐데요.",
-            "Notes": "전투 중 대사. 등장·미용 과정 대사는 보류."
+            "Notes": "전투 중 대사. 등장·미용 과정 대사는 보류.",
+            "__source": null
           },
           {
             "DialogueID": 900087,
@@ -2702,7 +2688,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "<wave=2 speed=3>으어어...</wave><wait=0.4> 오늘은 여기까지...\n<color=#B7F4D0>재도전도 휴식이 필요하다구요.</color>",
-            "Notes": "전투 중 대사. 등장·미용 과정 대사는 보류."
+            "Notes": "전투 중 대사. 등장·미용 과정 대사는 보류.",
+            "__source": null
           },
           {
             "DialogueID": 900088,
@@ -2710,39 +2697,44 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "<color=#FFD166>끈기 있는 지원자!</color> 저, 맞죠?<wait=0.3> <wave=2 speed=5>으허허... 아직 쓸 만하네요!</wave>",
-            "Notes": "전투 중 대사. 등장·미용 과정 대사는 보류."
+            "Notes": "전투 중 대사. 등장·미용 과정 대사는 보류.",
+            "__source": null
           },
           {
             "DialogueID": 900089,
             "GroupID": 80054,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "면접에선... 첫인상이 중요하다던데요...\n<color=#9A5B22><pulse=1.06>단정한 인상</pulse></color>이면... 덜 긴장할 것 같아요...",
-            "Notes": "미용 요구 · 선택지 연결"
+            "Text": "면접에선,<wait=0.25> 으어,<wait=0.25> 첫인상이 중요하니까요...\n덜 긴, 긴장하려면,<wait=0.25> <color=#9A5B22><pulse=1.06>단정한 인상</pulse></color>이면 덜 긴장할 것 같아요...<wait=0.35> 으어어...",
+            "Notes": "미용 요구 · 선택지 연결",
+            "__source": null
           },
           {
             "DialogueID": 900090,
             "GroupID": 80055,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "염색이요...? <wave=1.2><color=#71508F>자유롭게</color></wave> 부탁드려요...\n<color=#266B4D>지금 머리 색도</color> 저는 좋은데...",
-            "Notes": "미용 요구 · 선택지 연결"
+            "Text": "으어어...<wait=0.35> 염색은 <wave=1.2><color=#71508F>아무렇게나</color></wave> 괜찮아요...\n저, <wait=0.25>저는,<wait=0.25> <color=#266B4D>지금 머리 색도</color>,<wait=0.25> 좋아요...",
+            "Notes": "미용 요구 · 선택지 연결",
+            "__source": null
           },
           {
             "DialogueID": 900091,
             "GroupID": 80056,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "으어어... 머리도 정리하고, 정신도 번쩍 들었네요. 내일은 <color=#FFD166>면접장에 부활</color>하겠습니다!",
-            "Notes": "통합 플레이"
+            "Text": "<wave=1>으어어… <wait=0.35>머리도 하고…<wait=0.35> 상쾌하게 몸도 풀고...<wait=0.35> 면접 준비 끝났어요...</wave>",
+            "Notes": "통합 플레이",
+            "__source": null
           },
           {
             "DialogueID": 900092,
             "GroupID": 80057,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "으어어... 연습은 여기까지 하죠. 저도 내일 면접이 있어서요.",
-            "Notes": "통합 플레이"
+            "Text": "<wave=1>으어어...<wait=0.35> 연습은 여기까지 하죠...<wait=0.35> 저도 내일 면접이 있어서요.</wave>",
+            "Notes": "통합 플레이",
+            "__source": null
           },
           {
             "DialogueID": 900093,
@@ -2750,7 +2742,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "<shake=2>으하하하!</shake> 오랜만이구먼, 제이!!",
-            "Notes": "통합 플레이"
+            "Notes": "통합 플레이",
+            "__source": null
           },
           {
             "DialogueID": 900094,
@@ -2758,7 +2751,8 @@
             "Order": 2,
             "Speaker": "몬스터",
             "Text": "가게에 불이 켜져 있길래 냅다 뛰어왔지! 이야, 얼굴이 좀... <wave=3>두 개로 보이는구먼!</wave>",
-            "Notes": "통합 플레이"
+            "Notes": "통합 플레이",
+            "__source": null
           },
           {
             "DialogueID": 900095,
@@ -2766,7 +2760,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "...자네, 제이가 아니었구먼. 허허. 이제야 제대로 보이는군.",
-            "Notes": "통합 플레이"
+            "Notes": "통합 플레이",
+            "__source": null
           },
           {
             "DialogueID": 900096,
@@ -2774,7 +2769,8 @@
             "Order": 2,
             "Speaker": "몬스터",
             "Text": "제이가 사라진 뒤로 이 가게도, 내 손끝도 멈춘 줄 알았지. 일용직 일 끝내고 한잔하는 게 하루의 전부였어.",
-            "Notes": "통합 플레이"
+            "Notes": "통합 플레이",
+            "__source": null
           },
           {
             "DialogueID": 900097,
@@ -2782,7 +2778,8 @@
             "Order": 3,
             "Speaker": "몬스터",
             "Text": "우리 집안은 몬스터의 소울에 남은 힘을 <color=#9FE8D1>장비와 기술로 빚어내던</color> 일을 했네. 아는 이만 찾던 오래된 가업이지.",
-            "Notes": "통합 플레이"
+            "Notes": "통합 플레이",
+            "__source": null
           },
           {
             "DialogueID": 900098,
@@ -2790,7 +2787,8 @@
             "Order": 4,
             "Speaker": "몬스터",
             "Text": "세상이 편리해지니 그 솜씨를 찾는 이도 줄었어. 다시 쓸 일이 없을 줄 알았는데... 자네를 보니, <wave=2>손이 근질근질하구먼!</wave>",
-            "Notes": "통합 플레이"
+            "Notes": "통합 플레이",
+            "__source": null
           },
           {
             "DialogueID": 900099,
@@ -2798,7 +2796,8 @@
             "Order": 5,
             "Speaker": "몬스터",
             "Text": "좋아. 머물러도 된다면 손끝부터 다시 깨워 보지. <color=#FFD166>몬스터 소울을 다루는 법</color>도 차근차근 알려 주겠네.",
-            "Notes": "통합 플레이"
+            "Notes": "통합 플레이",
+            "__source": null
           },
           {
             "DialogueID": 900100,
@@ -2806,111 +2805,188 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "허허, 오늘은 술 대신 물 한 잔이면 되겠어. 도구를 챙겨 올 테니, 가게 불은 꺼뜨리지 말게!",
-            "Notes": "통합 플레이"
+            "Notes": "통합 플레이",
+            "__source": null
           },
           {
             "DialogueID": 900101,
             "GroupID": 80061,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "...헤. 여기 솜씨가 좋다는 소문을 들었거든.",
-            "Notes": "통합 플레이"
+            "Text": "...헤. <wait=0.35>여기 솜씨가 좋다는 소문을 들었거든.",
+            "Notes": "통합 플레이",
+            "__source": null
           },
           {
             "DialogueID": 900102,
             "GroupID": 80061,
             "Order": 2,
             "Speaker": "몬스터",
-            "Text": "뼈 있는 부탁 하나 해도 될까? <color=#FFD166>얼굴 테두리</color>만 다듬어 줘. 머리카락은... 보다시피 휴가 중이야.",
-            "Notes": "통합 플레이"
+            "Text": "<pulse=1.15>\"뼈\"</pulse> 있는 부탁 하나 해도 될까?<wait=0.35> <color=#FFD166>얼굴 테두리</color>만 다듬어 줘. <wait=0.35>머리카락은... <wait=0.35>보다시피 휴가 중이야.",
+            "Notes": "통합 플레이",
+            "__source": null
           },
           {
             "DialogueID": 900103,
             "GroupID": 80062,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "헤. 오늘은 <color=#52609B>인상 좀 다듬으러</color> 왔어.\n<color=#52609B>각진 데만 가볍게.</color> <wave=1.3>뼈대는 괜찮잖아?</wave>",
-            "Notes": "미용 요구 · 선택지 연결"
+            "Text": "헤. <wait=0.35>오늘은 <color=#52609B>인상 좀 다듬으러</color> 왔어.<wait=0.35>\n<color=#52609B>각진 데만 가볍게.<wait=0.35></color> <wave=1.3>뼈대는 괜찮잖아?</wave>",
+            "Notes": "미용 요구 · 선택지 연결",
+            "__source": null
           },
           {
             "DialogueID": 900104,
             "GroupID": 80063,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "이번엔 좀 <color=#9A4935><shake=0.6>만만하지 않은 인상</shake></color>이면 좋겠어.\n<color=#9A4935>장식</color>으로 한 수 보여 줄래?",
-            "Notes": "미용 요구 · 선택지 연결"
+            "Text": "이번엔 좀 <color=#9A4935><shake=0.6>만만하지 않은 인상</shake></color>이면 좋겠어.<wait=0.35>\n<color=#9A4935>장식</color>으로 한 수 보여 줄래?",
+            "Notes": "미용 요구 · 선택지 연결",
+            "__source": null
           },
           {
             "DialogueID": 900105,
             "GroupID": 80064,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "헤. 꽤 뼈대 있는 실력이네. 그럼... 몸도 한번 풀어 볼까?",
-            "Notes": "통합 플레이"
+            "Text": "헤. <wait=0.35>꽤 뼈대 있는 실력이네.<wait=0.35> 그럼... <wait=0.35>몸도 한번 풀어 볼까?",
+            "Notes": "통합 플레이",
+            "__source": null
           },
           {
             "DialogueID": 900106,
             "GroupID": 80065,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "나쁘지 않네. 이번엔 다른 솜씨도 보여 줄래?",
-            "Notes": "통합 플레이"
+            "Text": "나쁘지 않네.<wait=0.35> 이번엔 다른 솜씨도 보여 줄래?",
+            "Notes": "통합 플레이",
+            "__source": null
           },
           {
             "DialogueID": 900107,
             "GroupID": 80066,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "...친구, 이건 좀 뼈아픈데. 잠깐 밖에서 얘기할까?",
-            "Notes": "통합 플레이"
+            "Text": "...친구, <wait=0.35>이건 좀 <pulse=1.15>\"뼈\"</pulse>아픈데.<wait=0.35> 잠깐 밖에서 얘기할까?",
+            "Notes": "통합 플레이",
+            "__source": null
           },
           {
             "DialogueID": 900109,
             "GroupID": 80068,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "<color=#71508F>어떤 색이나 무늬든</color> 괜찮아요...\n<color=#266B4D>염색하지 않아도 좋아요.</color> 머리는 지금도 마음에 들어서...",
-            "Notes": "미용 선택지 대사"
+            "Text": "<color=#71508F>무슨 색이든,<wait=0.25> 무슨 무늬든</color> 사,<wait=0.25> 상관 없어요...<wait=0.35>\n<color=#266B4D>염색 안 해도 괜찮아요...</color><wait=0.35> 지금 머리도 마음에 들어요, <wait=0.25>으어...",
+            "Notes": "미용 선택지 대사",
+            "__source": null
           },
           {
             "DialogueID": 900110,
             "GroupID": 80069,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "면접장에서 <color=#9A5B22>단정하고 점잖아 보일 장식</color>으로...\n<color=#9A5B22>하나만</color> 골라 주시겠어요...? <wave=1.2>너무 요란하진 않게요...</wave>",
-            "Notes": "미용 선택지 대사"
+            "Text": "<color=#9A5B22>단정하고 점잖아 보일 장식</color>으로...<wait=0.35>\n<color=#9A5B22>하나만</color>...<wait=0.35> 골라 주시겠어요?<wait=0.35> 으어,<wait=0.25> <wave=1.2>너무 요란, <wait=0.25>하진 않게요...</wave>",
+            "Notes": "미용 선택지 대사",
+            "__source": null
           },
           {
             "DialogueID": 900111,
             "GroupID": 80070,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "<color=#52609B>얼굴 바깥 테두리만</color> 망치랑 정으로 톡톡 다듬어 줘.\n<color=#9A4935>눈코입은 그대로.</color> <wave=1.2>속까지 시원해질 필요는 없거든.</wave>",
-            "Notes": "미용 선택지 대사"
+            "Text": "<color=#52609B>얼굴 바깥 테두리만</color> 망치랑 정으로 톡톡 다듬어 줘.<wait=0.35>\n<color=#9A4935>눈코입은 그대로.<wait=0.35></color> <wave=1.2>속까지 시원해질 필요는 없거든.</wave>",
+            "Notes": "미용 선택지 대사",
+            "__source": null
           },
           {
             "DialogueID": 900112,
             "GroupID": 80071,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "색은 <color=#71508F>네 감각에 맡길게.</color>\n<color=#52609B>원래 뼈 색</color>도 꽤 멋지거든. <wave=1.2>뼈가 있는 색이지.</wave>",
-            "Notes": "미용 선택지 대사"
+            "Text": "색은 <color=#71508F>네 감각에 맡길게.<wait=0.35></color>\n<color=#52609B>원래 뼈 색</color>도 꽤 멋지거든.<wait=0.35> <wave=1.2><pulse=1.15>\"뼈\"</pulse>가 있는 색이지.</wave>",
+            "Notes": "미용 선택지 대사",
+            "__source": null
           },
           {
             "DialogueID": 900113,
             "GroupID": 80072,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "<color=#71508F>더한 뼈와 바깥 테두리</color>에 마음 가는 색을 칠해 봐.\n<color=#52609B>그대로 둬도 좋아.</color> 취향엔 정답이 없으니까. 헤.",
-            "Notes": "미용 선택지 대사"
+            "Text": "<color=#71508F>더한 뼈와 바깥 테두리</color>에 마음 가는 색을 칠해 봐.<wait=0.35>\n<color=#52609B>그대로 둬도 좋아.<wait=0.35></color> 취향엔 정답이 없으니까. <wait=0.35>헤.",
+            "Notes": "미용 선택지 대사",
+            "__source": null
           },
           {
             "DialogueID": 900114,
             "GroupID": 80073,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "<color=#9A4935>강해 보이는 장식 하나</color>를 <color=#52609B>얼굴이나 머리 쪽</color>에 부탁해.\n딱 봤을 때 <shake=0.6>쉽게 덤비지는 못하겠다</shake> 싶은 걸로.",
-            "Notes": "미용 선택지 대사"
+            "Text": "<color=#9A4935>강해 보이는 장식 하나</color>를 <color=#52609B>얼굴이나 머리 쪽</color>에 부탁해.<wait=0.35>\n딱 봤을 때 <shake=0.6>쉽게 덤비지는 못하겠다</shake> 싶은 걸로.",
+            "Notes": "미용 선택지 대사",
+            "__source": null
+          },
+          {
+            "DialogueID": 900140,
+            "GroupID": 80056,
+            "Order": 2,
+            "Speaker": "플레이어",
+            "Text": "두들겨 맞아서 어깨 힘도 다 빠졌죠?",
+            "Notes": "통합 개발실",
+            "__source": null
+          },
+          {
+            "DialogueID": 900141,
+            "GroupID": 80056,
+            "Order": 3,
+            "Speaker": "몬스터",
+            "Text": "<wave=1>그렇네요... <wait=0.35>감사합니다...</wave>",
+            "Notes": "통합 개발실",
+            "__source": null
+          },
+          {
+            "DialogueID": 900142,
+            "GroupID": 80037,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "뭐?<wait=0.5> <shake=1>모른다고?</shake><wait=0.5><shake=2> 어떻게 그럴 수가 있지?</shake> <wait=0.5>와,<wait=0.25> <wave=1.4>샌즈의 <color=#1900d6>파란 공격</color>은 말이야...</wave>",
+            "Notes": "통합 개발실",
+            "__source": null
+          },
+          {
+            "DialogueID": 900143,
+            "GroupID": 80037,
+            "Order": 3,
+            "Speaker": "몬스터",
+            "Text": "아니야, <wait=0.25>그냥 직접 보여줘야겠어,<wait=0.25> <wait=0.35>헤.",
+            "Notes": "통합 개발실",
+            "__source": null
+          },
+          {
+            "DialogueID": 900137,
+            "GroupID": 80089,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "헤.<wait=0.35> 난 <color=#ec6565>그릴비</color>나 가야겠군.",
+            "Notes": "통합 개발실",
+            "__source": null
+          },
+          {
+            "DialogueID": 900138,
+            "GroupID": 80089,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "크, <wait=0.25>크흠... <wait=0.35>제법인데, <wait=0.25>꼬마야. <wave=1.4><pulse=1.15>\"뼈\"</pulse>가 시리는 전투였어.</wave>",
+            "Notes": "통합 개발실",
+            "__source": null
+          },
+          {
+            "DialogueID": 900139,
+            "GroupID": 80001,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "<wave=1>주,<wait=0.25> 죽고 나서 면접은,<wait=0.25> 처음이에요...</wave>",
+            "Notes": "통합 개발실",
+            "__source": null
           },
           {
             "DialogueID": 900115,
@@ -2918,7 +2994,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "점검은 <color=#52609B>손님의 부탁을 얼마나 정확히 이루어 주는지</color> 보겠습니다. 제 부탁으로 시험하지요.",
-            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안."
+            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안.",
+            "__source": null
           },
           {
             "DialogueID": 900116,
@@ -2926,7 +3003,8 @@
             "Order": 2,
             "Speaker": "몬스터",
             "Text": "우선 이 뿔부터입니다. 보고서는 정리했는데, 제 머리 위는 아직이군요.\n눈을 찌르면 점검표도 읽을 수 없습니다.",
-            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안."
+            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안.",
+            "__source": null
           },
           {
             "DialogueID": 900117,
@@ -2934,7 +3012,8 @@
             "Order": 3,
             "Speaker": "몬스터",
             "Text": "<color=#52609B>눈 세 개는 무사하게, 뿔은 왔을 때보다 가볍게</color> 부탁드립니다.\n모양은 맡기겠습니다. 정해진 답을 베끼는 시험은 아니니까요.",
-            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안."
+            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안.",
+            "__source": null
           },
           {
             "DialogueID": 900118,
@@ -2942,7 +3021,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "<color=#52609B>세 눈에 닿지 않게</color> 뿔을 다듬어 주세요.\n모양은 자유입니다. 다만 전체 양은 처음보다 줄어야 합니다. 줄여 달랬는데 늘어나면 곤란하겠지요.",
-            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안."
+            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안.",
+            "__source": null
           },
           {
             "DialogueID": 900120,
@@ -2950,7 +3030,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "이제 본시험입니다. 저는 <color=#52609B>666년 동안 단 한 번도 반차를 승인받지 못했습니다.</color> 무슨 수를 써도 “멀쩡해 보인다”시더군요.\n<color=#52609B>세 눈 아래 모두, 가장 어두운 색으로 다크서클</color>을 만들어 주십시오. 쉬어야 한다는 말이 얼굴만 봐도 전해지도록요.",
-            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안."
+            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안.",
+            "__source": null
           },
           {
             "DialogueID": 900121,
@@ -2958,7 +3039,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "<color=#52609B>이마의 눈과 안경 쓴 두 눈, 세 눈 아래를 모두</color> 짙게 해 주세요.\n눈 자체와 나머지 얼굴은 깔끔하게. 피곤한 인상을 만드는 솜씨를 보는 거지, 보고서를 못 읽게 하는 시험은 아닙니다.",
-            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안."
+            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안.",
+            "__source": null
           },
           {
             "DialogueID": 900122,
@@ -2966,7 +3048,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "마지막으로 <color=#D94B4B>코끝에 빨간 코 장식 하나</color>를 붙여 주십시오.\n마왕님이 제 얼굴을 보고 먼저 “오늘은 쉬어라” 하신다면…… 그보다 확실한 실력 증명이 있겠습니까?",
-            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안."
+            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안.",
+            "__source": null
           },
           {
             "DialogueID": 900123,
@@ -2974,7 +3057,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "<color=#D94B4B>빨간 코는 코 주변에 하나</color>면 됩니다.\n아파 보이되 우스꽝스럽지는 않게. 반차 신청서이지, 궁정 축제 참가 신청서가 아닙니다.",
-            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안."
+            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안.",
+            "__source": null
           },
           {
             "DialogueID": 900124,
@@ -2982,7 +3066,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "실례합니다. 마왕님의 직속 부하입니다. 예고드린 <color=#FFD166>중간 점검</color>을 하러 왔습니다.\n5일차에 마왕님을 모시려면, 별 세 개에 어울리는 솜씨를 보여 주셔야겠지요.",
-            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안."
+            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안.",
+            "__source": null
           },
           {
             "DialogueID": 900125,
@@ -2990,7 +3075,8 @@
             "Order": 2,
             "Speaker": "몬스터",
             "Text": "제게는 한 번도 통과하지 못한 결재가 있습니다. <color=#FFD166>반차 신청.</color>\n저조차 포기한 부탁을 미용으로 이루어 주실 수 있습니까? 오늘은 제가 직접 손님이 되어 확인하겠습니다. 커피는…… 들고 앉아도 되겠지요?",
-            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안."
+            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안.",
+            "__source": null
           },
           {
             "DialogueID": 900126,
@@ -2998,7 +3084,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "<wave=1.2>호오……</wave> 뿔은 가볍고, 세 눈과 코는 쉬어야 한다는 말을 분명히 전하는군요.\n부탁을 알아듣고 인상을 바꾸는 솜씨, 잘 보았습니다.",
-            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안."
+            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안.",
+            "__source": null
           },
           {
             "DialogueID": 900127,
@@ -3006,7 +3093,8 @@
             "Order": 2,
             "Speaker": "몬스터",
             "Text": "이번에는 반차 신청서에 제 얼굴도 첨부해야겠습니다.\n중간 점검에는 좋은 평가를 남기지요. 이 솜씨로 별 세 개까지 올라오십시오.",
-            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안."
+            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안.",
+            "__source": null
           },
           {
             "DialogueID": 900128,
@@ -3014,7 +3102,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "음…… 의도는 전해집니다. 다만 “당장 쉬어라”보다는 “커피 한 잔 더 마셔라”에 가깝군요.",
-            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안."
+            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안.",
+            "__source": null
           },
           {
             "DialogueID": 900129,
@@ -3022,7 +3111,8 @@
             "Order": 2,
             "Speaker": "몬스터",
             "Text": "점검 기록에는 조금 더 다듬을 여지가 있다고 적겠습니다.\n5일차까지 손님들의 부탁을 듣고, 그 차이를 익혀 보십시오. 제 반차도 아직 포기하지 않겠습니다.",
-            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안."
+            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안.",
+            "__source": null
           },
           {
             "DialogueID": 900130,
@@ -3030,7 +3120,8 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "<shake=0.8>하아……</shake> 반차를 설득할 얼굴을 부탁드렸는데, 설명해야 할 부분이 더 늘었군요.",
-            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안."
+            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안.",
+            "__source": null
           },
           {
             "DialogueID": 900131,
@@ -3038,7 +3129,8 @@
             "Order": 2,
             "Speaker": "몬스터",
             "Text": "중간 점검에는 보완이 필요하다고 남기겠습니다.\n손님이 어떤 모습이 되고 싶은지, 그 말을 놓치지 마십시오. 마왕님을 만날 때도 중요할 겁니다.",
-            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안."
+            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안.",
+            "__source": null
           },
           {
             "DialogueID": 900132,
@@ -3046,7 +3138,44 @@
             "Order": 1,
             "Speaker": "몬스터",
             "Text": "점검은 여기까지입니다. 보고서와 반차 신청서를 함께 올리러 가겠습니다.\n다음에 마왕님을 모시고 올 때는, <color=#FFD166>별 세 개</color>가 걸려 있기를 기대하지요.",
-            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안."
+            "Notes": "중간 점검: 한 번도 승인되지 않은 반차를 외모 변화로 설득하는 과제. 로컬 검토 초안.",
+            "__source": null
+          },
+          {
+            "DialogueID": 900133,
+            "GroupID": 80085,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "잠깐! 점검하는 눈입니다. 심사위원을 안 보이게 한다고 통과가 되는 건 아닙니다!",
+            "Notes": "마왕 부하 · 눈에 닿았을 때 · 첫 항의",
+            "__source": null
+          },
+          {
+            "DialogueID": 900134,
+            "GroupID": 80086,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "하아…… 눈은 세 개지만, 재시험 기회까지 세 번인 건 아닙니다.",
+            "Notes": "마왕 부하 · 다시 눈에 닿았을 때 · 두 번째 항의",
+            "__source": null
+          },
+          {
+            "DialogueID": 900135,
+            "GroupID": 80087,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "잠깐…… 뿔은 줄여 달라고 말씀드렸습니다. 점검표의 줄 수를 늘릴 생각은 아니시지요?",
+            "Notes": "마왕 부하 · 뿔을 줄인 뒤 다시 불어날 때",
+            "__source": null
+          },
+          {
+            "DialogueID": 900136,
+            "GroupID": 80088,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "왔을 때보다 뿔이 더 많군요. “요구 이상의 성과”라고 적기에는 방향이 반대입니다만.",
+            "Notes": "마왕 부하 · 처음보다 뿔이 더 많아졌을 때",
+            "__source": null
           }
         ]
       },
@@ -3120,7 +3249,8 @@
             "GapMs": 0,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80002,
@@ -3133,7 +3263,8 @@
             "GapMs": 0,
             "Notes": "미용 대사 연결에서 선택하는 부탁",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80003,
@@ -3146,7 +3277,8 @@
             "GapMs": 0,
             "Notes": "미용 대사 연결에서 선택하는 부탁",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80004,
@@ -3159,7 +3291,8 @@
             "GapMs": 0,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80005,
@@ -3172,7 +3305,8 @@
             "GapMs": 0,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80006,
@@ -3185,7 +3319,8 @@
             "GapMs": 0,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80007,
@@ -3198,7 +3333,8 @@
             "GapMs": 0,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80008,
@@ -3211,7 +3347,8 @@
             "GapMs": 0,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80009,
@@ -3224,7 +3361,8 @@
             "GapMs": 0,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80010,
@@ -3237,7 +3375,8 @@
             "GapMs": 0,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80011,
@@ -3250,7 +3389,8 @@
             "GapMs": 0,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80012,
@@ -3263,7 +3403,8 @@
             "GapMs": 0,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80013,
@@ -3276,7 +3417,8 @@
             "GapMs": 0,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80014,
@@ -3289,7 +3431,8 @@
             "GapMs": 0,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80015,
@@ -3302,7 +3445,8 @@
             "GapMs": 0,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80016,
@@ -3315,7 +3459,8 @@
             "GapMs": 400,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80017,
@@ -3328,7 +3473,8 @@
             "GapMs": 400,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80018,
@@ -3341,7 +3487,8 @@
             "GapMs": 400,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80019,
@@ -3354,7 +3501,8 @@
             "GapMs": 400,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80020,
@@ -3367,7 +3515,8 @@
             "GapMs": 400,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80021,
@@ -3380,7 +3529,8 @@
             "GapMs": 400,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80022,
@@ -3393,7 +3543,8 @@
             "GapMs": 400,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80023,
@@ -3406,7 +3557,8 @@
             "GapMs": 400,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80024,
@@ -3419,7 +3571,8 @@
             "GapMs": 400,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80025,
@@ -3432,7 +3585,8 @@
             "GapMs": 400,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80026,
@@ -3445,7 +3599,8 @@
             "GapMs": 400,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80027,
@@ -3458,7 +3613,8 @@
             "GapMs": 400,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80028,
@@ -3471,7 +3627,8 @@
             "GapMs": 0,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80029,
@@ -3484,7 +3641,8 @@
             "GapMs": 0,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80030,
@@ -3497,7 +3655,8 @@
             "GapMs": 0,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80031,
@@ -3510,7 +3669,8 @@
             "GapMs": 0,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80032,
@@ -3523,7 +3683,8 @@
             "GapMs": 0,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80033,
@@ -3536,7 +3697,8 @@
             "GapMs": 0,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80034,
@@ -3549,7 +3711,8 @@
             "GapMs": 0,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80035,
@@ -3562,7 +3725,8 @@
             "GapMs": 0,
             "Notes": "원본의 대사 연결 순서를 순번으로 옮김. 본문은 그대로 유지.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80036,
@@ -3575,20 +3739,22 @@
             "GapMs": 250,
             "Notes": "취객·샌즈 전투 연출 초안. 태그와 시간은 자유롭게 조정 가능.",
             "ActorEffect": "비틀거림",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80037,
             "Name": "샌즈 · 가볍게 인사",
             "PlaybackMode": "순서대로",
-            "PauseCombat": "끄기",
+            "PauseCombat": true,
             "AdvanceMode": "자동",
             "CPS": 23,
             "HoldMs": 900,
             "GapMs": 250,
             "Notes": "취객·샌즈 전투 연출 초안. 태그와 시간은 자유롭게 조정 가능.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80038,
@@ -3601,7 +3767,8 @@
             "GapMs": 250,
             "Notes": "취객·샌즈 전투 연출 초안. 태그와 시간은 자유롭게 조정 가능.",
             "ActorEffect": "비틀거림",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80039,
@@ -3614,7 +3781,8 @@
             "GapMs": 250,
             "Notes": "취객·샌즈 전투 연출 초안. 태그와 시간은 자유롭게 조정 가능.",
             "ActorEffect": "놀람",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80040,
@@ -3627,7 +3795,8 @@
             "GapMs": 250,
             "Notes": "취객·샌즈 전투 연출 초안. 태그와 시간은 자유롭게 조정 가능.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80041,
@@ -3640,7 +3809,8 @@
             "GapMs": 250,
             "Notes": "취객·샌즈 전투 연출 초안. 태그와 시간은 자유롭게 조정 가능.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80042,
@@ -3653,7 +3823,8 @@
             "GapMs": 250,
             "Notes": "전투에서는 해금·지급 연출 없이 귀환을 예고합니다. 소울 해금과 튜토리얼은 이후 미용실 대화에서 진행.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80043,
@@ -3666,7 +3837,8 @@
             "GapMs": 250,
             "Notes": "첫 MISS와 함께 재생. 말하는 중에도 빈틈 게이지와 연타 진행.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80044,
@@ -3679,7 +3851,8 @@
             "GapMs": 250,
             "Notes": "취객·샌즈 전투 연출 초안. 태그와 시간은 자유롭게 조정 가능.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80045,
@@ -3692,7 +3865,8 @@
             "GapMs": 250,
             "Notes": "첫 MISS와 함께 재생. 말하는 중에도 빈틈 게이지와 연타 진행.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80046,
@@ -3705,7 +3879,8 @@
             "GapMs": 250,
             "Notes": "취객·샌즈 전투 연출 초안. 태그와 시간은 자유롭게 조정 가능.",
             "ActorEffect": "식은땀",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80047,
@@ -3718,7 +3893,8 @@
             "GapMs": 250,
             "Notes": "세 번째 페이즈 빈틈 시작, 공격과 함께 말한다.",
             "ActorEffect": "식은땀",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80048,
@@ -3731,7 +3907,8 @@
             "GapMs": 250,
             "Notes": "취객·샌즈 전투 연출 초안. 태그와 시간은 자유롭게 조정 가능.",
             "ActorEffect": "식은땀",
-            "FinishEffect": "소멸"
+            "FinishEffect": "소멸",
+            "__source": null
           },
           {
             "GroupID": 80049,
@@ -3744,7 +3921,8 @@
             "GapMs": 250,
             "Notes": "좀비 전투 전용. 기존 문자 효과 태그로 연출.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80050,
@@ -3757,7 +3935,8 @@
             "GapMs": 250,
             "Notes": "좀비 전투 전용. 기존 문자 효과 태그로 연출.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80051,
@@ -3770,7 +3949,8 @@
             "GapMs": 250,
             "Notes": "실제 부활 모션 완료 → 글자 시작 → 다음 대사 입력 후 전투 재개.",
             "ActorEffect": "부활 후 대사",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80052,
@@ -3783,7 +3963,8 @@
             "GapMs": 250,
             "Notes": "좀비 전투 전용. 기존 문자 효과 태그로 연출.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80053,
@@ -3796,7 +3977,8 @@
             "GapMs": 250,
             "Notes": "좀비 전투 전용. 기존 문자 효과 태그로 연출.",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80054,
@@ -3809,7 +3991,8 @@
             "GapMs": 100,
             "Notes": "미용 대사 연결에서 선택하는 부탁",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80055,
@@ -3822,7 +4005,8 @@
             "GapMs": 100,
             "Notes": "미용 대사 연결에서 선택하는 부탁",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80056,
@@ -3835,7 +4019,8 @@
             "GapMs": 100,
             "Notes": "통합 프로토타입 미용실 대사",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80057,
@@ -3848,7 +4033,8 @@
             "GapMs": 100,
             "Notes": "통합 프로토타입 미용실 대사",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80058,
@@ -3861,7 +4047,8 @@
             "GapMs": 100,
             "Notes": "통합 프로토타입 미용실 대사",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80059,
@@ -3874,7 +4061,8 @@
             "GapMs": 100,
             "Notes": "통합 프로토타입 미용실 대사",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80060,
@@ -3887,7 +4075,8 @@
             "GapMs": 100,
             "Notes": "통합 프로토타입 미용실 대사",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80061,
@@ -3900,7 +4089,8 @@
             "GapMs": 100,
             "Notes": "통합 프로토타입 미용실 대사",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80062,
@@ -3913,7 +4103,8 @@
             "GapMs": 100,
             "Notes": "미용 대사 연결에서 선택하는 부탁",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80063,
@@ -3926,7 +4117,8 @@
             "GapMs": 100,
             "Notes": "미용 대사 연결에서 선택하는 부탁",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80064,
@@ -3939,7 +4131,8 @@
             "GapMs": 100,
             "Notes": "통합 프로토타입 미용실 대사",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80065,
@@ -3952,7 +4145,8 @@
             "GapMs": 100,
             "Notes": "통합 프로토타입 미용실 대사",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80066,
@@ -3965,10 +4159,12 @@
             "GapMs": 100,
             "Notes": "통합 프로토타입 미용실 대사",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80068,
+            "Name": "취준좀비 · 색·무늬 꾸미기 · 자세한 부탁",
             "PlaybackMode": "순서대로",
             "PauseCombat": true,
             "AdvanceMode": "입력",
@@ -3978,10 +4174,11 @@
             "Notes": "미용 대사 연결에서 선택하는 부탁",
             "ActorEffect": "없음",
             "FinishEffect": "없음",
-            "Name": "취준좀비 · 색·무늬 꾸미기 · 자세한 부탁"
+            "__source": null
           },
           {
             "GroupID": 80069,
+            "Name": "취준좀비 · 장식 붙이기 · 자세한 부탁",
             "PlaybackMode": "순서대로",
             "PauseCombat": true,
             "AdvanceMode": "입력",
@@ -3991,10 +4188,11 @@
             "Notes": "미용 대사 연결에서 선택하는 부탁",
             "ActorEffect": "없음",
             "FinishEffect": "없음",
-            "Name": "취준좀비 · 장식 붙이기 · 자세한 부탁"
+            "__source": null
           },
           {
             "GroupID": 80070,
+            "Name": "샌즈 · 형태 만들기 · 자세한 부탁",
             "PlaybackMode": "순서대로",
             "PauseCombat": true,
             "AdvanceMode": "입력",
@@ -4004,10 +4202,11 @@
             "Notes": "미용 대사 연결에서 선택하는 부탁",
             "ActorEffect": "없음",
             "FinishEffect": "없음",
-            "Name": "샌즈 · 형태 만들기 · 자세한 부탁"
+            "__source": null
           },
           {
             "GroupID": 80071,
+            "Name": "샌즈 · 색·무늬 꾸미기 · 처음 부탁",
             "PlaybackMode": "순서대로",
             "PauseCombat": true,
             "AdvanceMode": "입력",
@@ -4017,10 +4216,11 @@
             "Notes": "미용 대사 연결에서 선택하는 부탁",
             "ActorEffect": "없음",
             "FinishEffect": "없음",
-            "Name": "샌즈 · 색·무늬 꾸미기 · 처음 부탁"
+            "__source": null
           },
           {
             "GroupID": 80072,
+            "Name": "샌즈 · 색·무늬 꾸미기 · 자세한 부탁",
             "PlaybackMode": "순서대로",
             "PauseCombat": true,
             "AdvanceMode": "입력",
@@ -4030,10 +4230,11 @@
             "Notes": "미용 대사 연결에서 선택하는 부탁",
             "ActorEffect": "없음",
             "FinishEffect": "없음",
-            "Name": "샌즈 · 색·무늬 꾸미기 · 자세한 부탁"
+            "__source": null
           },
           {
             "GroupID": 80073,
+            "Name": "샌즈 · 장식 붙이기 · 자세한 부탁",
             "PlaybackMode": "순서대로",
             "PauseCombat": true,
             "AdvanceMode": "입력",
@@ -4043,7 +4244,21 @@
             "Notes": "미용 대사 연결에서 선택하는 부탁",
             "ActorEffect": "없음",
             "FinishEffect": "없음",
-            "Name": "샌즈 · 장식 붙이기 · 자세한 부탁"
+            "__source": null
+          },
+          {
+            "GroupID": 80089,
+            "Name": "샌즈 · 야차 승리 후 미용실",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "통합 개발실",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80074,
@@ -4056,7 +4271,8 @@
             "GapMs": 100,
             "Notes": "미용 시험용 대사 초안",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80075,
@@ -4069,7 +4285,8 @@
             "GapMs": 100,
             "Notes": "미용 시험용 대사 초안",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80076,
@@ -4082,7 +4299,8 @@
             "GapMs": 100,
             "Notes": "미용 시험용 대사 초안",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80077,
@@ -4095,7 +4313,8 @@
             "GapMs": 100,
             "Notes": "미용 시험용 대사 초안",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80078,
@@ -4108,7 +4327,8 @@
             "GapMs": 100,
             "Notes": "미용 시험용 대사 초안",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80079,
@@ -4121,7 +4341,8 @@
             "GapMs": 100,
             "Notes": "미용 시험용 대사 초안",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80080,
@@ -4134,7 +4355,8 @@
             "GapMs": 100,
             "Notes": "로컬 본편 시연용 임시 대사",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80081,
@@ -4147,7 +4369,8 @@
             "GapMs": 100,
             "Notes": "로컬 본편 시연용 임시 대사",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80082,
@@ -4160,7 +4383,8 @@
             "GapMs": 100,
             "Notes": "로컬 본편 시연용 임시 대사",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80083,
@@ -4173,7 +4397,8 @@
             "GapMs": 100,
             "Notes": "로컬 본편 시연용 임시 대사",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
           },
           {
             "GroupID": 80084,
@@ -4186,7 +4411,64 @@
             "GapMs": 100,
             "Notes": "로컬 본편 시연용 임시 대사",
             "ActorEffect": "없음",
-            "FinishEffect": "없음"
+            "FinishEffect": "없음",
+            "__source": null
+          },
+          {
+            "GroupID": 80085,
+            "Name": "마왕 부하 · 눈에 닿았을 때 · 첫 항의",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": false,
+            "AdvanceMode": "자동",
+            "CPS": 30,
+            "HoldMs": 5500,
+            "GapMs": 100,
+            "Notes": "미용 중 반응 · 조건과 재생 시점은 미용 설정",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "__source": null
+          },
+          {
+            "GroupID": 80086,
+            "Name": "마왕 부하 · 다시 눈에 닿았을 때 · 두 번째 항의",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": false,
+            "AdvanceMode": "자동",
+            "CPS": 30,
+            "HoldMs": 5500,
+            "GapMs": 100,
+            "Notes": "미용 중 반응 · 조건과 재생 시점은 미용 설정",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "__source": null
+          },
+          {
+            "GroupID": 80087,
+            "Name": "마왕 부하 · 뿔을 줄인 뒤 다시 불어날 때",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": false,
+            "AdvanceMode": "자동",
+            "CPS": 30,
+            "HoldMs": 5500,
+            "GapMs": 100,
+            "Notes": "미용 중 반응 · 조건과 재생 시점은 미용 설정",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "__source": null
+          },
+          {
+            "GroupID": 80088,
+            "Name": "마왕 부하 · 처음보다 뿔이 더 많아졌을 때",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": false,
+            "AdvanceMode": "자동",
+            "CPS": 30,
+            "HoldMs": 5500,
+            "GapMs": 100,
+            "Notes": "미용 중 반응 · 조건과 재생 시점은 미용 설정",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "__source": null
           }
         ]
       },
@@ -4865,55 +5147,64 @@
             "MonsterID": 10001,
             "Stage": "cut",
             "RequestGroupID": 80002,
-            "DetailGroupID": 80003
+            "DetailGroupID": 80003,
+            "__source": null
           },
           {
             "MonsterID": 10001,
             "Stage": "draw",
             "RequestGroupID": 80055,
-            "DetailGroupID": 80068
+            "DetailGroupID": 80068,
+            "__source": null
           },
           {
             "MonsterID": 10001,
             "Stage": "attach",
             "RequestGroupID": 80054,
-            "DetailGroupID": 80069
+            "DetailGroupID": 80069,
+            "__source": null
           },
           {
             "MonsterID": 10003,
             "Stage": "cut",
             "RequestGroupID": 80062,
-            "DetailGroupID": 80070
+            "DetailGroupID": 80070,
+            "__source": null
           },
           {
             "MonsterID": 10003,
             "Stage": "draw",
             "RequestGroupID": 80071,
-            "DetailGroupID": 80072
+            "DetailGroupID": 80072,
+            "__source": null
           },
           {
             "MonsterID": 10003,
             "Stage": "attach",
             "RequestGroupID": 80063,
-            "DetailGroupID": 80073
+            "DetailGroupID": 80073,
+            "__source": null
           },
           {
             "MonsterID": 10004,
             "Stage": "cut",
             "RequestGroupID": 80074,
-            "DetailGroupID": 80075
+            "DetailGroupID": 80075,
+            "__source": null
           },
           {
             "MonsterID": 10004,
             "Stage": "draw",
             "RequestGroupID": 80076,
-            "DetailGroupID": 80077
+            "DetailGroupID": 80077,
+            "__source": null
           },
           {
             "MonsterID": 10004,
             "Stage": "attach",
             "RequestGroupID": 80078,
-            "DetailGroupID": 80079
+            "DetailGroupID": 80079,
+            "__source": null
           }
         ]
       }
@@ -5278,7 +5569,8 @@
         "arrival": 80061,
         "best": 80064,
         "normal": 80065,
-        "fail": 80066
+        "fail": 80066,
+        "afterWin": 80089
       },
       "battle": "forced",
       "note": "망치·정 / 얼굴 테두리 / Tag_Strong. 발모제는 기존 두개골과 이어지는 뼈 재료. 형태 목표·배점은 기존 임시값을 유지한 시험 설정입니다. 눈·입 표현도 임시입니다."
@@ -5506,17 +5798,12 @@
           "draw": "세 눈 아래 짙은 다크서클로\n쉬어야 할 얼굴 만들기",
           "attach": "코 주변 빨간 코 하나로\n반차를 설득할 인상 완성"
         },
-        "eyeContactLine": "잠깐! 점검하는 눈입니다. 심사위원을 안 보이게 한다고 통과가 되는 건 아닙니다!",
         "drawRequiredRatio": 0.9,
-        "eyeContactSecondLine": "하아…… 눈은 세 개지만, 재시험 기회까지 세 번인 건 아닙니다.",
-        "areaWarningLine": "잠깐…… 뿔은 줄여 달라고 말씀드렸습니다. 점검표의 줄 수를 늘릴 생각은 아니시지요?",
-        "areaOverflowLine": "왔을 때보다 뿔이 더 많군요. “요구 이상의 성과”라고 적기에는 방향이 반대입니다만.",
         "resultLines": {
           "satisfied": "좋습니다. 말로는 못 얻은 반차를, 이 얼굴로 설득해 보지요.",
           "neutral": "의도는 알겠습니다. 다만 결재를 뒤집으려면 한 끗이 더 필요하군요.",
           "angry": "하아…… 부탁을 이루는 것과, 얼굴을 바꾸는 것은 다른 일입니다."
         },
-        "attachHint": "코 주변에 빨간 코 하나 · 반차를 설득할 마지막 인상",
         "stickerScale": 0.3
       },
       "bindings": {
@@ -5524,11 +5811,15 @@
         "best": 80081,
         "normal": 80082,
         "fail": 80083,
-        "leave": 80084
+        "leave": 80084,
+        "eyeContactLine": 80085,
+        "eyeContactSecondLine": 80086,
+        "areaWarningLine": 80087,
+        "areaOverflowLine": 80088
       },
       "battle": "none",
       "note": "중간 점검 과제: 승인된 적 없는 반차를 받을 수 있는 인상 만들기. 뿔·세 다크서클·빨간 코 판정과 수치 유지. 현 시연은 미용만 연결.",
-      "workbookExcluded": true
+      "workbookExcluded": false
     }
   ],
   "schedule": [
@@ -5542,25 +5833,83 @@
   ],
   "storyIntro": [
     {
-      "title": "힘으로 왕이 되었지만",
+      "title": "왕이 되었지만",
+      "speaker": "내레이션",
       "paragraphs": [
-        "고블린은 이 세계에서 가장 낮게 취급받는 종족이다. 한 고블린은 야차에서 거듭 승리해, 마침내 마왕의 자리에 올랐다.",
-        "하지만 누구도 그의 힘을 보려 하지 않았다. 고블린의 외모와 출신만으로 왕을 인정하지 않았다. 상처는 외모에 대한 집착이 되었고, 마왕은 나라를 돌볼 수도 없게 되었다."
+        "이 세계에서 고블린은 가장 천대받는 종족이었다.",
+        "그러나 한 고블린은 힘을 겨루는 ‘야차’에서 거듭 승리했고, 마침내 마왕의 자리에 올랐다.",
+        "그런데도 누구 하나 고개를 숙이지 않았다.\n그들에게 그는 여전히, 볼품없는 고블린일 뿐이었다."
+      ],
+      "alt": "고블린 마왕이 왕좌에 앉아 있지만 주변 몬스터들은 등을 돌리고 있다.",
+      "image": "./media/intro/intro-1.png"
+    },
+    {
+      "title": "거울에 갇힌 왕",
+      "speaker": "내레이션",
+      "paragraphs": [
+        "처음에는 수군거림을 무시하려 했다.\n하지만 마왕은 점점, 남들이 흉보던 자신의 모습에서 눈을 떼지 못했다.",
+        "거울 앞에 머무는 시간이 길어질수록,\n돌보지 못한 나라의 일도 쌓여 갔다."
+      ],
+      "alt": "서류가 쌓인 왕좌에서 고블린 마왕이 손거울을 바라본다.",
+      "image": "./media/intro/intro-2.png"
+    },
+    {
+      "title": "모습을 바꾸면",
+      "speaker": "내레이션",
+      "paragraphs": [
+        "마왕은 마침내 외형을 바꾸는 마법에 손을 댔다.\n작은 몸을 키우고, 누구도 얕볼 수 없는 위압적인 모습을 만들었다.",
+        "하지만 거울 속 모습이 달라져도 마음은 놓이지 않았다.\n마왕은 여전히, 자신에게 부족한 무언가를 찾고 있었다."
+      ],
+      "alt": "고블린이 손을 댄 큰 거울 속에 위압적인 마왕의 실루엣이 비친다.",
+      "image": "./media/intro/intro-3.png"
+    },
+    {
+      "title": "뜻밖의 소환",
+      "speaker": "마왕 부하",
+      "paragraphs": [
+        "“마왕님을 도울 수 있는 누군가를…\n이곳으로 보내 주십시오.”",
+        "간절한 소환에 응답한 것은,\n인간 세계에서 가위를 쥐고 있던 당신이었다.",
+        "“…인간이라니. 예상과는 다릅니다만.”\n“미용을 하시는 분이군요. 그렇다면 부탁드릴 일이 있습니다.”"
+      ],
+      "alt": "어두운 미용실에서 마왕 부하가 초록빛 소환 마법을 펼친다.",
+      "image": "./media/intro/intro-4.png",
+      "speakers": [
+        "마왕 부하",
+        "내레이션",
+        "마왕 부하"
       ]
     },
     {
-      "title": "마왕을 바꿀 손길을 찾아",
+      "title": "돌아갈 조건",
+      "speaker": "마왕 부하",
       "paragraphs": [
-        "“마왕님을 도울 수 있는 누군가를 보내 주십시오.”",
-        "마왕 부하의 소환 마법에 이끌려, 인간 세계에 있던 당신이 이곳으로 왔다. 당신에게 맡겨진 일은 미용실을 키우고, 마왕이 만족할 변화를 만드는 것."
-      ]
+        "“이 미용실을 맡아 주십시오.\n마왕님께서 자신의 모습에 만족하실 수 있도록, 당신의 손길이 필요합니다.”",
+        "“다만 마왕님은 별 세 개를 얻지 못한 가게에는 발도 들이지 않으십니다.\n방문 예정일인 5일차까지, 이곳을 3스타 미용실로 만들어야 합니다.”",
+        "“손님들의 부탁을 들어주고 좋은 후기를 얻으십시오.\n팔로워가 모이면, 미용실의 별도 올라갈 겁니다.”"
+      ],
+      "alt": "마왕 부하가 5일차 달력과 별 세 개 미용실을 가리키며 설명한다.",
+      "image": "./media/intro/intro-5.png"
     },
     {
-      "title": "돌아갈 조건, 별 세 개",
+      "title": "그 전에, 중간 점검",
+      "speaker": "마왕 부하",
       "paragraphs": [
-        "마왕의 방문 예정일은 5일차. 하지만 별 세 개를 얻지 못한 가게에는 발도 들이지 않는다. 손님들의 부탁을 해결하고, 후기로 팔로워를 모아 그전까지 미용실을 3스타로 키워야 한다.",
-        "마왕이 방문해 미용에 만족하면, 원래 세계로 돌아갈 수 있다. 그 전에 2일차에는 부하가 중간 점검을 하러 온다. 먼저 오늘의 손님부터 맞이하자."
-      ]
+        "“2일차에는 제가 먼저 방문하겠습니다.\n마왕님을 맡겨도 될 실력인지, 직접 확인해야 하니까요.”",
+        "“미용 솜씨는 물론, 필요하다면 야차 실력까지.”\n“점검 과제는 그때 말씀드리겠습니다.”"
+      ],
+      "alt": "1일부터 5일까지의 달력 중 2일차 아래에서 마왕 부하가 걸어온다.",
+      "image": "./media/intro/intro-6.png"
+    },
+    {
+      "title": "마왕이 오는 날",
+      "speaker": "마왕 부하",
+      "paragraphs": [
+        "“5일차, 이곳에 마왕님을 모시겠습니다.\n그때까지 별 세 개를 갖춰 주십시오.”",
+        "“그리고 당신의 미용으로 마왕님을 만족시켜 주신다면…\n책임지고 원래 세계로 돌려보내 드리겠습니다.”",
+        "“그럼, 첫 손님을 맞을 준비부터 하시죠.”"
+      ],
+      "alt": "5일차 달력 아래에서 검은 마왕의 실루엣이 보랏빛 기운과 함께 다가온다.",
+      "image": "./media/intro/intro-7.png"
     }
   ]
 }

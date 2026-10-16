@@ -1,5 +1,5 @@
 import {migrateSalonDialogues,salonDialogueProblems} from './salon-dialogue.js';
-export const FLOW_VERSION='통합 플레이 0.25 · 화면에서 배우는 첫 손질과 야차';
+export const FLOW_VERSION='통합 플레이 0.28 · 마왕 부하 대사 엑셀 연결';
 export const SALON_EVENTS=[['arrival','손님 등장'],['cut','형태 만들기 요청'],['draw','색·무늬 요청'],['attach','장식 요청'],['best','미용 매우 만족'],['normal','미용 만족'],['fail','미용 불만족'],['proposal','야차 제안'],['afterWin','야차 승리 후 미용실'],['afterLoss','야차 패배 후 미용실'],['leave','손님 퇴장']];
 export function modelRows(p,name){return p.combat.sheets.find(s=>s.name===name)?.rows||[];}
 export function defaultProject(combat,assets){
@@ -382,7 +382,7 @@ const BEAUTY_PRESETS={
 export function addWorkshopGuests(project,defaults){
  if(!project?.combat?.sheets||!Array.isArray(project.guests))return project;
  const links=modelRows(project,'미용 대사 연결'),groups=modelRows(project,'대화 그룹'),lines=modelRows(project,'대사');
- for(const source of defaults.guests.filter(g=>(g.previewOnly||g.workbookExcluded)&&!project.guests.some(x=>x.id===g.id))){
+ for(const source of defaults.guests.filter(g=>(g.previewOnly||g.workbookExcluded||g.battle==='none')&&!project.guests.some(x=>x.id===g.id))){
   const guest=structuredClone(source),map=new Map();
   const sourceLinks=modelRows(defaults,'미용 대사 연결').filter(r=>r.MonsterID===guest.id);
   const ids=new Set([...Object.values(guest.bindings),...sourceLinks.flatMap(r=>[r.RequestGroupID,r.DetailGroupID])]);

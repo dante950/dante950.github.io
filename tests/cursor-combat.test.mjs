@@ -66,7 +66,9 @@ test('empty Sans openings keep every board and phase; removed return narration s
   assert.equal(b.enemyHP,100);assert.equal(b.state,'recover');
  }
  assert(!b.cues.some(c=>['heartHit','heartDrop'].includes(c.kind)));
- assert.equal(project.guests.find(g=>g.id===10003).bindings.afterWin,undefined);
+ const afterWin=project.guests.find(g=>g.id===10003).bindings.afterWin;
+ const returnLines=rows(project.combat,'대사').filter(r=>r.GroupID===afterWin);
+ assert(returnLines.length>0);assert(returnLines.every(r=>r.Speaker==='몬스터'));
  assert(!rows(project.combat,'대사').some(r=>r.GroupID===80067));
 });
 
@@ -77,7 +79,10 @@ test('Sans final warning begins on opening and death waits for HP0, dialogue and
   b.next=Infinity;open(b);
   if(phase===3){assert.equal(b.dialogues.active.group.GroupID,80047);assert.equal(b.dialogueBlocking,false);}
   for(let i=0;i<10;i++)b.scratchAttack(true);
-  b.tick(3330);assert.equal(b.dialogues.active.group.GroupID,[80044,80046,80048][phase-1]);
+  b.tick(3330);
+  // Revised warning text can outlast the opening; success must wait its turn.
+  if(phase===3)for(let i=0;i<300&&b.dialogues.active?.group.GroupID===80047;i++){assert.equal(b.state,'openingResult');b.tick(100);}
+  assert.equal(b.dialogues.active.group.GroupID,[80044,80046,80048][phase-1]);
   assert.equal(b.state,'openingResult');drain();
   if(phase<3)b.tick(1);
   else {assert.equal(b.finale.type,'소멸');b.tick(1199);assert.equal(b.state,'openingResult');b.tick(1);assert.equal(b.state,'victory');assert(b.actorDead);}

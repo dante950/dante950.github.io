@@ -108,11 +108,13 @@ async function checkEditorRoundtrip(page) {
   }));
   const groupIDs = new Set(editedDialogue.groups.map(group => group.GroupID));
   for (const data of Object.values(combatData)) {
-    assert(!data.sheets.flatMap(sheet => sheet.rows).some(row => row.MonsterID === 10004),
-      'workbook-bound combat data contains no unfinished minion references');
+    assert(!data.sheets.find(sheet => sheet.name === '몬스터 페이즈').rows.some(row => row.MonsterID === 10004),
+      'beauty-only minion does not invent combat phases');
+    assert.deepEqual(data.sheets.find(sheet => sheet.name === '미용 대사 연결').rows.filter(row => row.MonsterID === 10004), editedDialogue.links);
     for (const name of ['대화 그룹', '대사']) {
-      assert(!data.sheets.find(sheet => sheet.name === name)?.rows.some(row => groupIDs.has(row.GroupID)),
-        'exclusive workshop request groups stay out of the combat workbook editor');
+      const expected = name === '대화 그룹' ? editedDialogue.groups : editedDialogue.lines;
+      assert.deepEqual(data.sheets.find(sheet => sheet.name === name).rows.filter(row => groupIDs.has(row.GroupID)), expected,
+        'published minion request groups and lines are included in the workbook editor');
     }
   }
   await page.locator('#editorScreen [data-editor="beauty"]').click();
@@ -267,11 +269,11 @@ async function checkSculpt(page, salon, engine) {
     assert(touched.shape.eyeCoverCount > 0 && touched.shape.hardFailure);
     assert.equal(touched.scores.cut, 0);
     assert.equal(touched.expression, 'angry');
-    if(region.key==='EyeLeft'){assert.match(touched.reaction.text,/인내심/);await page.screenshot({path:path.join(output,engine+'-minion-second-complaint.png')});}
+    if(region.key==='EyeLeft'){assert.equal(touched.reaction.text,initial.guest.beauty.eyeContactSecondLine);await page.screenshot({path:path.join(output,engine+'-minion-second-complaint.png')});}
     if(region.key==='EyeRight')assert.equal(touched.reaction.count,2,'third contact has no further complaint');
     if (region.key === 'EyeTop') {
       assert.equal(touched.reaction.visible, true);
-      assert.match(touched.reaction.text, /연차.*안대/);
+      assert.equal(touched.reaction.text, initial.guest.beauty.eyeContactLine);
       assert(await salon.locator('.beautyEyeReaction').evaluate(node => Number(getComputedStyle(node).zIndex) > Number(getComputedStyle(document.querySelector('.beautyCustomer')).zIndex)), 'the complaint stays in front of the horns');
       await page.screenshot({path: path.join(output, `${engine}-minion-eye-contact.png`)});
       await stroke(page, salon, point(root), point(eye));
@@ -393,7 +395,7 @@ async function checkDrawing(page, salon, engine) {
 async function checkResult(page, salon, finished, engine) {
   await salon.locator('.beautyNext').click();
   await readRequest(page);
-  assert.match(await page.locator('#talkText').innerText(),/666년 무결근/);
+  assert.match(await page.locator('#talkText').innerText(),/빨간 코 장식/);
   await page.locator('#beautyAccept').click();await page.locator('#talkLayer').waitFor({state:'hidden'});
   await salon.waitForFunction(()=>!beautyDebug.briefing);
   await salon.locator('[data-sticker="ST-FUN-NOSE-RED"]').click();

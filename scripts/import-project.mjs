@@ -7,7 +7,7 @@ if(!source)throw Error('사용법: node scripts/import-project.mjs "저장한 �
 const defaults=JSON.parse(await fs.readFile(new URL('../data/project.json',import.meta.url),'utf8'));
 const project=addWorkshopGuests(migrateSalonDialogues(JSON.parse(await fs.readFile(source,'utf8'))),defaults);
 const problems=projectProblems(project);
-for(const guest of (project.guests||[]).filter(g=>!g.previewOnly)) problems.push(...validate(project.combat,{monsterID:guest.id}).errors);
+for(const guest of (project.guests||[]).filter(g=>!g.previewOnly&&g.battle!=='none')) problems.push(...validate(project.combat,{monsterID:guest.id}).errors);
 if(problems.length)throw Error(problems.join('\n'));
 await fs.writeFile(new URL('../data/project.json',import.meta.url),JSON.stringify(project,null,2)+'\n');
 console.log(`공개할 프로젝트 v${project.version}를 반영했습니다. build/test 후 Git에 올리면 배포됩니다.`);

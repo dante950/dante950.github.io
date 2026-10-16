@@ -94,10 +94,17 @@ for(const sticker of STICKERS){
  const img=new Image();img.src=sticker.src;stickerImages.set(sticker.id,img);
  const button=document.createElement('button');button.dataset.sticker=sticker.id;button.title=sticker.name;
  button.innerHTML='<img src="'+safeText(sticker.src)+'" alt=""><span>'+safeText(sticker.name)+'</span>';
- button.onclick=()=>{selectedSticker=sticker;refreshTools();};decorations.querySelector('.sculptStickers').append(button);
+ button.onclick=()=>{selectedSticker=sticker;refreshTools();};
+ button.addEventListener('pointerdown',e=>beginStickerDrag(e,sticker,button));
+ button.addEventListener('pointermove',moveStickerDrag);
+ button.addEventListener('pointerup',endStickerDrag);
+ button.addEventListener('pointercancel',cancelStickerDrag);
+ button.addEventListener('lostpointercapture',cancelStickerDrag);
+ button.querySelector('img').draggable=false;
+ decorations.querySelector('.sculptStickers').append(button);
  img.onload=()=>{if(ready)renderPortrait();};
 }
-const guideButton=document.getElementById('showBeautyZones');if(guideButton)guideButton.onclick=()=>{zonesVisible=!zonesVisible;guideButton.setAttribute('aria-pressed',String(zonesVisible));renderPortrait();};
+const guideButton=document.getElementById('showBeautyZones');if(guideButton)guideButton.onclick=()=>{zonesVisible=!zonesVisible;guideButton.setAttribute('aria-pressed',String(zonesVisible));renderPortrait();beautyLessonGuide();};
 document.getElementById('repeatBeautyRequest').onclick=()=>announceBeautyRequest();
 document.getElementById('undoBeauty').onclick=undoBeauty;
 const rgb=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
@@ -271,6 +278,30 @@ function placeSticker(sticker,x,y){
  pushUndo();const region=B.attachRegions.find(r=>inBeautyRegion(x,y,r))?.key||'Other';
  placements.push({sticker,region,x,y});touched.attach=true;updateBeautyScore();renderPortrait();beautyLessonSticker();
 }
+let stickerDrag=null;
+const stickerGhost=document.createElement('img');stickerGhost.className='sculptStickerGhost';stickerGhost.hidden=true;stickerGhost.alt='';beautyScreen.append(stickerGhost);
+function beginStickerDrag(e,sticker,button){
+ if(e.button!==0||!ready||briefing||finishing||beautyPhase!=='attach')return;
+ e.preventDefault();selectedSticker=sticker;refreshTools();
+ stickerDrag={sticker,button,pointerId:e.pointerId,x:e.clientX,y:e.clientY,moved:false};button.setPointerCapture(e.pointerId);
+ stickerGhost.src=sticker.src;
+}
+function moveStickerDrag(e){
+ if(!stickerDrag||stickerDrag.pointerId!==e.pointerId)return;
+ if(Math.hypot(e.clientX-stickerDrag.x,e.clientY-stickerDrag.y)>6)stickerDrag.moved=true;
+ if(!stickerDrag.moved)return;e.preventDefault();
+ const r=beautyScreen.getBoundingClientRect();stickerGhost.hidden=false;
+ stickerGhost.style.left=(e.clientX-r.left)/r.width*beautyScreen.clientWidth+'px';stickerGhost.style.top=(e.clientY-r.top)/r.height*beautyScreen.clientHeight+'px';
+}
+function cancelStickerDrag(){const drag=stickerDrag;stickerDrag=null;stickerGhost.hidden=true;if(drag?.button.hasPointerCapture(drag.pointerId))drag.button.releasePointerCapture(drag.pointerId);}
+function endStickerDrag(e){
+ if(!stickerDrag||stickerDrag.pointerId!==e.pointerId)return;
+ const drag=stickerDrag,r=portrait.getBoundingClientRect();cancelStickerDrag();
+ if(!drag.moved)return;
+ if(e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom){const p=point(e);placeSticker(drag.sticker,p.x,p.y);}
+ else if(!beautyLessonDone){lessonFeedback='손님 밖에 놓았어요. 동그라미까지 끌어와 놓아 주세요.';renderBeautyLesson();}
+}
+addEventListener('blur',cancelStickerDrag);
 function updateBeautyScore(){
  if(!ready)return;
  const shape=scoreShape(current,original,B,W,H,masks);shapeProgress=shape;cutScore=shape.score;
@@ -400,6 +431,7 @@ function refreshTools(){
  document.getElementById('erasePaint').classList.toggle('selected',activeTool==='erase');
  for(const b of decorations.querySelectorAll('[data-sticker]'))b.classList.toggle('selected',b.dataset.sticker===selectedSticker?.id);
  hint.textContent=beautyPhase==='attach'?'붙인 장식은 눌러 떼기':beautyPhase==='draw'?(B.growth?.material==='horn'?'가이드: 초록 칠하기 · 빨강 피하기':'머리와 얼굴 위에 쓱쓱'):activeTool==='grow'?(B.growth?.connected?'붙어 있는 뿔 위에서 이어 발라 주세요':B.growth?.mask==='original'?'잘라 낸 뿔 자리에 발라 복원해 주세요':'누른 채 발라 주세요'):activeTool==='scissors'?'드래그 후 놓으면 싹둑':'누른 채 조금씩 다듬기';
+ renderBeautyLesson();
 }
 function renderRequestStatus(){
  if(!BEAUTY_STAGES.includes(beautyPhase))return;
@@ -414,7 +446,7 @@ function renderRequestStatus(){
  const list=status.querySelector('.requestText');if(list.innerHTML!==markup)list.innerHTML=markup;
 }
 function setBeautyPhase(phase,announce=true){
- if(finishing||briefing)return;cancelGesture();beautyPhase=phase;
+ if(finishing||briefing)return;cancelStickerDrag();cancelGesture();beautyPhase=phase;
  if(phase==='draw'&&B.growth?.material==='horn'&&!heardRequests.draw){brushRadius=4;document.getElementById('sculptSize').value=4;document.getElementById('sculptSizeValue').value=4;}
  const names={cut:'형태 만들기',draw:'색·무늬 꾸미기',attach:'장식 붙이기'},stages=beautyStageOrder(B);
  stageTag.textContent=(stages.indexOf(phase)+1)+'. '+names[phase];
@@ -425,10 +457,10 @@ function setBeautyPhase(phase,announce=true){
  nav.innerHTML=stages.map((k,i)=>'<button data-phase="'+k+'" class="'+(phase===k?'selected':'')+'">'+(i+1)+'. '+names[k]+'</button>').join('');
  for(const button of nav.children)button.onclick=()=>setBeautyPhase(button.dataset.phase);
  next.textContent=stages.indexOf(phase)===stages.length-1?'미용 완성':phase==='draw'&&!B.weights.draw?'꾸미기 마치기':'다음 단계';
- next.disabled=!ready;syncUndo();refreshTools();updateBeautyScore();renderPortrait();if(announce&&!heardRequests[phase])announceBeautyRequest();else status.hidden=false;renderBeautyLesson();
+ next.disabled=!ready;syncUndo();refreshTools();updateBeautyScore();renderPortrait();if(announce&&!heardRequests[phase])announceBeautyRequest();else status.hidden=false;beautyLessonPhase(phase);renderBeautyLesson();
 }
 function announceBeautyRequest(){
- if(finishing||briefing)return;cancelGesture();briefing=true;beautyLesson.hidden=true;status.hidden=true;panel.inert=true;nav.inert=true;actions.inert=true;next.disabled=true;syncUndo();
+ if(finishing||briefing)return;cancelStickerDrag();cancelGesture();briefing=true;renderBeautyLesson();status.hidden=true;panel.inert=true;nav.inert=true;actions.inert=true;next.disabled=true;syncUndo();
  send('stage-request',{stage:beautyPhase,requestId:++requestSerial,detail:!!heardDetails[beautyPhase]});
 }
 function finishBeautyRequest(id,detail=false){
