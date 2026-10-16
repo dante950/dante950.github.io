@@ -1,7 +1,7 @@
 // Workshop guests have no Unity monster contract yet. Keep their salon dialogue
 // in project JSON while the existing workbook editor handles established guests.
 const workshopRows=(data,name)=>data.sheets.find(s=>s.name===name)?.rows||[];
-const workshopIDs=project=>new Set(project.guests.filter(g=>g.previewOnly===true).map(g=>g.id));
+const workshopIDs=project=>new Set(project.guests.filter(g=>g.previewOnly===true||g.workbookExcluded===true).map(g=>g.id));
 const workshopLinkKey=row=>row.MonsterID+'/'+row.Stage;
 const workshopGroupIDs=links=>new Set(links.flatMap(r=>[r.RequestGroupID,r.DetailGroupID]).filter(Number.isInteger));
 function workshopValue(value,ignored=new Set()){
@@ -18,10 +18,11 @@ export function combatForWorkbook(project){
  const data=structuredClone(project.combat),ids=workshopIDs(project);
  const links=data.sheets.find(s=>s.name==='미용 대사 연결');if(!links||!ids.size)return data;
  const removed=links.rows.filter(r=>ids.has(r.MonsterID)),candidates=workshopGroupIDs(removed),retained=new Set();
+ for(const guest of project.guests.filter(g=>ids.has(g.id)))for(const id of Object.values(guest.bindings||{}))candidates.add(id);
  links.rows=links.rows.filter(r=>!ids.has(r.MonsterID));
  // Any reference outside the removed links makes the group shared. Guest event
  // bindings are also external references, including possible future workshop events.
- for(const guest of project.guests)for(const id of Object.values(guest.bindings||{}))retained.add(id);
+ for(const guest of project.guests.filter(g=>!ids.has(g.id)))for(const id of Object.values(guest.bindings||{}))retained.add(id);
  for(const sheet of data.sheets){
   if(sheet.name==='대사'||sheet.name==='대화 그룹')continue;
   for(const row of sheet.rows)for(const [key,value] of Object.entries(row))if(key.endsWith('GroupID'))retained.add(value);
@@ -63,5 +64,18 @@ export function mergeWorkshopDialogues(project,newCombat){
   }
  }
  for(const link of missing)links.push({...structuredClone(link),RequestGroupID:remap.get(link.RequestGroupID),DetailGroupID:remap.get(link.DetailGroupID)});
+ // Story-only prototype event bindings also stay in JSON. Do not silently remap
+ // their IDs: the caller's guest bindings must continue to reference the same group.
+ for(const guest of project.guests.filter(g=>ids.has(g.id)))for(const id of Object.values(guest.bindings||{})){
+  if(groups.some(g=>g.GroupID===id)){
+   if(workshopGroupContent(data,id)!==workshopGroupContent(project.combat,id))throw Error('임시 손님 대화 ID가 충돌합니다. 프로젝트 JSON에서 확인해 주세요: '+id);
+   continue;
+  }
+  groups.push(structuredClone(sourceGroups.find(g=>g.GroupID===id)));
+  for(const line of sourceLines.filter(l=>l.GroupID===id)){
+   if(usedLines.has(line.DialogueID))throw Error('임시 손님 문장 ID가 충돌합니다: '+line.DialogueID);
+   lines.push(structuredClone(line));usedLines.add(line.DialogueID);
+  }
+ }
  return data;
 }

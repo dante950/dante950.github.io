@@ -5,8 +5,8 @@ import {storyStartOptions,createStoryState,stageForGuest} from '../src/model.js'
 import {projectForPlay} from '../src/publishing.js';
 const project=JSON.parse(await fs.readFile(new URL('../data/project.json',import.meta.url),'utf8'));
 test('start from each scheduled guest, then keep the remaining customer order',()=>{
- assert.deepEqual(storyStartOptions(project).map(({guest,day,index})=>[guest.id,day,index]),[[10001,1,0],[10002,1,1],[10003,2,0]]);
- for(const [id,remaining,stage] of [[10001,[10001,10002,10003],'beauty'],[10002,[10002,10003],'battle'],[10003,[10003],'beauty']]){
+ assert.deepEqual(storyStartOptions(project).map(({guest,day,index})=>[guest.id,day,index]),[[10001,1,0],[10003,1,1],[10004,2,0]]);
+ for(const [id,remaining,stage] of [[10001,[10001,10003,10004],'beauty'],[10003,[10003,10004],'beauty'],[10004,[10004],'beauty']]){
   const state=createStoryState(structuredClone(project),id);
   assert.deepEqual([...state.project.schedule[state.day-1].slice(state.index),...state.project.schedule.slice(state.day).flat()],remaining);
   assert.equal(stageForGuest(state.project.guests.find(g=>g.id===id)),stage);

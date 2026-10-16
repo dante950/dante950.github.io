@@ -40,8 +40,8 @@ test('public play receives new deployment even if a visitor saved different data
 
 test('story guests and beauty-only guests pass their respective validation',()=>{
  assert.deepEqual(projectProblems(project),[]);
- for(const guest of project.guests.filter(g=>!g.previewOnly))assert.deepEqual(validate(project.combat,{monsterID:guest.id}).errors,[],guest.name);
- assert.deepEqual(project.schedule,[[10001,10002],[10003]]);
+ for(const guest of project.guests.filter(g=>!g.previewOnly&&g.battle!=='none'))assert.deepEqual(validate(project.combat,{monsterID:guest.id}).errors,[],guest.name);
+ assert.deepEqual(project.schedule,[[10001,10003],[10004]]);
  assert.equal(project.guests.find(g=>g.id===10002).beauty.enabled,false);
 });
 

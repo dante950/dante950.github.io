@@ -1,8 +1,8 @@
 {
   "format": "YACHACHA_FULLFLOW",
   "schemaVersion": 1,
-  "version": 8,
-  "updatedAt": "2026-10-16T07:10:28.222Z",
+  "version": 13,
+  "updatedAt": "2026-10-16T09:31:31.723Z",
   "combat": {
     "version": 4,
     "layout": "legacy",
@@ -1041,7 +1041,7 @@
             "Name": "샌즈",
             "PhaseID": 1,
             "IsInitial": "켜기",
-            "MaxHP": 1,
+            "MaxHP": 100,
             "GaugeMax": 100,
             "ParryGain": 50,
             "GuardGain": 0,
@@ -1050,11 +1050,11 @@
             "AttackSpeed": 1,
             "TransitionTrigger": "HP 0",
             "NextPhaseID": 2,
-            "PlayerDodgeMissCount": 1,
+            "PlayerDodgeMissCount": 0,
             "EntryDialogueGroupID": null,
             "PauseForEntryDialogue": "켜기",
-            "DesignStatus": "첫 빈틈의 첫 MISS부터 대사(정지 없음). 다음 빈틈은 999999 연타 표시, 종료 후 명중 대사·전환.",
-            "OpeningDamageDisplay": 999999,
+            "DesignStatus": "하트 판3개. 기본면역. 빈틈 중 적중한 경우에만 종료 시 오른쪽→왼쪽→중앙 순으로 한 판 낙하. 무타격 빈틈은 유지. 내부HP100은 전환용.",
+            "OpeningDamageDisplay": null,
             "__source": 10
           },
           {
@@ -1062,7 +1062,7 @@
             "Name": "샌즈",
             "PhaseID": 2,
             "IsInitial": "끄기",
-            "MaxHP": 1,
+            "MaxHP": 100,
             "GaugeMax": 100,
             "ParryGain": 50,
             "GuardGain": 0,
@@ -1071,11 +1071,11 @@
             "AttackSpeed": 1.2,
             "TransitionTrigger": "HP 0",
             "NextPhaseID": 3,
-            "PlayerDodgeMissCount": 1,
+            "PlayerDodgeMissCount": 0,
             "EntryDialogueGroupID": null,
             "PauseForEntryDialogue": "켜기",
-            "DesignStatus": "첫 빈틈의 첫 MISS부터 대사(정지 없음). 다음 빈틈은 999999 연타 표시, 종료 후 명중 대사·전환.",
-            "OpeningDamageDisplay": 999999,
+            "DesignStatus": "하트 판3개. 기본면역. 빈틈 중 적중한 경우에만 종료 시 오른쪽→왼쪽→중앙 순으로 한 판 낙하. 무타격 빈틈은 유지. 내부HP100은 전환용.",
+            "OpeningDamageDisplay": null,
             "__source": 11
           },
           {
@@ -1083,7 +1083,7 @@
             "Name": "샌즈",
             "PhaseID": 3,
             "IsInitial": "끄기",
-            "MaxHP": 1,
+            "MaxHP": 100,
             "GaugeMax": 100,
             "ParryGain": 50,
             "GuardGain": 0,
@@ -1092,11 +1092,11 @@
             "AttackSpeed": 1.5,
             "TransitionTrigger": "HP 0",
             "NextPhaseID": null,
-            "PlayerDodgeMissCount": 1,
+            "PlayerDodgeMissCount": 0,
             "EntryDialogueGroupID": null,
             "PauseForEntryDialogue": "끄기",
-            "DesignStatus": "첫 빈틈의 첫 MISS부터 대사(정지 없음). 다음 빈틈은 999999 연타 표시, 종료 후 명중 대사·전환.",
-            "OpeningDamageDisplay": 999999,
+            "DesignStatus": "하트 판3개. 기본면역. 빈틈 중 적중한 경우에만 종료 시 오른쪽→왼쪽→중앙 순으로 한 판 낙하. 무타격 빈틈은 유지. 내부HP100은 전환용.",
+            "OpeningDamageDisplay": null,
             "__source": 12
           },
           {
@@ -1518,7 +1518,7 @@
             "PlayerID": 1,
             "Name": "주인공",
             "MaxHP": 100,
-            "DodgeDamage": 30,
+            "DodgeDamage": 10,
             "GuardMax": 100,
             "ParryMs": 200,
             "GuardHitCost": 40,
@@ -2621,7 +2621,7 @@
             "GroupID": 80044,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "뭐...<wait=0.45> 이 정도는 맞아줄 수 있지.<wait=0.3> <color=#8BE9FD>서비스</color>라고 해 두자고.",
+            "Text": "이 정도는 맞아줄 수 있지.",
             "Notes": "색·동작 태그는 문자 효과 규칙 시트 참고."
           },
           {
@@ -2637,7 +2637,7 @@
             "GroupID": 80046,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "...어라.<wait=0.6> 그 타이밍을 또 맞혔네.<wait=0.35> <shake=1.4 speed=14>좀 쉬엄쉬엄하자고, 친구.</shake>",
+            "Text": "<shake=0.7>쉬엄쉬엄 하자고, 친구.</shake>",
             "Notes": "색·동작 태그는 문자 효과 규칙 시트 참고."
           },
           {
@@ -2645,7 +2645,7 @@
             "GroupID": 80047,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "잠깐,<wait=0.45> 우리...<wait=0.45> <color=#8BE9FD>친구잖아..?</color>\n<shake=2.2 speed=20>날 정말 죽일 셈이야..?</shake>",
+            "Text": "잠깐..<wait=0.25> <shake=1.4>날 정말 죽일 셈이야?</shake>",
             "Notes": "색·동작 태그는 문자 효과 규칙 시트 참고."
           },
           {
@@ -2653,7 +2653,7 @@
             "GroupID": 80048,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "나는 이래서...<wait=0.65> <cps=16><shake=1.6 speed=16><color=#FF9797>눈치 빠른 애송이들이 싫어...</color></shake></cps>",
+            "Text": "이래서..<wait=0.4> <shake=1.2><color=#FF9797>눈치 빠른 꼬맹이들이 정말 싫어.</color></shake>",
             "Notes": "색·동작 태그는 문자 효과 규칙 시트 참고."
           },
           {
@@ -2865,14 +2865,6 @@
             "Notes": "통합 플레이"
           },
           {
-            "DialogueID": 900108,
-            "GroupID": 80067,
-            "Order": 1,
-            "Speaker": "나레이션",
-            "Text": "미용실로 돌아오자, 문에 달린 종이 작게 울렸다. 오늘의 마지막 손님과의 야차가 끝났다.",
-            "Notes": "통합 플레이"
-          },
-          {
             "DialogueID": 900109,
             "GroupID": 80068,
             "Order": 1,
@@ -2953,19 +2945,11 @@
             "Notes": "마왕 부하 미용 시험용 초안"
           },
           {
-            "DialogueID": 900119,
-            "GroupID": 80075,
-            "Order": 2,
-            "Speaker": "몬스터",
-            "Text": "발모제는 <color=#52609B>붙어 있는 뿔에서 이어서</color> 발라 주세요.\n눈만 피하면 얼굴 앞으로 휘어도 괜찮습니다. 뿔까지 업무처럼 불어나지는 않게 부탁드립니다.",
-            "Notes": "마왕 부하 미용 시험용 초안"
-          },
-          {
             "DialogueID": 900120,
             "GroupID": 80076,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "잠을 못 잔 지 <color=#52609B>666년</color>입니다. 그런데 멀쩡해 보인다며 반차가 반려됐지 뭡니까.\n<color=#52609B>이마의 외눈 아래에 가장 어두운 색으로 다크서클</color>을 그려 주세요. 이번엔 꼭 쉬고 싶습니다.",
+            "Text": "잠을 못 잔 지 <color=#52609B>666년</color>입니다. 그런데 멀쩡해 보인다며 반차가 반려됐지 뭡니까.\n<color=#52609B>세 눈 아래 모두, 가장 어두운 색으로 다크서클</color>을 부탁드립니다. 이번엔 꼭 쉬고 싶습니다.",
             "Notes": "마왕 부하 미용 시험용 초안"
           },
           {
@@ -2973,7 +2957,7 @@
             "GroupID": 80077,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "<color=#52609B>이마에 혼자 있는 눈 바로 아래</color>만 짙게 부탁드립니다.\n눈 자체와 나머지 얼굴은 남겨 주세요. 아파 보이되, 인수인계는 할 수 있는 얼굴이어야 합니다.",
+            "Text": "<color=#52609B>이마의 눈도, 안경 쓴 두 눈도</color> 빠짐없이 피곤해 보여야 합니다.\n눈 자체는 남겨 주세요. 아파 보이되, 인수인계는 할 수 있는 얼굴이어야 합니다.",
             "Notes": "마왕 부하 미용 시험용 초안"
           },
           {
@@ -2981,7 +2965,7 @@
             "GroupID": 80078,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "장식은 없어도 괜찮습니다. 회의에 늦지만 않으면 됩니다.",
+            "Text": "코끝도 좀 <color=#D94B4B>빨갛게</color> 부탁드립니다.\n666년 무결근이라, 말로 아프다 하면 아무도 안 믿습니다.",
             "Notes": "마왕 부하 미용 시험용 초안"
           },
           {
@@ -2989,8 +2973,80 @@
             "GroupID": 80079,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "장식은 없어도 괜찮습니다. 회의에 늦지만 않으면 됩니다.",
+            "Text": "<color=#D94B4B>빨간 코 장식 하나</color>면 충분합니다.\n<wait=0.3>아파 보이려는 거지, 부서 송년회 사회를 보려는 건 아닙니다.",
             "Notes": "마왕 부하 미용 시험용 초안"
+          },
+          {
+            "DialogueID": 900124,
+            "GroupID": 80080,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "실례합니다. 마왕님 직속으로 일하고 있습니다. 커피는…… 들고 있어도 되겠습니까?",
+            "Notes": "로컬 본편 시연용 임시 대사"
+          },
+          {
+            "DialogueID": 900125,
+            "GroupID": 80080,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "쉬지 않고 일하다 보니 <color=#FFD166>뿔을 돌볼 틈이 없었습니다.</color>\n보고서는 매일 정리했는데, 제 머리 위는 결재가 밀렸군요.",
+            "Notes": "로컬 본편 시연용 임시 대사"
+          },
+          {
+            "DialogueID": 900126,
+            "GroupID": 80081,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "<wave=1.2>아…… 좋습니다.</wave> 뿔도 가벼워졌고, 세 눈 모두 아주 설득력 있게 피곤해 보이는군요.",
+            "Notes": "로컬 본편 시연용 임시 대사"
+          },
+          {
+            "DialogueID": 900127,
+            "GroupID": 80081,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "이 얼굴로 반차를 반려하시면, 마왕님도 양심에 좀 찔리시겠지요.",
+            "Notes": "로컬 본편 시연용 임시 대사"
+          },
+          {
+            "DialogueID": 900128,
+            "GroupID": 80082,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "음…… 회의에 들어가면 다들 무슨 일 있냐고는 묻겠군요.",
+            "Notes": "로컬 본편 시연용 임시 대사"
+          },
+          {
+            "DialogueID": 900129,
+            "GroupID": 80082,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "반차는 모르겠지만, 오늘 야근 명단에서는 빠질 수 있겠습니다. 아마도요.",
+            "Notes": "로컬 본편 시연용 임시 대사"
+          },
+          {
+            "DialogueID": 900130,
+            "GroupID": 80083,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "<shake=0.8>하아……</shake> 쉬고 싶어서 왔는데, 해명할 일이 하나 더 생겼군요.",
+            "Notes": "로컬 본편 시연용 임시 대사"
+          },
+          {
+            "DialogueID": 900131,
+            "GroupID": 80083,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "마왕님께는…… 새로운 복지 제도를 시험했다고 보고하겠습니다.",
+            "Notes": "로컬 본편 시연용 임시 대사"
+          },
+          {
+            "DialogueID": 900132,
+            "GroupID": 80084,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "그럼 결재를 올리러 가겠습니다. 커피가 식기 전에…… 아니, 반차가 사라지기 전에.",
+            "Notes": "로컬 본편 시연용 임시 대사"
           }
         ]
       },
@@ -3653,14 +3709,14 @@
           },
           {
             "GroupID": 80047,
-            "Name": "샌즈 · 세 번째 MISS 식은땀",
+            "Name": "샌즈 · 마지막 빈틈 경계",
             "PlaybackMode": "순서대로",
             "PauseCombat": "끄기",
             "AdvanceMode": "자동",
-            "CPS": 23,
-            "HoldMs": 1500,
+            "CPS": 30,
+            "HoldMs": 900,
             "GapMs": 250,
-            "Notes": "첫 MISS와 함께 재생. 말하는 중에도 빈틈 게이지와 연타 진행.",
+            "Notes": "세 번째 페이즈 빈틈 시작, 공격과 함께 말한다.",
             "ActorEffect": "식은땀",
             "FinishEffect": "없음"
           },
@@ -3912,19 +3968,6 @@
             "FinishEffect": "없음"
           },
           {
-            "GroupID": 80067,
-            "Name": "샌즈 · 야차가 끝난 미용실",
-            "PlaybackMode": "순서대로",
-            "PauseCombat": true,
-            "AdvanceMode": "입력",
-            "CPS": 30,
-            "HoldMs": 1400,
-            "GapMs": 100,
-            "Notes": "통합 프로토타입 미용실 대사",
-            "ActorEffect": "없음",
-            "FinishEffect": "없음"
-          },
-          {
             "GroupID": 80068,
             "PlaybackMode": "순서대로",
             "PauseCombat": true,
@@ -4077,6 +4120,71 @@
             "HoldMs": 1400,
             "GapMs": 100,
             "Notes": "미용 시험용 대사 초안",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80080,
+            "Name": "마왕 부하 · 손님 등장",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "로컬 본편 시연용 임시 대사",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80081,
+            "Name": "마왕 부하 · 미용 만족",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "로컬 본편 시연용 임시 대사",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80082,
+            "Name": "마왕 부하 · 미용 보통",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "로컬 본편 시연용 임시 대사",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80083,
+            "Name": "마왕 부하 · 미용 불만족",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "로컬 본편 시연용 임시 대사",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80084,
+            "Name": "마왕 부하 · 손님 퇴장",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "로컬 본편 시연용 임시 대사",
             "ActorEffect": "없음",
             "FinishEffect": "없음"
           }
@@ -4464,8 +4572,8 @@
             "HPThresholdPct": null,
             "CooldownMs": 0,
             "MaxPerBattle": 1,
-            "Enabled": "켜기",
-            "Notes": "첫 MISS 순간 대사 시작. 같은 빈틈의 후속 MISS에는 재시작하지 않음. 전투 정지 없음.",
+            "Enabled": "끄기",
+            "Notes": "최신 빌드 기준 빈틈 MISS 없음. 과거 연결 보관.",
             "EventCount": 1,
             "__source": 23
           },
@@ -4496,8 +4604,8 @@
             "HPThresholdPct": null,
             "CooldownMs": 0,
             "MaxPerBattle": 1,
-            "Enabled": "켜기",
-            "Notes": "첫 MISS 순간 대사 시작. 같은 빈틈의 후속 MISS에는 재시작하지 않음. 전투 정지 없음.",
+            "Enabled": "끄기",
+            "Notes": "최신 빌드 기준 빈틈 MISS 없음. 과거 연결 보관.",
             "EventCount": 1,
             "__source": 25
           },
@@ -4521,7 +4629,7 @@
             "TriggerID": 100024,
             "MonsterID": 10003,
             "PhaseID": 3,
-            "EventType": "빈틈공격 MISS",
+            "EventType": "빈틈 발생",
             "PatternID": null,
             "BeautyCondition": "공통",
             "GroupID": 80047,
@@ -4529,24 +4637,24 @@
             "CooldownMs": 0,
             "MaxPerBattle": 1,
             "Enabled": "켜기",
-            "Notes": "첫 MISS 순간 대사 시작. 같은 빈틈의 후속 MISS에는 재시작하지 않음. 전투 정지 없음.",
-            "EventCount": 1,
+            "Notes": "3페이즈 빈틈 발생 시 전투를 멈추지 않고 한 번 재생.",
+            "EventCount": null,
             "__source": 27
           },
           {
             "TriggerID": 100025,
             "MonsterID": 10003,
             "PhaseID": 3,
-            "EventType": "빈틈공격 성공",
+            "EventType": "몬스터 HP 이하",
             "PatternID": null,
             "BeautyCondition": "공통",
             "GroupID": 80048,
-            "HPThresholdPct": null,
+            "HPThresholdPct": 0,
             "CooldownMs": 0,
             "MaxPerBattle": 1,
             "Enabled": "켜기",
-            "Notes": "1번째 명중한 빈틈 종료 후 한 번 재생. 연타 개수는 세지 않음.",
-            "EventCount": 1,
+            "Notes": "3페이즈 HP0, 빈틈 전체 시간 종료 후 마지막 대사와 소멸.",
+            "EventCount": null,
             "__source": 28
           },
           {
@@ -5170,8 +5278,7 @@
         "arrival": 80061,
         "best": 80064,
         "normal": 80065,
-        "fail": 80066,
-        "afterWin": 80067
+        "fail": 80066
       },
       "battle": "forced",
       "note": "망치·정 / 얼굴 테두리 / Tag_Strong. 발모제는 기존 두개골과 이어지는 뼈 재료. 형태 목표·배점은 기존 임시값을 유지한 시험 설정입니다. 눈·입 표현도 임시입니다."
@@ -5179,23 +5286,23 @@
     {
       "id": 10004,
       "name": "마왕 부하",
-      "previewOnly": true,
+      "previewOnly": false,
       "beauty": {
         "enabled": true,
         "steps": {
           "cut": true,
           "draw": true,
-          "attach": false
+          "attach": true
         },
         "weights": {
-          "cut": 70,
+          "cut": 50,
           "draw": 30,
-          "attach": 0
+          "attach": 20
         },
         "cutTool": "hammer",
-        "attachTag": "Tag_Strong",
-        "attachFirst": 30,
-        "attachExtra": 15,
+        "attachTag": "Tag_Fun",
+        "attachFirst": 20,
+        "attachExtra": 0,
         "attachMisplaced": 10,
         "attachWrong": 15,
         "drawColors": [
@@ -5210,7 +5317,7 @@
             "w": 22.5,
             "h": 12.5,
             "kind": "good",
-            "shape": "rect",
+            "shape": "ellipse",
             "points": 10,
             "stickerIDs": [],
             "rule": "clear",
@@ -5225,7 +5332,7 @@
             "w": 20,
             "h": 15,
             "kind": "good",
-            "shape": "rect",
+            "shape": "ellipse",
             "points": 10,
             "stickerIDs": [],
             "rule": "clear",
@@ -5240,7 +5347,7 @@
             "w": 20,
             "h": 15,
             "kind": "good",
-            "shape": "rect",
+            "shape": "ellipse",
             "points": 10,
             "stickerIDs": [],
             "rule": "clear",
@@ -5256,38 +5363,107 @@
             "h": 350,
             "kind": "good",
             "shape": "rect",
-            "points": 40,
+            "points": 20,
             "stickerIDs": [],
             "rule": "area",
-            "maxRatio": 0.9,
+            "maxRatio": 0.8,
             "tolerance": 0
           }
         ],
-        "attachRegions": [],
+        "attachRegions": [
+          {
+            "key": "Nose",
+            "label": "코 주변",
+            "x": 144,
+            "y": 148,
+            "w": 32,
+            "h": 32,
+            "kind": "good",
+            "shape": "ellipse",
+            "points": 20,
+            "stickerIDs": [
+              "ST-FUN-NOSE-RED"
+            ]
+          }
+        ],
         "drawRegions": [
           {
             "key": "ThirdEyeCircle",
-            "label": "이마 외눈 아래 다크서클",
+            "label": "이마 눈 아래 다크서클",
             "x": 148,
             "y": 134,
             "w": 24,
             "h": 8,
             "kind": "good",
-            "points": 40,
+            "points": 10,
             "shape": "ellipse",
-            "stickerIDs": []
+            "stickerIDs": [],
+            "requiredCoverage": 0.6
           },
           {
-            "key": "ThirdEye",
+            "key": "LeftEyeCircle",
+            "label": "왼쪽 눈 아래 다크서클",
+            "x": 136,
+            "y": 158,
+            "w": 20,
+            "h": 8,
+            "kind": "good",
+            "points": 10,
+            "shape": "ellipse",
+            "stickerIDs": [],
+            "requiredCoverage": 0.6
+          },
+          {
+            "key": "RightEyeCircle",
+            "label": "오른쪽 눈 아래 다크서클",
+            "x": 166,
+            "y": 158,
+            "w": 20,
+            "h": 8,
+            "kind": "good",
+            "points": 10,
+            "shape": "ellipse",
+            "stickerIDs": [],
+            "requiredCoverage": 0.6
+          },
+          {
+            "key": "EyeTopPaint",
             "label": "이마 외눈은 가리지 않기",
-            "x": 148,
-            "y": 120,
-            "w": 24,
-            "h": 12,
+            "x": 148.75,
+            "y": 120.5,
+            "w": 22.5,
+            "h": 12.5,
             "kind": "bad",
             "points": 15,
             "shape": "ellipse",
-            "stickerIDs": []
+            "stickerIDs": [],
+            "tolerance": 0.12
+          },
+          {
+            "key": "EyeLeftPaint",
+            "label": "왼쪽 눈은 가리지 않기",
+            "x": 136.25,
+            "y": 143,
+            "w": 20,
+            "h": 15,
+            "kind": "bad",
+            "points": 15,
+            "shape": "ellipse",
+            "stickerIDs": [],
+            "tolerance": 0.12
+          },
+          {
+            "key": "EyeRightPaint",
+            "label": "오른쪽 눈은 가리지 않기",
+            "x": 166.25,
+            "y": 143,
+            "w": 20,
+            "h": 15,
+            "kind": "bad",
+            "points": 15,
+            "shape": "ellipse",
+            "stickerIDs": [],
+            "tolerance": 0.12
           },
           {
             "key": "RestFace",
@@ -5299,7 +5475,8 @@
             "kind": "bad",
             "points": 15,
             "shape": "ellipse",
-            "stickerIDs": []
+            "stickerIDs": [],
+            "tolerance": 0.08
           }
         ],
         "basePay": 0,
@@ -5321,28 +5498,46 @@
         },
         "requestNotes": {
           "cut": "눈 세 개는 무사하게\n뿔은 출근할 때보다 가볍게",
-          "draw": "이마 외눈 아래만 가장 어둡게\n눈과 나머지 얼굴은 깔끔하게",
-          "attach": "장식 없이 단정하게"
+          "draw": "세 눈 아래 모두 가장 어둡게\n눈과 나머지 얼굴은 깔끔하게",
+          "attach": "감기 걸린 듯\n코끝에 빨간 코 하나"
         },
         "requestBriefNotes": {
           "cut": "눈 세 개는 무사하게\n뿔은 출근할 때보다 가볍게",
-          "draw": "외눈 아래 짙은 다크서클로\n반차가 필요한 얼굴 만들기",
-          "attach": "장식 없이 단정하게"
+          "draw": "세 눈 아래 짙은 다크서클로\n반차가 필요한 얼굴 만들기",
+          "attach": "반차 결재를 위한\n감기 연기 마무리"
         },
-        "eyeContactLine": "잠깐, 그건 눈입니다. 연차도 못 쓰는데 안대까지 쓰게 하시려고요?"
+        "eyeContactLine": "잠깐! 그건 눈입니다. 연차도 못 쓰는데 안대까지 쓰게 하시려고요?",
+        "drawRequiredRatio": 0.9,
+        "eyeContactSecondLine": "하아…… 눈은 세 개지만, 인내심까지 세 벌인 건 아닙니다.",
+        "areaWarningLine": "잠깐…… 줄이러 왔는데 다시 불어나는군요. 제 업무량도 아니고.",
+        "areaOverflowLine": "잠깐…… 왔을 때보다 뿔이 더 자란 것 같습니다만. 증원은 제 부서에 해 주십시오.",
+        "resultLines": {
+          "satisfied": "좋습니다. 이 얼굴이면 반차가 아니라 병가도 결재 나겠군요.",
+          "neutral": "음…… 피곤해 보이기는 하네요. 반차 말고 조퇴부터 올려 보겠습니다.",
+          "angry": "하아…… 반차 사유에 미용실 방문 후유증도 적어야겠군요."
+        },
+        "attachHint": "감기 걸린 듯 코끝에 빨간 코 하나",
+        "stickerScale": 0.3
       },
-      "bindings": {},
+      "bindings": {
+        "arrival": 80080,
+        "best": 80081,
+        "normal": 80082,
+        "fail": 80083,
+        "leave": 80084
+      },
       "battle": "none",
-      "note": "미용 시험 초안. 얼굴에 붙은 뿔에서 이어 기르고 다시 깎는다. 얼굴 위 덮기 허용, 세 눈 접촉과 시작 면적 초과는 실패. 시작 대비90% 이하 면적은 조절 가능한 시험값이며 정해진 목표 모양은 없다. 다크서클로 반차를 얻으려는 직장인 부탁을 유지한다."
+      "note": "로컬 시연: 연결된 뿔80% 이하·세 눈 다크서클·빨간 코 감기 연기. 형태50/그리기30/장식20. 야차 미연결.",
+      "workbookExcluded": true
     }
   ],
   "schedule": [
     [
       10001,
-      10002
+      10003
     ],
     [
-      10003
+      10004
     ]
   ]
 }

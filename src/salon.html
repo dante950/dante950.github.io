@@ -375,12 +375,7 @@ body.cutscene #gameWrap:before,body.cutscene #gameWrap:after{content:'';position
   <div id="yachaSettlement"><div class="yachaSettlementCard"><h2></h2><p></p><button type="button">타이틀로 돌아가기</button></div></div>
 </div>
 <script id="guest-data" type="application/json">__GUEST_JSON__</script><script>const GUEST=JSON.parse(document.getElementById("guest-data").textContent);
-function beautyInside(x,y,r){if(r.shape==='ellipse')return ((x-r.x-r.w/2)/(r.w/2))**2+((y-r.y-r.h/2)/(r.h/2))**2<=1;return x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h;}
-function beautyAttachScore(placements,b){let score=0,valid=0;const seen=new Set();for(const p of placements){const duplicate=seen.has(p.sticker.id);seen.add(p.sticker.id);if(duplicate||p.sticker.tag!==b.attachTag)score-=b.attachWrong;else if(!b.attachRegions.find(r=>r.key===p.region)?.stickerIDs.includes(p.sticker.id))score-=b.attachMisplaced;else score+=valid++===0?b.attachFirst:b.attachExtra;}return Math.max(0,Math.min(b.weights.attach,score));}
-function beautyDrawScore(pixels,b,width=320,height=350){const totals=b.drawRegions.map(()=>0),painted=totals.slice(),correct=totals.slice(),colors=b.drawColors.map(h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)));for(let y=0;y<height;y++)for(let x=0;x<width;x++){const n=b.drawRegions.findIndex(r=>beautyInside(x,y,r));if(n<0)continue;totals[n]++;const i=(y*width+x)*4;if(pixels[i+3]<=16)continue;painted[n]++;if(colors.some(c=>c.every((v,j)=>Math.abs(v-pixels[i+j])<10)))correct[n]++;}let result=0;for(let i=0;i<totals.length;i++){const r=b.drawRegions[i];result+=(r.kind==='good'?correct[i]:r.kind==='bad'?-painted[i]:0)/Math.max(1,totals[i])*r.points;}return Math.max(0,Math.min(b.weights.draw,result));}
-function beautyTotal(scores,b){return Math.max(0,Math.min(100,Object.keys(b.steps).reduce((s,k)=>s+(b.steps[k]?scores[k]:0),0)));}
-
-
+/* Shared beauty rules are injected by the build. */
 const SPRITES={front:'./media/a60f39797ec2a08be94bb830.png',back:'./media/a8779e7993df7187d998345f.png',left:'./media/855ab40978f1cafb6734db12.png',right:'./media/f3c56ecc6e0e4af16a6051d8.png'};
 const ZOMBIE_WALK={body:'./media/3a020267b83b0dadb23c770c.png',head:'./media/71edf9e050b25880b364b7cd.png',hair:'./media/e76deff52e3baa856cfe7016.png'};
 const screens=[...document.querySelectorAll('.screen')],settingsModal=document.getElementById('settingsModal'),gameScreen=document.getElementById('gameScreen'),gameWrap=document.getElementById('gameWrap'),gameWorld=document.getElementById('gameWorld'),player=document.getElementById('player'),shadow=document.getElementById('shadow'),hudTop=document.querySelector('.hudTop'),speedRange=document.getElementById('speedRange'),debugToggle=document.getElementById('debugToggle');
@@ -421,6 +416,11 @@ const chairFront=document.querySelector('.chair.main').cloneNode(true);chairFron
 beautyCustomer.innerHTML=seatedCustomer.innerHTML;
 beautyCustomer.querySelector('.hairBack').style.display='none';
 if(GUEST.skin){for(const root of [seatedCustomer,beautyCustomer]){root.querySelector('.head').src=GUEST.skin.head;root.querySelector('.hairFront').src=GUEST.skin.hair;root.querySelector('.hairBack').style.display='none';}}
+if(GUEST.skin?.layers&&GUEST.skin.portrait){
+ for(const selector of ['.head','.hairFront','.hairBack'])seatedCustomer.querySelector(selector).style.display='none';
+ const image=document.createElement('img');image.className='seatedLayeredPortrait';image.src=GUEST.skin.portrait;image.style.cssText='left:-29px;top:-34px;width:147px;height:161px;z-index:3';seatedCustomer.append(image);
+ seatedCustomer.setAttribute('aria-label',GUEST.name+' 손님');
+}
 
 document.querySelector('.beautyCounterProps').src=document.querySelector('.salonProps').src;
 /*__BEAUTY_RUNTIME__*/
@@ -447,7 +447,8 @@ function safeText(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<
 function send(type,extra={}){parent.postMessage({source:'yachacha-salon',token:GUEST.token,type,...extra},'*');}
 if(GUEST.skin?.full&&GUEST.id!==10001){const img=document.createElement('img');img.className='guestWalk';img.src=GUEST.skin.full;customer.append(img);for(const e of [customerBody,customerHead,customerHair])e.style.visibility='hidden';}
 if(!GUEST.beauty.enabled){for(const e of [...seatedCustomer.children])e.style.visibility='hidden';const img=document.createElement('img');img.src=GUEST.skin.full;img.style.cssText='position:absolute;left:24px;top:0;width:180px;height:300px;object-fit:contain;image-rendering:pixelated';seatedCustomer.append(img);}
-document.querySelector('.beautyMoney').textContent=(GUEST.money||0)+' G';document.querySelector('.beautyDay').innerHTML='DAY '+GUEST.day+'<br><small>'+safeText(GUEST.name)+'</small>';
+addEventListener('message',e=>{if(e.source===parent&&e.data?.token===GUEST.token&&e.data.type==='followers')document.querySelector('.beautyMoney').textContent=e.data.value+' 팔로워';});
+document.querySelector('.beautyMoney').textContent=(GUEST.followers||0)+' 팔로워';document.querySelector('.beautyDay').innerHTML='DAY '+GUEST.day+'<br><small>'+safeText(GUEST.name)+'</small>';
 document.querySelector('.phone').textContent='DAY '+GUEST.day;beautyCustomer.setAttribute('aria-label',GUEST.name+' 미용');
 document.getElementById('backToTitle').onclick=()=>send('home');
 const interact=document.createElement('button');interact.className='childExit';interact.textContent='손님에게 말 걸기 · F';interact.style.display='none';gameWorld.append(interact);interact.onclick=()=>{if(customerState.phase==='seated')startDialogue();};

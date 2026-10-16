@@ -54,6 +54,18 @@ export function createRun(settings = DEFAULT_SETTINGS) {
   };
 }
 
+// Adapt completed story visits only; jumping to a later customer never invents rewards.
+export function runFromStory(records,day){
+ const ids={10001:'zombie',10003:'sans',10004:'minion'};
+ const visits=records.filter(r=>ids[r.id]&&r.day<=day).map(r=>({
+  ...r,id:`day-${r.day}-${ids[r.id]}`,guestId:ids[r.id],
+  reviewKind:r.forced?'battle':'beauty',
+ }));
+ const today=visits.filter(r=>r.day===day);
+ const total=visits.at(-1)?.after||0;
+ return {...createRun(),day,total,dayStart:today[0]?.before??total,visits};
+}
+
 export function dayVisits(run) {
   return run.visits.filter(visit => visit.day === run.day);
 }

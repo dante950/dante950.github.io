@@ -11,3 +11,18 @@ body.storyMode .storyPause{position:absolute;right:1.5%;bottom:7%;z-index:10}bod
 #fightGate h2{font-size:clamp(42px,7vw,82px);font-weight:1000;margin:10px 0;transform:rotate(-5deg);animation:yachaArrival .5s cubic-bezier(.2,1.6,.4,1) both}#fightGate small{letter-spacing:4px;font-size:13px}@keyframes yachaArrival{from{transform:scale(1.7) rotate(-15deg);opacity:0}to{transform:scale(1) rotate(-5deg);opacity:1}}
 
 body.storyMode .dialoguebox{background:#332630f7;border-color:#d7b68e;color:#f0eee3}body.storyMode .dialoguehead{color:#ffcf93}body.storyMode .dialoguebox p{color:#f0eee3}
+
+/* Confirmed cursor combat uses the reference stage proportions. */
+body.storyMode main{width:min(96vw,calc(96vh * 1280 / 650));aspect-ratio:1280/650}body.storyMode .cursorSettingsNote{display:none}#arena{touch-action:none;aspect-ratio:1280/650}body.storyMode .storyPause{bottom:8%}
+
+/* The actor's speech follows its rendered head; pointer gestures pass through. */
+#battleArea{position:relative}
+#dialogueBox.bubbleReplaced{display:none!important}
+.monsterBubble{position:absolute;z-index:6;background:#14131e;color:#fff;padding:10px 14px;border:2px solid #282432;border-radius:11px;box-shadow:0 4px 0 #0003;text-align:center;pointer-events:none;max-height:calc(100% - 16px)}
+.monsterBubble[hidden]{display:none}
+.monsterBubble::after{content:'';position:absolute;left:var(--bubble-tail,50%);top:100%;transform:translateX(-50%);border-left:9px solid transparent;border-right:9px solid transparent;border-top:14px solid #14131e}
+.monsterBubble .bubbleSpeaker{display:block;font-size:calc(var(--bubble-font,19px) * .7);line-height:1.25;margin-bottom:5px;color:#eee}
+.monsterBubble .bubbleText{font-size:var(--bubble-font,19px);line-height:1.4;margin:0;white-space:pre-wrap;overflow-wrap:anywhere;min-height:1.4em}
+
+.monsterBubble .bubbleNext{pointer-events:auto;display:block;margin:6px 0 0 auto;font-size:10px;padding:3px 7px;background:#302c3d;border:1px solid #6d627b;color:#eee}
+.monsterBubble .bubbleNext[hidden]{display:none}

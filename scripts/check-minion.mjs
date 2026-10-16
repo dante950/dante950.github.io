@@ -8,7 +8,7 @@ import path from 'node:path';
 // Drive the actual editor and pointer controls. Diagnostics are read-only: the
 // test never writes a material cell, score, expression, or application state.
 const root = path.resolve('dist');
-const output = path.resolve(process.env.YACHA_MINION_SCREENSHOTS || '../minion-connected-2026-10-16');
+const output = path.resolve(process.env.YACHA_MINION_SCREENSHOTS || '../local-demo-2026-10-16');
 const report = [];
 await fs.mkdir(output, { recursive: true });
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json',
@@ -130,8 +130,8 @@ async function openPreview(page, engine) {
   await page.goto(base);
   await page.locator('#siteLoading').waitFor({ state: 'detached' });
   await page.locator('#play').click();
-  assert.equal(await page.locator('[data-start-guest="10004"]').count(), 0,
-    'the unfinished customer must stay out of public story starts');
+  assert.equal(await page.locator('[data-start-guest="10004"]').count(), 1);
+  assert.equal(await page.locator('[data-start-guest="10002"]').count(), 0);
   assert.equal(await page.locator('[data-start-guest]').count(), 3);
   await page.locator('#cancelStoryStart').click();
   await page.locator('#developer').click();
@@ -145,7 +145,7 @@ async function openPreview(page, engine) {
   await page.locator('[data-rfield="maxRatio"]').fill('0.85');
   await page.locator('[data-rfield="maxRatio"]').blur();
   assert.equal(await page.evaluate(() => fullflow.project.guests.find(g=>g.id===10004).beauty.cutRegions.find(r=>r.rule==='area').maxRatio), .85);
-  await page.locator('[data-rfield="maxRatio"]').fill('0.9');
+  await page.locator('[data-rfield="maxRatio"]').fill('0.8');
   await page.locator('[data-rfield="maxRatio"]').blur();
   await page.locator('[data-select-region="0"]').click();
   assert.equal(await page.locator('#toolSelect').inputValue(), 'hammer');
@@ -237,6 +237,9 @@ async function checkSculpt(page, salon, engine) {
   const { roots, eyes, face } = initial.masks;
   assert(initial.guest.beauty.growth.connected && initial.guest.beauty.growth.allowFace);
   assert(roots.some(Boolean) && eyes.some(Boolean));
+  for(const region of initial.guest.beauty.cutRegions.filter(r=>r.mask==='eyes')){
+    for(let n=0;n<eyes.length;n++)if(inBeautyRegion(...point(n),region))assert.equal(eyes[n],1,`${region.key}: the entire eye zone detects contact`);
+  }
   assert.equal(initial.shape.areaRatio, 1);
   assert.equal(initial.shape.eyeCoverCount, 0, 'arrival horns leave all three eyes clear');
   const nearest = (mask, xy) => mask.reduce((best, v, n) => !v ? best : best < 0 || distance(point(n), xy) < distance(point(best), xy) ? n : best, -1);
@@ -259,10 +262,13 @@ async function checkSculpt(page, salon, engine) {
     await setSize(salon, 3);
     await stroke(page, salon, point(root), point(eye));
     const touched = await snapshot(salon);
+    assert.equal(touched.reaction.count, Math.min(2, initial.guest.beauty.cutRegions.filter(r=>r.mask==='eyes').indexOf(region)+1));
     assert.equal(touched.material[eye], 2, 'horn grows over the eye on the face');
     assert(touched.shape.eyeCoverCount > 0 && touched.shape.hardFailure);
     assert.equal(touched.scores.cut, 0);
     assert.equal(touched.expression, 'angry');
+    if(region.key==='EyeLeft'){assert.match(touched.reaction.text,/인내심/);await page.screenshot({path:path.join(output,engine+'-minion-second-complaint.png')});}
+    if(region.key==='EyeRight')assert.equal(touched.reaction.count,2,'third contact has no further complaint');
     if (region.key === 'EyeTop') {
       assert.equal(touched.reaction.visible, true);
       assert.match(touched.reaction.text, /연차.*안대/);
@@ -294,8 +300,8 @@ async function checkSculpt(page, salon, engine) {
   const styled = await snapshot(salon);
   assert(styled.material.some((v,n) => v && !initial.original[n]), 'new branches are not constrained by the source silhouette');
   assert(styled.material.some((v,n) => v && initial.masks.hornTrim[n]), 'old trim locations are now allowed in a different shape');
-  assert(styled.shape.areaRatio < .9);
-  assert.equal(styled.scores.cut, 70, 'a different connected shape satisfies both requests');
+  assert(styled.shape.areaRatio < .8);
+  assert.equal(styled.scores.cut, 50, 'a different connected shape satisfies both requests');
   await page.screenshot({path: path.join(output, `${engine}-minion-connected-style.png`)});
   await salon.locator('[data-tool="hammer"]').click();
   await setSize(salon, 8);
@@ -312,6 +318,7 @@ async function checkSculpt(page, salon, engine) {
   await stroke(page, salon, [280,25], [280,85]);
   await stroke(page, salon, [280,85], [40,85]);
   const oversized = await snapshot(salon);
+  assert.match(oversized.reaction.text,/왔을 때보다/);
   assert.equal(oversized.shape.eyeCoverCount, 0);
   assert(oversized.shape.areaRatio > 1 && oversized.shape.hardFailure);
   assert.equal(oversized.scores.cut, 0, 'more horn area than arrival fails even with clear eyes');
@@ -320,7 +327,7 @@ async function checkSculpt(page, salon, engine) {
   await setSize(salon, 1);
   for (const [from,to] of rowRuns(oversized.material.map((v,n) => Number(v && !severed.material[n])))) await stroke(page, salon, from, to);
   const finished = await snapshot(salon);
-  assert.equal(finished.scores.cut, 70);
+  assert.equal(finished.scores.cut, 50);
   assert.equal(finished.shape.hardFailure, false);
   await salon.locator('#showBeautyZones').click();
   await page.screenshot({path: path.join(output, `${engine}-minion-eye-guide.png`)});
@@ -337,12 +344,12 @@ async function checkDrawing(page, salon, engine) {
   assert.match(await page.locator('#talkText').textContent(), /반차/);
   await page.screenshot({ path: path.join(output, `${engine}-minion-dark-circle-request.png`) });
   await page.locator('#beautyAsk').click();
-  await page.waitForFunction(() => document.getElementById('talkText').textContent.includes('이마에'));
+  await page.waitForFunction(() => document.getElementById('talkText').textContent.includes('이마의'));
   await readRequest(page);
   await page.locator('#beautyAccept').click();
   await salon.waitForFunction(() => !beautyDebug.briefing);
   const before = await snapshot(salon);
-  await setSize(salon, 4);
+  await setSize(salon, 3);
   await salon.locator('[data-color="#FF3024"]').click();
   await stroke(page, salon, [152, 138], [168, 138]);
   assert.equal((await snapshot(salon)).scores.draw, 0, 'a bright color does not satisfy the darkest-circle request');
@@ -350,13 +357,17 @@ async function checkDrawing(page, salon, engine) {
   assert.deepEqual((await snapshot(salon)).paint, before.paint);
   await salon.locator('[data-color="#03051B"]').click();
   await stroke(page, salon, [152, 138], [168, 138]);
+  assert((await snapshot(salon)).scores.draw<=10.01,'one eye alone cannot complete the three circles');
+  await stroke(page,salon,[140,162],[152,162]);
+  await stroke(page,salon,[170,162],[182,162]);
   const painted = await snapshot(salon);
-  assert.equal(painted.scores.draw, 30, 'an ordinary small horizontal brush stroke completes the dark circle');
-  assert.equal(painted.scores.total, 100);
+  await fs.writeFile(path.join(output,engine+'-drawing-diagnostics.json'),JSON.stringify(painted));
+  assert(painted.scores.draw >= 27, 'a thin horizontal brush stroke completes all three dark circles without stencil filling');
+  assert(painted.scores.total >= before.scores.total+27);
   assert.deepEqual(painted.material, before.material, 'drawing does not change the horn silhouette');
   await salon.locator('#erasePaint').click();
   await stroke(page, salon, [152, 138], [168, 138]);
-  assert.equal((await snapshot(salon)).scores.draw, 0);
+  assert((await snapshot(salon)).scores.draw < painted.scores.draw);
   await salon.locator('#undoBeauty').click();
   assert.deepEqual((await snapshot(salon)).paint, painted.paint, 'erased dark circles can be undone');
   // Painting the whole face cannot substitute for the specific under-eye request.
@@ -367,6 +378,9 @@ async function checkDrawing(page, salon, engine) {
   await salon.locator('#undoBeauty').click();
   assert.deepEqual((await snapshot(salon)).paint, painted.paint);
   await setSize(salon, 4);
+  await salon.locator('#showBeautyZones').click();
+  await page.screenshot({path:path.join(output,engine+'-minion-draw-guide.png')});
+  await salon.locator('#showBeautyZones').click();
   const controls = await salon.locator('.beautyPanel').evaluate(panel => ({
     bottom: panel.getBoundingClientRect().bottom,
     hintBottom: panel.querySelector('.sculptHint').getBoundingClientRect().bottom,
@@ -377,6 +391,25 @@ async function checkDrawing(page, salon, engine) {
 }
 
 async function checkResult(page, salon, finished, engine) {
+  await salon.locator('.beautyNext').click();
+  await readRequest(page);
+  assert.match(await page.locator('#talkText').innerText(),/666년 무결근/);
+  await page.locator('#beautyAccept').click();await page.locator('#talkLayer').waitFor({state:'hidden'});
+  await salon.waitForFunction(()=>!beautyDebug.briefing);
+  await salon.locator('[data-sticker="ST-FUN-NOSE-RED"]').click();
+  await stroke(page,salon,[200,180]);assert.equal((await snapshot(salon)).scores.attach,0,'off-nose placement does not count');
+  await stroke(page,salon,[200,180]);assert.equal(await salon.evaluate(()=>beautyDebug.placements.length),0,'click removes misplaced sticker');
+  for(const point of [[150,164],[170,164],[160,152],[160,176]]){
+    await stroke(page,salon,point);assert.equal((await snapshot(salon)).scores.attach,20,'generous circle accepts nearby placement');
+    await salon.locator('#undoBeauty').click();
+  }
+  await stroke(page,salon,[160,164]);assert.equal((await snapshot(salon)).scores.attach,20);
+  await salon.locator('#undoBeauty').click();assert.equal((await snapshot(salon)).scores.attach,0);
+  await stroke(page,salon,[160,164]);assert((await snapshot(salon)).scores.total>=97);
+  await salon.locator('#showBeautyZones').click();
+  await page.screenshot({path:path.join(output,engine+'-minion-nose-guide.png')});
+  await salon.locator('#showBeautyZones').click();
+  await page.screenshot({path:path.join(output,engine+'-minion-red-nose.png')});
   await salon.locator('.beautyNext').click();
   await salon.waitForFunction(() => beautyDebug.result.revealed);
   assert.equal(await salon.locator('#beautyScreen').getAttribute('data-result-mood'), 'satisfied');
@@ -407,13 +440,13 @@ try {
       const finished = await checkDrawing(page, salon, name);
       await checkResult(page, salon, finished, name);
       assert.deepEqual(errors, []);
-      report.push({ engine: name, guest: 10004, score: finished.scores.total,
+      report.push({ engine: name, guest: 10004, beforeAttachScore: finished.scores.total,
         sourceCells: finished.original.reduce((sum, cell) => sum + cell, 0),
         remainingCells: finished.material.reduce((sum, cell) => sum + Number(!!cell), 0),
         checks: ['editor', 'beauty toggle', 'combat workbook boundary', 'edited request roundtrip',
-          'cape clipping', 'story exclusion', 'multi-line request', 'hammer', 'face protection',
-          'connected growth only', 'face overlay', 'three eyes contact', 'one reaction per contact', 'root recovery', 'free shape by area', 'severed branch removal', 'oversize failure', 'dark-circle request',
-          'wrong color', 'small brush completion', 'erase and undo', 'face overpaint penalty', 'result', 'editor return'] });
+          'cape clipping', 'two-day story inclusion', 'multi-line request', 'hammer', 'face protection',
+          'connected growth only', 'face overlay', 'three eyes contact', 'two complaints maximum', 'root recovery', 'free shape by area', 'severed branch removal', 'oversize failure', 'dark-circle request',
+          'wrong color', 'small brush completion', 'erase and undo', 'face overpaint penalty', 'red nose request', 'off-nose failure', 'remove sticker', 'nose20 points', 'sticker undo', 'result', 'editor return'] });
       console.log(`${name}: minion free growth, new horn material, dark circles, result and return passed`);
     } finally { await browser.close(); }
   }

@@ -11,14 +11,18 @@ const current=new Uint8Array(W*H),original=new Uint8Array(W*H),paint=new Uint8Cl
 const sourcePixels=new Uint8ClampedArray(W*H*4),originalBorder=new Uint8Array(W*H);
 const masks={eyes:new Uint8Array(W*H),brain:new Uint8Array(W*H),face:new Uint8Array(W*H),protectedFace:new Uint8Array(W*H)};
 const sculptAnchors=new Uint8Array(W*H);
-let eyeWasCovered=false,eyeReactionCount=0,reactionTimer=0,reactionTick=0,reactionOpen=false,lastEyeReaction=-Infinity;
+let eyeWasCovered=false,eyeReactionCount=0,reactionTimer=0,reactionTick=0,reactionOpen=false,areaWarned=false,overflowWarned=false,lastAreaRatio=1;
 const eyeReaction=document.createElement('div');eyeReaction.className='beautyEyeReaction';eyeReaction.hidden=true;eyeReaction.setAttribute('role','status');eyeReaction.setAttribute('aria-live','polite');beautyScreen.append(eyeReaction);
 function showEyeReaction(){
- if(performance.now()-lastEyeReaction<3000)return;lastEyeReaction=performance.now();
- eyeReactionCount++;eyeReaction.textContent=B.eyeContactLine||'잠깐, 그건 눈입니다. 안대까지 쓰게 하시려고요?';eyeReaction.hidden=false;
+ if(eyeReactionCount>=2)return;
+ eyeReactionCount++;
+ showBeautyReaction(eyeReactionCount===1?B.eyeContactLine||'잠깐, 그건 눈입니다.':B.eyeContactSecondLine||'하아…… 눈은 좀 남겨 주십시오.',eyeReactionCount===1?'angry':'sigh');
+}
+function showBeautyReaction(text,tone){
+ eyeReaction.replaceChildren(...Array.from(text).map((letter,i)=>{const span=document.createElement('span');span.textContent=letter;span.style.setProperty('--letter',i);return span;}));eyeReaction.dataset.tone=tone;eyeReaction.hidden=false;
  clearTimeout(reactionTimer);clearInterval(reactionTick);
  reactionTick=setInterval(()=>{reactionOpen=!reactionOpen;renderPortrait();},160);
- reactionTimer=setTimeout(()=>{eyeReaction.hidden=true;reactionOpen=false;clearInterval(reactionTick);renderPortrait();},3800);
+ reactionTimer=setTimeout(()=>{eyeReaction.hidden=true;reactionOpen=false;clearInterval(reactionTick);renderPortrait();},5500);
 }
 let fallingPieces=[],fallingFrame=0;
 const heardDetails={},heardRequests={};
@@ -119,9 +123,9 @@ async function prepareBeauty(){
   for(let n=0;n<W*H;n++)target[n]=targetPixels[n*4+3]>100?1:0;
   Object.assign(masks,beautyMaterialMasks(original,target));
   if(B.growth?.connected){
-   cctx.clearRect(0,0,W,H);drawPortraitLayer(cctx,portraitLayers.eyes?.neutral);
-   const eyes=cctx.getImageData(0,0,W,H).data;
-   for(let n=0;n<W*H;n++)masks.eyes[n]=Number(eyes[n*4+3]>100&&B.cutRegions.some(r=>r.mask==='eyes'&&inBeautyRegion((n%W+.5)*PIX,(Math.floor(n/W)+.5)*PIX,r)));
+   // Use the entire three eye zones, including transparent gaps in the eye artwork.
+   // Animation and glasses must not create holes in the contact detection.
+   for(let n=0;n<W*H;n++)masks.eyes[n]=Number(B.cutRegions.some(r=>r.mask==='eyes'&&inBeautyRegion((n%W+.5)*PIX,(Math.floor(n/W)+.5)*PIX,r)));
    sculptAnchors.set(beautyRootMask(original,masks.face,W,H));
    for(let n=0;n<W*H;n++)if(masks.eyes[n])sculptAnchors[n]=0;
   }else sculptAnchors.set(masks.hornKeep);
@@ -214,7 +218,7 @@ function applyStroke(points,kind){
 portrait.addEventListener('pointerdown',e=>{
  if(!ready||finishing||briefing||e.button!==0)return;e.preventDefault();const p=point(e);
  if(beautyPhase==='attach'){
-  const hit=[...placements].reverse().find(q=>Math.abs(p.x-q.x)<q.sticker.w*.75&&Math.abs(p.y-q.y)<q.sticker.h*.75);
+  const hit=[...placements].reverse().find(q=>Math.abs(p.x-q.x)<q.sticker.w*.75*(B.stickerScale??1)&&Math.abs(p.y-q.y)<q.sticker.h*.75*(B.stickerScale??1));
   if(hit){pushUndo();placements=placements.filter(q=>q!==hit);touched.attach=true;updateBeautyScore();renderPortrait();}
   else if(selectedSticker)placeSticker(selectedSticker,p.x,p.y);
   return;
@@ -279,6 +283,14 @@ function updateBeautyScore(){
  expression=liveBeautyMood(live,expression,Object.values(touched).some(Boolean));
  if(B.growth?.connected){
   const covered=shape.eyeCoverCount>0;if(covered&&!eyeWasCovered&&!finishing)showEyeReaction();eyeWasCovered=covered;
+  const goal=B.cutRegions.find(r=>r.rule==='area')?.maxRatio??.8;
+  if(shape.areaRatio<=goal)areaWarned=false;
+  if(shape.areaRatio<=1)overflowWarned=false;
+  if(!covered&&!finishing&&gesture?.kind==='grow'&&shape.areaRatio>lastAreaRatio){
+   if(shape.areaRatio>1&&!overflowWarned){overflowWarned=true;areaWarned=true;showBeautyReaction(B.areaOverflowLine||'왔을 때보다 뿔이 늘어난 것 같습니다만.','angry');}
+   else if(shape.areaRatio>goal&&!areaWarned){areaWarned=true;showBeautyReaction(B.areaWarningLine||'줄이러 왔는데 다시 불어나는군요.','sigh');}
+  }
+  lastAreaRatio=shape.areaRatio;
   if(shape.hardFailure)expression='angry';
  }
  renderRequestStatus();
@@ -351,7 +363,7 @@ function renderPortrait(includeGuides=true,target=ctx){
  const facePaint=facePaintCanvas.getContext('2d'),tint=facePaint.createImageData(W,H);
  for(let n=0;n<W*H;n++)if(masks.protectedFace[n]||!bone&&!current[n]&&masks.face[n]){const i=n*4;tint.data.set(paint.subarray(i,i+4),i);}
  facePaint.putImageData(tint,0,0);target.drawImage(facePaintCanvas,0,0);
- for(const p of placements){const image=stickerImages.get(p.sticker.id);if(image?.complete&&image.naturalWidth)target.drawImage(image,p.x/2-p.sticker.w*.375,p.y/2-p.sticker.h*.375,p.sticker.w*.75,p.sticker.h*.75);}
+ for(const p of placements){const image=stickerImages.get(p.sticker.id),scale=B.stickerScale??1;if(image?.complete&&image.naturalWidth)target.drawImage(image,p.x/2-p.sticker.w*.375*scale,p.y/2-p.sticker.h*.375*scale,p.sticker.w*.75*scale,p.sticker.h*.75*scale);}
  if(includeGuides&&zonesVisible){
   target.save();target.lineWidth=.8;target.font='5px sans-serif';
   const regions=beautyPhase==='cut'?B.cutRegions:beautyPhase==='attach'?B.attachRegions:B.drawRegions;
@@ -364,9 +376,15 @@ function renderPortrait(includeGuides=true,target=ctx){
   }
   for(const r of regions){
    if(r.rule==='area')continue;
+   if(beautyPhase==='draw'){
+    // Match scoring's first-region priority, so the face penalty cannot cover the targets.
+    target.fillStyle=r.kind==='good'?'#46B97B80':'#E9566538';
+    for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(regions.find(q=>inBeautyRegion((x+.5)*PIX,(y+.5)*PIX,q))===r)target.fillRect(x,y,1,1);
+    continue;
+   }
    const warm=r.rule==='cover'||layered&&r.rule==='preserve';target.strokeStyle=warm?'#FCBB52':'#E95665';target.fillStyle=(warm?'#FCBB52':'#E95665')+(layered?'70':'25');
    if(layered&&r.mask&&masks[r.mask]){for(let n=0;n<W*H;n++)if(masks[r.mask][n]&&inBeautyRegion((n%W+.5)*PIX,(Math.floor(n/W)+.5)*PIX,r))target.fillRect(n%W,Math.floor(n/W),1,1);}
-   else {target.fillRect(r.x/2,r.y/2,r.w/2,r.h/2);target.strokeRect(r.x/2,r.y/2,r.w/2,r.h/2);}
+   else {target.beginPath();if(r.shape==='ellipse')target.ellipse((r.x+r.w/2)/2,(r.y+r.h/2)/2,r.w/4,r.h/4,0,0,Math.PI*2);else target.rect(r.x/2,r.y/2,r.w/2,r.h/2);target.fill();target.stroke();}
   }
   target.restore();
  }
@@ -381,7 +399,7 @@ function refreshTools(){
  for(const b of paintTools.querySelectorAll('[data-color]'))b.classList.toggle('selected',activeTool==='paint'&&b.dataset.color===paintColor);
  document.getElementById('erasePaint').classList.toggle('selected',activeTool==='erase');
  for(const b of decorations.querySelectorAll('[data-sticker]'))b.classList.toggle('selected',b.dataset.sticker===selectedSticker?.id);
- hint.textContent=beautyPhase==='attach'?'붙인 장식은 눌러 떼기':beautyPhase==='draw'?'머리와 얼굴 위에 쓱쓱':activeTool==='grow'?(B.growth?.connected?'붙어 있는 뿔 위에서 이어 발라 주세요':B.growth?.mask==='original'?'잘라 낸 뿔 자리에 발라 복원해 주세요':'누른 채 발라 주세요'):activeTool==='scissors'?'드래그 후 놓으면 싹둑':'누른 채 조금씩 다듬기';
+ hint.textContent=beautyPhase==='attach'?'붙인 장식은 눌러 떼기':beautyPhase==='draw'?(B.growth?.material==='horn'?'가이드: 초록 칠하기 · 빨강 피하기':'머리와 얼굴 위에 쓱쓱'):activeTool==='grow'?(B.growth?.connected?'붙어 있는 뿔 위에서 이어 발라 주세요':B.growth?.mask==='original'?'잘라 낸 뿔 자리에 발라 복원해 주세요':'누른 채 발라 주세요'):activeTool==='scissors'?'드래그 후 놓으면 싹둑':'누른 채 조금씩 다듬기';
 }
 function renderRequestStatus(){
  if(!BEAUTY_STAGES.includes(beautyPhase))return;

@@ -300,7 +300,9 @@ async function normalMotionSequence(page, engine) {
       > Math.max(cashierBox.y, bubbleBox.y);
   assert.equal(overlaps, false, 'the closing button must leave the cashier visible');
   await capture(page, engine, 'original-hud-and-cashier');
-  await page.locator('#closeShop').click();
+  // The bobbing bubble intentionally never settles; click its visible center.
+  const movingBubble = await page.locator('#closeShop').boundingBox();
+  await page.mouse.click(movingBubble.x + movingBubble.width / 2, movingBubble.y + movingBubble.height / 2);
   await phase(page, 'review');
   await page.waitForFunction(() => Number(document.querySelector('#stage').dataset.displayedFollowers) > 0);
   const countingObserved = Date.now();

@@ -160,7 +160,7 @@ export function beautyRequirementChecks(b,phase,shape,scores,placementCount){
   return checks.length?checks:[scores.cut>=b.weights.cut-1e-9];
  }
  if(phase==='attach')return [placementCount===1&&scores.attach>=b.weights.attach-1e-9];
- return [!b.weights.draw||scores.draw>=b.weights.draw-1e-9];
+ return [!b.weights.draw||scores.draw>=b.weights.draw*(b.drawRequiredRatio||1)-1e-9];
 }
 export function liveBeautyMood(score,previous='neutral',touched=false){
  if(!touched)return 'neutral';
@@ -176,7 +176,8 @@ export function beautyResultMood(b,shape,total){
   if(shape.hardFailure)return 'angry';
   const keep=shape.details.filter(r=>r.rule==='preserve');
   if(total<40||keep.some(r=>r.ratio<.5))return 'angry';
-  return total>=80&&shape.details.filter(r=>r.rule!=='free').every(r=>r.fulfilled>=1-1e-9)?'satisfied':'neutral';
+  const drawMet=!b.drawRequiredRatio||total-shape.score>=b.weights.draw*b.drawRequiredRatio-1e-9;
+  return total>=80&&drawMet&&shape.details.filter(r=>r.rule!=='free').every(r=>r.fulfilled>=1-1e-9)?'satisfied':'neutral';
  }
  return total>=80?'satisfied':total>=40?'neutral':'angry';
 }
