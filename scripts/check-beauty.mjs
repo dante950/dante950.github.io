@@ -13,13 +13,12 @@ async function finishRequest(page,salon,{screenshot,clarify=true}={}){
  assert.equal(await salon.locator('.sculptStatus').isVisible(),false,'the note waits until the request has ended');
  assert(await salon.locator('.beautyNext').isDisabled(),'no stage skipping during a request');
  const shape=await material(salon);
- const frames=new Set(),mouths=new Set();
- for(let i=0;i<8;i++){
-  const sample=await salon.evaluate(()=>({frame:beautyDebug.mouthFrame,mouth:Array.from(document.querySelector('.sculptCanvas').getContext('2d').getImageData(68,77,27,12).data).join(',')}));
-  frames.add(sample.frame);mouths.add(sample.mouth);await page.waitForTimeout(75);
- }
- assert.equal(frames.size,2,'the mouth cycles while the guest speaks');
- assert(mouths.size>1,'the mouth pixels visibly animate');
+ // Observe from the first speaking frame, before readiness checks and large
+ // material transfers can consume a short reviewed line on a slower runner.
+ await salon.waitForFunction(()=>window.__speechSamples?.frames.size===2);
+ const samples=await salon.evaluate(()=>({frames:__speechSamples.frames.size,mouths:__speechSamples.mouths.size}));
+ assert.equal(samples.frames,2,'the mouth cycles while the guest speaks');
+ assert(samples.mouths>1,'the mouth pixels visibly animate');
  assert.deepEqual(await material(salon),shape,'speaking cannot edit hair or scoring masks');
  await page.locator('#beautyChoices').waitFor();
  const briefText=await page.locator('#talkText').textContent();
@@ -49,6 +48,7 @@ async function finishRequest(page,salon,{screenshot,clarify=true}={}){
  assert(!/Tag_|점수|안경|콧수염|나비넥타이|장식 \d\/5/.test(note));
  assert.equal(await salon.locator('.requestSatisfaction,.satisfactionReadout').count(),0);
  assert.equal(await salon.locator('.goalList,.moodLabel').count(),0);
+ await salon.evaluate(()=>{__speechSamples.frames.clear();__speechSamples.mouths.clear();});
 }
 async function revisit(page,salon,stage){
  await salon.locator('[data-phase="'+stage+'"]').click();await page.waitForTimeout(150);
@@ -85,6 +85,15 @@ try{
   const browser=await engine.launch({headless:true});
   try{
    const page=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[];
+   await page.addInitScript(()=>{
+    window.__speechSamples={frames:new Set(),mouths:new Set()};
+    setInterval(()=>{
+     const canvas=document.querySelector('.sculptCanvas');
+     if(!window.beautyDebug?.ready||!canvas||!document.querySelector('[data-talking="true"]'))return;
+     __speechSamples.frames.add(beautyDebug.mouthFrame);
+     __speechSamples.mouths.add(Array.from(canvas.getContext('2d').getImageData(68,77,27,12).data).join(','));
+    },40);
+   });
    page.on('pageerror',e=>errors.push(e.message));
    let salon=await startPreview(page,10001);
    assert.equal(await salon.evaluate(()=>beautyDebug.expression),'neutral');
