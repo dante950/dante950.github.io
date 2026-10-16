@@ -4,7 +4,7 @@ if(B.steps.cut){
  beautyLessonSteps.push({id:'cut',phase:'cut',tool:hammer?'hammer':'scissors',title:hammer?'빛나는 부분을 조금 다듬어요':'선을 따라 한 번 잘라요',text:hammer?'망치·정을 고르고, 동그라미 안을 조금 다듬어 보세요.':'가위를 고르고, 동그라미 안에서 점선을 따라 누른 채 움직인 뒤 놓아 주세요.',practice:true});
  if(B.growth?.enabled!==false)beautyLessonSteps.push({id:'grow',phase:'cut',tool:'grow',title:'방금 자른 곳을 다시 길러요',text:B.growth?.connected?'발모제를 고르고, 남아 있는 뿔에서 잘린 자리로 이어 발라 주세요.':'발모제를 고르고, 방금 자른 동그라미 안에 누른 채 발라 보세요.',practice:true});
 }
-beautyLessonSteps.push({id:'request',title:'부탁은 지키고, 모양은 자유롭게',text:'왼쪽 메모는 손님의 최소 요구예요. 지금은 도구만 연습했으니 아직 체크가 없어도 괜찮아요. 손질 가이드를 켜서 부탁한 위치를 찾아보세요.',target:'#showBeautyZones',practice:true});
+beautyLessonSteps.push({id:'request',title:'부탁은 지키고, 모양은 자유롭게',text:'본 미용에서는 손님의 최소 요구를 지키며 자유롭게 꾸밀 수 있어요. 지금은 손질 가이드를 켜서 표시되는 위치를 확인해 보세요. 실제 부탁은 연습이 끝난 뒤 들어요.',target:'#showBeautyZones',practice:true});
 if(B.steps.draw){
  beautyLessonSteps.push({id:'draw',phase:'draw',tool:'paint',title:'작은 부분에 색을 칠해요',text:'오른쪽에서 색을 고르고, 동그라미 안을 누른 채 짧게 칠해 보세요. 칠한 색은 되돌리거나 지울 수 있어요.',practice:true});
  if(B.steps.cut){
@@ -13,12 +13,12 @@ if(B.steps.draw){
  }
 }
 if(B.steps.attach)beautyLessonSteps.push({id:'attach',phase:'attach',title:'장식을 끌어서 붙여요',text:'빛나는 장식을 잡고 점선을 따라 동그라미 안에 놓아 보세요. 장식을 고른 뒤 그 자리를 클릭해도 돼요.',practice:true});
-beautyLessonSteps.push({id:'done',title:'이제 자유롭게 손질해요',text:'연습한 모양은 그대로 남아요. 왼쪽 부탁을 확인하며 마무리해 주세요. 자세한 부탁은 ‘다시 듣기’, 장식은 다시 눌러 떼기! 준비되면 ‘미용 완성’을 눌러요.'});
+beautyLessonSteps.push({id:'done',title:'연습 끝! 이제 손님을 맞이해요',text:'연습한 머리·색·장식은 모두 처음 상태로 돌아가요. 이제 손님의 첫 부탁을 듣고 본격적으로 미용을 시작해요.'});
 let beautyLessonIndex=0,beautyLessonDone=!GUEST.tutorialBeauty,beautyLessonPassed=false,lessonTimer=0,lessonHintTimer=0,lessonPoint=null,lessonFrom=null,lessonRemoved=[],lessonFeedback='';
 const beautyLesson=document.createElement('section');beautyLesson.id='beautyTutorial';beautyLesson.hidden=true;beautyLesson.setAttribute('aria-label','미용 연습');beautyScreen.append(beautyLesson);
 const lessonOverlay=document.createElementNS('http://www.w3.org/2000/svg','svg');lessonOverlay.id='beautyLessonOverlay';lessonOverlay.setAttribute('aria-hidden','true');lessonOverlay.style.display='none';beautyScreen.append(lessonOverlay);
 function clearLessonTimers(){clearTimeout(lessonTimer);clearTimeout(lessonHintTimer);lessonTimer=lessonHintTimer=0;}
-function finishBeautyLesson(){clearLessonTimers();beautyLessonDone=true;beautyLesson.hidden=true;lessonOverlay.style.display='none';beautyScreen.classList.remove('learningBeauty');document.querySelectorAll('.lessonTarget').forEach(e=>e.classList.remove('lessonTarget'));send('tutorial-done',{kind:'beauty'});}
+function finishBeautyLesson(){if(beautyLessonDone)return;clearLessonTimers();cancelStickerDrag();cancelGesture();beautyLessonDone=true;finishing=true;panel.inert=true;nav.inert=true;actions.inert=true;beautyLesson.hidden=true;lessonOverlay.style.display='none';beautyScreen.classList.remove('learningBeauty');document.querySelectorAll('.lessonTarget').forEach(e=>e.classList.remove('lessonTarget'));send('tutorial-done',{kind:'beauty'});}
 function lessonSticker(){return STICKERS.find(s=>s.tag===B.attachTag&&B.attachRegions.some(r=>r.stickerIDs.includes(s.id)))||STICKERS[0];}
 function setupLessonTarget(){
  const step=beautyLessonSteps[beautyLessonIndex];lessonPoint=null;lessonFrom=null;
@@ -63,7 +63,7 @@ function renderBeautyLesson(){
  const step=beautyLessonSteps[beautyLessonIndex],wrong=step.phase&&beautyPhase!==step.phase;
  if(!lessonPoint&&['cut','grow','draw','attach'].includes(step.id))setupLessonTarget();
  beautyLesson.dataset.step=step.id;
- beautyLesson.innerHTML='<small>한 동작씩 미용 연습 · '+(beautyLessonIndex+1)+' / '+beautyLessonSteps.length+'</small><h3>'+step.title+'</h3><p>'+step.text+'</p><div class="lessonFeedback" role="status">'+(wrong?'다른 단계에 와 있어요. 연습하던 단계로 돌아가면 이어서 할 수 있어요.':lessonFeedback||(step.practice?lessonMessage(step):''))+'</div><div class="lessonButtons"><button id="beautyTutorialSkip">연습 건너뛰기</button>'+(wrong?'<button id="beautyTutorialReturn">연습 단계로 돌아가기</button>':step.practice?(beautyLessonPassed?'<span>다음 안내로 이동 중…</span>':'<span>직접 해보세요</span>'):'<button id="beautyTutorialNext">자유롭게 손질하기</button>')+'</div>';
+ beautyLesson.innerHTML='<small>본 미용 전 연습 · '+(beautyLessonIndex+1)+' / '+beautyLessonSteps.length+'</small><h3>'+step.title+'</h3><p>'+step.text+'</p><div class="lessonFeedback" role="status">'+(wrong?'다른 단계에 와 있어요. 연습하던 단계로 돌아가면 이어서 할 수 있어요.':lessonFeedback||(step.practice?lessonMessage(step):''))+'</div><div class="lessonButtons"><button id="beautyTutorialSkip">연습 건너뛰고 미용 시작</button>'+(wrong?'<button id="beautyTutorialReturn">연습 단계로 돌아가기</button>':step.practice?(beautyLessonPassed?'<span>다음 안내로 이동 중…</span>':'<span>직접 해보세요</span>'):'<button id="beautyTutorialNext">손님의 첫 부탁 듣기</button>')+'</div>';
  document.getElementById('beautyTutorialSkip').onclick=finishBeautyLesson;
  const back=document.getElementById('beautyTutorialReturn');if(back)back.onclick=()=>setBeautyPhase(step.phase);
  const nextButton=document.getElementById('beautyTutorialNext');if(nextButton)nextButton.onclick=advanceBeautyLesson;

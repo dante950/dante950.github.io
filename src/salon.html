@@ -454,7 +454,7 @@ document.getElementById('backToTitle').onclick=()=>send('home');
 const interact=document.createElement('button');interact.className='childExit';interact.textContent='손님에게 말 걸기 · F';interact.style.display='none';gameWorld.append(interact);interact.onclick=()=>{if(customerState.phase==='seated')startDialogue();};
 const oldInteraction=updateInteraction;updateInteraction=()=>{oldInteraction();interact.style.display=customerState.phase==='seated'&&!beautyActive&&!dialogueState.active?'block':'none';};
 let departure=false;addEventListener('message',e=>{if(e.source!==parent||e.data?.token!==GUEST.token)return;const c=e.data;
- if(c.type==='beauty-start')enterBeauty();
+ if(c.type==='beauty-start'){customerState.phase='seated';seatedCustomer.style.display='block';openShopBtn.style.display='none';enterBeauty();}
  if(c.type==='salon-return'){beautyActive=false;dialogueState.active=false;beautyScreen.style.display='none';interact.style.display='none';}
  if(c.type==='depart'&&!departure){departure=true;beautyActive=false;dialogueState.active=false;beautyScreen.style.display='none';seatedCustomer.style.display='none';customerState.phase='closed';interact.style.display='none';openShopBtn.style.display='none';const img=document.createElement('img');img.className='departingGuest';img.src=c.portrait||GUEST.skin?.full||document.querySelector('#zombiePortrait img').src;gameWorld.append(img);setTimeout(()=>send('departed'),2250);}
  if(c.type==='pause'){state.keys.clear();openSettings();}

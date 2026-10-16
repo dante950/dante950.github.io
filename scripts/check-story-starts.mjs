@@ -49,7 +49,24 @@ export async function checkStoryStarts(page,{screenshotPath,checkContinuation=fa
   if(await page.locator('#playGuideDone').isVisible()){await page.locator('#playGuideDone').click();await page.locator('#talkLayer').waitFor();await advanceTalk(page);}
   if(steps){
    await salon.locator('#beautyScreen').waitFor();
-   if(await salon.locator('#beautyTutorialSkip').isVisible())await salon.locator('#beautyTutorialSkip').click();
+   if(await salon.locator('#beautyTutorialSkip').isVisible()){
+    assert.equal(await page.locator('#talkLayer').isVisible(),false,'tool practice precedes the first beauty request');
+    await salon.locator('#beautyTutorialSkip').click();
+    await page.locator('#talkLayer').waitFor();
+    if(id===10001){
+     await page.locator('#beautyChoices').waitFor();
+     const brief=await page.locator('#talkText').innerText();
+     for(const key of ['f','f','f','Enter','Space'])await page.keyboard.press(key);
+     assert.equal(await page.locator('#beautyChoiceHint').isVisible(),true,'keyboard spam cannot accept the clarification lesson');
+     assert.equal(await page.locator('#talkText').innerText(),brief);
+     assert.equal(await page.locator('#beautyAccept').isEnabled(),false);
+     await page.locator('#beautyAsk').click();
+     await page.locator('#beautyChoices').waitFor();
+     assert.notEqual(await page.locator('#talkText').innerText(),brief,'pointer click starts the detailed request');
+     await page.locator('#beautyAccept').click();
+     await page.locator('#talkLayer').waitFor({state:'hidden'});
+    }else await advanceTalk(page);
+   }
    assert.equal(await salon.locator('#showBeautyZones').innerText(),'손질 가이드','the guide is available in public story play');
    for(let i=0;i<steps;i++){
     await salon.locator('.beautyNext').click();await page.waitForTimeout(250);await advanceTalk(page);

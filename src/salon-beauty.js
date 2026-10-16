@@ -460,6 +460,7 @@ function setBeautyPhase(phase,announce=true){
  next.disabled=!ready;syncUndo();refreshTools();updateBeautyScore();renderPortrait();if(announce&&!heardRequests[phase])announceBeautyRequest();else status.hidden=false;beautyLessonPhase(phase);renderBeautyLesson();
 }
 function announceBeautyRequest(){
+ if(!beautyLessonDone)return;
  if(finishing||briefing)return;cancelStickerDrag();cancelGesture();briefing=true;renderBeautyLesson();status.hidden=true;panel.inert=true;nav.inert=true;actions.inert=true;next.disabled=true;syncUndo();
  send('stage-request',{stage:beautyPhase,requestId:++requestSerial,detail:!!heardDetails[beautyPhase]});
 }
