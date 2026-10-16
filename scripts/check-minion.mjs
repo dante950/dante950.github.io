@@ -1,4 +1,5 @@
 import { chromium, webkit } from 'playwright';
+import {rootedBeautyMaterial,inBeautyRegion} from '../src/beauty-shape.js';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import http from 'node:http';
@@ -7,7 +8,7 @@ import path from 'node:path';
 // Drive the actual editor and pointer controls. Diagnostics are read-only: the
 // test never writes a material cell, score, expression, or application state.
 const root = path.resolve('dist');
-const output = path.resolve(process.env.YACHA_MINION_SCREENSHOTS || '../minion-beauty-freeform-2026-10-16');
+const output = path.resolve(process.env.YACHA_MINION_SCREENSHOTS || '../minion-connected-2026-10-16');
 const report = [];
 await fs.mkdir(output, { recursive: true });
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json',
@@ -32,6 +33,7 @@ async function snapshot(salon) {
     original: beautyDebug.original,
     masks: Object.fromEntries(Object.entries(beautyDebug.masks).map(([name, mask]) => [name, Array.from(mask)])),
     scores: beautyDebug.scores,
+    shape: beautyDebug.shape, expression: beautyDebug.expression, reaction: beautyDebug.reaction,
     guest: JSON.parse(document.getElementById('guest-data').textContent),
   }));
 }
@@ -139,6 +141,13 @@ async function openPreview(page, engine) {
   for (const id of [10001, 10003, 10004]) assert(options.includes(id), `beauty editor includes guest ${id}`);
   await page.locator('#beautyGuest').selectOption('10004');
   await checkEditorRoundtrip(page);
+  await page.locator('[data-select-region="3"]').click();
+  await page.locator('[data-rfield="maxRatio"]').fill('0.85');
+  await page.locator('[data-rfield="maxRatio"]').blur();
+  assert.equal(await page.evaluate(() => fullflow.project.guests.find(g=>g.id===10004).beauty.cutRegions.find(r=>r.rule==='area').maxRatio), .85);
+  await page.locator('[data-rfield="maxRatio"]').fill('0.9');
+  await page.locator('[data-rfield="maxRatio"]').blur();
+  await page.locator('[data-select-region="0"]').click();
   assert.equal(await page.locator('#toolSelect').inputValue(), 'hammer');
   const clipping = await page.locator('#regionStage').evaluate(stage => ({
     bottom: stage.getBoundingClientRect().bottom,
@@ -225,73 +234,100 @@ function rowRuns(mask) {
 
 async function checkSculpt(page, salon, engine) {
   const initial = await snapshot(salon);
-  assert.equal(initial.guest.id, 10004);
-  assert.equal(initial.guest.previewOnly, true);
-  assert.equal(initial.guest.beauty.growth.material, 'horn');
-  assert.notEqual(initial.guest.beauty.growth.mask, 'original');
-  assert.equal(initial.original.length, 160 * 175);
-  const { hornTrim, hornKeep, protectedFace } = initial.masks;
-  assert(hornTrim.some(Boolean) && hornKeep.some(Boolean) && protectedFace.some(Boolean));
-  assert(initial.original.every((v, n) => v === hornTrim[n] + hornKeep[n]),
-    'the source horn silhouette is partitioned into trim and keep targets');
-  const faceCell = protectedFace.findIndex(Boolean);
-  const keepCell = hornKeep.findIndex(Boolean);
-  const beforeFace = initial.material;
+  const { roots, eyes, face } = initial.masks;
+  assert(initial.guest.beauty.growth.connected && initial.guest.beauty.growth.allowFace);
+  assert(roots.some(Boolean) && eyes.some(Boolean));
+  assert.equal(initial.shape.areaRatio, 1);
+  assert.equal(initial.shape.eyeCoverCount, 0, 'arrival horns leave all three eyes clear');
+  const nearest = (mask, xy) => mask.reduce((best, v, n) => !v ? best : best < 0 || distance(point(n), xy) < distance(point(best), xy) ? n : best, -1);
+  const distance = (a, b) => (a[0]-b[0])**2+(a[1]-b[1])**2;
+  const leftRoot = nearest(roots, [130, 120]), rightRoot = nearest(roots, [190, 120]);
+  const faceCell = face.findIndex((v,n) => v && !initial.original[n]);
   await setSize(salon, 1);
   await stroke(page, salon, point(faceCell));
-  assert.deepEqual((await snapshot(salon)).material, beforeFace, 'hammer cannot cut the separate face artwork');
+  assert.deepEqual((await snapshot(salon)).material, initial.material, 'cutting an empty face does not cut the underlying face');
   await salon.locator('[data-tool="grow"]').click();
-  await setSize(salon, 30);
-  await stroke(page, salon, [10, 260], [310, 260]);
-  await setSize(salon, 1);
-  await stroke(page, salon, point(faceCell));
-  assert.deepEqual((await snapshot(salon)).material, beforeFace,
-    'growth stays inside its configured area and cannot replace the face');
-
-  // Free material is drawn in an area that never contained source horn pixels.
   await setSize(salon, 5);
   await stroke(page, salon, [20, 174], [64, 194]);
-  const free = await snapshot(salon);
-  const added = free.material.map((v, n) => Number(v && !initial.original[n]));
-  assert(added.filter(Boolean).length > 60, 'growth follows a new stroke outside the source silhouette');
-  assert(free.material.every((v, n) => !added[n] || v === 2), 'new horns use editable grown material');
-  await page.screenshot({ path: path.join(output, `${engine}-minion-free-growth.png`) });
+  await stroke(page, salon, [20, 174], point(leftRoot));
+  assert.deepEqual((await snapshot(salon)).material, initial.material, 'a stroke starting in air cannot grow, even if dragged onto a horn');
+  for (const region of initial.guest.beauty.cutRegions.filter(r => r.mask === 'eyes')) {
+    const eye = eyes.findIndex((v,n) => v && inBeautyRegion(...point(n), region));
+    assert(eye >= 0, `${region.key} has an actual source eye mask`);
+    const root = nearest(roots, point(eye));
+    await salon.locator('[data-tool="grow"]').click();
+    await setSize(salon, 3);
+    await stroke(page, salon, point(root), point(eye));
+    const touched = await snapshot(salon);
+    assert.equal(touched.material[eye], 2, 'horn grows over the eye on the face');
+    assert(touched.shape.eyeCoverCount > 0 && touched.shape.hardFailure);
+    assert.equal(touched.scores.cut, 0);
+    assert.equal(touched.expression, 'angry');
+    if (region.key === 'EyeTop') {
+      assert.equal(touched.reaction.visible, true);
+      assert.match(touched.reaction.text, /연차.*안대/);
+      assert(await salon.locator('.beautyEyeReaction').evaluate(node => Number(getComputedStyle(node).zIndex) > Number(getComputedStyle(document.querySelector('.beautyCustomer')).zIndex)), 'the complaint stays in front of the horns');
+      await page.screenshot({path: path.join(output, `${engine}-minion-eye-contact.png`)});
+      await stroke(page, salon, point(root), point(eye));
+      assert.equal((await snapshot(salon)).reaction.count, touched.reaction.count, 'continuous contact does not repeat the line');
+    }
+    await salon.locator('[data-tool="hammer"]').click();
+    await setSize(salon, 1);
+    for (const [from,to] of rowRuns(touched.material.map((v,n) => Number(v && !initial.original[n])))) await stroke(page, salon, from, to);
+    const clear = await snapshot(salon);
+    assert.equal(clear.shape.eyeCoverCount, 0, 'removing the intrusive horn clears the eye condition');
+    assert.deepEqual(clear.masks.face, face, 'the underlying face artwork is preserved');
+  }
+  // Broad cuts leave the small roots usable, even after removing every branch.
+  await salon.locator('[data-tool="hammer"]').click();
+  await setSize(salon, 30);
+  for (const y of [25,75,125]) await stroke(page, salon, [1,y], [319,y]);
+  const bare = await snapshot(salon);
+  assert(bare.material.every((v,n) => !roots[n] || !!v), 'head-connected roots remain available to regrow');
+  assert(bare.shape.areaRatio < .3);
+  await salon.locator('[data-tool="grow"]').click();
+  await setSize(salon, 4);
+  await stroke(page, salon, point(leftRoot), [90,60]);
+  await stroke(page, salon, [90,60], [60,40]);
+  await stroke(page, salon, point(rightRoot), [230,60]);
+  await stroke(page, salon, [230,60], [260,40]);
+  const styled = await snapshot(salon);
+  assert(styled.material.some((v,n) => v && !initial.original[n]), 'new branches are not constrained by the source silhouette');
+  assert(styled.material.some((v,n) => v && initial.masks.hornTrim[n]), 'old trim locations are now allowed in a different shape');
+  assert(styled.shape.areaRatio < .9);
+  assert.equal(styled.scores.cut, 70, 'a different connected shape satisfies both requests');
+  await page.screenshot({path: path.join(output, `${engine}-minion-connected-style.png`)});
+  await salon.locator('[data-tool="hammer"]').click();
+  await setSize(salon, 8);
+  await stroke(page, salon, [75,50]);
+  const severed = await snapshot(salon);
+  assert.equal(severed.material[20*160+30], 0, 'the severed far tip falls away');
+  const connected = rootedBeautyMaterial(severed.material, roots, 160,175);
+  assert(severed.material.every((v,n) => !v || connected[n]), 'every remaining horn cell is attached to the head');
+  // Oversize only above the face, so failure must be caused by area, not eyes.
+  const start = nearest(severed.material, [100,60]);
+  await salon.locator('[data-tool="grow"]').click();
+  await setSize(salon, 30);
+  await stroke(page, salon, point(start), [280,25]);
+  await stroke(page, salon, [280,25], [280,85]);
+  await stroke(page, salon, [280,85], [40,85]);
+  const oversized = await snapshot(salon);
+  assert.equal(oversized.shape.eyeCoverCount, 0);
+  assert(oversized.shape.areaRatio > 1 && oversized.shape.hardFailure);
+  assert.equal(oversized.scores.cut, 0, 'more horn area than arrival fails even with clear eyes');
+  await page.screenshot({path: path.join(output, `${engine}-minion-overgrown.png`)});
   await salon.locator('[data-tool="hammer"]').click();
   await setSize(salon, 1);
-  for (const [from, to] of rowRuns(added)) await stroke(page, salon, from, to);
-  assert.deepEqual((await snapshot(salon)).material, beforeFace, 'freely grown horns can be cut away');
-
-  await salon.locator('[data-tool="hammer"]').click();
-  await stroke(page, salon, point(keepCell));
-  const cut = await snapshot(salon);
-  assert.equal(cut.material[keepCell], 0, 'a real pointer tap cuts an editable target horn cell');
-  // A single lost pixel may intentionally fall inside the request tolerance.
-  assert(cut.material.every((v, n) => !v || initial.original[n]), 'hammer leaves only original material');
-  await salon.locator('[data-tool="grow"]').click();
-  // Restore every removed source cell through the actual brush, including any
-  // piece detached by the physical cut. No direct material writes are used.
-  for (const [from, to] of rowRuns(initial.original.map((v, n) => Number(v && !cut.material[n])))) {
-    await stroke(page, salon, from, to);
-  }
-  const repaired = await snapshot(salon);
-  assert.equal(repaired.material[keepCell], 2, 'a cut cell receives new horn material instead of restored source pixels');
-  assert.deepEqual(repaired.material.map(Boolean), initial.material.map(Boolean), 'growth can also repair a missing silhouette');
-  assert.equal(repaired.scores.cut, initial.scores.cut, 'repair restores the preservation score');
-  await salon.locator('[data-tool="hammer"]').click();
-  for (const [from, to] of rowRuns(hornTrim)) await stroke(page, salon, from, to);
+  for (const [from,to] of rowRuns(oversized.material.map((v,n) => Number(v && !severed.material[n])))) await stroke(page, salon, from, to);
   const finished = await snapshot(salon);
-  assert(finished.material.every((v, n) => Boolean(v) === Boolean(hornKeep[n])),
-    'precise pointer strokes remove the large horns and preserve both small target horns');
-  assert.equal(finished.scores.cut, finished.guest.beauty.weights.cut);
-  assert.equal(finished.scores.total, 70, 'the new drawing request is still outstanding');
-  assert(finished.material.every((v, n) => !protectedFace[n] || v === 0), 'no editable material is created on the face');
+  assert.equal(finished.scores.cut, 70);
+  assert.equal(finished.shape.hardFailure, false);
   await salon.locator('#showBeautyZones').click();
-  assert.equal(await salon.locator('#showBeautyZones').getAttribute('aria-pressed'), 'true');
-  await page.screenshot({ path: path.join(output, `${engine}-minion-trim-guide.png`) });
+  await page.screenshot({path: path.join(output, `${engine}-minion-eye-guide.png`)});
   await salon.locator('#showBeautyZones').click();
-  await page.screenshot({ path: path.join(output, `${engine}-minion-finished.png`) });
   return finished;
 }
+
 
 async function checkDrawing(page, salon, engine) {
   await salon.locator('.beautyNext').click();
@@ -308,18 +344,18 @@ async function checkDrawing(page, salon, engine) {
   const before = await snapshot(salon);
   await setSize(salon, 4);
   await salon.locator('[data-color="#FF3024"]').click();
-  await stroke(page, salon, [152, 133], [168, 133]);
+  await stroke(page, salon, [152, 138], [168, 138]);
   assert.equal((await snapshot(salon)).scores.draw, 0, 'a bright color does not satisfy the darkest-circle request');
   await salon.locator('#undoBeauty').click();
   assert.deepEqual((await snapshot(salon)).paint, before.paint);
   await salon.locator('[data-color="#03051B"]').click();
-  await stroke(page, salon, [152, 133], [168, 133]);
+  await stroke(page, salon, [152, 138], [168, 138]);
   const painted = await snapshot(salon);
   assert.equal(painted.scores.draw, 30, 'an ordinary small horizontal brush stroke completes the dark circle');
   assert.equal(painted.scores.total, 100);
   assert.deepEqual(painted.material, before.material, 'drawing does not change the horn silhouette');
   await salon.locator('#erasePaint').click();
-  await stroke(page, salon, [152, 133], [168, 133]);
+  await stroke(page, salon, [152, 138], [168, 138]);
   assert.equal((await snapshot(salon)).scores.draw, 0);
   await salon.locator('#undoBeauty').click();
   assert.deepEqual((await snapshot(salon)).paint, painted.paint, 'erased dark circles can be undone');
@@ -376,7 +412,7 @@ try {
         remainingCells: finished.material.reduce((sum, cell) => sum + Number(!!cell), 0),
         checks: ['editor', 'beauty toggle', 'combat workbook boundary', 'edited request roundtrip',
           'cape clipping', 'story exclusion', 'multi-line request', 'hammer', 'face protection',
-          'freeform growth', 'new material after cutting', 'precise target', 'dark-circle request',
+          'connected growth only', 'face overlay', 'three eyes contact', 'one reaction per contact', 'root recovery', 'free shape by area', 'severed branch removal', 'oversize failure', 'dark-circle request',
           'wrong color', 'small brush completion', 'erase and undo', 'face overpaint penalty', 'result', 'editor return'] });
       console.log(`${name}: minion free growth, new horn material, dark circles, result and return passed`);
     } finally { await browser.close(); }

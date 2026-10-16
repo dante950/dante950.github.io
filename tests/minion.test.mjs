@@ -5,6 +5,11 @@ import {addWorkshopGuests,projectProblems,storyStartOptions} from '../src/model.
 import {salonDialogueGroup} from '../src/salon-dialogue.js';
 import {beautyResultMood} from '../src/beauty-shape.js';
 const project=JSON.parse(await fs.readFile(new URL('../data/project.json',import.meta.url),'utf8'));
+test('the editable area goal rejects zero, non-numeric and above-start ratios',()=>{
+ const p=structuredClone(project),r=p.guests.find(g=>g.id===10004).beauty.cutRegions.find(r=>r.rule==='area');
+ for(const value of [0,1.01,'90']){r.maxRatio=value;assert(projectProblems(p).some(e=>e.includes('면적 비율')));}
+ r.maxRatio=.85;assert.deepEqual(projectProblems(p),[]);
+});
 test('minion stays editable but cannot enter the unfinished story or battle',()=>{
  assert.deepEqual(projectProblems(project),[]);
  const g=project.guests.find(g=>g.id===10004);assert.equal(g.previewOnly,true);assert.equal(g.battle,'none');
@@ -14,8 +19,8 @@ test('minion stays editable but cannot enter the unfinished story or battle',()=
  const p=structuredClone(project);p.schedule[1].push(10004);assert(projectProblems(p).some(s=>s.includes('본편 일정')));
  p.schedule[1].pop();p.guests[0].previewOnly=true;assert(projectProblems(p).length);
 });
-test('removing every horn or preserving only part of the target cannot produce satisfied feedback',()=>{
- const b=project.guests.find(g=>g.id===10004).beauty;
+test('older silhouette drafts retain their original preservation feedback',()=>{
+ const b={growth:{material:'horn'}};
  const shape=(keep,trim=1)=>({details:[{rule:'trim',ratio:trim,fulfilled:trim},{rule:'preserve',ratio:keep,fulfilled:Math.min(1,keep/.92)}]});
  assert.equal(beautyResultMood(b,shape(0),70),'angry');
  assert.equal(beautyResultMood(b,shape(.5),86),'neutral');

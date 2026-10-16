@@ -1,8 +1,8 @@
 {
   "format": "YACHACHA_FULLFLOW",
   "schemaVersion": 1,
-  "version": 7,
-  "updatedAt": "2026-10-16T06:24:36.052Z",
+  "version": 8,
+  "updatedAt": "2026-10-16T07:10:28.222Z",
   "combat": {
     "version": 4,
     "layout": "legacy",
@@ -2933,7 +2933,7 @@
             "GroupID": 80074,
             "Order": 2,
             "Speaker": "몬스터",
-            "Text": "업무가 쌓이는 동안 <color=#52609B>뿔도 자꾸 자라서요.</color>\n이러다 <color=#9A4935>눈 세 개가 전부 찔리겠습니다.</color>",
+            "Text": "업무가 쌓이는 동안 <color=#52609B>뿔도 한 짐이 됐습니다.</color>\n눈까지 찌르면 보고서를 읽을 수가 없어서요.",
             "Notes": "마왕 부하 미용 시험용 초안"
           },
           {
@@ -2941,7 +2941,7 @@
             "GroupID": 80074,
             "Order": 3,
             "Speaker": "몬스터",
-            "Text": "<color=#52609B>작은 뿔 한 쌍만 단정하게</color> 남겨 주세요.\n업무도 세 배인데, 눈까지 세 개 다 잃을 순 없어서요.",
+            "Text": "<color=#52609B>눈 세 개는 무사하게, 뿔은 출근할 때보다 가볍게</color> 부탁드립니다.\n모양은 맡기겠습니다. 업무만큼 무성할 필요는 없으니까요.",
             "Notes": "마왕 부하 미용 시험용 초안"
           },
           {
@@ -2949,7 +2949,7 @@
             "GroupID": 80075,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "<color=#9A4935>바깥으로 무성하게 뻗은 가지는 깎고,</color>\n<color=#52609B>눈 위의 작은 뿔 한 쌍은 남겨</color> 주세요.",
+            "Text": "<color=#52609B>세 눈을 건드리지 않게</color> 뿔을 다듬어 주세요.\n모양은 자유롭게 바꾸셔도 좋지만, 전체 양은 처음보다 좀 줄여 주십시오.",
             "Notes": "마왕 부하 미용 시험용 초안"
           },
           {
@@ -2957,7 +2957,7 @@
             "GroupID": 80075,
             "Order": 2,
             "Speaker": "몬스터",
-            "Text": "너무 깎았다면 <color=#52609B>발모제로 원하는 모양의 뿔을 다시 길러</color> 주세요.\n원래 가지를 전부 되살릴 필요는 없습니다. 눈앞만 시원하게 부탁드립니다.",
+            "Text": "발모제는 <color=#52609B>붙어 있는 뿔에서 이어서</color> 발라 주세요.\n눈만 피하면 얼굴 앞으로 휘어도 괜찮습니다. 뿔까지 업무처럼 불어나지는 않게 부탁드립니다.",
             "Notes": "마왕 부하 미용 시험용 초안"
           },
           {
@@ -5203,34 +5203,64 @@
         ],
         "cutRegions": [
           {
-            "key": "HornTrim",
-            "label": "눈을 위협하는 긴 가지 깎기",
-            "x": 0,
-            "y": 0,
-            "w": 320,
-            "h": 220,
+            "key": "EyeTop",
+            "label": "이마 외눈",
+            "x": 148.75,
+            "y": 120.5,
+            "w": 22.5,
+            "h": 12.5,
             "kind": "good",
             "shape": "rect",
-            "points": 49,
+            "points": 10,
             "stickerIDs": [],
-            "rule": "trim",
-            "tolerance": 0.08,
-            "mask": "hornTrim"
+            "rule": "clear",
+            "mask": "eyes",
+            "tolerance": 0
           },
           {
-            "key": "HornKeep",
-            "label": "작은 뿔 한 쌍 남기기",
+            "key": "EyeLeft",
+            "label": "왼쪽 눈",
+            "x": 136.25,
+            "y": 143,
+            "w": 20,
+            "h": 15,
+            "kind": "good",
+            "shape": "rect",
+            "points": 10,
+            "stickerIDs": [],
+            "rule": "clear",
+            "mask": "eyes",
+            "tolerance": 0
+          },
+          {
+            "key": "EyeRight",
+            "label": "오른쪽 눈",
+            "x": 166.25,
+            "y": 143,
+            "w": 20,
+            "h": 15,
+            "kind": "good",
+            "shape": "rect",
+            "points": 10,
+            "stickerIDs": [],
+            "rule": "clear",
+            "mask": "eyes",
+            "tolerance": 0
+          },
+          {
+            "key": "HornArea",
+            "label": "출근할 때보다 가벼운 뿔",
             "x": 0,
             "y": 0,
             "w": 320,
-            "h": 220,
-            "kind": "bad",
+            "h": 350,
+            "kind": "good",
             "shape": "rect",
-            "points": 21,
+            "points": 40,
             "stickerIDs": [],
-            "rule": "preserve",
-            "tolerance": 0.08,
-            "mask": "hornKeep"
+            "rule": "area",
+            "maxRatio": 0.9,
+            "tolerance": 0
           }
         ],
         "attachRegions": [],
@@ -5239,9 +5269,9 @@
             "key": "ThirdEyeCircle",
             "label": "이마 외눈 아래 다크서클",
             "x": 148,
-            "y": 128,
+            "y": 134,
             "w": 24,
-            "h": 10,
+            "h": 8,
             "kind": "good",
             "points": 40,
             "shape": "ellipse",
@@ -5251,9 +5281,9 @@
             "key": "ThirdEye",
             "label": "이마 외눈은 가리지 않기",
             "x": 148,
-            "y": 116,
+            "y": 120,
             "w": 24,
-            "h": 10,
+            "h": 12,
             "kind": "bad",
             "points": 15,
             "shape": "ellipse",
@@ -5285,22 +5315,25 @@
             "y": 0,
             "w": 320,
             "h": 220
-          }
+          },
+          "connected": true,
+          "allowFace": true
         },
         "requestNotes": {
-          "cut": "눈 앞의 긴 가지는 정리\n작은 뿔 한 쌍은 남기기",
+          "cut": "눈 세 개는 무사하게\n뿔은 출근할 때보다 가볍게",
           "draw": "이마 외눈 아래만 가장 어둡게\n눈과 나머지 얼굴은 깔끔하게",
           "attach": "장식 없이 단정하게"
         },
         "requestBriefNotes": {
-          "cut": "세 눈이 다치기 전에\n작은 뿔만 단정하게",
+          "cut": "눈 세 개는 무사하게\n뿔은 출근할 때보다 가볍게",
           "draw": "외눈 아래 짙은 다크서클로\n반차가 필요한 얼굴 만들기",
           "attach": "장식 없이 단정하게"
-        }
+        },
+        "eyeContactLine": "잠깐, 그건 눈입니다. 연차도 못 쓰는데 안대까지 쓰게 하시려고요?"
       },
       "bindings": {},
       "battle": "none",
-      "note": "미용 시험 초안. 긴 뿔을 다듬고 발모제로 자유롭게 새 뿔을 만든다. 666년 불면의 직장인이 반차를 얻기 위해 이마 외눈 아래 가장 어두운 다크서클을 부탁한다. 영역·70/30 배점은 시험값이며 본편 방문·야차 연결은 미정이다."
+      "note": "미용 시험 초안. 얼굴에 붙은 뿔에서 이어 기르고 다시 깎는다. 얼굴 위 덮기 허용, 세 눈 접촉과 시작 면적 초과는 실패. 시작 대비90% 이하 면적은 조절 가능한 시험값이며 정해진 목표 모양은 없다. 다크서클로 반차를 얻으려는 직장인 부탁을 유지한다."
     }
   ],
   "schedule": [

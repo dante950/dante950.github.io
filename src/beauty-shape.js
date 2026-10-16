@@ -22,6 +22,30 @@ export function beautyGrowthValue(value,original,border,growth={},bone=false){
  if(!bone)return 2;
  return !value?(original?1:2):!border?2:value;
 }
+// Eight-neighbour connectivity matches the pixel brush, including diagonal branches.
+export function rootedBeautyMaterial(material,roots,width,height,candidates=new Set()){
+ const connected=new Uint8Array(material.length),queue=[];
+ for(let n=0;n<material.length;n++)if(roots[n]&&material[n]){connected[n]=1;queue.push(n);}
+ for(let i=0;i<queue.length;i++){
+  const n=queue[i],x=n%width,y=Math.floor(n/width);
+  for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
+   const xx=x+dx,yy=y+dy;if(xx<0||xx>=width||yy<0||yy>=height)continue;
+   const q=yy*width+xx;
+   if(!connected[q]&&(material[q]||candidates.has(q))){connected[q]=1;queue.push(q);}
+  }
+ }
+ return connected;
+}
+export function beautyRootMask(material,face,width,height){
+ const roots=new Uint8Array(material.length);
+ for(let n=0;n<material.length;n++)if(material[n]){
+  const x=n%width,y=Math.floor(n/width);
+  for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
+   const xx=x+dx,yy=y+dy;if(xx>=0&&xx<width&&yy>=0&&yy<height&&face[yy*width+xx])roots[n]=1;
+  }
+ }
+ return roots;
+}
 export function strokeCells(width,height,points,radius,scale=2){
  const cells=new Set();
  for(let i=0;i<points.length;i++){
@@ -71,8 +95,17 @@ export function detachedByBeautyCut(before,after,width,height,anchors=new Uint8A
 const BONE_TRIM_COMPLETION=.50,BONE_REGION_COMPLETION=.30,BONE_PRESERVE_TOLERANCE=.12;
 export function scoreShape(current,original,b,width=160,height=175,masks={}){
  if(!b.designVersion)return scoreLegacyShape(current,original,b,width,height,masks);
- let points=0,interiorIntact=true,interiorLossRatio=0,eyeCoverRatio=0;const details=[];
+ let points=0,interiorIntact=true,interiorLossRatio=0,eyeCoverRatio=0,areaRatio=0,eyeCoverCount=0;const details=[];
+ if(b.growth?.connected&&masks.eyes)for(let n=0;n<current.length;n++)if(masks.eyes[n]&&current[n])eyeCoverCount++;
  for(const r of b.cutRegions){
+  if(r.rule==='area'){
+   let start=0,now=0;
+   for(let y=0;y<height;y++)for(let x=0;x<width;x++)if(inBeautyRegion((x+.5)*2,(y+.5)*2,r)){const n=y*width+x;start+=Number(!!original[n]);now+=Number(!!current[n]);}
+   const ratio=start?now/start:0,limit=r.maxRatio??.9;
+   const fulfilled=start?ratio<=limit?1:Math.max(0,(1-ratio)/Math.max(.01,1-limit)):0;
+   const value=fulfilled*(r.points||0);points+=value;areaRatio=Math.max(areaRatio,ratio);
+   details.push({key:r.key,label:r.label,rule:'area',ratio,fulfilled,points:value,total:start,current:now,maxRatio:limit});continue;
+  }
   let total=0,met=0,protectedTotal=0;
   for(let y=0;y<height;y++)for(let x=0;x<width;x++){
    const n=y*width+x;
@@ -103,7 +136,8 @@ export function scoreShape(current,original,b,width=160,height=175,masks={}){
   points-=b.weights.cut*eyeCoverRatio;
   interiorIntact=interiorLossRatio<=BONE_PRESERVE_TOLERANCE&&eyeCoverRatio<=BONE_PRESERVE_TOLERANCE;
  }
- return {score:Math.max(0,Math.min(b.weights.cut,points)),details,interiorIntact,interiorLossRatio,eyeCoverRatio};
+ const hardFailure=!!b.growth?.connected&&(eyeCoverCount>0||areaRatio>1);
+ return {score:hardFailure?0:Math.max(0,Math.min(b.weights.cut,points)),details,interiorIntact,interiorLossRatio,eyeCoverRatio,eyeCoverCount,areaRatio,hardFailure};
 }
 // Memo completion follows existing requirements, never the number of strokes.
 export function beautyRequirementChecks(b,phase,shape,scores,placementCount){
@@ -139,6 +173,7 @@ export function beautyStageOrder(b){return BEAUTY_STAGES.filter(k=>b.steps[k]);}
 // A precise silhouette request is satisfied only when both removal and preservation succeed.
 export function beautyResultMood(b,shape,total){
  if(b.growth?.material==='horn'){
+  if(shape.hardFailure)return 'angry';
   const keep=shape.details.filter(r=>r.rule==='preserve');
   if(total<40||keep.some(r=>r.ratio<.5))return 'angry';
   return total>=80&&shape.details.filter(r=>r.rule!=='free').every(r=>r.fulfilled>=1-1e-9)?'satisfied':'neutral';

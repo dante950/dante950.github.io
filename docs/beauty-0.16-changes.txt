@@ -1,0 +1,34 @@
+변경 의도: 고정된 작은 뿔 모양을 요구하던 판정을 없애고, 눈의 안전과 전체 재료량 안에서 플레이어가 자기 형태를 만들도록 한다.
+2026-10-16 · 통합 웹판0.16 · 마왕 부하 미용 시험
+
+뿔 성장: 얼굴과 연결된 기존 뿔 픽셀 위에서 붓질을 시작해야 한다. 연결된 범위만 자라며 얼굴 위도 덮는다. 허공에서 시작한 붓질은 중간에 뿔을 만나도 생기지 않는다. 대각선을 포함한8방향 연결을 사용하고, 커트 후 얼굴 쪽 연결이 끊긴 조각은 떨어진다. 원본 뿔 중 얼굴에 닿은 작은 뿌리를 보호해 전부 깎아도 다시 기를 수 있다.
+조건: 기존 긴 가지/작은 뿔 보존49/21 → 세 눈 가리지 않기10+10+10, 시작 대비 면적 줄이기40. 형태70/그리기30 총 배점은 같다. 남아 있는 원래 뿔과 새로 기른 뿔 모두 점유 픽셀로 세고, 최초 점유 픽셀 수를 분모로 삼는다. 기본 목표90% 이하는 시험값이며 편집 가능. 90~100%는 미완성, 100% 초과 또는 눈 한 픽셀 이상 접촉 시 형태0점과 불만족 반응이며 손질로 회복 가능하다. 연결 조건은 마왕 부하에만 적용했다.
+실시간 항의: 눈 접촉이 시작될 때 한 번, 최소3초 간격. 3.8초간 말을 하며 조작은 계속 가능하다. 문장은 미용 수정의 눈에 닿았을 때 한마디에서 편집한다. 이 반응 설정은 프로젝트 JSON의 시험 기능이며 Excel/Unity 수신 계약 추가가 아니다.
+다크서클은 눈 스프라이트의 아래에 맞춰 정답 영역y128/h10 → y134/h8, 눈 감점 영역y116/h10 → y120/h12로 정렬했다. 나머지 그리기 배점과 색상은 그대로다. 원화와 Excel 파일은 변경하지 않았다.
+작은 뿔 원화 버튼을 목표가 아닌 참고 예시로 바꾸었다. 부탁은 눈 세 개는 무사하게 / 뿔은 출근할 때보다 가볍게로 수정했다.
+빌드와 단위/데이터 검사59개 통과. 실제 Chromium/WebKit 포인터 검사에서 허공 성장 차단, 세 눈 접촉과 표정/항의, 얼굴 복구, 뿌리 보존, 새로운 형태의 성공, 절단 가지 낙하, 눈을 가리지 않은 면적 초과 실패, 다크서클과 결과를 확인했다. 말풍선 외형 보완과 편집기 비율 변경은 Chromium에서 추가 확인하고 배포 서버에서 두 브라우저를 재검사한다. 검사 결과·실제 캡처·배포 확인은 outputs/minion-connected-2026-10-16에 보관한다. Unity 및 사용자 재미/사용성 검증은 아니다.
+기존 세 손님의 설정·일정과 마왕 부하 부탁4문장 이외 전투/대사 값의 보존을 대조했다.
+
+실제 값 변경(대사 배열 키는 DialogueID, 미용 영역 키는 key, 손님 키는 MonsterID):
+project.version : 7 → 8
+project.updatedAt : "2026-10-16T06:24:36.052Z" → "2026-10-16T07:10:28.222Z"
+project.combat.sheets[대사].rows[900116].Text : "업무가 쌓이는 동안 <color=#52609B>뿔도 자꾸 자라서요.</color>\n이러다 <color=#9A4935>눈 세 개가 전부 찔리겠습니다.</color>" → "업무가 쌓이는 동안 <color=#52609B>뿔도 한 짐이 됐습니다.</color>\n눈까지 찌르면 보고서를 읽을 수가 없어서요."
+project.combat.sheets[대사].rows[900117].Text : "<color=#52609B>작은 뿔 한 쌍만 단정하게</color> 남겨 주세요.\n업무도 세 배인데, 눈까지 세 개 다 잃을 순 없어서요." → "<color=#52609B>눈 세 개는 무사하게, 뿔은 출근할 때보다 가볍게</color> 부탁드립니다.\n모양은 맡기겠습니다. 업무만큼 무성할 필요는 없으니까요."
+project.combat.sheets[대사].rows[900118].Text : "<color=#9A4935>바깥으로 무성하게 뻗은 가지는 깎고,</color>\n<color=#52609B>눈 위의 작은 뿔 한 쌍은 남겨</color> 주세요." → "<color=#52609B>세 눈을 건드리지 않게</color> 뿔을 다듬어 주세요.\n모양은 자유롭게 바꾸셔도 좋지만, 전체 양은 처음보다 좀 줄여 주십시오."
+project.combat.sheets[대사].rows[900119].Text : "너무 깎았다면 <color=#52609B>발모제로 원하는 모양의 뿔을 다시 길러</color> 주세요.\n원래 가지를 전부 되살릴 필요는 없습니다. 눈앞만 시원하게 부탁드립니다." → "발모제는 <color=#52609B>붙어 있는 뿔에서 이어서</color> 발라 주세요.\n눈만 피하면 얼굴 앞으로 휘어도 괜찮습니다. 뿔까지 업무처럼 불어나지는 않게 부탁드립니다."
+project.guests[10004].beauty.cutRegions[HornTrim] : {"key":"HornTrim","label":"눈을 위협하는 긴 가지 깎기","x":0,"y":0,"w":320,"h":220,"kind":"good","shape":"rect","points":49,"stickerIDs":[],"rule":"trim","tolerance":0.08,"mask":"hornTrim"} → null
+project.guests[10004].beauty.cutRegions[HornKeep] : {"key":"HornKeep","label":"작은 뿔 한 쌍 남기기","x":0,"y":0,"w":320,"h":220,"kind":"bad","shape":"rect","points":21,"stickerIDs":[],"rule":"preserve","tolerance":0.08,"mask":"hornKeep"} → null
+project.guests[10004].beauty.cutRegions[EyeTop] : null → {"key":"EyeTop","label":"이마 외눈","x":148.75,"y":120.5,"w":22.5,"h":12.5,"kind":"good","shape":"rect","points":10,"stickerIDs":[],"rule":"clear","mask":"eyes","tolerance":0}
+project.guests[10004].beauty.cutRegions[EyeLeft] : null → {"key":"EyeLeft","label":"왼쪽 눈","x":136.25,"y":143,"w":20,"h":15,"kind":"good","shape":"rect","points":10,"stickerIDs":[],"rule":"clear","mask":"eyes","tolerance":0}
+project.guests[10004].beauty.cutRegions[EyeRight] : null → {"key":"EyeRight","label":"오른쪽 눈","x":166.25,"y":143,"w":20,"h":15,"kind":"good","shape":"rect","points":10,"stickerIDs":[],"rule":"clear","mask":"eyes","tolerance":0}
+project.guests[10004].beauty.cutRegions[HornArea] : null → {"key":"HornArea","label":"출근할 때보다 가벼운 뿔","x":0,"y":0,"w":320,"h":350,"kind":"good","shape":"rect","points":40,"stickerIDs":[],"rule":"area","maxRatio":0.9,"tolerance":0}
+project.guests[10004].beauty.drawRegions[ThirdEyeCircle].y : 128 → 134
+project.guests[10004].beauty.drawRegions[ThirdEyeCircle].h : 10 → 8
+project.guests[10004].beauty.drawRegions[ThirdEye].y : 116 → 120
+project.guests[10004].beauty.drawRegions[ThirdEye].h : 10 → 12
+project.guests[10004].beauty.growth.connected : null → true
+project.guests[10004].beauty.growth.allowFace : null → true
+project.guests[10004].beauty.requestNotes.cut : "눈 앞의 긴 가지는 정리\n작은 뿔 한 쌍은 남기기" → "눈 세 개는 무사하게\n뿔은 출근할 때보다 가볍게"
+project.guests[10004].beauty.requestBriefNotes.cut : "세 눈이 다치기 전에\n작은 뿔만 단정하게" → "눈 세 개는 무사하게\n뿔은 출근할 때보다 가볍게"
+project.guests[10004].beauty.eyeContactLine : null → "잠깐, 그건 눈입니다. 연차도 못 쓰는데 안대까지 쓰게 하시려고요?"
+project.guests[10004].note : "미용 시험 초안. 긴 뿔을 다듬고 발모제로 자유롭게 새 뿔을 만든다. 666년 불면의 직장인이 반차를 얻기 위해 이마 외눈 아래 가장 어두운 다크서클을 부탁한다. 영역·70/30 배점은 시험값이며 본편 방문·야차 연결은 미정이다." → "미용 시험 초안. 얼굴에 붙은 뿔에서 이어 기르고 다시 깎는다. 얼굴 위 덮기 허용, 세 눈 접촉과 시작 면적 초과는 실패. 시작 대비90% 이하 면적은 조절 가능한 시험값이며 정해진 목표 모양은 없다. 다크서클로 반차를 얻으려는 직장인 부탁을 유지한다."

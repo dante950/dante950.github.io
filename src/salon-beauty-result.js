@@ -43,6 +43,7 @@ function advanceBeautyResult(){
 function startBeautyResult(){
  if(!ready||finishing||briefing)return;cancelGesture();updateBeautyScore();finishing=true;beautyPhase='result';beautyResultActive=true;
  resultMood=beautyResultMood(B,shapeProgress,totalSatisfaction);
+ eyeReaction.hidden=true;clearTimeout(reactionTimer);clearInterval(reactionTick);reactionOpen=false;
  expression='neutral';talking=false;mouthFrame=false;zonesVisible=false;fallingPieces=[];renderPortrait(false);
  next.disabled=true;finish.disabled=true;state.keys.clear();
  panel.inert=true;nav.inert=true;actions.inert=true;status.inert=true;

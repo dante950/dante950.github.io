@@ -11,6 +11,15 @@ const current=new Uint8Array(W*H),original=new Uint8Array(W*H),paint=new Uint8Cl
 const sourcePixels=new Uint8ClampedArray(W*H*4),originalBorder=new Uint8Array(W*H);
 const masks={eyes:new Uint8Array(W*H),brain:new Uint8Array(W*H),face:new Uint8Array(W*H),protectedFace:new Uint8Array(W*H)};
 const sculptAnchors=new Uint8Array(W*H);
+let eyeWasCovered=false,eyeReactionCount=0,reactionTimer=0,reactionTick=0,reactionOpen=false,lastEyeReaction=-Infinity;
+const eyeReaction=document.createElement('div');eyeReaction.className='beautyEyeReaction';eyeReaction.hidden=true;eyeReaction.setAttribute('role','status');eyeReaction.setAttribute('aria-live','polite');beautyScreen.append(eyeReaction);
+function showEyeReaction(){
+ if(performance.now()-lastEyeReaction<3000)return;lastEyeReaction=performance.now();
+ eyeReactionCount++;eyeReaction.textContent=B.eyeContactLine||'잠깐, 그건 눈입니다. 안대까지 쓰게 하시려고요?';eyeReaction.hidden=false;
+ clearTimeout(reactionTimer);clearInterval(reactionTick);
+ reactionTick=setInterval(()=>{reactionOpen=!reactionOpen;renderPortrait();},160);
+ reactionTimer=setTimeout(()=>{eyeReaction.hidden=true;reactionOpen=false;clearInterval(reactionTick);renderPortrait();},3800);
+}
 let fallingPieces=[],fallingFrame=0;
 const heardDetails={},heardRequests={};
 let liveSatisfaction=50,shapeProgress={details:[]};
@@ -104,12 +113,19 @@ async function prepareBeauty(){
   const src=cctx.getImageData(0,0,W,H).data;
   for(let n=0;n<W*H;n++)if(src[n*4+3]>100){current[n]=original[n]=1;sourcePixels.set(src.subarray(n*4,n*4+4),n*4);}
   // Material can overlap the face, but the separate face artwork is never cut.
-  for(let n=0;n<W*H;n++)masks.protectedFace[n]=masks.face[n]&&!original[n]?1:0;
+  for(let n=0;n<W*H;n++)masks.protectedFace[n]=!B.growth?.allowFace&&masks.face[n]&&!original[n]?1:0;
   cctx.clearRect(0,0,W,H);drawPortraitLayer(cctx,portraitLayers.target);
   const targetPixels=cctx.getImageData(0,0,W,H).data,target=new Uint8Array(W*H);
   for(let n=0;n<W*H;n++)target[n]=targetPixels[n*4+3]>100?1:0;
   Object.assign(masks,beautyMaterialMasks(original,target));
-  sculptAnchors.set(masks.hornKeep);
+  if(B.growth?.connected){
+   cctx.clearRect(0,0,W,H);drawPortraitLayer(cctx,portraitLayers.eyes?.neutral);
+   const eyes=cctx.getImageData(0,0,W,H).data;
+   for(let n=0;n<W*H;n++)masks.eyes[n]=Number(eyes[n*4+3]>100&&B.cutRegions.some(r=>r.mask==='eyes'&&inBeautyRegion((n%W+.5)*PIX,(Math.floor(n/W)+.5)*PIX,r)));
+   sculptAnchors.set(beautyRootMask(original,masks.face,W,H));
+   for(let n=0;n<W*H;n++)if(masks.eyes[n])sculptAnchors[n]=0;
+  }else sculptAnchors.set(masks.hornKeep);
+  masks.roots=sculptAnchors;
   for(let n=0;n<W*H;n++)originalBorder[n]=original[n]&&emptyNeighbor(original,n)?1:0;
   ready=true;next.disabled=briefing;updateBeautyScore();refreshTools();renderPortrait();return;
  }
@@ -169,10 +185,17 @@ function undoBeauty(){
 function point(e){const r=portrait.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*320,y:(e.clientY-r.top)/r.height*350};}
 function applyStroke(points,kind){
  const cells=strokeCells(W,H,points,brushRadius);let changed=false;
+ let connected=null;
+ if(kind==='grow'&&B.growth?.connected){
+  if(!gesture?.growthAllowed)return;
+  const candidates=new Set([...cells].filter(n=>inBeautyRegion((n%W+.5)*PIX,(Math.floor(n/W)+.5)*PIX,growthRegion)));
+  connected=rootedBeautyMaterial(current,sculptAnchors,W,H,candidates);
+ }
  for(const n of cells){
   if(masks.protectedFace[n]&&kind!=='paint'&&kind!=='erase')continue;
   const x=(n%W+.5)*PIX,y=(Math.floor(n/W)+.5)*PIX,i=n*4,previous=current[n],previousPaint=paint.slice(i,i+4);
   if(kind==='grow'){
+   if(connected&&!connected[n])continue;
    if(!inBeautyRegion(x,y,growthRegion))continue;
    if(B.growth?.mask==='original'&&!original[n])continue;
    // Growth can cover facial features and remain separate from the original material.
@@ -180,7 +203,7 @@ function applyStroke(points,kind){
    if(B.growth?.mask==='original'){if(grown!==current[n]){current[n]=grown;paint.fill(0,i,i+4);}}
    else if(!bone||!current[n]){current[n]=grown;paint.fill(0,i,i+4);}
    else current[n]=grown;
-  }else if(kind==='scissors'||kind==='hammer'){if(current[n])paint.fill(0,i,i+4);current[n]=0;}
+  }else if(kind==='scissors'||kind==='hammer'){if(B.growth?.connected&&sculptAnchors[n])continue;if(current[n])paint.fill(0,i,i+4);current[n]=0;}
   else if(kind==='erase')paint.fill(0,i,i+4);
   else if(kind==='paint'&&canPaintAt(n)){paint.set(blendBeautyRGBA(gesture.paint.subarray(i,i+4),rgb(paintColor),paintOpacity),i);}
   if(current[n]!==previous||previousPaint.some((v,k)=>v!==paint[i+k]))changed=true;
@@ -197,6 +220,7 @@ portrait.addEventListener('pointerdown',e=>{
   return;
  }
  const undoAdded=pushUndo();gesture={undoAdded,pointerId:e.pointerId,from:p,to:p,last:p,kind:activeTool,snapshot:current.slice(),paint:paint.slice(),touched:{...touched}};
+ if(activeTool==='grow'&&B.growth?.connected){const x=Math.floor(p.x/PIX),y=Math.floor(p.y/PIX);gesture.growthAllowed=x>=0&&x<W&&y>=0&&y<H&&!!rootedBeautyMaterial(current,sculptAnchors,W,H)[y*W+x];}
  portrait.setPointerCapture(e.pointerId);
  if(activeTool!=='scissors'){applyStroke([p],activeTool);updateBeautyScore();}
  renderPortrait();
@@ -218,7 +242,8 @@ portrait.addEventListener('pointerup',e=>{
  updateBeautyScore();renderPortrait();
 });
 function removeCutFragments(before){
- const removed=detachedByBeautyCut(before,current,W,H,sculptAnchors).filter(n=>!masks.protectedFace[n]);if(!removed.length)return;
+ const rooted=B.growth?.connected?rootedBeautyMaterial(current,sculptAnchors,W,H):null;
+ const removed=rooted?Array.from(current,(_,n)=>n).filter(n=>current[n]&&!rooted[n]):detachedByBeautyCut(before,current,W,H,sculptAnchors).filter(n=>!masks.protectedFace[n]);if(!removed.length)return;
  renderPortrait(false);
  const data=materialCanvas.getContext('2d').getImageData(0,0,W,H),piece=offscreen(),pc=piece.getContext('2d'),pixels=pc.createImageData(W,H);
  for(const n of removed){const i=n*4;pixels.data.set(data.data.subarray(i,i+4),i);current[n]=0;paint.fill(0,i,i+4);}
@@ -252,6 +277,10 @@ function updateBeautyScore(){
  const live=BEAUTY_STAGES.reduce((s,k)=>s+(B.steps[k]?(touched[k]?scores[k]:B.weights[k]*.5):0),0);
  liveSatisfaction=Math.round(Math.max(0,Math.min(100,live)));
  expression=liveBeautyMood(live,expression,Object.values(touched).some(Boolean));
+ if(B.growth?.connected){
+  const covered=shape.eyeCoverCount>0;if(covered&&!eyeWasCovered&&!finishing)showEyeReaction();eyeWasCovered=covered;
+  if(shape.hardFailure)expression='angry';
+ }
  renderRequestStatus();
  beautyCustomer.dataset.expression=expression;beautyCustomer.dataset.talking=String(talking);
 }
@@ -261,7 +290,7 @@ function paintFace(){
  if(layered){
   drawPortraitLayer(f,portraitLayers.head);
   drawPortraitLayer(f,portraitLayers.eyes?.[expression]||portraitLayers.eyes?.neutral);
-  drawPortraitLayer(f,portraitLayers.mouth?.[talking&&mouthFrame?'open':'closed']||portraitLayers.mouth?.open);
+  drawPortraitLayer(f,portraitLayers.mouth?.[(talking&&mouthFrame||!eyeReaction.hidden&&reactionOpen)?'open':'closed']||portraitLayers.mouth?.open);
   return;
  }
  if(faceFeatures){
@@ -327,13 +356,14 @@ function renderPortrait(includeGuides=true,target=ctx){
   target.save();target.lineWidth=.8;target.font='5px sans-serif';
   const regions=beautyPhase==='cut'?B.cutRegions:beautyPhase==='attach'?B.attachRegions:B.drawRegions;
   if(beautyPhase==='cut'){target.strokeStyle='#92713F';target.setLineDash([2,2]);target.strokeRect(growthRegion.x/2,growthRegion.y/2,growthRegion.w/2,growthRegion.h/2);target.setLineDash([]);}
-  if((faceFeatures||layered)&&beautyPhase==='cut'){
+  if((faceFeatures||layered)&&!B.growth?.connected&&beautyPhase==='cut'){
    // Preview the editable target cells, leaving the immutable face out of the guide.
    target.beginPath();
    for(let n=0;n<W*H;n++)if(original[n]&&!masks.protectedFace[n])target.rect(n%W,Math.floor(n/W),1,1);
    target.clip();
   }
   for(const r of regions){
+   if(r.rule==='area')continue;
    const warm=r.rule==='cover'||layered&&r.rule==='preserve';target.strokeStyle=warm?'#FCBB52':'#E95665';target.fillStyle=(warm?'#FCBB52':'#E95665')+(layered?'70':'25');
    if(layered&&r.mask&&masks[r.mask]){for(let n=0;n<W*H;n++)if(masks[r.mask][n]&&inBeautyRegion((n%W+.5)*PIX,(Math.floor(n/W)+.5)*PIX,r))target.fillRect(n%W,Math.floor(n/W),1,1);}
    else {target.fillRect(r.x/2,r.y/2,r.w/2,r.h/2);target.strokeRect(r.x/2,r.y/2,r.w/2,r.h/2);}
@@ -351,7 +381,7 @@ function refreshTools(){
  for(const b of paintTools.querySelectorAll('[data-color]'))b.classList.toggle('selected',activeTool==='paint'&&b.dataset.color===paintColor);
  document.getElementById('erasePaint').classList.toggle('selected',activeTool==='erase');
  for(const b of decorations.querySelectorAll('[data-sticker]'))b.classList.toggle('selected',b.dataset.sticker===selectedSticker?.id);
- hint.textContent=beautyPhase==='attach'?'붙인 장식은 눌러 떼기':beautyPhase==='draw'?'머리와 얼굴 위에 쓱쓱':activeTool==='grow'?(B.growth?.mask==='original'?'잘라 낸 뿔 자리에 발라 복원해 주세요':'누른 채 발라 주세요'):activeTool==='scissors'?'드래그 후 놓으면 싹둑':'누른 채 조금씩 다듬기';
+ hint.textContent=beautyPhase==='attach'?'붙인 장식은 눌러 떼기':beautyPhase==='draw'?'머리와 얼굴 위에 쓱쓱':activeTool==='grow'?(B.growth?.connected?'붙어 있는 뿔 위에서 이어 발라 주세요':B.growth?.mask==='original'?'잘라 낸 뿔 자리에 발라 복원해 주세요':'누른 채 발라 주세요'):activeTool==='scissors'?'드래그 후 놓으면 싹둑':'누른 채 조금씩 다듬기';
 }
 function renderRequestStatus(){
  if(!BEAUTY_STAGES.includes(beautyPhase))return;
@@ -402,5 +432,5 @@ function enterBeauty(){
 /*__BEAUTY_RESULT__*/
 addEventListener('message',e=>{if(e.source!==parent||e.data?.token!==GUEST.token)return;if(e.data.type==='beauty-request-done'){finishBeautyRequest(e.data.requestId,e.data.detail);return;}if(e.data.type!=='beauty-speaking')return;talking=!!e.data.speaking;mouthFrame=!!e.data.open;beautyCustomer.dataset.talking=String(talking);renderPortrait();});
 prepareBeauty().catch(error=>{hint.textContent='미용 리소스를 불러오지 못했어요. 새로고침해 주세요.';console.error(error);});
-window.beautyDebug={get result(){return {active:beautyResultActive,revealed:resultRevealed,mood:resultMood};},get ready(){return ready;},get material(){return Array.from(current);},get paint(){return Array.from(paint);},get original(){return Array.from(original);},get toolSize(){return brushRadius;},get opacity(){return paintOpacity;},get masks(){return masks;},get expression(){return expression;},get scores(){return {cut:cutScore,draw:drawScore,attach:attachScore,total:totalSatisfaction,live:liveSatisfaction};},get placements(){return placements.map(p=>({id:p.sticker.id,x:p.x,y:p.y}));},get historyLength(){return history[beautyPhase]?.length||0;},get briefing(){return briefing;},get mouthFrame(){return mouthFrame;}};
+window.beautyDebug={get shape(){return structuredClone(shapeProgress);},get reaction(){return {count:eyeReactionCount,visible:!eyeReaction.hidden,text:eyeReaction.textContent};},get result(){return {active:beautyResultActive,revealed:resultRevealed,mood:resultMood};},get ready(){return ready;},get material(){return Array.from(current);},get paint(){return Array.from(paint);},get original(){return Array.from(original);},get toolSize(){return brushRadius;},get opacity(){return paintOpacity;},get masks(){return masks;},get expression(){return expression;},get scores(){return {cut:cutScore,draw:drawScore,attach:attachScore,total:totalSatisfaction,live:liveSatisfaction};},get placements(){return placements.map(p=>({id:p.sticker.id,x:p.x,y:p.y}));},get historyLength(){return history[beautyPhase]?.length||0;},get briefing(){return briefing;},get mouthFrame(){return mouthFrame;}};
 
