@@ -32,7 +32,7 @@ const resultContinue=document.createElement('button');resultContinue.className='
 function revealBeautyResult(){
  if(resultRevealed)return;resultRevealed=true;expression=resultMood;talking=false;mouthFrame=false;
  beautyCustomer.dataset.expression=expression;beautyScreen.dataset.resultMood=resultMood;beautyScreen.classList.add('resultRevealed');
- resultCaption.textContent=GUEST.skin?.layers?(resultMood==='satisfied'?'이제 보고서가 세 눈에 다 들어오는군요.':resultMood==='angry'?'…이건 수정 요청을 드려야겠군요.':'네, 회의에는 갈 수 있겠습니다.'):bone?(resultMood==='satisfied'?'헤. 꽤 멋진데?':resultMood==='angry'?'…뼈아픈데.':'음. 이 정도면 됐어.'):(resultMood==='satisfied'?'정말… 마음에 들어요…!':resultMood==='angry'?'어… 이건 좀…':'음… 괜찮아요…');
+ resultCaption.textContent=GUEST.skin?.layers?(resultMood==='satisfied'?'좋습니다. 이 얼굴로 반차 결재를 올리겠습니다.':resultMood==='angry'?'…이건 수정 요청을 드려야겠군요.':'네, 회의에는 갈 수 있겠습니다.'):bone?(resultMood==='satisfied'?'헤. 꽤 멋진데?':resultMood==='angry'?'…뼈아픈데.':'음. 이 정도면 됐어.'):(resultMood==='satisfied'?'정말… 마음에 들어요…!':resultMood==='angry'?'어… 이건 좀…':'음… 괜찮아요…');
  resultContinue.textContent='계속하기 →';renderPortrait(false);
 }
 function advanceBeautyResult(){

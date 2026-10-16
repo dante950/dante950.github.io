@@ -8,8 +8,8 @@ const project=JSON.parse(await fs.readFile(new URL('../data/project.json',import
 test('minion stays editable but cannot enter the unfinished story or battle',()=>{
  assert.deepEqual(projectProblems(project),[]);
  const g=project.guests.find(g=>g.id===10004);assert.equal(g.previewOnly,true);assert.equal(g.battle,'none');
- assert.equal(g.beauty.cutTool,'hammer');assert.equal(g.beauty.growth.mask,'original');
- assert.deepEqual(g.beauty.steps,{cut:true,draw:false,attach:false});
+ assert.equal(g.beauty.cutTool,'hammer');assert.notEqual(g.beauty.growth.mask,'original');
+ assert.deepEqual(g.beauty.steps,{cut:true,draw:true,attach:false});
  assert(!storyStartOptions(project).some(s=>s.guest.id===10004));
  const p=structuredClone(project);p.schedule[1].push(10004);assert(projectProblems(p).some(s=>s.includes('본편 일정')));
  p.schedule[1].pop();p.guests[0].previewOnly=true;assert(projectProblems(p).length);

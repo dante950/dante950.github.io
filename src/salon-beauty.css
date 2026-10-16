@@ -12,6 +12,7 @@
 .opacityLabel{margin:4px 0 16px}
 .sculptPalette{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:10px 0 18px}
 .sculptPalette button{height:30px;padding:0}.sculptPalette button.selected{box-shadow:0 0 0 3px #453329}
+.sculptPalette.extendedPalette{gap:6px;margin:8px 0 10px}.sculptPalette.extendedPalette button{height:24px}
 #erasePaint{width:100%}
 .sculptStickers{display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:265px;overflow:auto}
 .sculptStickers button{padding:5px;font-size:8px}.sculptStickers img{height:32px;width:50px;object-fit:contain;display:block;image-rendering:pixelated}

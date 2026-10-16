@@ -61,15 +61,16 @@ finish.style.display='none';next.disabled=true;
 next.addEventListener('click',()=>{const stages=beautyStageOrder(B),n=stages.indexOf(beautyPhase);if(n===stages.length-1)startBeautyResult();else setBeautyPhase(stages[n+1]);});
 finish.addEventListener('click',startBeautyResult);
 const shapeTools=document.getElementById('shapeTools');
-for(const [key,name] of [[hammer?'hammer':'scissors',hammer?'망치·정':'가위'],['grow',B.growth?.material==='horn'?'발모제 · 뿔 복원':bone?'발모제 · 뼈 잇기':'발모제 · 머리 늘리기']]){
+for(const [key,name] of [[hammer?'hammer':'scissors',hammer?'망치·정':'가위'],['grow',B.growth?.material==='horn'?'발모제 · 뿔 기르기':bone?'발모제 · 뼈 잇기':'발모제 · 머리 늘리기']]){
  if(key==='grow'&&B.growth?.enabled===false)continue;
  const button=document.createElement('button');button.className='sculptTool';button.dataset.tool=key;button.textContent=name;
  button.onclick=()=>{cancelGesture();activeTool=key;refreshTools();};shapeTools.append(button);
 }
 document.getElementById('sculptSize').oninput=e=>{cancelGesture();brushRadius=+e.target.value;document.getElementById('sculptSizeValue').value=brushRadius;};
-const colors=['#FF3024','#FF8800','#FFD342','#00DC0A','#228947','#75452D','#4A2C26','#483ADF','#A439F4','#FF67A7','#E9E2D6','#FFFFFF'];
+const colors=[...new Set(['#FF3024','#FF8800','#FFD342','#00DC0A','#228947','#75452D','#4A2C26','#483ADF','#A439F4','#FF67A7','#E9E2D6','#FFFFFF',...(B.drawColors||[]).map(c=>c.toUpperCase())])];
 const paintTools=document.getElementById('paintTools');
 paintTools.innerHTML='<div class="sculptPalette"></div><label class="opacityLabel" for="paintOpacity"><span>불투명도 <output id="paintOpacityValue">100%</output></span><input id="paintOpacity" type="range" min="1" max="100" step="1" value="100"></label><button id="erasePaint">색만 지우기</button>';
+paintTools.querySelector('.sculptPalette').classList.toggle('extendedPalette',colors.length>12);
 document.getElementById('paintOpacity').oninput=e=>{cancelGesture();paintOpacity=+e.target.value/100;document.getElementById('paintOpacityValue').value=e.target.value+'%';};
 for(const color of colors){const button=document.createElement('button');button.style.background=color;button.dataset.color=color;button.title=color;button.setAttribute('aria-label','색상 '+color);button.onclick=()=>{activeTool='paint';paintColor=color;refreshTools();};paintTools.querySelector('.sculptPalette').append(button);}
 document.getElementById('erasePaint').onclick=()=>{activeTool='erase';refreshTools();};
@@ -309,7 +310,7 @@ function renderPortrait(includeGuides=true,target=ctx){
   const edge=emptyNeighbor(current,n),joining=originalBorder[n]&&!edge;
   const sourceDark=!bone&&sourcePixels[i+1]<140;
   const nearGrowth=!bone&&sourceDark&&[-2*W,-W,-2,-1,1,2,W,2*W].some(d=>current[n+d]===2);
-  const color=layered?(current[n]===2?materialColor:null):edge?outlineColor:current[n]===2||joining||nearGrowth?materialColor:null;
+  const color=layered?(current[n]===2?(edge?outlineColor:materialColor):null):edge?outlineColor:current[n]===2||joining||nearGrowth?materialColor:null;
   if(color)data.data.set([...color,255],i);else data.data.set((bone?face:sourcePixels).subarray(i,i+4),i);
   if(paint[i+3]&&!masks.protectedFace[n])data.data.set(blendBeautyRGBA(data.data.subarray(i,i+4),paint.subarray(i,i+3),paint[i+3]/255),i);
  }
@@ -366,6 +367,7 @@ function renderRequestStatus(){
 }
 function setBeautyPhase(phase,announce=true){
  if(finishing||briefing)return;cancelGesture();beautyPhase=phase;
+ if(phase==='draw'&&B.growth?.material==='horn'&&!heardRequests.draw){brushRadius=4;document.getElementById('sculptSize').value=4;document.getElementById('sculptSizeValue').value=4;}
  const names={cut:'형태 만들기',draw:'색·무늬 꾸미기',attach:'장식 붙이기'},stages=beautyStageOrder(B);
  stageTag.textContent=(stages.indexOf(phase)+1)+'. '+names[phase];
  panel.querySelector('h3').textContent=names[phase];

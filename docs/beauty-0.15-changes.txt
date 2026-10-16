@@ -1,0 +1,28 @@
+변경 의도: 정해진 원본을 되살리는 대신 플레이어의 붓질로 새 뿔을 만들고, 반차를 얻고 싶은 직장인의 부탁을 다크서클 그리기로 표현한다.
+통합 웹판 0.15 · 2026-10-16
+
+마왕 부하 10004의 발모제 원본 마스크 제한을 제거했다. 지정 범위 안의 빈 곳·잘린 곳에 새 재료를 그리며 원본 픽셀을 복구하지 않는다. 자란 뿔의 색과 외곽선은 발모제 설정을 사용하고 망치·정으로 다시 깎을 수 있다. 보호된 얼굴과 범위 밖에는 자라지 않는다.
+형태100/그리기0 → 형태70/그리기30. 긴 가지49/작은 뿔21로 기존 비율 유지. 이마 외눈 아래 다크서클 정답 색상은 #03051B다. 기존 영역·색상·가점/감점 구조를 사용했다. 정답 영역 최대40, 단계 상한30으로 약75%의 칠하기를 허용하고 눈·나머지 얼굴 각 최대15 감점을 적용한다. 좌표와 배점은 시험값이다.
+그리기 첫 진입 도구 크기는4. 정답 사용자 색상이 팔레트에 없으면 추가하며, 13개 이상일 때 패널 안에 들어오도록 간격을 조정했다. 새 대사3문장은 기존 마왕 부하 그룹/행 ID를 유지했다.
+일반 검사55개와 빌드 통과. Chromium·WebKit 실제 포인터 검사와 배포 결과는 같은 폴더의 기록을 참고한다. Unity 실행·사용자 재미 검증을 뜻하지 않는다.
+기존 세 손님 설정과 일정, 시험 대사3문장 이외의 전투/대사 데이터가 이전 배포와 같음을 대조했다. Excel 파일과 원화는 변경하지 않았다.
+
+실제 값 변경:
+project.version : 6 → 7
+project.updatedAt : "2026-10-16T05:46:11.714Z" → "2026-10-16T06:24:36.052Z"
+project.combat.sheets.8.rows.117.Text : "너무 짧아졌다면 <color=#266B4D>발모제로 뿔만 복구</color>해 주세요.\n보고서는 제가 고칠 테니, 뿔은 부탁드리겠습니다." → "너무 깎았다면 <color=#52609B>발모제로 원하는 모양의 뿔을 다시 길러</color> 주세요.\n원래 가지를 전부 되살릴 필요는 없습니다. 눈앞만 시원하게 부탁드립니다."
+project.combat.sheets.8.rows.118.Text : "색은 지금 그대로면 충분합니다. 단정하게만 부탁드려요." → "잠을 못 잔 지 <color=#52609B>666년</color>입니다. 그런데 멀쩡해 보인다며 반차가 반려됐지 뭡니까.\n<color=#52609B>이마의 외눈 아래에 가장 어두운 색으로 다크서클</color>을 그려 주세요. 이번엔 꼭 쉬고 싶습니다."
+project.combat.sheets.8.rows.119.Text : "색은 지금 그대로면 충분합니다. 단정하게만 부탁드려요." → "<color=#52609B>이마에 혼자 있는 눈 바로 아래</color>만 짙게 부탁드립니다.\n눈 자체와 나머지 얼굴은 남겨 주세요. 아파 보이되, 인수인계는 할 수 있는 얼굴이어야 합니다."
+project.guests.3.beauty.steps.draw : false → true
+project.guests.3.beauty.weights.cut : 100 → 70
+project.guests.3.beauty.weights.draw : 0 → 30
+project.guests.3.beauty.drawColors.0 : "#36364D" → "#03051B"
+project.guests.3.beauty.cutRegions.0.points : 70 → 49
+project.guests.3.beauty.cutRegions.1.points : 30 → 21
+project.guests.3.beauty.drawRegions.0 : null → {"key":"ThirdEyeCircle","label":"이마 외눈 아래 다크서클","x":148,"y":128,"w":24,"h":10,"kind":"good","points":40,"shape":"ellipse","stickerIDs":[]}
+project.guests.3.beauty.drawRegions.1 : null → {"key":"ThirdEye","label":"이마 외눈은 가리지 않기","x":148,"y":116,"w":24,"h":10,"kind":"bad","points":15,"shape":"ellipse","stickerIDs":[]}
+project.guests.3.beauty.drawRegions.2 : null → {"key":"RestFace","label":"나머지 얼굴은 깔끔하게","x":128,"y":112,"w":64,"h":84,"kind":"bad","points":15,"shape":"ellipse","stickerIDs":[]}
+project.guests.3.beauty.growth.mask : "original" → null
+project.guests.3.beauty.requestNotes.draw : "원래 뿔 색 유지" → "이마 외눈 아래만 가장 어둡게\n눈과 나머지 얼굴은 깔끔하게"
+project.guests.3.beauty.requestBriefNotes.draw : "원래 뿔 색 유지" → "외눈 아래 짙은 다크서클로\n반차가 필요한 얼굴 만들기"
+project.guests.3.note : "미용 시험용 초안 · 망치·정으로 긴 가지를 깎아 제공한 작은 뿔 형태를 남깁니다. 발모제는 원래 뿔 범위의 복구용입니다. 대사·배점·허용 오차는 조정용 초안이며 본편 일정과 야차는 아직 연결하지 않았습니다." → "미용 시험 초안. 긴 뿔을 다듬고 발모제로 자유롭게 새 뿔을 만든다. 666년 불면의 직장인이 반차를 얻기 위해 이마 외눈 아래 가장 어두운 다크서클을 부탁한다. 영역·70/30 배점은 시험값이며 본편 방문·야차 연결은 미정이다."
