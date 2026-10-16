@@ -4,7 +4,7 @@ if(B.steps.cut){
  beautyLessonSteps.push({id:'cut',phase:'cut',tool:hammer?'hammer':'scissors',title:hammer?'망치·정으로 조금 다듬어 볼까요?':'가위로 조금 잘라 볼까요?',text:hammer?'오른쪽 망치·정을 고르고, 다듬을 부분을 누르거나 드래그해 보세요.':'오른쪽 가위를 고르고, 머리카락 위에서 누른 채 선을 그은 뒤 놓아 보세요.',target:'[data-tool="'+(hammer?'hammer':'scissors')+'"]',practice:true});
  if(B.growth?.enabled!==false)beautyLessonSteps.push({id:'grow',phase:'cut',tool:'grow',title:'이번엔 발모제로 다시 길러요',text:B.growth?.connected?'발모제를 고른 뒤, 얼굴에 붙어 있는 뿔에서 시작해 바깥으로 이어 발라 보세요.':'발모제를 고른 뒤, 머리 가장자리나 방금 자른 곳에 누른 채 발라 보세요.',target:'[data-tool="grow"]',practice:true});
 }
-beautyLessonSteps.push({id:'request',title:'부탁은 지키고, 모양은 자유롭게',text:'왼쪽 메모가 손님의 최소 요구 사항이에요. 체크를 채우면서 원하는 모습으로 꾸며 주세요. ‘손질 가이드’를 누르면 부탁한 곳을 볼 수 있어요.',target:'.sculptStatus'});
+beautyLessonSteps.push({id:'request',title:'부탁은 지키고, 모양은 자유롭게',text:'왼쪽 메모가 손님의 최소 요구 사항이에요. 체크를 채우면서 원하는 모습으로 꾸며 주세요. ‘손질 가이드’로 부탁한 곳을 확인해요. 자세한 말을 놓쳤다면 ‘다시 듣기’ → ‘네?’로 되물어 보세요.',target:'.sculptStatus'});
 if(B.steps.draw){
  beautyLessonSteps.push({id:'draw',phase:'draw',tool:'paint',title:'색과 무늬를 그려 볼까요?',text:'오른쪽에서 색을 고르고 머리나 얼굴 위에 누른 채 칠해 보세요. 도구 크기와 불투명도도 조절할 수 있어요.',target:'#paintTools',practice:true});
  beautyLessonSteps.push({id:'stages',title:'단계는 언제든 오갈 수 있어요',text:'위쪽 단계 버튼을 누르면 다시 자르거나 색을 고칠 수 있어요. 그리기와 장식은 ‘되돌리기’도 가능해요. 마지막에만 ‘미용 완성’을 눌러 주세요.',target:'.sculptNav'});

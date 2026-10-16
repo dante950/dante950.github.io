@@ -149,7 +149,7 @@ let effectSelection=null;
 function selectEffect(t){if(page!=='editor'||editorMode!=='dialogue'||t.selectionEnd<=t.selectionStart)return;effectSelection={textarea:t,start:t.selectionStart,end:t.selectionEnd};const r=t.getBoundingClientRect();el('effectPopup').style.left=Math.max(8,Math.min(innerWidth-450,r.left))+'px';el('effectPopup').style.top=Math.min(innerHeight-110,r.bottom+6)+'px';el('effectPopup').hidden=false;}
 function applyEffect(kind){const s=effectSelection;if(!s||!s.textarea.isConnected)return;const t=s.textarea,values={color:el('effectColor').value,shake:2,wave:3,pulse:1.15,size:23},value=t.value.slice(s.start,s.end);t.value=t.value.slice(0,s.start)+`<${kind}=${values[kind]}>`+value+`</${kind}>`+t.value.slice(s.end);t.dispatchEvent(new Event('input',{bubbles:true}));el('effectPopup').hidden=true;}
 function richMarkup(glyphs,clock,defaultColor=null){return glyphs.map((g,i)=>{if(g.char==='\n')return '<br>';const v=dialogueGlyphStyle(g,i,clock);if(defaultColor){v.fontSize*=13/17;if(v.color.toUpperCase()==='#F0EEE3')v.color=defaultColor;}return `<span class="glyph" style="color:${v.color};font-size:${v.fontSize}px;opacity:${v.opacity};transform:translate(${v.x.toFixed(1)}px,${v.y.toFixed(1)}px) scale(${v.scale.toFixed(2)})">${htmlEsc(g.char)}</span>`;}).join('');}
-function playGroup(project,g,gid,done){beautyRequest=null;el('beautyChoices').hidden=true;el('talkNext').hidden=false;el('talkLayer').classList.remove('beautyRequest');const host={data:project.combat,monster:{Name:g.name},options:{},time:0};talk=new DialoguePlayer(host);talkDone=done;if(!talk.play(gid)){talk=null;done?.();return;}el('talkLayer').hidden=false;el('talkNext').focus();beep(380);}
+function playGroup(project,g,gid,done){beautyRequest=null;el('beautyChoiceHint').hidden=true;el('beautyAsk').classList.remove('choiceLessonTarget');el('beautyChoices').hidden=true;el('talkNext').hidden=false;el('talkLayer').classList.remove('beautyRequest');const host={data:project.combat,monster:{Name:g.name},options:{},time:0};talk=new DialoguePlayer(host);talkDone=done;if(!talk.play(gid)){talk=null;done?.();return;}el('talkLayer').hidden=false;el('talkNext').focus();beep(380);}
 let beautyRequest=null;
 function playBeautyRequest(project,g,event,done,detail=false){
  startBeautyRequestLine({project,g,event,done,detail});
@@ -159,13 +159,16 @@ function startBeautyRequestLine(request){
  playGroup(project,g,group.GroupID,()=>{beautyRequest=null;el("beautyChoices").hidden=true;request.done?.({detail:request.detail});});
  beautyRequest=request;el("talkLayer").classList.add("beautyRequest");positionBeautyTalk();
 }
-function clarifyBeautyRequest(){if(!beautyRequest||!salonRequestAtEnd(talk)||beautyRequest.detail)return;startBeautyRequestLine({...beautyRequest,detail:true});}
+function rememberChoiceGuide(){if(story&&!story.preview){story.guidesSeen??={};story.guidesSeen.ask=true;}}
+function clarifyBeautyRequest(){if(!beautyRequest||!salonRequestAtEnd(talk)||beautyRequest.detail)return;rememberChoiceGuide();startBeautyRequestLine({...beautyRequest,detail:true});}
 function renderBeautyChoices(){
  const show=!!beautyRequest&&salonRequestAtEnd(talk);
  const changed=el("beautyChoices").hidden===show;
  el("beautyChoices").hidden=!show;el("talkNext").hidden=show;
  el("beautyAsk").hidden=!!beautyRequest?.detail;
- if(show&&changed)el("beautyAccept").focus();
+ const explain=show&&!beautyRequest.detail&&story&&!story.preview&&!story.guidesSeen?.ask;
+ el('beautyChoiceHint').hidden=!explain;el('beautyAsk').classList.toggle('choiceLessonTarget',!!explain);
+ if(show&&changed)el(explain?'beautyAsk':'beautyAccept').focus();
 }
 function positionBeautyTalk(){
  if(!el('talkLayer').classList.contains('beautyRequest')||!document.body.classList.contains('playing'))return;
@@ -174,7 +177,7 @@ function positionBeautyTalk(){
  box.style.setProperty('--speech-x',(f.left+r.left+175*scale)+'px');box.style.setProperty('--speech-y',(f.top+r.top+386*scale)+'px');box.style.setProperty('--speech-scale',scale);
 }
 function say(event,done,detail=false){const g=story.guest;if(g.beauty.designVersion>=2&&["cut","draw","attach"].includes(event)){playBeautyRequest(story.project,g,event,done,detail);return;}playGroup(story.project,g,g.bindings[event],done);}
-function advanceTalk(){talk?.advance();beep(480,.025);}
+function advanceTalk(){if(beautyRequest&&salonRequestAtEnd(talk))rememberChoiceGuide();talk?.advance();beep(480,.025);}
 let speakingState='';function syncBeautySpeaking(t){const speaking=!!talk?.active&&talk.line?.Speaker==='몬스터'&&!talk.complete,open=speaking&&Math.floor(t/150)%2===0,key=speaking+':'+open;if(key!==speakingState){speakingState=key;sendSalon('beauty-speaking',{speaking,open});}}
 let frameTime=0;function animate(t){const dt=frameTime?Math.min(100,t-frameTime):0;frameTime=t;if(previewRich&&el('richPreview')){const clock=t-previewStart;el('richPreview').innerHTML=richMarkup(previewRich.glyphs.filter(g=>g.at<=clock),clock,el('beautyRequestText')?'#493627':null);}if(talk){talk.tick(dt);if(talk.active){el('talkSpeaker').textContent=talk.line?.Speaker==='몬스터'?talk.host.monster.Name:talk.line?.Speaker||'';el('talkCount').textContent=(talk.active.index+1)+' / '+talk.active.lines.length;el('talkText').innerHTML=richMarkup(talk.visibleGlyphs,talk.textClock,el('talkLayer').classList.contains('beautyRequest')?'#493627':null);el('talkNext').textContent=talk.complete?(el('talkLayer').classList.contains('beautyRequest')?'다음 문장 →':'다음 · Enter / F →'):'문장 바로 보기 · Enter / F';}else{const done=talkDone;talk=null;talkDone=null;el('talkLayer').hidden=true;done?.();}}syncBeautySpeaking(t);if(talk){renderBeautyChoices();positionBeautyTalk();}requestAnimationFrame(animate);}
 function updateStoryHud(step){if(!story)return;el('storyDay').textContent='DAY '+String(story.day).padStart(2,'0');el('storyGuest').textContent=story.guest?.name||'영업 마감';el('storyStep').textContent=step;el('storyMoney').textContent=(story.followers||0).toLocaleString()+' 팔로워';el('storyHint').textContent=step==='손님 맞이'?'영업 시작 버튼을 누른 뒤 손님에게 다가가 F로 대화하세요.':step==='미용'?'도구를 고르고 손질하세요. 각 단계가 끝나면 다음 단계로 이동합니다.':step==='야차'?'예고를 피하며 몬스터를 클릭하세요. 빈틈에는 누른 채 좌우로 긁으세요.':step;el('storyHint').hidden=['야차','미용','미용 시험','미용 결과'].includes(step);}

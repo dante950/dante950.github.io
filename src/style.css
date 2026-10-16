@@ -59,3 +59,6 @@ body.playing #talkLayer.beautyRequest .talkbox:after{content:"";position:absolut
 .storyIntroCopy p{color:#ede4d8;word-break:keep-all;overflow-wrap:anywhere}
 .introGoal{display:flex;gap:20px;align-items:center;border-block:1px solid #766044;padding:14px 0;margin:20px 0}.introGoal b{color:#ffe0a0;white-space:nowrap}.introGoal span{color:#cfbeb2}
 @media(max-width:620px){.storyIntroCopy{font-size:16px}.introGoal{align-items:start;flex-direction:column;gap:5px}}
+#beautyChoiceHint{position:absolute;right:0;bottom:calc(100% + 14px);width:320px;max-width:100%;margin:0;padding:12px 15px;border:2px solid #c58a45;border-radius:11px;background:#fff1cd;color:#66472c;font-size:12px;line-height:1.65;box-shadow:0 3px 12px #39212230}
+#beautyChoiceHint b{color:#8a471d;font-size:13px}
+#beautyChoices #beautyAsk.choiceLessonTarget{outline:3px solid #e29435;outline-offset:3px;background:#ffe3ac;font-weight:bold}
