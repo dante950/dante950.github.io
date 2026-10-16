@@ -10,6 +10,18 @@ export function inBeautyRegion(x,y,r){
  if(r.shape==='ellipse')return ((x-r.x-r.w/2)/(r.w/2))**2+((y-r.y-r.h/2)/(r.h/2))**2<=1;
  return x>=r.x&&x<r.x+r.w&&y>=r.y&&y<r.y+r.h;
 }
+// Keep source and target silhouettes fixed while the visible material is edited.
+export function beautyMaterialMasks(original,target){
+ const hornTrim=new Uint8Array(original.length),hornKeep=new Uint8Array(original.length);
+ for(let n=0;n<original.length;n++)if(original[n]){if(target[n])hornKeep[n]=1;else hornTrim[n]=1;}
+ return {hornTrim,hornKeep};
+}
+// Original-only restoration cannot create material on the face or in empty space.
+export function beautyGrowthValue(value,original,border,growth={},bone=false){
+ if(growth.mask==='original')return original?1:value;
+ if(!bone)return 2;
+ return !value?(original?1:2):!border?2:value;
+}
 export function strokeCells(width,height,points,radius,scale=2){
  const cells=new Set();
  for(let i=0;i<points.length;i++){
@@ -123,6 +135,16 @@ export function liveBeautyMood(score,previous='neutral',touched=false){
  return score>=82?'satisfied':score<36?'angry':'neutral';
 }
 export function beautyStageOrder(b){return BEAUTY_STAGES.filter(k=>b.steps[k]);}
+
+// A precise silhouette request is satisfied only when both removal and preservation succeed.
+export function beautyResultMood(b,shape,total){
+ if(b.growth?.material==='horn'){
+  const keep=shape.details.filter(r=>r.rule==='preserve');
+  if(total<40||keep.some(r=>r.ratio<.5))return 'angry';
+  return total>=80&&shape.details.filter(r=>r.rule!=='free').every(r=>r.fulfilled>=1-1e-9)?'satisfied':'neutral';
+ }
+ return total>=80?'satisfied':total>=40?'neutral':'angry';
+}
 
 
 function scoreLegacyShape(current,original,b,width,height,masks={}){

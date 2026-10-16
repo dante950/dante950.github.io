@@ -446,5 +446,73 @@
   "7d74d45195cb183d3fa820af.ogg": {
     "bytes": 5669,
     "mime": "audio/ogg"
+  },
+  "minion-head.png": {
+    "bytes": 335,
+    "mime": "image/png"
+  },
+  "minion-horns-long.png": {
+    "bytes": 1364,
+    "mime": "image/png"
+  },
+  "minion-horns-short.png": {
+    "bytes": 573,
+    "mime": "image/png"
+  },
+  "minion-body.png": {
+    "bytes": 4194,
+    "mime": "image/png"
+  },
+  "minion-guide.png": {
+    "bytes": 5481,
+    "mime": "image/png"
+  },
+  "minion-eyes-neutral.png": {
+    "bytes": 479,
+    "mime": "image/png"
+  },
+  "minion-eyes-satisfied.png": {
+    "bytes": 503,
+    "mime": "image/png"
+  },
+  "minion-eyes-angry.png": {
+    "bytes": 506,
+    "mime": "image/png"
+  },
+  "minion-mouth.png": {
+    "bytes": 237,
+    "mime": "image/png"
+  },
+  "minion-walk-front-body.png": {
+    "bytes": 10121,
+    "mime": "image/png"
+  },
+  "minion-walk-front-head.png": {
+    "bytes": 1975,
+    "mime": "image/png"
+  },
+  "minion-walk-front-hair.png": {
+    "bytes": 2925,
+    "mime": "image/png"
+  },
+  "minion-walk-front-target.png": {
+    "bytes": 1309,
+    "mime": "image/png"
+  },
+  "minion-walk-back-body.png": {
+    "bytes": 8964,
+    "mime": "image/png"
+  },
+  "minion-walk-back-head.png": {
+    "bytes": 1282,
+    "mime": "image/png"
+  },
+  "minion-walk-back-hair.png": {
+    "bytes": 2941,
+    "mime": "image/png"
+  },
+  "minion-walk-back-target.png": {
+    "bytes": 1340,
+    "mime": "image/png"
   }
 }

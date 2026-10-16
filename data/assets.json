@@ -744,5 +744,118 @@
         "h": 4
       }
     }
+  },
+  "minion": {
+    "head": "./media/minion-head.png",
+    "hair": "./media/minion-horns-long.png",
+    "target": "./media/minion-horns-short.png",
+    "body": "./media/minion-body.png",
+    "full": "./media/minion-guide.png",
+    "layers": {
+      "head": {
+        "src": "./media/minion-head.png",
+        "x": 128.75,
+        "y": 113,
+        "w": 62.5,
+        "h": 82.5
+      },
+      "material": {
+        "src": "./media/minion-horns-long.png",
+        "x": 18.75,
+        "y": 8,
+        "w": 282.5,
+        "h": 187.5
+      },
+      "target": {
+        "src": "./media/minion-horns-short.png",
+        "x": 93.75,
+        "y": 70.5,
+        "w": 135,
+        "h": 125
+      },
+      "eyes": {
+        "neutral": {
+          "src": "./media/minion-eyes-neutral.png",
+          "x": 128.75,
+          "y": 113,
+          "w": 62.5,
+          "h": 82.5,
+          "sx": 0,
+          "sy": 0,
+          "sw": 25,
+          "sh": 33
+        },
+        "satisfied": {
+          "src": "./media/minion-eyes-satisfied.png",
+          "x": 128.75,
+          "y": 113,
+          "w": 62.5,
+          "h": 82.5,
+          "sx": 0,
+          "sy": 0,
+          "sw": 25,
+          "sh": 33
+        },
+        "angry": {
+          "src": "./media/minion-eyes-angry.png",
+          "x": 128.75,
+          "y": 113,
+          "w": 62.5,
+          "h": 82.5,
+          "sx": 0,
+          "sy": 0,
+          "sw": 25,
+          "sh": 33
+        }
+      },
+      "mouth": {
+        "open": {
+          "src": "./media/minion-mouth.png",
+          "x": 128.75,
+          "y": 113,
+          "w": 62.5,
+          "h": 82.5,
+          "sx": 0,
+          "sy": 0,
+          "sw": 25,
+          "sh": 33
+        },
+        "closed": {
+          "src": "./media/minion-mouth.png",
+          "x": 128.75,
+          "y": 113,
+          "w": 62.5,
+          "h": 82.5,
+          "sx": 25,
+          "sy": 0,
+          "sw": 25,
+          "sh": 33
+        }
+      }
+    },
+    "animation": {
+      "front": {
+        "fw": 120,
+        "fh": 175,
+        "count": 4,
+        "cols": 4,
+        "frameMs": 140,
+        "body": "./media/minion-walk-front-body.png",
+        "head": "./media/minion-walk-front-head.png",
+        "hair": "./media/minion-walk-front-hair.png",
+        "target": "./media/minion-walk-front-target.png"
+      },
+      "back": {
+        "fw": 120,
+        "fh": 176,
+        "count": 4,
+        "cols": 4,
+        "frameMs": 140,
+        "body": "./media/minion-walk-back-body.png",
+        "head": "./media/minion-walk-back-head.png",
+        "hair": "./media/minion-walk-back-hair.png",
+        "target": "./media/minion-walk-back-target.png"
+      }
+    }
   }
 }

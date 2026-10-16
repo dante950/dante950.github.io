@@ -4,10 +4,10 @@ import fs from 'node:fs/promises';
 import {salonDialogueGroup,salonDialogueProblems,migrateSalonDialogues,salonRequestAtEnd} from '../src/salon-dialogue.js';
 import {DialoguePlayer} from '../src/combat/dialogue.js';
 const project=JSON.parse(await fs.readFile(new URL('../data/project.json',import.meta.url),'utf8'));
-test('six stage links resolve twelve ordered request groups with no legacy shadow text',()=>{
+test('stage links resolve ordered request groups with no legacy shadow text',()=>{
  assert.deepEqual(salonDialogueProblems(project),[]);
- assert.equal(project.combat.sheets.find(s=>s.name==='미용 대사 연결').rows.length,6);
- for(const id of [10001,10003])for(const stage of ['cut','draw','attach'])for(const detail of [false,true])assert.ok(salonDialogueGroup(project,id,stage,detail).lines.length);
+ assert.equal(project.combat.sheets.find(s=>s.name==='미용 대사 연결').rows.length,9);
+ for(const id of [10001,10003,10004])for(const stage of ['cut','draw','attach'])for(const detail of [false,true])assert.ok(salonDialogueGroup(project,id,stage,detail).lines.length);
  for(const g of project.guests.filter(g=>g.beauty.enabled)){assert.equal(g.beauty.request,undefined);assert.equal(g.beauty.requestDetails,undefined);assert.equal(g.bindings.cut,undefined);}
 });
 test('Excel-linked text is authoritative and separate groups cannot advance into clarification',()=>{
@@ -26,7 +26,7 @@ test('choices wait until the final sentence of a multi-line group',()=>{
  player.advance();assert.equal(player.line.DialogueID,999991);assert.equal(salonRequestAtEnd(player),false);player.advance();assert.equal(salonRequestAtEnd(player),true);
 });
 test('reject missing, duplicate, invalid stage and non-input request links',()=>{
- for(const mutate of [p=>p.combat.sheets.find(s=>s.name==='미용 대사 연결').rows.pop(),p=>{const r=p.combat.sheets.find(s=>s.name==='미용 대사 연결').rows;r.push({...r[0]});},p=>p.combat.sheets.find(s=>s.name==='미용 대사 연결').rows[0].Stage='unknown',p=>p.combat.sheets.find(s=>s.name==='미용 대사 연결').rows[0].DetailGroupID=999999,p=>salonDialogueGroup(p,10001,'cut').group.AdvanceMode='자동']){
+ for(const mutate of [p=>p.combat.sheets.find(s=>s.name==='미용 대사 연결').rows.shift(),p=>{const r=p.combat.sheets.find(s=>s.name==='미용 대사 연결').rows;r.push({...r[0]});},p=>p.combat.sheets.find(s=>s.name==='미용 대사 연결').rows[0].Stage='unknown',p=>p.combat.sheets.find(s=>s.name==='미용 대사 연결').rows[0].DetailGroupID=999999,p=>salonDialogueGroup(p,10001,'cut').group.AdvanceMode='자동']){
   const p=structuredClone(project);mutate(p);assert.ok(salonDialogueProblems(p).length);
  }
 });

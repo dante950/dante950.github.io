@@ -10,7 +10,7 @@ const resultHand=document.createElement('canvas');resultHand.width=28;resultHand
 // Temporary code-drawn pixel hands. Bone joints and a blue cuff distinguish Sans.
 function drawResultHand(){
  const c=resultHand.getContext('2d');c.clearRect(0,0,28,40);
- const palette=bone?{edge:'#45425E',shade:'#A6A0BA',base:'#E9E2D6',light:'#FFF6DE',cuff:'#526BA4'}:{edge:'#204659',shade:'#29988F',base:'#5BDEC7',light:'#9CF3D6',cuff:'#B7C8CF'};
+ const palette=GUEST.skin?.layers?{edge:'#03051B',shade:'#636072',base:'#B8AFAB',light:'#F2D6B9',cuff:'#403F54'}:bone?{edge:'#45425E',shade:'#A6A0BA',base:'#E9E2D6',light:'#FFF6DE',cuff:'#526BA4'}:{edge:'#204659',shade:'#29988F',base:'#5BDEC7',light:'#9CF3D6',cuff:'#B7C8CF'};
  const rect=(color,x,y,w,h)=>{c.fillStyle=palette[color];c.fillRect(x,y,w,h);};
  c.fillStyle=palette.edge;c.beginPath();for(const [i,p] of [[10,2],[15,2],[17,5],[17,14],[23,14],[26,17],[26,29],[23,33],[22,39],[4,39],[4,31],[2,28],[2,20],[5,17],[8,16],[8,5]].entries())i?c.lineTo(...p):c.moveTo(...p);c.closePath();c.fill();
  rect('base',10,5,5,14);rect('light',10,5,2,10);rect('shade',13,5,2,12);
@@ -32,7 +32,7 @@ const resultContinue=document.createElement('button');resultContinue.className='
 function revealBeautyResult(){
  if(resultRevealed)return;resultRevealed=true;expression=resultMood;talking=false;mouthFrame=false;
  beautyCustomer.dataset.expression=expression;beautyScreen.dataset.resultMood=resultMood;beautyScreen.classList.add('resultRevealed');
- resultCaption.textContent=bone?(resultMood==='satisfied'?'헤. 꽤 멋진데?':resultMood==='angry'?'…뼈아픈데.':'음. 이 정도면 됐어.'):(resultMood==='satisfied'?'정말… 마음에 들어요…!':resultMood==='angry'?'어… 이건 좀…':'음… 괜찮아요…');
+ resultCaption.textContent=GUEST.skin?.layers?(resultMood==='satisfied'?'이제 보고서가 세 눈에 다 들어오는군요.':resultMood==='angry'?'…이건 수정 요청을 드려야겠군요.':'네, 회의에는 갈 수 있겠습니다.'):bone?(resultMood==='satisfied'?'헤. 꽤 멋진데?':resultMood==='angry'?'…뼈아픈데.':'음. 이 정도면 됐어.'):(resultMood==='satisfied'?'정말… 마음에 들어요…!':resultMood==='angry'?'어… 이건 좀…':'음… 괜찮아요…');
  resultContinue.textContent='계속하기 →';renderPortrait(false);
 }
 function advanceBeautyResult(){
@@ -42,7 +42,7 @@ function advanceBeautyResult(){
 }
 function startBeautyResult(){
  if(!ready||finishing||briefing)return;cancelGesture();updateBeautyScore();finishing=true;beautyPhase='result';beautyResultActive=true;
- resultMood=totalSatisfaction>=80?'satisfied':totalSatisfaction>=40?'neutral':'angry';
+ resultMood=beautyResultMood(B,shapeProgress,totalSatisfaction);
  expression='neutral';talking=false;mouthFrame=false;zonesVisible=false;fallingPieces=[];renderPortrait(false);
  next.disabled=true;finish.disabled=true;state.keys.clear();
  panel.inert=true;nav.inert=true;actions.inert=true;status.inert=true;

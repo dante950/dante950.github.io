@@ -9,7 +9,7 @@ const root=path.resolve(fileURLToPath(new URL('../',import.meta.url)));
 const read=f=>fs.readFile(path.join(root,f),'utf8');
 const project=JSON.parse(await read('data/project.json'));
 const errors=projectProblems(project);
-for(const guest of project.guests||[]) errors.push(...validate(project.combat,{monsterID:guest.id}).errors);
+for(const guest of (project.guests||[]).filter(g=>!g.previewOnly)) errors.push(...validate(project.combat,{monsterID:guest.id}).errors);
 if(errors.length)throw Error('배포 데이터 확인 필요:\n'+errors.join('\n'));
 const dist=path.join(root,'dist');
 // Only this repository's generated output directory may be replaced.
@@ -33,7 +33,7 @@ const schema=await read('data/schema.json'),assets=await read('src/combat/assets
 const zip=await read('vendor/jszip.min.js'),license=await read('vendor/JSZip-LICENSE.txt');
 combat=combat.replace('<link rel="stylesheet" href="style.css">',()=>`<style>${css}</style>`)
  .replace('<script type="module" src="app.js"></script>',()=>`<script id="host-data" type="application/json">__HOST_JSON__</script><script id="embedded-workbook" type="application/octet-stream">${wb}</script><script id="embedded-authoring" type="application/octet-stream">${au}</script><script id="embedded-schema" type="application/json">${safe(schema)}</script><script id="embedded-assets" type="application/json">${safe(assets)}</script><script>${safe(zip)}</script><script type="module">${safe(combatScript)}</script><script type="text/plain">${safe(license)}</script>`);
-const parentBundle=await bundle('src/',['text-effects.js','combat/dialogue.js','combat/engine.js','salon-dialogue.js','model.js','publishing.js','owner-access.js','media.js','audio.js','app.js']);
+const parentBundle=await bundle('src/',['text-effects.js','combat/dialogue.js','combat/engine.js','salon-dialogue.js','model.js','workshop-dialogue.js','publishing.js','owner-access.js','media.js','audio.js','app.js']);
 const appURL=await emit('app','js',parentBundle),styleURL=await emit('style','css',await read('src/style.css'));
 const beautyResultRuntime=await read('src/salon-beauty-result.js');
 const beautyRules=await read('src/beauty-shape.js'),beautyRuntime=(await read('src/salon-beauty.js')).replace('/*__BEAUTY_RESULT__*/',()=>beautyResultRuntime);

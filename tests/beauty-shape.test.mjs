@@ -2,7 +2,7 @@ import {salonDialogueText} from '../src/salon-dialogue.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
-import {scoreShape,strokeCells,beautyStageOrder,liveBeautyMood,beautyRequirementChecks,detachedByBeautyCut,blendBeautyRGBA} from '../src/beauty-shape.js';
+import {scoreShape,strokeCells,beautyStageOrder,liveBeautyMood,beautyRequirementChecks,detachedByBeautyCut,blendBeautyRGBA,beautyMaterialMasks,beautyGrowthValue} from '../src/beauty-shape.js';
 import {defaultProject,projectProblems} from '../src/model.js';
 const project=JSON.parse(await fs.readFile(new URL('../data/project.json',import.meta.url),'utf8'));
 const assets=JSON.parse(await fs.readFile(new URL('../data/assets.json',import.meta.url),'utf8'));
@@ -176,4 +176,37 @@ test('the five supplied Sans feature assets have valid placement data and ship a
   }
  }
  assert.equal(Object.keys(assets.sansFace.eyes).length,3);assert.equal(Object.keys(assets.sansFace.mouth).length,2);
+});
+
+test('target silhouettes separate excess horns from the small horns that must survive',()=>{
+ const original=Uint8Array.of(0,1,1,1,1,0),target=Uint8Array.of(1,0,1,1,0,0),masks=beautyMaterialMasks(original,target);
+ assert.deepEqual([...masks.hornTrim],[0,1,0,0,1,0]);
+ assert.deepEqual([...masks.hornKeep],[0,0,1,1,0,0]);
+ const b={designVersion:2,growth:{material:'horn',mask:'original'},weights:{cut:100},cutRegions:[
+  {key:'trim',x:0,y:0,w:12,h:2,rule:'trim',mask:'hornTrim',points:70,tolerance:0},
+  {key:'keep',x:0,y:0,w:12,h:2,rule:'preserve',mask:'hornKeep',points:30,tolerance:0}
+ ]};
+ const current=original.slice(),read=()=>scoreShape(current,original,b,6,1,masks);
+ assert.equal(read().score,30);
+ current[1]=current[4]=0;
+ assert.equal(read().score,100);assert.deepEqual(beautyRequirementChecks(b,'cut',read(),{cut:100},0),[true,true]);
+ current[2]=0;assert.equal(read().score,85);assert.deepEqual(beautyRequirementChecks(b,'cut',read(),{cut:85},0),[true,false]);
+ current[2]=beautyGrowthValue(current[2],original[2],0,b.growth,false);assert.equal(read().score,100);
+ current[1]=beautyGrowthValue(current[1],original[1],0,b.growth,false);assert.equal(read().score,65);
+});
+
+test('original-only potion restores lost material without growing onto the face or empty space',()=>{
+ const growth={material:'horn',mask:'original'};
+ for(const border of [0,1]){
+  assert.equal(beautyGrowthValue(0,1,border,growth,false),1);
+  assert.equal(beautyGrowthValue(1,1,border,growth,false),1);
+  assert.equal(beautyGrowthValue(0,0,border,growth,false),0);
+ }
+ // Existing free-growth hair and bone semantics remain available to the other guests.
+ assert.equal(beautyGrowthValue(0,0,0,{},false),2);
+ assert.equal(beautyGrowthValue(1,1,1,{},false),2);
+ assert.equal(beautyGrowthValue(0,1,1,{},true),1);
+ assert.equal(beautyGrowthValue(1,1,1,{},true),1);
+ assert.equal(beautyGrowthValue(1,1,0,{},true),2);
+ assert.equal(beautyGrowthValue(0,0,0,{},true),2);
 });

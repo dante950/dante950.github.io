@@ -1,8 +1,8 @@
 {
   "format": "YACHACHA_FULLFLOW",
   "schemaVersion": 1,
-  "version": 5,
-  "updatedAt": "2026-10-11T05:41:57.237Z",
+  "version": 6,
+  "updatedAt": "2026-10-16T05:46:11.714Z",
   "combat": {
     "version": 4,
     "layout": "legacy",
@@ -2919,6 +2919,78 @@
             "Speaker": "몬스터",
             "Text": "<color=#9A4935>강해 보이는 장식 하나</color>를 <color=#52609B>얼굴이나 머리 쪽</color>에 부탁해.\n딱 봤을 때 <shake=0.6>쉽게 덤비지는 못하겠다</shake> 싶은 걸로.",
             "Notes": "미용 선택지 대사"
+          },
+          {
+            "DialogueID": 900115,
+            "GroupID": 80074,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "마왕님 직속으로 일하고 있습니다. 잠깐만요, 커피 한 모금만…",
+            "Notes": "마왕 부하 미용 시험용 초안"
+          },
+          {
+            "DialogueID": 900116,
+            "GroupID": 80074,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "업무가 쌓이는 동안 <color=#52609B>뿔도 자꾸 자라서요.</color>\n이러다 <color=#9A4935>눈 세 개가 전부 찔리겠습니다.</color>",
+            "Notes": "마왕 부하 미용 시험용 초안"
+          },
+          {
+            "DialogueID": 900117,
+            "GroupID": 80074,
+            "Order": 3,
+            "Speaker": "몬스터",
+            "Text": "<color=#52609B>작은 뿔 한 쌍만 단정하게</color> 남겨 주세요.\n업무도 세 배인데, 눈까지 세 개 다 잃을 순 없어서요.",
+            "Notes": "마왕 부하 미용 시험용 초안"
+          },
+          {
+            "DialogueID": 900118,
+            "GroupID": 80075,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "<color=#9A4935>바깥으로 무성하게 뻗은 가지는 깎고,</color>\n<color=#52609B>눈 위의 작은 뿔 한 쌍은 남겨</color> 주세요.",
+            "Notes": "마왕 부하 미용 시험용 초안"
+          },
+          {
+            "DialogueID": 900119,
+            "GroupID": 80075,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "너무 짧아졌다면 <color=#266B4D>발모제로 뿔만 복구</color>해 주세요.\n보고서는 제가 고칠 테니, 뿔은 부탁드리겠습니다.",
+            "Notes": "마왕 부하 미용 시험용 초안"
+          },
+          {
+            "DialogueID": 900120,
+            "GroupID": 80076,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "색은 지금 그대로면 충분합니다. 단정하게만 부탁드려요.",
+            "Notes": "마왕 부하 미용 시험용 초안"
+          },
+          {
+            "DialogueID": 900121,
+            "GroupID": 80077,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "색은 지금 그대로면 충분합니다. 단정하게만 부탁드려요.",
+            "Notes": "마왕 부하 미용 시험용 초안"
+          },
+          {
+            "DialogueID": 900122,
+            "GroupID": 80078,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "장식은 없어도 괜찮습니다. 회의에 늦지만 않으면 됩니다.",
+            "Notes": "마왕 부하 미용 시험용 초안"
+          },
+          {
+            "DialogueID": 900123,
+            "GroupID": 80079,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "장식은 없어도 괜찮습니다. 회의에 늦지만 않으면 됩니다.",
+            "Notes": "마왕 부하 미용 시험용 초안"
           }
         ]
       },
@@ -3929,6 +4001,84 @@
             "ActorEffect": "없음",
             "FinishEffect": "없음",
             "Name": "샌즈 · 장식 붙이기 · 자세한 부탁"
+          },
+          {
+            "GroupID": 80074,
+            "Name": "마왕 부하 · 형태 다듬기 · 처음 부탁",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "미용 시험용 대사 초안",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80075,
+            "Name": "마왕 부하 · 형태 다듬기 · 자세한 부탁",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "미용 시험용 대사 초안",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80076,
+            "Name": "마왕 부하 · 색·무늬 · 처음 부탁",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "미용 시험용 대사 초안",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80077,
+            "Name": "마왕 부하 · 색·무늬 · 자세한 부탁",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "미용 시험용 대사 초안",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80078,
+            "Name": "마왕 부하 · 장식 · 처음 부탁",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "미용 시험용 대사 초안",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80079,
+            "Name": "마왕 부하 · 장식 · 자세한 부탁",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "미용 시험용 대사 초안",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
           }
         ]
       },
@@ -4638,6 +4788,24 @@
             "Stage": "attach",
             "RequestGroupID": 80063,
             "DetailGroupID": 80073
+          },
+          {
+            "MonsterID": 10004,
+            "Stage": "cut",
+            "RequestGroupID": 80074,
+            "DetailGroupID": 80075
+          },
+          {
+            "MonsterID": 10004,
+            "Stage": "draw",
+            "RequestGroupID": 80076,
+            "DetailGroupID": 80077
+          },
+          {
+            "MonsterID": 10004,
+            "Stage": "attach",
+            "RequestGroupID": 80078,
+            "DetailGroupID": 80079
           }
         ]
       }
@@ -5007,6 +5175,96 @@
       },
       "battle": "forced",
       "note": "망치·정 / 얼굴 테두리 / Tag_Strong. 발모제는 기존 두개골과 이어지는 뼈 재료. 형태 목표·배점은 기존 임시값을 유지한 시험 설정입니다. 눈·입 표현도 임시입니다."
+    },
+    {
+      "id": 10004,
+      "name": "마왕 부하",
+      "previewOnly": true,
+      "beauty": {
+        "enabled": true,
+        "steps": {
+          "cut": true,
+          "draw": false,
+          "attach": false
+        },
+        "weights": {
+          "cut": 100,
+          "draw": 0,
+          "attach": 0
+        },
+        "cutTool": "hammer",
+        "attachTag": "Tag_Strong",
+        "attachFirst": 30,
+        "attachExtra": 15,
+        "attachMisplaced": 10,
+        "attachWrong": 15,
+        "drawColors": [
+          "#36364D"
+        ],
+        "cutRegions": [
+          {
+            "key": "HornTrim",
+            "label": "눈을 위협하는 긴 가지 깎기",
+            "x": 0,
+            "y": 0,
+            "w": 320,
+            "h": 220,
+            "kind": "good",
+            "shape": "rect",
+            "points": 70,
+            "stickerIDs": [],
+            "rule": "trim",
+            "tolerance": 0.08,
+            "mask": "hornTrim"
+          },
+          {
+            "key": "HornKeep",
+            "label": "작은 뿔 한 쌍 남기기",
+            "x": 0,
+            "y": 0,
+            "w": 320,
+            "h": 220,
+            "kind": "bad",
+            "shape": "rect",
+            "points": 30,
+            "stickerIDs": [],
+            "rule": "preserve",
+            "tolerance": 0.08,
+            "mask": "hornKeep"
+          }
+        ],
+        "attachRegions": [],
+        "drawRegions": [],
+        "basePay": 0,
+        "tipRate": 0.3,
+        "designVersion": 2,
+        "growth": {
+          "enabled": true,
+          "material": "horn",
+          "mask": "original",
+          "color": "#403F54",
+          "outline": "#03051B",
+          "region": {
+            "x": 0,
+            "y": 0,
+            "w": 320,
+            "h": 220
+          }
+        },
+        "requestNotes": {
+          "cut": "눈 앞의 긴 가지는 정리\n작은 뿔 한 쌍은 남기기",
+          "draw": "원래 뿔 색 유지",
+          "attach": "장식 없이 단정하게"
+        },
+        "requestBriefNotes": {
+          "cut": "세 눈이 다치기 전에\n작은 뿔만 단정하게",
+          "draw": "원래 뿔 색 유지",
+          "attach": "장식 없이 단정하게"
+        }
+      },
+      "bindings": {},
+      "battle": "none",
+      "note": "미용 시험용 초안 · 망치·정으로 긴 가지를 깎아 제공한 작은 뿔 형태를 남깁니다. 발모제는 원래 뿔 범위의 복구용입니다. 대사·배점·허용 오차는 조정용 초안이며 본편 일정과 야차는 아직 연결하지 않았습니다."
     }
   ],
   "schedule": [

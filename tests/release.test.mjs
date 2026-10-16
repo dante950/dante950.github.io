@@ -38,9 +38,9 @@ test('public play receives new deployment even if a visitor saved different data
  assert.notEqual(draftStoreKey('new'),draftStoreKey('old'));
 });
 
-test('all three guests and their combat data pass existing validation',()=>{
+test('story guests and beauty-only guests pass their respective validation',()=>{
  assert.deepEqual(projectProblems(project),[]);
- for(const guest of project.guests)assert.deepEqual(validate(project.combat,{monsterID:guest.id}).errors,[],guest.name);
+ for(const guest of project.guests.filter(g=>!g.previewOnly))assert.deepEqual(validate(project.combat,{monsterID:guest.id}).errors,[],guest.name);
  assert.deepEqual(project.schedule,[[10001,10002],[10003]]);
  assert.equal(project.guests.find(g=>g.id===10002).beauty.enabled,false);
 });
