@@ -67,5 +67,5 @@ test('red nose uses the existing Fun tag and rewards only the nose placement',()
  assert.equal(beautyAttachScore([{sticker:{id:'wrong',tag:'Tag_Strong'},region:'Nose'}],b),0);
  assert.equal(beautyAttachScore([{sticker,region:'Nose'},{sticker,region:'Nose'}],b),5);
  assert.deepEqual(b.weights,{cut:50,draw:30,attach:20});
- assert.match(salonDialogueGroup(project,10004,'attach').lines.map(l=>l.Text).join(''),/666년 무결근/);
+ assert.match(salonDialogueGroup(project,10004,'attach').lines.map(l=>l.Text).join(''),/빨간 코 장식 하나/);
 });

@@ -22,7 +22,7 @@ async function meet(id){
  await frame.locator('#gameWorld').click({position:{x:600,y:440}});await page.keyboard.press('f');
  await page.locator('#talkLayer').waitFor();
  if(id===10004){await page.waitForTimeout(200);await shot('minion-arrival');}
- await talk();await frame.locator('#beautyScreen').waitFor();
+ await talk();if(await page.locator('#playGuideDone').isVisible()){await page.locator('#playGuideDone').click();await page.locator('#talkLayer').waitFor();await talk();}await frame.locator('#beautyScreen').waitFor();
  return frame;
 }
 async function finishBeauty(frame){
@@ -67,8 +67,10 @@ try{
  await page.locator('#soundToggle').click();await page.locator('#play').click();
  assert.deepEqual(await page.locator('[data-start-guest]').evaluateAll(nodes=>nodes.map(n=>+n.dataset.startGuest)),[10001,10003,10004]);
  await page.locator('[data-start-guest="10001"]').click();
+ await page.locator('#introSkip').click();
  for(const [id,total] of [[10001,1500],[10003,3000]]){
   const frame=await meet(id);await finishBeauty(frame);await page.locator('#acceptBattle').click();
+  if(await page.locator('#playGuideDone').isVisible())await page.locator('#playGuideDone').click();
   if(id===10003){await battleResult('defeat');await page.locator('#retryBattle').waitFor();assert.equal(await page.locator('#lossContinue').count(),0);assert.equal(await page.evaluate(()=>fullflow.story.followers),1500);await page.locator('#retryBattle').click();}
   await battleResult('victory');await talk();
   await page.waitForFunction(total=>fullflow.story?.followers===total,total);
