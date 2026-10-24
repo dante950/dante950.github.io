@@ -1,0 +1,44 @@
+{
+  "base": "http://127.0.0.1:55469",
+  "checkedAt": "2026-10-24T13:26:30.157Z",
+  "results": [
+    {
+      "engine": "webkit",
+      "guest": 10004,
+      "beforeAttachScore": 80,
+      "sourceCells": 4499,
+      "remainingCells": 462,
+      "checks": [
+        "editor",
+        "beauty toggle",
+        "combat workbook boundary",
+        "edited request roundtrip",
+        "cape clipping",
+        "two-day story inclusion",
+        "multi-line request",
+        "hammer",
+        "face protection",
+        "connected growth only",
+        "face overlay",
+        "three eyes contact",
+        "two complaints maximum",
+        "root recovery",
+        "free shape by area",
+        "severed branch removal",
+        "oversize failure",
+        "dark-circle request",
+        "wrong color",
+        "small brush completion",
+        "erase and undo",
+        "face overpaint penalty",
+        "red nose request",
+        "off-nose failure",
+        "remove sticker",
+        "nose20 points",
+        "sticker undo",
+        "result",
+        "editor return"
+      ]
+    }
+  ]
+}

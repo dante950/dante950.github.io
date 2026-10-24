@@ -38,6 +38,8 @@ async function finishRequest(page,salon,{screenshot,clarify=true}={}){
  await page.locator('#beautyAccept').click();
  await page.locator('#talkLayer').waitFor({state:'hidden'});await salon.waitForFunction(()=>!beautyDebug.briefing);
  assert(await salon.locator('.sculptStatus').isVisible());
+ await salon.evaluate(()=>{window.__memoSample={text:null,at:performance.now()};});
+ await salon.waitForFunction(()=>{const text=document.querySelector('.requestText').textContent;if(text!==__memoSample.text){__memoSample={text,at:performance.now()};return false;}return performance.now()-__memoSample.at>1000;});
  const noteBefore=await salon.locator('.requestText').textContent();
  await salon.locator('#repeatBeautyRequest').click();await page.locator('#talkLayer').waitFor();
  await page.waitForTimeout(200);await page.locator('#beautyChoices').waitFor();

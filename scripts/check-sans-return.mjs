@@ -52,7 +52,7 @@ async function battleResult(outcome){
 async function closeDay(day,total){
  await page.locator('#storyClosing').waitFor();
  const frame=await page.locator('#storyClosing').elementHandle().then(h=>h.contentFrame());
- await frame.locator('#closeShop').click();
+ await frame.locator('#closeShop').click();await frame.locator('[data-exit]').click();
  await frame.locator('#settlement').waitFor();
  assert.equal(await frame.locator('#stage').getAttribute('data-actual-followers'),String(total));
  assert.equal(await frame.locator('.post').count(),day===1?2:1);

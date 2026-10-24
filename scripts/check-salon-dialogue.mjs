@@ -22,13 +22,13 @@ try{for(const [name,engine] of Object.entries({chromium,webkit})){
     await choice(page,first);assert(await page.locator('#beautyAsk').isVisible());
     if(stage==='cut'){
      if(output&&name==='chromium')await page.screenshot({path:path.join(output,id+'-initial.png')});
-     await page.locator('#beautyAccept').click();await page.locator('#talkLayer').waitFor({state:'hidden'});
+     await page.locator('#beautyAccept').click();await page.locator('#talkLayer').waitFor({state:'hidden'});await frame.waitForFunction(()=>!beautyDebug.briefing);
      await frame.locator('#repeatBeautyRequest').click();await choice(page,first);
     }
     await page.locator('#beautyAsk').click();await choice(page,detail);assert.equal(await page.locator('#beautyAsk').isVisible(),false);
     if(stage==='cut'&&output&&name==='chromium')await page.screenshot({path:path.join(output,id+'-detail.png')});
-    await page.locator('#beautyAccept').click();await page.locator('#talkLayer').waitFor({state:'hidden'});
-    await frame.locator('#repeatBeautyRequest').click();await choice(page,detail);await page.locator('#beautyAccept').click();await page.locator('#talkLayer').waitFor({state:'hidden'});
+    await page.locator('#beautyAccept').click();await page.locator('#talkLayer').waitFor({state:'hidden'});await frame.waitForFunction(()=>!beautyDebug.briefing);
+    await frame.locator('#repeatBeautyRequest').click();await choice(page,detail);await page.locator('#beautyAccept').click();await page.locator('#talkLayer').waitFor({state:'hidden'});await frame.waitForFunction(()=>!beautyDebug.briefing);
    }
    await frame.locator('[data-phase="cut"]').click();await page.waitForTimeout(250);assert.equal(await page.locator('#talkLayer').isVisible(),false);
    console.log(`${name}: ${id}, all three linked stages, direct accept, clarification, replay and no tab replay`);
@@ -46,7 +46,8 @@ try{for(const [name,engine] of Object.entries({chromium,webkit})){
   const revised='엑셀 대사 연결 확인. 첫 번째 문장.';await child.locator('td[data-key="Text"] textarea').fill(revised);await child.locator('td[data-key="Text"] textarea').blur();
   await page.locator('#editorScreen [data-editor="dialogue"]').click();await page.locator('#dialogueEvent').selectOption('cut');assert.equal(await page.locator('#beautyRequestText').inputValue(),revised);
   await page.locator('[data-request-add="RequestGroupID"]').click();await page.locator('[data-request-line]').nth(1).fill('추가한 두 번째 문장.');
-  await page.locator('#previewBeautyRequest').click();await page.waitForTimeout(1400);assert.equal(await page.locator('#beautyChoices').isVisible(),false);await page.locator('#talkNext').click();
+  await page.locator('#previewBeautyRequest').click();await page.waitForTimeout(1400);assert.equal(await page.locator('#beautyChoices').isVisible(),false);
+  while((await page.locator('#talkCount').textContent()).startsWith('1 /')){await page.locator('#talkNext').click();await page.waitForTimeout(100);}
   await choice(page,'추가한 두 번째 문장.');await page.locator('#beautyAsk').click();await choice(page,salonDialogueText(project,10001,'cut',true));await page.locator('#beautyAccept').click();await page.locator('#talkLayer').waitFor({state:'hidden'});
   // The developer preview changes are session-local and are never saved or published.
   assert.equal(await page.locator('#ownerStatus').textContent(),'저장 기능 잠김');assert.deepEqual(errors,[]);

@@ -37,7 +37,7 @@ const parentBundle=await bundle('src/',['text-effects.js','combat/dialogue.js','
 const reactionStyle=await read('src/beauty-reaction.css');
 const appURL=await emit('app','js',parentBundle),styleURL=await emit('style','css',reactionStyle+'\n'+await read('src/style.css'));
 const beautyResultRuntime=await read('src/salon-beauty-result.js'),beautyTutorialRuntime=await read('src/salon-tutorial.js');
-const beautyRules=await bundle('src/',['beauty-rules.js','beauty-shape.js','beauty-lesson-targets.js']),beautyRuntime=(await read('src/salon-beauty.js')).replace('/*__BEAUTY_RESULT__*/',()=>beautyResultRuntime).replace('/*__BEAUTY_TUTORIAL__*/',()=>beautyTutorialRuntime);
+const beautyRules=await bundle('src/',['beauty-rules.js','beauty-shape.js','beauty-lesson-targets.js','beauty-action-feedback.js']),beautyRuntime=(await read('src/salon-beauty.js')).replace('/*__BEAUTY_RESULT__*/',()=>beautyResultRuntime).replace('/*__BEAUTY_TUTORIAL__*/',()=>beautyTutorialRuntime);
 const salonStyle=await read('src/salon-beauty.css')+'\n'+reactionStyle;
 const inputs={
  'flow-assets':[await emit('assets','json',await read('data/assets.json')),'json'],
@@ -46,8 +46,10 @@ const inputs={
  'flow-combat':[await emit('combat','html',combat),'text']
 };
 const closingModelURL=await emit('closing-model','js',await read('src/closing/model.js'));
-const closingAppURL=await emit('closing-app','js',(await read('src/closing/app.js')).replace("from './model.js'",`from '${closingModelURL}'`));
-const closingStyleURL=await emit('closing-style','css',await read('src/closing/style.css'));
+const socialModelURL=await emit('social-model','js',await read('src/closing/social-model.js'));
+const socialUIURL=await emit('social-ui','js',(await read('src/closing/social-ui.js')).replace("from './social-model.js'",`from '${socialModelURL}'`));
+const closingAppURL=await emit('closing-app','js',(await read('src/closing/app.js')).replace("from './model.js'",`from '${closingModelURL}'`).replace("from './social-model.js'",`from '${socialModelURL}'`).replace("from './social-ui.js'",`from '${socialUIURL}'`));
+const closingStyleURL=await emit('closing-style','css',(await read('src/closing/style.css'))+'\n'+(await read('src/closing/social.css'))+'\n'+(await read('src/closing/social-refinements.css')));
 const closingHTML=(await read('src/closing/index.html')).replace('href="style.css"',`href="${closingStyleURL}"`).replace('src="app.js"',`src="${closingAppURL}"`);
 await fs.writeFile(path.join(dist,'closing.html'),closingHTML);
 const releaseId=hash(JSON.stringify(files));

@@ -77,3 +77,4 @@ body.playing #talkLayer.beautyRequest .talkbox:after{content:"";position:absolut
 #beautyChoiceSkip{margin-top:7px;padding:3px 6px;font-size:10px;background:transparent;border:1px solid #c58a45;color:#66472c}
 #beautyAccept:disabled{opacity:.4;cursor:default}
 #beautyChoices #beautyAsk.choiceLessonTarget{outline:3px solid #e29435;outline-offset:3px;background:#ffe3ac;font-weight:bold}
+body:has(#talkLayer.beautyRequest:not([hidden])) .storyhud{visibility:hidden}

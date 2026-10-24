@@ -418,7 +418,11 @@ async function checkResult(page, salon, finished, engine) {
   assert.deepEqual((await snapshot(salon)).material, finished.material,
     'the result reaction preserves the horns the player actually styled');
   await page.screenshot({ path: path.join(output, `${engine}-minion-result.png`) });
-  await salon.locator('#beautyResultContinue').click();
+  // The result may automatically finish while a screenshot is being encoded.
+  if(await salon.locator('#beautyResultContinue').isVisible()){
+    const button=await salon.locator('#beautyResultContinue').boundingBox();
+    if(button)await page.mouse.click(button.x+button.width/2,button.y+button.height/2);
+  }
   await page.locator('#returnBeauty').waitFor();
   await page.locator('#returnBeauty').click();
   await page.locator('#beautyGuest').waitFor();

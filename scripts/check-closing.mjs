@@ -183,7 +183,7 @@ async function fullSequence(page, engine) {
   assert.equal((await state(page)).actual, 3000, 'quick completion pays the day-one rewards immediately');
   assert.equal(await page.locator('#hudTotal').innerText(), '3,000');
   assert.equal(await page.locator('#closeShop').isVisible(), true);
-  await page.locator('#closeShop').click();
+  await page.locator('#closeShop').click();await page.locator('[data-exit]').click();
   await reviewReady(page);
   let current = await state(page);
   assert.equal(current.actual, 3000);
@@ -209,7 +209,7 @@ async function fullSequence(page, engine) {
   await phase(page, 'salon', 2);
   assert.equal((await state(page)).actual, 5200);
   assert.equal(await page.locator('#hudTotal').innerText(), '5,200');
-  await page.locator('#closeShop').click();
+  await page.locator('#closeShop').click();await page.locator('[data-exit]').click();
   await reviewReady(page);
   current = await state(page);
   assert.equal(current.actual, 5200);
@@ -259,7 +259,7 @@ async function retrySequence(page, engine) {
 async function belowThreshold(page, engine) {
   await start(page, { day: 2, threshold: 999999,
     choices: { zombie: 'beauty', sans: 'beauty', minion: 'beauty' } });
-  await page.locator('#closeShop').click();
+  await page.locator('#closeShop').click();await page.locator('[data-exit]').click();
   await reviewReady(page);
   assert.equal((await state(page)).actual, 5000);
   assert.equal((await state(page)).stars, 0);
@@ -302,7 +302,7 @@ async function normalMotionSequence(page, engine) {
   await capture(page, engine, 'original-hud-and-cashier');
   // The bobbing bubble intentionally never settles; click its visible center.
   const movingBubble = await page.locator('#closeShop').boundingBox();
-  await page.mouse.click(movingBubble.x + movingBubble.width / 2, movingBubble.y + movingBubble.height / 2);
+  await page.mouse.click(movingBubble.x + movingBubble.width / 2, movingBubble.y + movingBubble.height / 2);await page.locator('[data-exit]').click();
   await phase(page, 'review');
   await page.waitForFunction(() => Number(document.querySelector('#stage').dataset.displayedFollowers) > 0);
   const countingObserved = Date.now();
@@ -339,6 +339,7 @@ async function normalMotionSequence(page, engine) {
     });
     return {
       y,
+      postHeight: feed.querySelector('.post').offsetHeight,
       visibleHeights,
       displayed: Number(document.querySelector('#stage').dataset.displayedFollowers),
       disabled: document.querySelector('#nextReview').disabled,
@@ -346,14 +347,14 @@ async function normalMotionSequence(page, engine) {
   }, null, { timeout: 6000 });
   const scrollSample = await sampleHandle.jsonValue();
   await sampleHandle.dispose();
-  assert(scrollSample.y < 0 && scrollSample.y > -443, 'the feed must pass through an intermediate scroll position');
+  assert(scrollSample.y < 0 && scrollSample.y > -scrollSample.postHeight, 'the feed must pass through an intermediate scroll position');
   assert(scrollSample.visibleHeights[0] > 5 && scrollSample.visibleHeights[1] > 5,
     'both outgoing and incoming posts must be partially visible while scrolling');
   assert.equal(scrollSample.displayed, 1500, 'the next reward count must wait until the feed has arrived');
   assert.equal(scrollSample.disabled, true);
   await capture(page, engine, 'normal-feed-mid-scroll');
   await page.waitForFunction(() => Math.abs(new DOMMatrixReadOnly(
-    getComputedStyle(document.querySelector('#feed')).transform).m42 + 443) < 0.5);
+    getComputedStyle(document.querySelector('#feed')).transform).m42 + document.querySelector('#feed .post').offsetHeight) < 0.5);
   assert.equal((await state(page)).displayed, 1500);
   await page.waitForFunction(() => Number(document.querySelector('#stage').dataset.displayedFollowers) > 1500);
   assert.equal(await page.locator('#nextReview').isDisabled(), true);

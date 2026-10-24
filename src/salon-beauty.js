@@ -6,6 +6,9 @@ let beautyActive=false,beautyResultActive=false,beautyPhase='cut',totalSatisfact
 let cutScore=0,attachScore=0,drawScore=0,placements=[],selectedSticker=null;
 let ready=false,finishing=false,gesture=null,activeTool=hammer?'hammer':'scissors';
 let brushRadius=10,paintOpacity=1,paintColor='#75452D',expression='neutral',talking=false,mouthFrame=false;
+let actionMoodTimer=0,requestAnimationSerial=0;
+function resetActionMood(){clearTimeout(actionMoodTimer);expression='neutral';beautyCustomer.dataset.expression=expression;}
+function flashActionMood(mood){if(finishing||briefing)return;clearTimeout(actionMoodTimer);expression=mood;beautyCustomer.dataset.expression=mood;actionMoodTimer=setTimeout(()=>{if(finishing)return;expression='neutral';beautyCustomer.dataset.expression=expression;renderPortrait();},900);}
 let touched={cut:false,draw:false,attach:false},zonesVisible=false,history={draw:[],attach:[]},briefing=false,requestSerial=0;
 const current=new Uint8Array(W*H),original=new Uint8Array(W*H),paint=new Uint8ClampedArray(W*H*4);
 const sourcePixels=new Uint8ClampedArray(W*H*4),originalBorder=new Uint8Array(W*H);
@@ -223,22 +226,22 @@ function applyStroke(points,kind){
  if(kind==='grow'&&bone&&!touched.cut){touched.cut=[...cells].some(n=>masks.eyes[n]&&current[n]===2);}else touched[beautyPhase]=true;
 }
 portrait.addEventListener('pointerdown',e=>{
- if(!ready||finishing||briefing||e.button!==0)return;e.preventDefault();const p=point(e);
+ if(!ready||finishing||briefing||e.button!==0)return;e.preventDefault();resetActionMood();const p=point(e);
  if(beautyPhase==='attach'){
   const hit=[...placements].reverse().find(q=>Math.abs(p.x-q.x)<q.sticker.w*.75*(B.stickerScale??1)&&Math.abs(p.y-q.y)<q.sticker.h*.75*(B.stickerScale??1));
-  if(hit){pushUndo();placements=placements.filter(q=>q!==hit);touched.attach=true;updateBeautyScore();renderPortrait();}
+  if(hit){pushUndo();placements=placements.filter(q=>q!==hit);touched.attach=true;updateBeautyScore(true);renderPortrait();}
   else if(selectedSticker)placeSticker(selectedSticker,p.x,p.y);
   return;
  }
  const undoAdded=pushUndo();gesture={undoAdded,pointerId:e.pointerId,from:p,to:p,last:p,kind:activeTool,snapshot:current.slice(),paint:paint.slice(),touched:{...touched}};
  if(activeTool==='grow'&&B.growth?.connected){const x=Math.floor(p.x/PIX),y=Math.floor(p.y/PIX);gesture.growthAllowed=x>=0&&x<W&&y>=0&&y<H&&!!rootedBeautyMaterial(current,sculptAnchors,W,H)[y*W+x];}
  portrait.setPointerCapture(e.pointerId);
- if(activeTool!=='scissors'){applyStroke([p],activeTool);updateBeautyScore();}
+ if(activeTool!=='scissors'){applyStroke([p],activeTool);updateBeautyScore(true);}
  renderPortrait();
 });
 portrait.addEventListener('pointermove',e=>{
  if(!gesture||e.pointerId!==gesture.pointerId)return;e.preventDefault();const p=point(e);gesture.to=p;
- if(gesture.kind!=='scissors'){applyStroke([gesture.last,p],gesture.kind);updateBeautyScore();}
+ if(gesture.kind!=='scissors'){applyStroke([gesture.last,p],gesture.kind);updateBeautyScore(true);}
  gesture.last=p;renderPortrait();
 });
 portrait.addEventListener('pointerup',e=>{
@@ -250,7 +253,7 @@ portrait.addEventListener('pointerup',e=>{
  if(g.kind==='scissors'||g.kind==='hammer')removeCutFragments(g.snapshot);
  if(beautyPhase==='cut'){history.draw=[];history.attach=[];syncUndo();}
  if(g.kind==='hammer')send('sound',{key:'hammer'});
- updateBeautyScore();renderPortrait();beautyLessonStroke(g);
+ updateBeautyScore(true);renderPortrait();beautyLessonStroke(g);
 });
 function removeCutFragments(before){
  const rooted=B.growth?.connected?rootedBeautyMaterial(current,sculptAnchors,W,H):null;
@@ -275,8 +278,8 @@ addEventListener('blur',cancelGesture);
 addEventListener('keydown',e=>{if(!beautyActive)return;if(e.key==='Escape')cancelGesture();if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();undoBeauty();}},true);
 function placeSticker(sticker,x,y){
  if(!ready||finishing||briefing||beautyPhase!=='attach'||placements.length>=5)return;
- pushUndo();const region=B.attachRegions.find(r=>inBeautyRegion(x,y,r))?.key||'Other';
- placements.push({sticker,region,x,y});touched.attach=true;updateBeautyScore();renderPortrait();beautyLessonSticker();
+ resetActionMood();pushUndo();const region=B.attachRegions.find(r=>inBeautyRegion(x,y,r))?.key||'Other';
+ placements.push({sticker,region,x,y});touched.attach=true;updateBeautyScore(true);renderPortrait();beautyLessonSticker();
 }
 let stickerDrag=null;
 const stickerGhost=document.createElement('img');stickerGhost.className='sculptStickerGhost';stickerGhost.hidden=true;stickerGhost.alt='';beautyScreen.append(stickerGhost);
@@ -302,8 +305,9 @@ function endStickerDrag(e){
  else if(!beautyLessonDone){lessonFeedback='손님 밖에 놓았어요. 동그라미까지 끌어와 놓아 주세요.';renderBeautyLesson();}
 }
 addEventListener('blur',cancelStickerDrag);
-function updateBeautyScore(){
+function updateBeautyScore(action=false){
  if(!ready)return;
+ const beforeScore=totalSatisfaction,beforeFailure=!!shapeProgress.hardFailure;
  const shape=scoreShape(current,original,B,W,H,masks);shapeProgress=shape;cutScore=shape.score;
  attachScore=beautyAttachScore(placements,B);
  if(B.weights.draw){const full=new Uint8ClampedArray(320*350*4);for(let y=0;y<350;y++)for(let x=0;x<320;x++){const n=(Math.floor(y/2)*W+Math.floor(x/2))*4;full.set(paint.subarray(n,n+4),(y*320+x)*4);}drawScore=beautyDrawScore(full,B);}else drawScore=0;
@@ -311,7 +315,7 @@ function updateBeautyScore(){
  const scores={cut:cutScore,draw:drawScore,attach:attachScore};
  const live=BEAUTY_STAGES.reduce((s,k)=>s+(B.steps[k]?(touched[k]?scores[k]:B.weights[k]*.5):0),0);
  liveSatisfaction=Math.round(Math.max(0,Math.min(100,live)));
- expression=liveBeautyMood(live,expression,Object.values(touched).some(Boolean));
+ if(action){const mood=beautyActionMood(beforeScore,totalSatisfaction,beforeFailure,!!shape.hardFailure);if(mood!=='neutral')flashActionMood(mood);}
  if(B.growth?.connected){
   const covered=shape.eyeCoverCount>0;if(covered&&!eyeWasCovered&&!finishing)showEyeReaction();eyeWasCovered=covered;
   const goal=B.cutRegions.find(r=>r.rule==='area')?.maxRatio??.8;
@@ -322,7 +326,7 @@ function updateBeautyScore(){
    else if(shape.areaRatio>goal&&!areaWarned){areaWarned=true;showBeautyReaction(B.areaWarningLine||'줄이러 왔는데 다시 불어나는군요.','sigh');}
   }
   lastAreaRatio=shape.areaRatio;
-  if(shape.hardFailure)expression='angry';
+
  }
  renderRequestStatus();
  beautyCustomer.dataset.expression=expression;beautyCustomer.dataset.talking=String(talking);
@@ -369,11 +373,11 @@ function paintFace(){
  }else if(talking&&mouthFrame){f.fillStyle=dark;f.fillRect(7,24,15,2);}
  f.restore();
 }
-function renderPortrait(includeGuides=true,target=ctx){
+function renderPortrait(includeGuides=true,target=ctx,includeCape=true){
  if(!ready)return;
  if(finishing)includeGuides=false;
  target.imageSmoothingEnabled=false;target.clearRect(0,0,W,H);
- target.drawImage(capeImage,24,79.5,112,112*capeImage.naturalHeight/capeImage.naturalWidth);
+ if(includeCape)target.drawImage(capeImage,24,79.5,112,112*capeImage.naturalHeight/capeImage.naturalWidth);
  paintFace();
  if(!bone)target.drawImage(faceCanvas,0,0);
  const materialCtx=materialCanvas.getContext('2d'),data=materialCtx.createImageData(W,H),face=faceCanvas.getContext('2d').getImageData(0,0,W,H).data;
@@ -424,6 +428,7 @@ function renderPortrait(includeGuides=true,target=ctx){
   target.strokeStyle='#FFF2DD';target.lineWidth=.8;target.setLineDash([2,2]);target.stroke();target.restore();
  }
 }
+function captureBeautyHead(){const c=offscreen(),cx=c.getContext('2d');renderPortrait(false,cx,false);const data=cx.getImageData(0,0,W,H).data;let x0=W,y0=H,x1=0,y1=0;for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(data[(y*W+x)*4+3]){x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y);}if(x1<x0)return null;const head=document.createElement('canvas');head.width=x1-x0+1;head.height=y1-y0+1;head.getContext('2d').drawImage(c,x0,y0,head.width,head.height,0,0,head.width,head.height);return head.toDataURL();}
 function captureBeautyCustomer(){const c=offscreen();renderPortrait(false,c.getContext('2d'));return c.toDataURL();}
 function refreshTools(){
  for(const b of shapeTools.children)b.classList.toggle('selected',b.dataset.tool===activeTool);
@@ -446,7 +451,7 @@ function renderRequestStatus(){
  const list=status.querySelector('.requestText');if(list.innerHTML!==markup)list.innerHTML=markup;
 }
 function setBeautyPhase(phase,announce=true){
- if(finishing||briefing)return;cancelStickerDrag();cancelGesture();beautyPhase=phase;
+ if(finishing||briefing)return;cancelStickerDrag();cancelGesture();resetActionMood();requestAnimationSerial++;beautyScreen.classList.remove('requestReveal');beautyPhase=phase;
  if(phase==='draw'&&B.growth?.material==='horn'&&!heardRequests.draw){brushRadius=4;document.getElementById('sculptSize').value=4;document.getElementById('sculptSizeValue').value=4;}
  const names={cut:'형태 만들기',draw:'색·무늬 꾸미기',attach:'장식 붙이기'},stages=beautyStageOrder(B);
  stageTag.textContent=(stages.indexOf(phase)+1)+'. '+names[phase];
@@ -461,16 +466,29 @@ function setBeautyPhase(phase,announce=true){
 }
 function announceBeautyRequest(){
  if(!beautyLessonDone)return;
- if(finishing||briefing)return;cancelStickerDrag();cancelGesture();briefing=true;renderBeautyLesson();status.hidden=true;panel.inert=true;nav.inert=true;actions.inert=true;next.disabled=true;syncUndo();
+ if(finishing||briefing)return;cancelStickerDrag();cancelGesture();briefing=true;resetActionMood();beautyScreen.classList.add('requestFocus','requestHolding');beautyScreen.classList.remove('requestReveal');renderBeautyLesson();status.hidden=true;panel.inert=true;nav.inert=true;actions.inert=true;next.disabled=true;syncUndo();
  send('stage-request',{stage:beautyPhase,requestId:++requestSerial,detail:!!heardDetails[beautyPhase]});
+}
+function animateRequestMemo(serial){
+ const rows=[...status.querySelectorAll('.requestItem')];let delay=0;
+ for(const row of rows){const check=row.querySelector('.requestCheck'),label=row.querySelector('.requestLabel'),text=label.textContent;check.style.opacity='0';label.textContent='';
+  setTimeout(()=>{if(serial!==requestAnimationSerial)return;check.style.opacity='1';check.animate([{transform:'scale(.3)'},{transform:'scale(1.25)'},{transform:'scale(1)'}],{duration:220});},delay);
+  delay+=180;for(let n=1;n<=text.length;n++)setTimeout(()=>{if(serial===requestAnimationSerial)label.textContent=text.slice(0,n);},delay+n*60);delay+=text.length*60+450;
+ }
 }
 function finishBeautyRequest(id,detail=false){
  if(!briefing||id!==requestSerial)return;
- heardRequests[beautyPhase]=true;
- heardDetails[beautyPhase]=heardDetails[beautyPhase]||detail;
- renderRequestStatus();
- briefing=false;talking=false;mouthFrame=false;beautyCustomer.dataset.talking='false';status.hidden=false;panel.inert=false;nav.inert=false;actions.inert=false;next.disabled=!ready;syncUndo();renderPortrait();renderBeautyLesson();
+ const first=!heardRequests[beautyPhase],serial=++requestAnimationSerial;
+ heardRequests[beautyPhase]=true;heardDetails[beautyPhase]=heardDetails[beautyPhase]||detail;
+ renderRequestStatus();talking=false;mouthFrame=false;beautyCustomer.dataset.talking='false';beautyScreen.classList.remove('requestFocus');renderPortrait();
+ setTimeout(()=>{
+  if(serial!==requestAnimationSerial)return;
+  beautyScreen.classList.remove('requestHolding');status.hidden=false;
+  if(first){beautyScreen.classList.add('requestReveal');setTimeout(()=>{if(serial===requestAnimationSerial)animateRequestMemo(serial);},420);}
+  setTimeout(()=>{if(serial!==requestAnimationSerial)return;briefing=false;panel.inert=false;nav.inert=false;actions.inert=false;next.disabled=!ready;syncUndo();renderBeautyLesson();},first?1150:0);
+ },420);
 }
+
 function enterAttachPhase(){setBeautyPhase('attach');}
 function enterDrawPhase(){setBeautyPhase('draw');}
 function calculateDrawScore(){updateBeautyScore();}

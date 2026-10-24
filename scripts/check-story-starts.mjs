@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 async function advanceTalk(page){
  for(let i=0;i<120;i++){
   if(await page.locator('#beautyChoiceSkip').isVisible())await page.locator('#beautyChoiceSkip').click();
-  if(await page.locator('#beautyChoices').isVisible()){await page.locator('#beautyAccept').click();await page.waitForTimeout(100);continue;}
+  if(await page.locator('#beautyChoices').isVisible()){await page.locator('#beautyAccept').click();await page.locator('#beautyChoices').waitFor({state:'hidden'});await page.waitForTimeout(350);continue;}
   if(!await page.locator('#talkLayer').isVisible()){
    await page.waitForTimeout(350);
    if(!await page.locator('#talkLayer').isVisible())return;
@@ -81,7 +81,7 @@ export async function checkStoryStarts(page,{screenshotPath,checkContinuation=fa
   }else assert.equal(await salon.locator('#beautyScreen').isVisible(),false);
   const combat=page.frameLocator('#storyBattle');
   await combat.locator('#enemyHPText').filter({hasText:'/'}).waitFor({state:'attached'});
-  assert.equal(await page.locator('#storyDay').textContent(),'DAY '+String(day).padStart(2,'0'));
+  assert.match(await page.locator('#storyDay').textContent(),new RegExp('^DAY '+String(day).padStart(2,'0')+' · ☀ (2[2-8])°$'));
   console.log(`Selected ${id}: day ${day}, ${steps?'beauty → battle':'automatic entrance → battle, no beauty'}`);
   await page.locator('#home').click();await page.locator('#leavePlay').click();
  }
