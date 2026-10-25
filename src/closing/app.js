@@ -76,8 +76,8 @@ $('phone').querySelector('.phone-app-title').textContent='monstagram';
 $('phone').querySelectorAll('[data-review-home],[data-review-back]').forEach(button=>{button.disabled=true;button.setAttribute('aria-label',button.getAttribute('aria-label')+' · 정산 중 사용 불가');});
 let managementReviewed=false,exitPending=false;
 const phone=createSocialPhone(stage,{getRun:()=>run,onManagement:()=>action(openManagement)(),onExit:()=>action(exitPhone)()});
-function phoneHome(){busy=false;show('settlement',false);show('finishBanner',false);phase('phone');phone.show(managementReviewed);setStatus('몬스타그램을 둘러보거나 가게 관리에서 오늘의 정산을 확인하세요.');}
-async function openManagement(){if(busy)return;busy=true;phone.hide();await openReview(epoch);}
+function phoneHome(initialView='home'){busy=false;show('settlement',false);show('finishBanner',false);phase('phone');phone.show(managementReviewed,initialView);setStatus('몬스타그램을 둘러보거나 가게 관리에서 오늘의 정산을 확인하세요.');}
+async function openManagement(){if(busy||managementReviewed)return;busy=true;phone.hide();await openReview(epoch);}
 async function exitPhone(){if(busy)return;exitPending=true;if(closingExitAction(managementReviewed)==='management')await openManagement();else{phone.hide();await advanceDay(epoch);}}
 async function completeManagement(token){busy=true;phase('finish');const awarded=summary.eligibleForStar&&!managementReviewed;$('finishBanner').classList.toggle('award',awarded);$('finishEyebrow').textContent=awarded?'YOUR FIRST STAR':'TODAY’S FOLLOWERS';$('finishTitle').textContent=awarded?'★ 첫 번째 스타 획득!':'오늘도 한 걸음 더!';$('finishMessage').textContent=`오늘 +${fmt(summary.gain)}명 · 누적 ${fmt(run.total)}명`;show('finishBanner');if(awarded)chord();await pause(1900,token);managementReviewed=true;hud();show('finishBanner',false);if(exitPending)await advanceDay(token);else phoneHome();}
 
@@ -110,7 +110,7 @@ async function review(which,token,first=false){
  $('reviewHint').textContent=index<summary.visits.length-1?'후기를 읽고, 다음 손님의 이야기로 넘어가세요.':'오늘 도착한 후기를 모두 확인했어요.';
  setStatus(`${visit.name} · +${fmt(visit.gain)}명. 다음 진행을 기다리고 있어요.`);
 }
-async function close(){if(busy||(!storyMode&&!canClose(run)))return;busy=true;const token=epoch;summary=closingSummary(run);if(storyMode){summary.eligibleForStar=run.day===2&&run.total>=settings.threshold;run={...run,status:'closed',stars:summary.eligibleForStar?1:run.stars};}else run=closeDay(run);phase('closing');show('closeShop',false);show('visitPanel',false);$('closedDay').textContent=run.day;show('closeBanner');setStatus('오늘의 영업이 끝났습니다.');beep(220,.2,'triangle',.07);await pause(1600,token);show('closeBanner',false);phoneHome();}
+async function close(){if(busy||(!storyMode&&!canClose(run)))return;busy=true;const token=epoch;summary=closingSummary(run);if(storyMode){summary.eligibleForStar=run.day===2&&run.total>=settings.threshold;run={...run,status:'closed',stars:summary.eligibleForStar?1:run.stars};}else run=closeDay(run);phase('closing');show('closeShop',false);show('visitPanel',false);$('closedDay').textContent=run.day;show('closeBanner');setStatus('오늘의 영업이 끝났습니다.');beep(220,.2,'triangle',.07);await pause(1600,token);show('closeBanner',false);phoneHome('management');}
 async function advanceDay(token){busy=true;phone.hide();$('blackout').classList.add('dark');await pause(750,token);show('settlement',false);show('finishBanner',false);phase('calendar');$('oldDay').textContent=run.day;$('newDay').textContent=run.day+1;show('calendarScreen');$('calendarLeaf').classList.remove('flip');await pause(500,token);$('calendarLeaf').classList.add('flip');beep(150,.1,'triangle',.08);await pause(1700,token);run=nextDay(run);show('calendarScreen',false);if(run.status==='ending'){await ending(token);}else if(storyMode){storyMessage('next-day');}else{clearScene();prepareDay();busy=false;}}
 async function upgradeLoading(token){
  phase('upgrading');
@@ -157,5 +157,5 @@ action(async()=>{await Promise.all([ART.salon,ART.upgrade,ART.zombie,ART.sans,AR
 addEventListener('message',e=>{
  const m=e.data;if(!storyMode||storyInitialized||e.source!==parent||e.origin!==location.origin||m?.source!=='yachacha-story'||m.token!==storyToken||m.type!=='init')return;
  if(![1,2].includes(m.day)||!Array.isArray(m.records))return;
- storyInitialized=true;phone.setWeather(m.day,m.weather);phone.restore(m.socialChoices);run=runFromStory(m.records,m.day);settings=run.settings;clearScene();show('loading',false);renderSalon();resize();
+ storyInitialized=true;phone.setWeather(m.day,m.weather);run=runFromStory(m.records,m.day);phone.restore(m.socialChoices);settings=run.settings;clearScene();show('loading',false);renderSalon();resize();
 });
