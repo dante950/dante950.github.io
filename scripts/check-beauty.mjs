@@ -187,6 +187,7 @@ try{
    await stroke(page,salon,[116,105],[116,105]);await stroke(page,salon,[160,108],[160,108]);
    const acceptedNote=await salon.locator('.requestText').textContent();
    await revisit(page,salon,'draw');await revisit(page,salon,'cut');await revisit(page,salon,'attach');await revisit(page,salon,'attach');
+   await salon.waitForFunction(expected=>document.querySelector('.requestText').textContent===expected,acceptedNote);
    assert.equal(await salon.locator('.requestText').textContent(),acceptedNote,'switching tabs preserves the vague memo without revealing detail');
    await salon.locator('#repeatBeautyRequest').click();await finishRequest(page,salon,{clarify:false});
    assert.equal((await material(salon))[135*160+135],2,'separate growth survives other strokes and all stage changes');
