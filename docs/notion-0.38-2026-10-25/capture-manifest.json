@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-25",
+  "page": "https://app.notion.com/p/403648bf677880ea8afaf6edb41e6475",
+  "simulatorVersion": "0.38",
+  "sourceCommit": "2c5fbc7",
+  "releaseId": "0a5f6cb392c0b019",
+  "deployment": "none; public remains 0.37",
+  "pageImages": [
+    "01-first-request.jpg",
+    "02-beauty-tools.jpg",
+    "13-pleased-flowers.png",
+    "03-management.jpg",
+    "04-receipt.jpg",
+    "06-management-done.jpg",
+    "05-home-widget-new.jpg",
+    "11-day2-growth.jpg",
+    "08-passive-post.jpg",
+    "07-fortune-choices.jpg",
+    "09-review-reply.jpg",
+    "10-free-comment.jpg",
+    "12-seen-divider.jpg"
+  ],
+  "provenance": "12 screenshots captured directly from local simulator via browser during this documentation task. Flower screenshot reused from same final 0.38 actual browser verification (docs/local-0.38/pleased-flowers.png). No generated or retouched imagery.",
+  "notionVerification": "13 native notion-file-block images and all 9 sections confirmed by fetch after replacement. Original title/properties preserved. Original page body backed up.",
+  "limits": "Documentation only. No game logic changes, deployment, Unity validation, or new test suite execution."
+}
