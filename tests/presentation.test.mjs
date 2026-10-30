@@ -84,6 +84,14 @@ test('declining the customer skips directly without revealing the room',()=>{
  Object.assign(p,{active:true,mode:'customer-choice',choices:{},choiceHint:{},complete(r){result=r;},enterRoom(){assert.fail('must not enter room');}});
  p.confirmChoice(1);assert.equal(result,'skip');assert.notEqual(p.revealed,true);
 });
+test('skipping any intro segment cancels pending scenes and opens the customer choice without summary dialogue',()=>{
+ for(const mode of ['enter','greeting','story','slides']){
+  const p=Object.create(MinionPresentation.prototype),speech={hidden:true},title={},classes=new Set(['screen-down','projecting']);let cancelled=false,offered=0;
+  Object.assign(p,{active:true,mode,skipping:false,generation:0,screenDown:true,waiters:[{resolve(value){cancelled=value===false;}}],skip:{style:{setProperty(){}}},root:{classList:{remove:(...xs)=>xs.forEach(x=>classes.delete(x))},querySelector:s=>s==='.presentation-speech'?speech:title},sound(){},speak(){assert.fail('skip must not play narration');},offerCustomer(){this.mode='customer-choice';offered++;}});
+  p.skipIntro();assert.equal(p.mode,'customer-choice');assert.equal(offered,1);assert.equal(cancelled,true);assert.equal(p.lines,null);assert.equal(p.onLinesDone,null);assert.equal(speech.hidden,false);assert.equal(p.screenDown,false);assert.ok(!classes.has('screen-down'));
+  p.skipIntro();assert.equal(offered,1);
+ }
+});
 test('business images reveal progressively and reset timing on each slide',()=>{
  const p=Object.create(MinionPresentation.prototype),layer=()=>({style:{}});
  Object.assign(p,{mode:'slides',slideIndex:0,slideSince:1000,clock:2300,storyY:4,storyTarget:4,bow:1,bowTarget:1,mirror:1,mirrorTarget:1,sighAt:null,story:layer(),bowLayer:layer(),mirrorLayer:layer(),sighLayer:layer(),sighIcon:layer(),businessLayers:[0,1,2,3,4].map(step=>({dataset:{slide:'0',step:String(step)},style:{}}))});

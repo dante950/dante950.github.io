@@ -36,10 +36,6 @@ export const PRESENTATION_SLIDES=[
   '그리고 당신의 미용으로 마왕님을 만족시켜 주신다면…\n책임지고 원래 세계로 돌려보내 드리겠습니다.'
  ]}
 ];
-export const PRESENTATION_SUMMARY=[
- '요점만 말씀드리겠습니다.\n닷새 안에 이곳을 3스타 미용실로 만들어 주십시오.',
- '마왕님을 만족시켜 주시면,\n원래 세계로 돌려보내 드리겠습니다.'
-];
 export const INTRO_HOLD_MS=1200;
 export function normalizeNickname(value){return String(value??'').normalize('NFC').trim().replace(/\s+/gu,' ');}
 export function nicknameProblem(value){const name=normalizeNickname(value);if(!name)return '몬스타그램에서 사용할 이름을 입력해 주세요.';if([...name].length>16)return '닉네임은 16자 이내로 입력해 주세요.';if(/[<>\p{Cc}\p{Cf}]/u.test(name))return '꺾쇠나 보이지 않는 제어 문자는 사용할 수 없어요.';return '';}

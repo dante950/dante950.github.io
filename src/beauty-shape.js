@@ -159,7 +159,7 @@ export function beautyRequirementChecks(b,phase,shape,scores,placementCount){
   if(bone)checks.push(shape.interiorIntact===true);
   return checks.length?checks:[scores.cut>=b.weights.cut-1e-9];
  }
- if(phase==='attach')return [placementCount===1&&scores.attach>=b.weights.attach-1e-9];
+ if(phase==='attach')return [placementCount===(b.attachCount??1)&&scores.attach>=b.weights.attach-1e-9];
  return [!b.weights.draw||scores.draw>=b.weights.draw*(b.drawRequiredRatio||1)-1e-9];
 }
 export function liveBeautyMood(score,previous='neutral',touched=false){

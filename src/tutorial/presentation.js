@@ -1,4 +1,4 @@
-import {PRESENTATION_HELLO,PRESENTATION_REFUSALS,PRESENTATION_STORY,PRESENTATION_SLIDES,PRESENTATION_SUMMARY,INTRO_HOLD_MS} from './presentation-data.js';
+import {PRESENTATION_HELLO,PRESENTATION_REFUSALS,PRESENTATION_STORY,PRESENTATION_SLIDES,INTRO_HOLD_MS} from './presentation-data.js';
 
 export class MinionPresentation{
  constructor(host,room,{sound,done}){
@@ -96,7 +96,13 @@ export class MinionPresentation{
  skipIntro(){
   if(!this.active||this.skipping)return;
   this.skipping=true;this.generation++;for(const w of this.waiters)w.resolve(false);this.waiters=[];this.cancelHold();this.skip.hidden=true;this.sighAt=null;
-  this.setMode('wrapup');this.speak(PRESENTATION_SUMMARY,()=>this.raise(true));
+  this.lines=null;this.onLinesDone=null;this.returning=true;
+  this.root.classList.remove('screen-down','projecting');
+  this.root.querySelector('.presentation-title').hidden=true;
+  this.root.querySelector('.presentation-speech').hidden=false;
+  if(this.screenDown)this.sound('motor');this.screenDown=false;
+  this.actorX=475;this.actorScale=1.75;this.actorFeet=365;
+  this.offerCustomer();
  }
  complete(result){this.cancel();this.done(result);}
  beginHold(source){if(!this.active||this.paused||this.skipping||this.skip.hidden||this.hold)return;this.hold={at:this.clock,source};}

@@ -27,8 +27,8 @@ export const COFFEE_REQUESTS={
  ],
  attach:[
   '뿔도요! 부하님처럼!',
-  '머리 위에 뿔 한 쌍을 붙여주세요!',
-  '눈보다 위쪽, 머리 위에요! 부하님처럼 양쪽으로 뻗은 뿔이면 좋겠어요.'
+  '얼굴 양쪽에 큰 뿔을 하나씩 붙여주세요!',
+  '왼쪽 큰 뿔은 얼굴 왼쪽에, 오른쪽 큰 뿔은 얼굴 오른쪽에요! 부하님처럼 양쪽으로 뻗으면 좋겠어요.'
  ]
 };
 export function coffeeIntroBeats(){return COFFEE_INTRO.flatMap((card,sceneIndex)=>card.lines.map(text=>({...card,text,sceneIndex})));}

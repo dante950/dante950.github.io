@@ -2,8 +2,22 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {coffeeEyeMasks,coffeeMaterialBoundary,coffeeHairPixelColor} from '../src/coffee-beauty.js';
 import {createCoffeeGuest} from '../src/tutorial/guest.js';
+import {beautyAttachScore,beautyInside} from '../src/beauty-rules.js';
 import {scoreShape,beautyRequirementChecks,inBeautyRegion,beautyGrowthValue} from '../src/beauty-shape.js';
 const b=createCoffeeGuest({}).beauty;
+test('coffee requires the supplied left and right big horns on their matching face sides',()=>{
+ const guest=createCoffeeGuest({}),left=guest.stickers.find(s=>s.resourceFile==='T_hornBig_L.png'),right=guest.stickers.find(s=>s.resourceFile==='T_hornBig_R.png');
+ assert.ok(left&&right);assert.ok(!guest.stickers.some(s=>s.id==='TUTORIAL-COFFEE-HORNS-PAIR'));
+ const at=(sticker,x,y)=>({sticker,region:b.attachRegions.find(r=>beautyInside(x,y,r))?.key||'Other'});
+ const l=at(left,125,154),r=at(right,195,154);
+ assert.equal(beautyAttachScore([l,r],b),30);assert.equal(beautyAttachScore([r,l],b),30);
+ assert.equal(beautyAttachScore([l],b),15);assert.equal(beautyAttachScore([r],b),15);
+ assert.deepEqual(beautyRequirementChecks(b,'attach',null,{attach:30},2),[true]);
+ assert.deepEqual(beautyRequirementChecks(b,'attach',null,{attach:15},1),[false]);
+ assert.deepEqual(beautyRequirementChecks(b,'attach',null,{attach:30},3),[false]);
+ assert.deepEqual(beautyRequirementChecks({...b,attachCount:undefined},'attach',null,{attach:30},1),[true]);
+ for(const bad of [[at(right,125,154),at(left,195,154)],[l,at(left,195,154)],[l,at(right,160,154)],[l,r,l],[l,r,at(guest.stickers.find(s=>s.id!==left.id&&s.id!==right.id),125,154)]])assert.ok(beautyAttachScore(bad,b)<30);
+});
 const W=160,H=175;
 function sample(){
  const original=new Uint8Array(W*H).fill(1),current=original.slice();
