@@ -13,17 +13,44 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      intro_only: ${{ steps.scope.outputs.intro_only }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+      - name: Select checks for changed files
+        id: scope
+        env:
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          intro_only=false
+          if [ "$EVENT" = push ] && git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            intro_only=true
+            while IFS= read -r file; do
+              case "$file" in
+                src/tutorial/presentation*|src/tutorial/app.js|src/tutorial/index.html|public/media/intro/pt/*|tests/presentation.test.mjs|docs/*|.github/workflows/pages.yml) ;;
+                *) intro_only=false ;;
+              esac
+            done < <(git diff --name-only "$BEFORE" HEAD)
+          fi
+          echo "intro_only=$intro_only" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
       - run: npm run build
+      - name: Check changed presentation flow
+        if: steps.scope.outputs.intro_only == 'true'
+        run: node --test tests/presentation.test.mjs
       - run: npm test
+        if: steps.scope.outputs.intro_only != 'true'
       - uses: actions/upload-pages-artifact@v4
         with:
           path: dist
   browser-checks:
+    needs: build
+    if: needs.build.outputs.intro_only != 'true'
     name: Check ${{ matrix.suite }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -51,7 +78,7 @@ jobs:
       - run: npm run build
       - run: node ${{ matrix.script }}
   deploy:
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.build.result == 'success' && (needs.browser-checks.result == 'success' || needs.browser-checks.result == 'skipped')
     needs: [build, browser-checks]
     runs-on: ubuntu-latest
     permissions:

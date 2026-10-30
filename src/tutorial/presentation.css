@@ -20,6 +20,16 @@
 .king-sigh{position:absolute;left:31%;top:51%;width:13%;height:auto;opacity:0;overflow:visible;filter:drop-shadow(0 2px 3px #1118);transform-origin:left center}
 .full-art,.business-art{mask-image:linear-gradient(transparent,#000 5%,#000 95%,transparent)}
 .business-art img{object-fit:contain}
+.story-panel{container-type:size}
+.business-layer,.story-art-frame{position:absolute;width:min(100cqw,177.815cqh);height:min(100cqh,56.238cqw);left:50%;top:50%;transform:translate(-50%,-50%)}
+.business-layer{opacity:0;will-change:opacity}
+.scroll-reveal{position:absolute;inset:0;overflow:hidden}
+.reveal-camera{position:absolute;width:min(89cqw,177.815cqh);height:min(100cqh,50.05cqw);left:50%;top:50%;will-change:transform}
+.reveal-before,.reveal-after{position:absolute;inset:0;will-change:opacity}
+.reveal-after{opacity:0}
+.calendar-only{clip-path:inset(0 42% 67% 42%)}
+.business-layer[data-slide="1"][data-step="0"]{clip-path:inset(0 79% 0 0)}
+.business-layer[data-slide="1"][data-step="1"]{clip-path:inset(0 59% 0 0)}
 .art-proof{position:absolute;bottom:9px;left:0;right:0;text-align:center;font-size:10px;letter-spacing:.1em;color:#cbb888;background:#141512bd;width:fit-content;max-width:95%;padding:2px 10px;margin:auto}
 .projector-beam{position:absolute;inset:0;background:linear-gradient(120deg,#e4f4d600,#f7f1cf0e 45%,#f7f1cf00 70%);clip-path:polygon(0 2%,95% 82%,100% 100%,4% 70%);z-index:3;opacity:0;transition:opacity .5s;pointer-events:none}
 .projecting .projector-beam{opacity:1}
@@ -32,6 +42,9 @@
 .presentation-choices{display:flex;justify-content:center;gap:clamp(30px,10vw,140px);margin-top:20px}
 .presentation-choices button{background:transparent;border:0;border-bottom:2px solid #bba27044;border-radius:0;font-size:clamp(19px,2vw,29px);padding:7px 24px}
 .presentation-choices button:hover,.presentation-choices button:focus-visible{color:#f8d891;border-bottom-color:#f8d891;background:#e0b85f0b}
+.presentation-choices button.selected{color:#f8d891;border-bottom-color:#f8d891;background:#e0b85f16;box-shadow:0 3px 12px #e0b85f18}
+.presentation-choices button.selected:before{content:'▸ ';}
+.choice-hint{display:block;margin-top:12px;color:#c4b48f;font-size:12px;letter-spacing:.08em}
 .room-revealed .presentation-speech{background:#0a100fe8;border:1px solid #c4ab7970;border-radius:8px;padding:12px 24px;text-align:left;bottom:3%}
 .room-revealed .presentation-speaker{color:#d2ba83}
 .hold-skip{--hold:0%;position:absolute;z-index:9;right:20px;top:14px;padding:9px 14px 12px;background:#050b0de8;border:1px solid #d0bd8b70;color:#e6ddc5;font-size:11px;overflow:hidden;user-select:none;touch-action:none}

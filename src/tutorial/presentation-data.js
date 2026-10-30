@@ -22,12 +22,12 @@ export const PRESENTATION_STORY=[
  {at:3,text:'보다 못한 저는 마침내,\n마왕님의 고민을 해결해 줄 당신을 소환하게 되었습니다…'}
 ];
 export const PRESENTATION_SLIDES=[
- {number:'01',label:'돌아갈 조건',headline:'닷새 안에, 별 세 개.',kind:'stars',lines:[
+ {number:'01',label:'돌아갈 조건',headline:'닷새 안에, 별 세 개.',kind:'stars',art:['pt/day-five.png','pt/salon.png','pt/star-one.png','pt/star-two.png','pt/star-three.png'],lines:[
   '이 미용실을 맡아 주십시오.\n마왕님께서 만족하실 수 있도록, 당신의 손길이 필요합니다.',
   '마왕님은 별 세 개를 얻지 못한 가게에는 발도 들이지 않으십니다.\n방문 예정일인 5일차까지, 이곳을 3스타 미용실로 만들어야 합니다.',
   '손님들의 부탁을 들어주고 좋은 후기를 얻으십시오.\n팔로워가 모이면, 미용실의 별도 올라갈 겁니다.'
  ]},
- {number:'02',label:'중간 점검',headline:'2일차, 제가 찾아오겠습니다.',kind:'calendar',lines:[
+ {number:'02',label:'중간 점검',headline:'2일차, 제가 찾아오겠습니다.',kind:'calendar',art:['pt/day-one.png','pt/day-two.png','pt/day-four.png'],lines:[
   '2일차에는 제가 먼저 방문하겠습니다.\n마왕님을 맡겨도 될 실력인지, 직접 확인해야 하니까요.',
   '미용 솜씨는 물론, 필요하다면 야차 실력까지.\n점검 과제는 그때 말씀드리겠습니다.'
  ]},
