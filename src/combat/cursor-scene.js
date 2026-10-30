@@ -18,6 +18,19 @@ class CursorScene extends GameScene {
  tilePath(tile){const c=(tile-1)%3,r=Math.floor((tile-1)/3),g=this.ctx;g.beginPath();[[c,r],[c+1,r],[c+1,r+1],[c,r+1]].forEach(([u,v],i)=>{const p=this.floor(u/3,v/3);i?g.lineTo(p.x,p.y):g.moveTo(p.x,p.y);});g.closePath();}
  shadow(x,y,w){const g=this.ctx;g.fillStyle='#1a111788';g.beginPath();g.ellipse(x,y,w,14,0,0,Math.PI*2);g.fill();}
  actor(key,frame,x,feet,height,flip=false,alpha=1){const g=this.ctx;g.save();g.translate(x,0);if(flip)g.scale(-1,1);this.sprite(key,frame,0,feet,height,alpha);g.restore();}
+ coffeeActor(asset,frame,x,feet,height,alpha=1){
+  if(asset==='coffee_attack'){this.actor(asset,frame,x,feet,height,false,alpha);return;}
+  // captureBeautyCustomer already contains the entire ghost, including its
+  // body and hands. Drawing the raw pieces as well duplicates those parts.
+  if(this.images.coffee_portrait){this.actor('coffee_portrait',0,x,feet+height*.13,height,false,alpha);return;}
+  const g=this.ctx;g.save();g.globalAlpha=alpha;g.imageSmoothingEnabled=false;
+  // Keep the user's original pieces separate. The optional portrait carries
+  // the player's actual haircut, paint and stickers from the salon.
+  // Same 320 × 350 authored pose as the salon; the tail's authored base is y304.
+  const scale=height/304,draw=key=>{const img=this.images[key],spec=this.assets.images[key],pose=spec?.pose;if(!img||!spec||!pose)return;g.drawImage(img,pose.sx||0,pose.sy||0,spec.fw,spec.fh,x+(pose.x-160)*scale,feet+(pose.y-304)*scale,pose.w*scale,pose.h*scale);};
+  draw('coffee_body');draw('coffee_head');draw('coffee_eyes');draw('coffee_mouth');draw('coffee_hair');draw('coffee_hands');
+  g.restore();
+ }
  stroke(from,to,time){this.trails.push({from,to,time});this.trails=this.trails.slice(-80);}
  play(kind,b,cue){
   if(kind==='stoneRise'){this.rewardTone(80,.4,'triangle',.2);return;}
@@ -149,7 +162,7 @@ class CursorScene extends GameScene {
   this.shadow(ex,ey,character==='drunk'?89:55);
   g.save();
   if(recoiling){g.filter='brightness(1.8)';}
-  this.actor(asset,frame,ex,ey,height,true,alpha);g.restore();
+  if(character==='coffee')this.coffeeActor(asset,frame,ex,ey,height,alpha);else this.actor(asset,frame,ex,ey,height,true,alpha);g.restore();
   let pp=this.point(b?.pos??5);const push=plan?.push;
   if(attacking&&push?.started&&!push.done){const from=this.point(push.from),to=this.point(push.dest),p=Math.min(1,(t-push.start)/(push.end-push.start));pp={x:from.x+(to.x-from.x)*p,y:from.y+(to.y-from.y)*p};}
   // The last idle cell is transparent; use its eight populated frames.

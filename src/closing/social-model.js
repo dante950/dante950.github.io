@@ -12,7 +12,8 @@ export const REVIEW_CHOICES={
  minion:{beauty:[{label:'휴가 중에는 알림 꺼 두세요!',comment:'666년 만의 휴가라니! 이번만큼은 알림 꺼 두세요~',reply:'껐습니다. 그러자 연락용 박쥐가 창문을 두드리더군요. 다음에는 창문도 끄겠습니다.'},{label:'마왕님께는 예약부터 부탁드려요 ^^',comment:'추천 감사합니다! 마왕님께는 예약부터 부탁드려요 ^^',reply:'전달했습니다. 마왕님께서 왕은 기다리지 않는다 하셔서... 제가 대신 대기하기로 했습니다.'}],battle:[{label:'반차 동안은 업무 금지예요!',comment:'반차 동안은 업무 금지예요! 오늘만큼은 푹 쉬세요~',reply:'그 말을 결재 문서에 첨부했습니다. 업무 금지 승인 여부를 검토하라는 업무가 내려왔습니다.'},{label:'다음엔 평온한 커트로 모실게요~',comment:'다음엔 평온한 커트로 모실게요~ 몸조리 잘하세요!',reply:'감사합니다. 혹시 평온함도 영수증에 적어주실 수 있습니까? 복지비로 청구해 보겠습니다.'}]}
 };
 export function followerWidgetData(run){
- const days=Array.from({length:run.day},(_,i)=>({day:i+1,gain:run.visits.filter(v=>v.day===i+1).reduce((sum,v)=>sum+v.gain,0)}));
+ const firstDay=run.visits.some(v=>v.day===0)?0:1;
+ const days=Array.from({length:Math.max(0,run.day-firstDay+1)},(_,i)=>({day:i+firstDay,gain:run.visits.filter(v=>v.day===i+firstDay).reduce((sum,v)=>sum+v.gain,0)}));
  const threshold=run.settings.threshold;return {days,total:run.total,remaining:Math.max(0,threshold-run.total),achieved:run.total>=threshold};
 }
 export function reviewVariant(visit){
@@ -21,6 +22,7 @@ export function reviewVariant(visit){
  return ['victory','forcedWin','offerWin'].includes(visit.outcome)?'battle':null;
 }
 export function reviewPost(visit){
+ if(visit.guestId==='coffee')return {id:visit.id,user:visit.review?.user||'coffee_ghost',place:visit.review?.place||'몬스터 헤어살롱 · 첫 손님',text:visit.review?.text||'첫 변신을 마쳤어요! 부하님을 조금 닮았나요? #몬스터헤어살롱',photo:visit.portrait||null,wholePortrait:true,guest:'coffee',kind:'beauty',title:'첫 손님의 첫 변신',symbol:'☕',comments:[],draft:true};
  const kind=reviewVariant(visit),copy=REVIEW_COPY[visit.guestId];
  return {id:visit.id,user:copy.user,place:copy.place,text:kind?copy[kind]:'이 결과의 후기 원문은 아직 준비 중입니다.',photo:kind?`./media/social/${visit.guestId}-${kind}.webp`:null,guest:visit.guestId,kind,portrait:visit.headPortrait||null,comments:kind&&visit.guestId==='minion'?COLLEAGUE_COMMENTS:[],choices:kind?REVIEW_CHOICES[visit.guestId]?.[kind]:undefined,draft:!kind};
 }

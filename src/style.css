@@ -47,6 +47,7 @@ body.playing #talkLayer.beautyRequest .talkbox:after{content:"";position:absolut
 .beautyPreviewComplete{pointer-events:auto;width:min(370px,92vw);padding:18px 22px;background:#FFF2DF;color:#503B2C;border:2px solid #92715B;box-shadow:0 5px 0 #573C3926}
 .beautyPreviewComplete .eyebrow{display:none}.beautyPreviewComplete h2{font-size:19px;margin:0 0 4px}.beautyPreviewComplete p{font-size:12px;margin:0 0 10px;color:#816951}.beautyPreviewComplete .actions{margin:0}
 .closing-entry{display:flex;align-items:center;gap:16px;margin-top:14px;padding:15px 20px;border:1px solid #b78d6a;background:#2d1c29dc;color:#ffe1af;text-decoration:none}.closing-entry>span{font-size:10px;letter-spacing:1px;color:#d4a680}.closing-entry>b{font-size:16px}.closing-entry>small{font-size:12px;color:#d4c0c8}.closing-entry:hover{background:#573441}.closing-entry:focus-visible{outline:3px solid #ffd17f}@media(max-width:650px){.closing-entry{flex-wrap:wrap;gap:8px}.closing-entry>small{flex-basis:100%}}
+.tutorial-entry{display:flex;align-items:center;gap:16px;margin-top:10px;padding:15px 20px;border:1px solid #83bda2;background:#18372fdc;color:#d4ffe7;text-decoration:none}.tutorial-entry>span{font-size:10px;letter-spacing:1px;color:#9cceb5}.tutorial-entry>b{font-size:16px}.tutorial-entry>small{font-size:12px;color:#b6d4c5}.tutorial-entry:hover{background:#295b46}.tutorial-entry:focus-visible{outline:3px solid #c3efb1}@media(max-width:650px){.tutorial-entry{flex-wrap:wrap;gap:8px}.tutorial-entry>small{flex-basis:100%}}
 
 .minionReference{text-align:center}.minionReference .actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}.minionReference p{font-size:12px;margin:10px 0}.minionReference canvas{width:120px;height:176px;image-rendering:pixelated;margin:4px auto}.minionReference button[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
 
@@ -78,3 +79,11 @@ body.playing #talkLayer.beautyRequest .talkbox:after{content:"";position:absolut
 #beautyAccept:disabled{opacity:.4;cursor:default}
 #beautyChoices #beautyAsk.choiceLessonTarget{outline:3px solid #e29435;outline-offset:3px;background:#ffe3ac;font-weight:bold}
 body:has(#talkLayer.beautyRequest:not([hidden])) .storyhud{visibility:hidden}
+
+/* The same icon bubble is used for arrival, departure and beauty requests. */
+#talkLayer .talkbox.guestSpeech,body.playing #talkLayer .talkbox.guestSpeech{display:grid;grid-template-columns:80px minmax(0,1fr);column-gap:22px;position:relative;padding:22px 28px 44px;background:#fff6e5;color:#49392f;border:3px solid #71584d;border-radius:22px;box-shadow:0 5px 0 #38262055}
+#talkLayer .talktop{display:none}#talkLayer #talkText{grid-column:2;color:#49392f;min-height:48px;margin:0;line-height:1.75}#beautyChoices,#beautyChoiceHint{grid-column:2}
+body.playing #talkLayer.beautyRequest .talkbox.guestSpeech{position:fixed;left:var(--speech-x);top:var(--speech-y);width:600px;max-width:none;min-height:125px;padding:15px 20px 40px;grid-template-columns:64px minmax(0,1fr);column-gap:18px;transform:scale(var(--speech-scale,1));transform-origin:top left}
+body.playing #talkLayer.beautyRequest .talkbox:after{display:none}body.playing #talkLayer.beautyRequest .speechAvatar{width:64px;height:72px}
+#talkLayer.beautyRequest #talkText{font-size:17px;min-height:42px}#talkLayer .speechActions button{font-size:13px}
+@media(max-width:700px){#talkLayer .talkbox.guestSpeech,body.playing #talkLayer:not(.beautyRequest) .talkbox.guestSpeech{grid-template-columns:54px minmax(0,1fr);gap:0 13px;padding:15px 17px 40px}}

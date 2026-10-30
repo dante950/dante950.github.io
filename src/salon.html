@@ -421,6 +421,18 @@ if(GUEST.skin?.layers&&GUEST.skin.portrait){
  const image=document.createElement('img');image.className='seatedLayeredPortrait';image.src=GUEST.skin.portrait;image.style.cssText='left:-29px;top:-34px;width:147px;height:161px;z-index:3';seatedCustomer.append(image);
  seatedCustomer.setAttribute('aria-label',GUEST.name+' 손님');
 }
+function coffeeTransparentHair(image){
+ const canvas=document.createElement('canvas');canvas.width=image.naturalWidth||image.width;canvas.height=image.naturalHeight||image.height;
+ const context=canvas.getContext('2d');context.drawImage(image,0,0);const pixels=context.getImageData(0,0,canvas.width,canvas.height);
+ for(let i=0;i<pixels.data.length;i+=4)if(pixels.data[i]>=250&&pixels.data[i+1]>=250&&pixels.data[i+2]>=250)pixels.data[i+3]=0;
+ context.putImageData(pixels,0,0);return canvas;
+}
+if(GUEST.coffeeTutorial&&GUEST.skin?.layers){
+ const coffeeRoomCanvas=document.createElement('canvas');coffeeRoomCanvas.width=320;coffeeRoomCanvas.height=350;coffeeRoomCanvas.style.cssText='position:absolute;left:-15px;top:0;width:120px;height:131px;image-rendering:pixelated';
+ seatedCustomer.replaceChildren(coffeeRoomCanvas);seatedCustomer.setAttribute('aria-label',GUEST.name+' 손님');
+ const coffeeRoom=GUEST.skin.layers,coffeeRoomLayers=[coffeeRoom.body,coffeeRoom.head,coffeeRoom.material,coffeeRoom.eyes?.neutral,coffeeRoom.mouth?.closed,coffeeRoom.hands].filter(Boolean);
+ Promise.all(coffeeRoomLayers.map(async layer=>{const image=new Image();image.src=layer.src;await image.decode();return {layer,image:layer.whiteKey?coffeeTransparentHair(image):image};})).then(layers=>{const context=coffeeRoomCanvas.getContext('2d');context.imageSmoothingEnabled=false;for(const {layer:l,image} of layers){if(l.sw&&l.sh)context.drawImage(image,l.sx||0,l.sy||0,l.sw,l.sh,l.x,l.y,l.w,l.h);else context.drawImage(image,l.x,l.y,l.w,l.h);}}).catch(error=>console.error('커피 유령 미용실 리소스',error));
+}
 
 document.querySelector('.beautyCounterProps').src=document.querySelector('.salonProps').src;
 /*__BEAUTY_RUNTIME__*/

@@ -57,6 +57,11 @@ export class CursorBattle extends Battle {
  }
  enter(phase){this.heartDropped=false;super.enter(phase);this.footwork.reset();this.attackCooldownLeft=0;this.cycle=null;this.lastBasic=-Infinity;this.basicPending=false;this.stagger=0;this.staggerRestore=null;this.rush=null;this.patternsSinceRush=0;this.rushSuccesses??=0;}
  setGuard(){this.guardHeld=false;}
+ damage(amount){
+  // Only explicitly configured rehearsals have a floor; regular battles still reach zero.
+  const floor=Math.max(0,Math.min(this.player.MaxHP,Number(this.settings.minimumPlayerHP)||0));
+  super.damage(Math.min(Math.max(0,amount),Math.max(0,this.hp-floor)));
+ }
  addGauge(){} // Dodging alone no longer deals stagger damage.
  get staggerRemaining(){return Math.max(0,this.settings.staggerMax-this.stagger);}
  get usesHeartBoards(){return Number(this.id)===10003;}
@@ -117,7 +122,7 @@ export class CursorBattle extends Battle {
   if(!inside||!this.canPunch()||!this.attackReady)return false;
   this.lastBasic=this.time;this.attackCooldownLeft=this.settings.basicCooldown;
   // Sans evades punches, but the latest build allows damage on every opening.
-  const immune=Number(this.id)===10003,floor=this.monster.TransitionTrigger==='빈틈공격 성공'?1:0,before=this.enemyHP;
+  const immune=Number(this.id)===10003,floor=this.monster.TransitionTrigger==='빈틈공격 성공'||this.settings.requireOpeningFinish?1:0,before=this.enemyHP;
   const actual=immune?0:Math.min(this.settings.basicDamage,Math.max(0,this.enemyHP-floor));
   this.enemyHP-=actual;this.stats.damage+=actual;this.basicHits++;
   this.cue('basicHit',{value:actual,hit:this.basicHits,immune});this.cue('damage');this.cueBarDamage(before);

@@ -51,11 +51,19 @@ function installCursorInput(){
  const canvas=$('arena');canvas.style.touchAction='none';canvas.style.cursor='none';
  canvas.addEventListener('pointerdown',e=>{
   if(e.button!==0||cursorPointerID!==null)return;e.preventDefault();$('battleArea').focus();scene.pointer=cursorPoint(e);scene.unlock();
+  if(HOST.coffeeTutorial&&combatLesson){
+   if(hostSuspended)return;
+   if(combatLesson.id==='punch'&&insideBox(scene.pointer,scene.box))finishCombatLesson({preserveCursor:true});
+   else if(combatLesson.id==='opening'&&insideBox(scene.pointer,scene.scratchBox)){
+    cursorPointerID=e.pointerId;canvas.setPointerCapture(e.pointerId);cursorScratch.begin(scene.pointer);combatLesson.dragStart=scene.pointer;return;
+   }else return;
+  }
   if(!cursorCanInteract())return;cursorPointerID=e.pointerId;canvas.setPointerCapture(e.pointerId);cursorScratch.begin(scene.pointer);
   if(battle.state!=='opening')battle.basicAttack(insideBox(scene.pointer,scene.box));
  });
  canvas.addEventListener('pointermove',e=>{
   const p=cursorPoint(e),previous=scene.pointer;scene.pointer=p;
+  if(HOST.coffeeTutorial&&combatLesson?.id==='opening'&&cursorPointerID===e.pointerId&&!hostSuspended&&combatLesson.dragStart&&insideBox(p,scene.scratchBox)&&Math.hypot(p.x-combatLesson.dragStart.x,p.y-combatLesson.dragStart.y)>=6)finishCombatLesson({preserveCursor:true});
   if(cursorPointerID!==e.pointerId||!cursorCanInteract()||battle.state!=='opening')return;
   if(insideBox(p,scene.scratchBox)&&insideBox(previous,scene.scratchBox))scene.stroke(previous,p,battle.time);
   if(cursorScratch.move(p,scene.scratchBox,battle.time,scene.box.w))battle.scratchAttack(true);
@@ -65,7 +73,7 @@ function installCursorInput(){
  canvas.addEventListener('pointerleave',clearCursorInput);
  canvas.addEventListener('contextmenu',e=>e.preventDefault());
 }
-function updateCursorInput(){if(cursorState!==battle?.state){cursorState=battle?.state;cursorScratch.reset();if(cursorState==='opening'&&cursorPointerID!==null&&scene.pointer)cursorScratch.begin(scene.pointer);}if(battle?.paused||battle?.dialogueBlocking){cursorPointerID=null;cursorScratch.reset();}}
+function updateCursorInput(){if(cursorState!==battle?.state){cursorState=battle?.state;cursorScratch.reset();if(cursorState==='opening'&&cursorPointerID!==null&&scene.pointer)cursorScratch.begin(scene.pointer);}if((battle?.paused&&!(HOST.coffeeTutorial&&combatLesson?.id==='opening'&&!hostSuspended))||battle?.dialogueBlocking){cursorPointerID=null;cursorScratch.reset();}}
 
 function drawHeartBoards(g,b){
  const pixels=['01100110','11111111','11111111','11111111','01111110','00111100','00011000'];

@@ -41,3 +41,10 @@ body.storyMode main{width:min(96vw,calc(96vh * 1280 / 650));aspect-ratio:1280/65
 .scratchDemo{display:flex;align-items:center;gap:24px;color:#ffd18b;font-size:14px}.scratchDemo span{display:inline-block;font-size:27px;animation:scratchLesson 1.4s ease-in-out infinite alternate}
 @keyframes scratchLesson{from{transform:translateX(-10px)}to{transform:translateX(35px)}}
 @media(prefers-reduced-motion:reduce){.scratchDemo span{animation:none}}
+/* Coffee lessons share the in-battle dialogue bubble, with no confirmation controls. */
+#battleTutorial.coffeeLesson,.coffeeBattleCoach{position:absolute;left:3%!important;top:16%!important;width:34%!important;max-width:440px;z-index:25;padding:clamp(4px,1vw,12px) clamp(6px,1.3vw,16px);border:2px solid #282432!important;border-radius:11px;background:#14131e!important;color:#fff;box-shadow:0 4px 0 #0003;text-align:left;pointer-events:none;box-sizing:border-box;--bubble-font:clamp(7px,1.25vw,18px);--bubble-tail:36%}
+#battleTutorial.coffeeLesson .bubbleText,.coffeeBattleCoach .bubbleText{margin:0;font-size:var(--bubble-font);line-height:1.6;color:#fff;font-weight:normal}
+#battleTutorial.coffeeLesson .bubbleSpeaker,.coffeeBattleCoach .bubbleSpeaker{display:block;margin-bottom:clamp(2px,.5vw,6px);color:#eee;font-size:clamp(6px,1vw,12px)}
+#battleTutorial .coffeeMoveKey{color:#77727e;font-weight:bold;transition:color .15s}
+#battleTutorial .coffeeMoveKey.done{color:#fff0a3}
+.coffeeBattleCoach[hidden]{display:none}

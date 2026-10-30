@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>야차차 · 첫 손님 튜토리얼 실험실</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header class="labbar"><a class="brand" href="./">夜叉 <span>야차차</span></a><div class="labtitle"><strong>인트로 · 튜토리얼 실험실</strong><span>커피 유령의 첫 영업 · 로컬 0.6</span></div><nav><button id="labSound" aria-pressed="true">소리 켜짐 ♪</button><button id="labNotes">검토 메모</button><button id="labRestart">다시 시작</button></nav></header>
+<main id="labStage" data-state="loading">
+ <canvas id="roomCanvas" tabindex="-1" width="950" height="531" aria-label="커피 유령과 마왕 부하가 있는 미용실"></canvas>
+ <div id="roomInteractions" hidden><button id="talkCoffee" hidden class="actorAction coffeeAction">커피 유령에게 말 걸기 <kbd>F</kbd></button><button id="talkMinion" hidden class="actorAction minionAction">마왕 부하에게 말 걸기</button><p class="roomHint">W A S D 이동 · 가까운 손님 앞에서 F · 손님을 눌러 대화</p></div>
+ <section id="introScreen" hidden><button id="introPicture" aria-label="다음 이야기"><img id="introArt" alt=""><canvas id="introHelper" width="320" height="350" hidden></canvas></button><div class="introTop"><span id="introProgress"></span><button id="skipIntro">이야기 건너뛰기 →</button></div></section>
+ <iframe id="beautyFrame" title="커피 유령 미용" allow="autoplay" hidden></iframe>
+ <iframe id="battleFrame" title="커피 유령과 야차 대련" allow="autoplay" hidden></iframe>
+ <iframe id="closingFrame" title="첫 영업의 마감과 커피 유령 후기" allow="autoplay" hidden></iframe>
+ <output id="labFollowers" hidden aria-live="polite"></output>
+ <button id="closeBusiness" hidden>영업 종료 <span>오늘의 후기와 팔로워 확인하기 →</span></button>
+ <div id="labCaption" class="chapterCaption" hidden></div>
+ <aside class="guestSpeech" id="coach" hidden aria-live="polite"><span id="coachAvatar" class="speechAvatar"><img alt=""></span><div><b id="coachSpeaker" hidden>마왕 부하</b><p id="coachText" class="speechText"></p><small id="coachKeys" hidden></small></div><button id="coachClose" class="speechAdvance" aria-label="안내 접기 · F">F</button></aside>
+ <section id="dialogue" class="dialogue guestSpeech" hidden aria-label="등장인물 대화"><span id="dialogueAvatar" class="speechAvatar"><img alt=""></span><div class="speakerRow" hidden><b id="speaker"></b><span id="dialogueContext"></span></div><p id="dialogueText" class="speechText" aria-live="polite"></p><div id="dialogueChoices" class="dialogueChoices speechActions" hidden><button id="askAgain">네?</button><button id="acceptRequest" class="primary">알겠습니다</button></div><div id="dialogueNavigation"><button id="dialogueBack" hidden>이전</button><button id="dialogueNext" class="speechAdvance" aria-label="다음 대사 · F">F</button></div></section>
+ <section id="loading" class="centerCard" role="status"><span class="eyebrow">THE FIRST CUSTOMER</span><h1>첫 손님을 기다리고 있어요</h1><p>미용실과 커피 유령을 준비하고 있습니다.</p></section>
+ <section id="choiceCard" class="centerCard" hidden></section>
+</main>
+<dialog id="labModal"><div id="labModalBody"></div><button id="labModalClose">닫기</button></dialog>
+<script id="tutorial-config" type="application/json">__TUTORIAL_CONFIG__</script><script type="module" src="app.js"></script></body></html>

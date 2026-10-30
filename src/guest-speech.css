@@ -1,0 +1,16 @@
+/* Shared customer speech: portrait, dialogue, and a single advance key. */
+.guestSpeech{--speech-ink:#49392f;position:relative;box-sizing:border-box;display:grid;grid-template-columns:80px minmax(0,1fr);column-gap:22px;align-items:center;padding:22px 28px 44px;background:#fff6e5;color:var(--speech-ink);border:3px solid #71584d;border-radius:22px;box-shadow:0 5px 0 #38262055;text-align:left}
+.guestSpeech:before{content:'';position:absolute;left:58%;top:-12px;width:20px;height:20px;background:#fff6e5;border-top:3px solid #71584d;border-left:3px solid #71584d;transform:rotate(45deg)}
+.speechAvatar{grid-column:1;grid-row:1/span 3;display:flex;align-items:center;justify-content:center;width:80px;height:88px;position:relative;overflow:hidden;pointer-events:none}
+.speechAvatar img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+.speechAvatar[data-kind=player] img{position:absolute;width:1707%;height:auto;max-width:none;left:-135%;top:-84%}
+.speechAvatar[data-kind=king] img{position:absolute;width:1000%;height:auto;max-width:none;left:-450%;top:-125%}
+.guestSpeech .speechText{grid-column:2;white-space:pre-line;margin:0;color:var(--speech-ink);font-size:17px;line-height:1.75;min-height:48px;overflow-wrap:anywhere}
+.guestSpeech .speechActions{grid-column:2;display:flex;justify-content:flex-end;gap:10px;margin-top:12px}
+.guestSpeech .speechActions button{background:#f6ddb4;color:#49392f;border:2px solid #957457;border-radius:9px;padding:7px 20px}
+.speechAdvance{position:absolute!important;right:20px!important;bottom:12px!important;top:auto!important;width:30px!important;height:28px!important;min-width:0!important;display:grid!important;place-items:center;padding:0!important;margin:0!important;border:2px solid #725a4b!important;border-radius:6px!important;background:#fff8e9!important;color:#594337!important;font:bold 17px/1 'Malgun Gothic',sans-serif!important;box-shadow:0 3px 0 #aa8d70!important;cursor:pointer;pointer-events:auto}
+.speechAdvance[hidden]{display:none!important}.speechAdvance:hover{background:#f5ddb2!important}.speechAdvance:focus-visible{outline:3px solid #d78946;outline-offset:4px}
+.guestSpeech:has(.speechAvatar[hidden]){grid-template-columns:1fr}.guestSpeech:has(.speechAvatar[hidden]) .speechText,.guestSpeech:has(.speechAvatar[hidden]) .speechActions{grid-column:1}
+@media(max-width:700px){.guestSpeech{grid-template-columns:54px minmax(0,1fr);gap:13px;padding:15px 17px 40px;border-radius:17px}.speechAvatar{width:54px;height:66px}.guestSpeech .speechText{font-size:14px;min-height:38px}.speechAdvance{right:15px!important;bottom:10px!important;width:26px!important;height:24px!important;font-size:15px!important}}
+
+.speechAvatar[hidden]{display:none!important}

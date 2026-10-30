@@ -2,3 +2,6 @@
 .phone-home{padding:17px 20px}.home-weather{margin-top:13px;gap:5px}.home-weather b{font-size:40px}.king-countdown{padding:12px 0}.home-apps{margin:17px 0;gap:14px}.home-greeting{margin:10px 0}.world-photo{height:116px;font-size:43px;gap:5px}.social-post:has(.world-photo) .social-copy:not(.expanded){-webkit-line-clamp:2}.social-post:has(.world-photo) .post-choices button{padding:7px 9px}
 .post .social-photo{height:auto;width:max-content;max-width:100%;margin:auto}.post .social-photo .photo-base{height:255px;width:auto;max-width:100%;object-fit:contain}
 .minion-beauty .photo-head{width:75%;left:62%;bottom:26%}
+.social-photo.coffee-beauty{height:255px;width:100%;background:radial-gradient(circle at 50% 42%,#f6e8b8,#84b1a0);display:grid;place-items:center}
+.social-photo.coffee-beauty .photo-base{width:auto;height:235px;max-width:100%;object-fit:contain;image-rendering:pixelated}
+.tutorial-mode #hudDay{font-size:18px}.tutorial-mode #oldDay{font-size:38px}.tutorial-mode #closedDay{font-size:40px}
