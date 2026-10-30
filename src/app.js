@@ -181,7 +181,7 @@ function positionBeautyTalk(){
  if(!el('talkLayer').classList.contains('beautyRequest')||!document.body.classList.contains('playing'))return;
  const frame=el('salon'),screen=frame.contentDocument?.getElementById('beautyScreen');if(!screen)return;
  const r=screen.getBoundingClientRect(),f=frame.getBoundingClientRect(),scale=r.width/950,box=el('talkLayer').querySelector('.talkbox');
- box.style.setProperty('--speech-x',(f.left+r.left+175*scale)+'px');box.style.setProperty('--speech-y',(f.top+r.top+350*scale)+'px');box.style.setProperty('--speech-scale',scale);
+ box.style.setProperty('--speech-x',(f.left+r.left+175*scale)+'px');box.style.setProperty('--speech-y',(f.top+r.top+Math.min(350,531-box.offsetHeight-12)*scale)+'px');box.style.setProperty('--speech-scale',scale);
 }
 function say(event,done,detail=false){const g=story.guest;if(g.beauty.designVersion>=2&&["cut","draw","attach"].includes(event)){playBeautyRequest(story.project,g,event,done,detail);return;}playGroup(story.project,g,g.bindings[event],done);}
 function advanceTalk(event){if(beautyRequest&&salonRequestAtEnd(talk)){if(needsChoicePractice()){el('beautyAsk').focus();return;}if(event?.type!=='click'||!(event.detail>0)||event.currentTarget!==el('beautyAccept'))return;}talk?.advance();beep(480,.025);}

@@ -22,10 +22,10 @@ async function finishRequest(page,salon,{screenshot,clarify=true}={}){
  assert.deepEqual(await material(salon),shape,'speaking cannot edit hair or scoring masks');
  await page.locator('#beautyChoices').waitFor();
  const briefText=await page.locator('#talkText').textContent();
- const highlighted=await page.locator('#talkText .glyph').evaluateAll(gs=>gs.some(g=>getComputedStyle(g).color!=='rgb(73, 54, 39)'));assert(highlighted,'request keywords use the existing color markup');
+ const highlighted=await page.locator('#talkText .glyph').evaluateAll(gs=>gs.some(g=>getComputedStyle(g).color!=='rgb(73, 57, 47)'));assert(highlighted,'request keywords use the existing color markup');
  const hasQuestion=await page.locator('#beautyAsk').isVisible();
  if(screenshot&&output)await page.screenshot({path:path.join(output,'initial-'+screenshot)});
- assert.equal(await page.locator('.talkbox').evaluate(b=>getComputedStyle(b).backgroundColor),'rgb(255, 248, 233)');
+ assert.equal(await page.locator('.talkbox').evaluate(b=>getComputedStyle(b).backgroundColor),'rgb(255, 246, 229)');
  if(clarify&&hasQuestion){
   await page.locator('#beautyAsk').click();await page.waitForTimeout(650);
   assert(await salon.locator('.beautyNext').isDisabled());
@@ -33,7 +33,7 @@ async function finishRequest(page,salon,{screenshot,clarify=true}={}){
   assert.notEqual(await page.locator('#talkText').textContent(),briefText);assert.equal(await page.locator('#beautyAsk').isVisible(),false);
  }
  const bubble=await page.locator('.talkbox').boundingBox(),room=await salon.locator('#beautyScreen').boundingBox();
- assert(bubble.y>room.y+room.height*.7&&bubble.y+bubble.height<room.y+room.height,'speech stays on the counter');
+ assert(bubble.y>room.y+room.height*.55&&bubble.y+bubble.height<room.y+room.height,'the portrait speech bubble stays within the lower salon area');
  if(screenshot&&output)await page.screenshot({path:path.join(output,screenshot)});
  await page.locator('#beautyAccept').click();
  await page.locator('#talkLayer').waitFor({state:'hidden'});await salon.waitForFunction(()=>!beautyDebug.briefing);
