@@ -87,3 +87,5 @@ body.playing #talkLayer.beautyRequest .talkbox.guestSpeech{position:fixed;left:v
 body.playing #talkLayer.beautyRequest .talkbox:after{display:none}body.playing #talkLayer.beautyRequest .speechAvatar{width:64px;height:72px}
 #talkLayer.beautyRequest #talkText{font-size:17px;min-height:42px}#talkLayer .speechActions button{font-size:13px}
 @media(max-width:700px){#talkLayer .talkbox.guestSpeech,body.playing #talkLayer:not(.beautyRequest) .talkbox.guestSpeech{grid-template-columns:54px minmax(0,1fr);gap:0 13px;padding:15px 17px 40px}}
+
+body:after{content:"";position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;z-index:10000;transition:opacity .9s}body.starting-business:after{opacity:1;pointer-events:auto}.chapter-entry{margin:14px 0;background:transparent;font-size:12px;color:#b8bba6;border:0}

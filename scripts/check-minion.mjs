@@ -131,7 +131,7 @@ async function checkEditorRoundtrip(page) {
 async function openPreview(page, engine) {
   await page.goto(base);
   await page.locator('#siteLoading').waitFor({ state: 'detached' });
-  await page.locator('#play').click();
+  await page.locator('#playChapter').click();
   assert.equal(await page.locator('[data-start-guest="10004"]').count(), 1);
   assert.equal(await page.locator('[data-start-guest="10002"]').count(), 0);
   assert.equal(await page.locator('[data-start-guest]').count(), 3);

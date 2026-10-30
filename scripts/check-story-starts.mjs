@@ -14,13 +14,13 @@ async function advanceTalk(page){
 export async function checkStoryStarts(page,{screenshotPath,checkContinuation=false}={}){
  await page.locator('#home').click();
  await page.locator('#soundToggle').click();
- await page.locator('#play').click();
+ await page.locator('#playChapter').click();
  assert.equal(await page.locator('[data-start-guest]').count(),3);
  assert.equal(await page.evaluate(()=>window.fullflow.story),null);
  if(screenshotPath)await page.screenshot({path:screenshotPath});
  await page.keyboard.press('Escape');
  assert.equal(await page.locator('#modal').isVisible(),false);
- assert.equal(await page.evaluate(()=>document.activeElement.id),'play');
+ assert.equal(await page.evaluate(()=>document.activeElement.id),'playChapter');
  // Workshop uses the same chooser and returns to its own screen on cancellation.
  await page.locator('#developer').click();
  if(await page.locator('#updateOK').isVisible())await page.locator('#updateOK').click();
@@ -30,7 +30,7 @@ export async function checkStoryStarts(page,{screenshotPath,checkContinuation=fa
  assert.equal(await page.evaluate(()=>window.fullflow.page),'dev');
  await page.locator('#home').click();
  for(const [id,day,index,steps] of [[10001,1,0,2],[10003,1,1,2],[10004,2,0,2]]){
-  await page.locator('#play').click();
+  await page.locator('#playChapter').click();
   await page.locator(`[data-start-guest="${id}"]`).click();
   if(await page.locator('#introSkip').isVisible())await page.locator('#introSkip').click();
   await page.waitForFunction(id=>window.fullflow.story?.guest===id,id);

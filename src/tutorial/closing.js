@@ -24,7 +24,7 @@ export function coffeeReadHandoff(mode,storage=globalThis.sessionStorage){
  if(!['complete','skip'].includes(mode))return null;
  let data=null;try{data=JSON.parse(storage?.getItem(COFFEE_TUTORIAL_STORAGE)||'null');}catch{}
  const visit=createCoffeeTutorialVisit(mode==='skip'?{skipped:true}:data?.version===1?data.visit:{});
- return {visit,socialChoices:mode==='complete'&&data?.version===1&&data.socialChoices&&typeof data.socialChoices==='object'?data.socialChoices:{}};
+ return {visit,socialChoices:data?.version===1&&data.socialChoices&&typeof data.socialChoices==='object'?data.socialChoices:{}};
 }
 export function coffeeApplyHandoff(story,handoff){
  if(!handoff||story.records.some(r=>r.id===10005&&r.day===0))return story;

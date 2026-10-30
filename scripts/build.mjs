@@ -54,9 +54,9 @@ const closingStyleURL=await emit('closing-style','css',(await read('src/closing/
 const closingHTML=(await read('src/closing/index.html')).replace('href="style.css"',`href="${closingStyleURL}"`).replace('src="app.js"',`src="${closingAppURL}"`);
 await fs.writeFile(path.join(dist,'closing.html'),closingHTML);
 // The first-customer lab shares the runtime templates but owns its draft data and state.
-const tutorialScript=await bundle('src/',['speaker-avatar.js','media.js','audio.js','tutorial/narrative.js','tutorial/scene.js','tutorial/stickers.js','tutorial/guest.js','tutorial/combat-data.js','tutorial/closing.js','tutorial/app.js']);
+const tutorialScript=await bundle('src/',['speaker-avatar.js','media.js','audio.js','tutorial/narrative.js','tutorial/scene.js','tutorial/stickers.js','tutorial/guest.js','tutorial/combat-data.js','tutorial/closing.js','tutorial/presentation-data.js','tutorial/presentation.js','tutorial/app.js']);
 const tutorialAppURL=await emit('tutorial-app','js',tutorialScript);
-const tutorialStyleURL=await emit('tutorial-style','css',speechStyle+'\n'+await read('src/tutorial/style.css'));
+const tutorialStyleURL=await emit('tutorial-style','css',speechStyle+'\n'+await read('src/tutorial/style.css')+'\n'+await read('src/tutorial/presentation.css'));
 const tutorialConfig={assets:inputs['flow-assets'][0],project:inputs['flow-default'][0],salon:inputs['flow-salon'][0],combat:inputs['flow-combat'][0]};
 const tutorialHTML=(await read('src/tutorial/index.html')).replace('href="style.css"',`href="${tutorialStyleURL}"`).replace('src="app.js"',`src="${tutorialAppURL}"`).replace('__TUTORIAL_CONFIG__',()=>safe(JSON.stringify(tutorialConfig)));
 await fs.writeFile(path.join(dist,'tutorial.html'),tutorialHTML);

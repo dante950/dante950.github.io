@@ -41,9 +41,9 @@ WORLD_POSTS.push(
  {id:'bat-sleep',day:2,user:'bat_commuter',place:'집이 최고',title:'퇴근 완료',symbol:'☕',text:'거꾸로 매달려서 마시려고 빨대를 샀는데 컵도 거꾸로 들었다. 천장이 오늘 나보다 커피를 많이 마셨다.',comments:[]}
 );
 
-export function chooseComment(state,post,choiceIndex){
+export function chooseComment(state,post,choiceIndex,nickname='yacha_vely'){
  if(state[post.id]||!post.choices?.[choiceIndex])return state;
- const c=post.choices[choiceIndex];return {...state,[post.id]:{choiceIndex,comments:[{user:'yacha_vely',text:c.comment},{user:post.user,text:c.reply,reply:true}]}};
+ const c=post.choices[choiceIndex];return {...state,[post.id]:{choiceIndex,comments:[{user:nickname,text:c.comment},{user:post.user,text:c.reply,reply:true}]}};
 }
 export function rollWeather(random=Math.random){return {day:22+Math.min(6,Math.max(0,Math.floor(random()*7))),night:13+Math.min(5,Math.max(0,Math.floor(random()*6)))}};
 export function closingExitAction(reviewed){return reviewed?'calendar':'management';}
