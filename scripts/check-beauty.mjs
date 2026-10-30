@@ -47,7 +47,7 @@ async function finishRequest(page,salon,{screenshot,clarify=true}={}){
  await page.locator('#beautyAccept').click();await salon.waitForFunction(()=>!beautyDebug.briefing);
  assert.equal(await salon.locator('.requestText').textContent(),noteBefore,'repeat does not change the accepted memo');
  const note=await salon.locator('.sculptStatus').textContent();
- assert(!/Tag_|����|�Ȱ�|�����|�����Ÿ��|��� \d\/5/.test(note));
+ assert(!/Tag_|점수|안경|콧수염|나비넥타이|장식 \d\/5/.test(note));
  assert.equal(await salon.locator('.requestSatisfaction,.satisfactionReadout').count(),0);
  assert.equal(await salon.locator('.goalList,.moodLabel').count(),0);
  await salon.evaluate(()=>{__speechSamples.frames.clear();__speechSamples.mouths.clear();});
@@ -65,8 +65,8 @@ async function startPreview(page,id){
  await page.locator('[data-editor="beauty"]').first().click();
  await page.locator('#beautyGuest').selectOption(String(id));
  await page.locator('#editorScreen [data-editor="dialogue"]').click();await page.locator('#dialogueEvent').selectOption('cut');
- const request=await page.locator('#beautyRequestText').inputValue();await page.locator('#beautyRequestText').fill(request+' ����');
- await page.locator('#editorScreen [data-editor="beauty"]').click();assert.equal(await page.locator('[data-field="request"]').inputValue(),request+' ����');await page.locator('[data-field="request"]').fill(request);await page.locator('[data-field="request"]').blur();
+ const request=await page.locator('#beautyRequestText').inputValue();await page.locator('#beautyRequestText').fill(request+' 시험');
+ await page.locator('#editorScreen [data-editor="beauty"]').click();assert.equal(await page.locator('[data-field="request"]').inputValue(),request+' 시험');await page.locator('[data-field="request"]').fill(request);await page.locator('[data-field="request"]').blur();
  await page.locator('#beautyTry').click();await page.locator('#previewStart').click();
  const salon=await page.locator('#salon').elementHandle().then(h=>h.contentFrame());
  await salon.waitForFunction(()=>window.beautyDebug?.ready);
@@ -200,7 +200,7 @@ try{
    await salon.waitForFunction(()=>document.getElementById('beautyCustomer').dataset.talking==='true');
    assert.deepEqual(await material(salon),beforeTalking);assert.equal(await salon.evaluate(()=>beautyDebug.expression),expression);
    if(output)await page.screenshot({path:path.join(output,name+'-zombie-complete.png')});
-   await salon.locator('.beautyNext').click();await page.locator('#modalCard').filter({hasText:'�̿� ���� �Ϸ�'}).waitFor();assert(!/������|\d+\s*��|\d+\s*\/\s*100/.test(await page.locator('#modalCard').innerText()));
+   await salon.locator('.beautyNext').click();await page.locator('#modalCard').filter({hasText:'미용 시험 완료'}).waitFor();assert(!/만족도|\d+\s*점|\d+\s*\/\s*100/.test(await page.locator('#modalCard').innerText()));
    console.log(name+': zombie speech, note, growth and undo checks passed');
    salon=await startPreview(page,10003);
    assert.equal(await salon.locator('.requestItem').count(),1,'the vague Sans request stays one combined idea');
@@ -266,7 +266,8 @@ try{
    assert.equal(await salon.locator('.requestItem').last().evaluate(e=>e.classList.contains('complete')),false,'major inner damage still revokes the check');
 
    assert.deepEqual(errors,[]);
-   console.log(name+': speech �� note, visible mouth animation, seamless zombie growth, irreversible cuts, dye/sticker undo, masks, both guests pass');
+   console.log(name+': speech → note, visible mouth animation, seamless zombie growth, irreversible cuts, dye/sticker undo, masks, both guests pass');
   }finally{await browser.close();}
  }
 }finally{await new Promise(r=>server.close(r));}
+
