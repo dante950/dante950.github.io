@@ -10,6 +10,7 @@ export function coffeeCombatAssets(baseURL='./',portraitLayers=null){
  const image=(file,fw,fh,count=1,pose=null)=>({src:base+'media/coffee-ghost/'+file,file,fw,fh,count,cols:count,...(pose?{pose:{x:pose.x,y:pose.y,w:pose.w,h:pose.h,sx:pose.sx||0,sy:pose.sy||0}}:{})});
  const coffeePose=portraitLayers||{body:{x:116,y:192,w:88,h:112},hands:{x:52,y:164,w:216,h:72},head:{x:68,y:86,w:144,h:116},material:{x:46,y:10,w:228,h:244}};
  return {images:{
+   coffee_coach:{src:base+'media/intro/pt/minion-remote.png',file:'minion-remote.png',fw:512,fh:768,count:4,cols:4},
   coffee_head:image('head-base.png',36,29,1,coffeePose.head),coffee_hair:{...image('hair.png',57,61,1,coffeePose.material),whiteKey:true},
   coffee_body:image('body.png',22,28,1,coffeePose.body),coffee_hands:image('hands.png',54,18,1,coffeePose.hands),
   coffee_eyes:image('eyes-normal.png',36,29,1,coffeePose.eyes?.neutral||coffeePose.head),coffee_eyes_happy:image('eyes-happy.png',36,29,1,coffeePose.eyes?.satisfied||coffeePose.head),

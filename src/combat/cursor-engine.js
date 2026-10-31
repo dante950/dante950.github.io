@@ -80,7 +80,9 @@ export class CursorBattle extends Battle {
   if(mechanic&&this.options.gimmicks!==false&&!this.options.patternID&&(this.options.gimmickOnly||this.patternsSinceRush>=mechanic.afterPatterns)&&this.beginRush())return;
   this.footwork.next(this.time);
   this.cycle={id:++this.cycleSerial,resolved:0,damaged:false};super.plan();
-  if(this.cycle&&this.planInfo&&!this.planInfo.cancel){this.cycle.total=this.planInfo.groups.length;this.cycle.name=this.pattern.Name;}
+  if(this.cycle&&this.planInfo&&!this.planInfo.cancel){this.cycle.total=this.planInfo.groups.length;this.cycle.name=this.pattern.Name;
+    // Recovery begins only after the attack sprite has finished returning to idle.
+    this.planInfo.motionEnd=Math.max(this.planInfo.motionEnd,this.planInfo.lastHit+220/this.planInfo.speed);}
  }
  hit(q){
   const cycle=this.cycle,previousHits=this.stats.hit;this.guardHeld=false;super.hit(q);
@@ -113,7 +115,7 @@ export class CursorBattle extends Battle {
  }
  rule(key){if(key==='GroggyDrainPerSec'&&this.settings)return this.monster.GaugeMax/(this.settings.groggyMs/1000);return super.rule(key);}
  attack(){return false;}
- canPunch(){return !this.paused&&!this.dialogueBlocking&&['attack','recover','gimmick'].includes(this.state)&&this.enemyHP>0;}
+ canPunch(){return !this.paused&&!this.dialogueBlocking&&(this.state==='recover'||this.state==='gimmick'&&this.rush?.success)&&this.enemyHP>0;}
  cueBarDamage(before){
   const max=this.monster.MaxHP,previous=raidHealth(before,max),now=raidHealth(this.enemyHP,max),lost=previous.lines-now.lines;
   if(lost>0)this.cue('hpBars',{lost,remaining:now.lines});

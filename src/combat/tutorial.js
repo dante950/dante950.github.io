@@ -42,7 +42,7 @@ function renderCoffeeCombatLesson(){
  const keys=['w','a','s','d'].map(k=>'<span class="coffeeMoveKey'+(combatLesson.keys.has(k)?' done':'')+'" aria-label="'+k.toUpperCase()+(combatLesson.keys.has(k)?' 이동 완료':' 이동 대기')+'">'+k.toUpperCase()+'</span>').join(' ');
  const lines={
   move:'먼저 몸을 풀어 보시죠. '+keys+'로 한 번씩 움직여 보십시오.',
-  punch:'잘 피하셨군요. 이번에는 저 아이를 마우스 왼쪽 버튼으로 눌러 반격해 보십시오.',
+  punch:'잘 피하셨군요. 공격 중에는 무적입니다. 지금처럼 가만히 있을 때 마우스 왼쪽 버튼으로 눌러 반격해 보십시오.',
   opening:'지금입니다. 저 아이 위에서 마우스를 누른 채 좌우로 움직이십시오. 가위로 손질하듯이요.'
  };
  if(!lines[id]){finishCombatLesson();return;}
@@ -55,7 +55,7 @@ let coffeeCoachTimer=0;
 const coffeeCoach=document.createElement('div');coffeeCoach.className='coffeeBattleCoach monsterBubble';coffeeCoach.hidden=true;coffeeCoach.setAttribute('role','status');$('battleArea').append(coffeeCoach);
 function hideCoffeeCoach(){clearTimeout(coffeeCoachTimer);coffeeCoach.hidden=true;}
 function showCoffeeCoach(speaker,line,keys='',duration=9000){
- coffeeCoach.innerHTML='<b class="bubbleSpeaker">'+esc(speaker)+'</b><p class="bubbleText">'+esc(line)+'</p>';coffeeCoach.hidden=false;clearTimeout(coffeeCoachTimer);coffeeCoachTimer=setTimeout(()=>{coffeeCoach.hidden=true;},duration);
+ coffeeCoach.dataset.speaker=speaker;coffeeCoach.innerHTML='<b class="bubbleSpeaker">'+esc(speaker)+'</b><p class="bubbleText">'+esc(line)+'</p>';coffeeCoach.hidden=false;clearTimeout(coffeeCoachTimer);coffeeCoachTimer=setTimeout(()=>{coffeeCoach.hidden=true;},duration);
 }
 function installCoffeePractice(){
  coffeeTraining={evaded:false,punchTip:false,phase:1};

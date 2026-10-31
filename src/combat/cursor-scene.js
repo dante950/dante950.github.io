@@ -97,6 +97,8 @@ class CursorScene extends GameScene {
   g.save();const crash=this.cues.filter(c=>c.kind==='stoneCrash').at(-1),crashAge=crash?vt-crash.visualTime:Infinity;const breakAge=this.breakFX?vt-this.breakFX.time:Infinity;if(Math.min(breakAge,crashAge)<300){const age=Math.min(breakAge,crashAge),strength=9*(1-age/300);g.translate(Math.sin(age*.19)*strength,Math.cos(age*.23)*strength*.5);}
   g.save();g.filter='blur(3px) brightness(.55) saturate(.65)';if(this.backdrop)g.drawImage(this.backdrop,-8,-12,1296,665);else{g.fillStyle='#473a39';g.fillRect(0,0,1280,650);}g.restore();
   const shade=g.createLinearGradient(0,0,0,650);shade.addColorStop(0,'#11141af2');shade.addColorStop(.34,'#15152177');shade.addColorStop(.7,'#261d2500');shade.addColorStop(1,'#11141a77');g.fillStyle=shade;g.fillRect(0,0,1280,650);
+  // The tutorial guide watches from the right of the salon, above the mat.
+  if(character==='coffee')this.actor('coffee_coach',0,1080,332,300);
   // Gold fighting mat on the salon floor, behind the crisp characters and tiles.
   g.beginPath();g.moveTo(98,329);g.lineTo(1162,329);g.lineTo(1260,610);g.lineTo(18,610);g.closePath();const mat=g.createLinearGradient(0,320,0,610);mat.addColorStop(0,'#aa733bba');mat.addColorStop(1,'#d39e52dd');g.fillStyle=mat;g.fill();g.lineWidth=5;g.strokeStyle='#f8d497a0';g.stroke();
   g.save();g.strokeStyle='#ffe4a343';g.lineWidth=5;g.beginPath();g.ellipse(676,480,190,85,0,0,Math.PI*2);g.stroke();g.beginPath();g.moveTo(666,345);g.lineTo(692,602);g.stroke();g.restore();
@@ -118,7 +120,7 @@ class CursorScene extends GameScene {
   this.gravestone(b);
   let ex=home.x,ey=home.y,asset=character+'_idle',frame=0,height=character==='drunk'?280:character==='sans'?265:285;
   if(character==='drunk'){asset='drunk_'+Math.floor(t/200)%4;}
-  if(plan?.motionStarted&&['attack','recover'].includes(b.state)&&t<=plan.lastHit+220/plan.speed){
+  if(plan?.motionStarted&&attacking&&t<plan.motionEnd){
    const end=plan.lastHit+220/plan.speed,e=plan.extra,p=Math.max(0,Math.min(.999,(t-plan.motionStart)/Math.max(1,end-plan.motionStart)));
    asset=character==='sans'?(b.pattern.RangeMode==='밀친 위치'?'sans_push':'sans_blaster'):character==='zombie'?'zombie_attack':asset;
    if(e.MotionKey){const custom=Object.keys(this.assets.images).find(k=>k===e.MotionKey||this.assets.images[k].file===e.MotionKey||this.assets.images[k].file.replace(/\.png$/i,'')===e.MotionKey);if(custom)asset=custom;}
@@ -154,7 +156,7 @@ class CursorScene extends GameScene {
   if(recoiling)ex+=Math.sin(vt/8)*5;
   this.enemy={x:ex,y:ey,height};
   this.box=monsterHitbox(character,{x:ex,y:ey});this.scratchBox=openingHitbox(this.box);
-  const area=this.attackBox,opening=b?.state==='opening',hovering=insideBox(this.pointer,area),canTarget=b&&!b.paused&&!b.dialogueBlocking&&['attack','recover','opening','gimmick'].includes(b.state);
+  const area=this.attackBox,opening=b?.state==='opening',hovering=insideBox(this.pointer,area),canTarget=b&&!b.paused&&!b.dialogueBlocking&&(opening||b.canPunch());
   if(opening||this.showHitbox||hovering&&canTarget){
    g.save();g.strokeStyle=opening?'#9effedbb':hovering?'#9ef8f1':'#9ac8d78c';g.fillStyle=opening?'#83eee80b':hovering?'#83eee80c':'#00000000';g.lineWidth=2;g.setLineDash(opening?[12,7]:hovering?[]:[7,6]);g.strokeRect(area.x,area.y,area.w,area.h);g.fillRect(area.x,area.y,area.w,area.h);g.font='10px monospace';g.fillStyle='#ccece8';g.fillText(opening?'좌우로 긁기 ↔':'HIT AREA',area.x+6,opening?area.y+16:area.y-9);
    if(opening&&this.showHitbox){g.strokeStyle='#9ac8d75c';g.setLineDash([3,6]);g.strokeRect(this.box.x,this.box.y,this.box.w,this.box.h);}g.restore();

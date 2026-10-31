@@ -29,7 +29,7 @@ test('coffee rehearsal is isolated, has valid references and uses provided asset
 });
 test('actual telegraph can be evaded; avoidance does not grant stagger',()=>{
  const b=start();b.tick(500);assert.equal(b.state,'attack');assert.deepEqual(b.queue[0].tiles,[4,5,6]);
- assert(b.move(0,-1));b.tick(1800);assert.equal(b.stats.dodge,1);assert.equal(b.dodgedPatterns,1);assert.equal(b.stagger,0);assert.equal(b.hp,100);
+ assert(b.move(0,-1));b.tick(2020);assert.equal(b.stats.dodge,1);assert.equal(b.dodgedPatterns,1);assert.equal(b.stagger,0);assert.equal(b.hp,100);
 });
 test('empty openings never auto-clear the tutorial phase and punches cannot finish it',()=>{
  const b=start();
@@ -47,4 +47,17 @@ test('two real attack and scratch cycles are needed; transitions wait for the co
   b.tick(10);assert.equal(b.monster.PhaseID,phase===1?2:2);
  }
  assert.equal(b.state,'victory');assert.equal(b.basicHits,12);assert.equal(b.stats.damage,120);
+});
+
+test('coffee stays invulnerable through the attack tail and is idle when the counter lesson pauses',()=>{
+ const b=start();b.tick(500);b.move(0,-1);
+ const hp=b.enemyHP,stagger=b.stagger;
+ assert.equal(b.basicAttack(true),false);assert.equal(b.attackCooldownLeft,0);
+ b.tick(1800);assert.equal(b.state,'attack');assert.equal(b.stats.dodge,1);
+ assert.equal(b.basicAttack(true),false);assert.equal(b.enemyHP,hp);assert.equal(b.stagger,stagger);
+ const recover=b.recover.bind(b);let lessonAt=null;
+ b.recover=()=>{recover();if(b.dodgedPatterns){lessonAt=b.time;b.paused=true;}};
+ b.tick(1000);assert.equal(b.state,'recover');assert.equal(lessonAt,b.planInfo.motionEnd);
+ assert.equal(b.dodgedPatterns,1);assert.equal(b.next-b.time,1700);
+ b.paused=false;assert(b.basicAttack(true));assert.equal(b.enemyHP,hp-5);assert.equal(b.stagger,stagger+5);
 });

@@ -107,10 +107,15 @@ test('gravestone induction restores existing stagger progress, including a resur
   assert.equal(b.monster.PhaseID,transition?2:1);if(transition)assert.equal(b.monster.MaxHP,300);
  }
 });
-test('normal lethal click resolves after the current pattern, and during recovery resolves immediately',()=>{
- const b=start();b.plan();b.enemyHP=1;b.basicAttack(true);assert.equal(b.state,'attack');assert.equal(b.enemyHP,0);
- while(b.state==='attack')b.tick(10);assert.equal(b.monster.PhaseID,2);
- b.enemyHP=1;b.attackCooldownLeft=0;b.basicAttack(true);assert.equal(b.state,'victory');
+test('monsters reject punches during attacks and accept them after returning to idle',()=>{
+ for(const id of [10001,10002,10003]){
+  const b=start(id);b.plan();const hp=b.enemyHP;
+  assert.equal(b.basicAttack(true),false);assert.equal(b.enemyHP,hp);assert.equal(b.stagger,0);assert.equal(b.basicHits,0);assert.equal(b.attackCooldownLeft,0);
+  while(b.state==='attack')b.tick(10);
+  assert.equal(b.state,'recover');assert(b.time>=b.planInfo.motionEnd);assert(b.basicAttack(true));
+ }
+ const b=start();b.enemyHP=1;assert(b.basicAttack(true));assert.equal(b.monster.PhaseID,2);
+ b.enemyHP=1;b.attackCooldownLeft=0;assert(b.basicAttack(true));assert.equal(b.state,'victory');
 });
 test('raid display is a ratio, not a multiplier of real HP',()=>{
  assert.equal(raidHealth(1,1).lines,200);assert.equal(raidHealth(998,1000).lines,200);assert.equal(raidHealth(0,1000).lines,0);
