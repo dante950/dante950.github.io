@@ -41,6 +41,7 @@ function advanceBeautyResult(){
  send('beauty-result',{score:totalSatisfaction,mood:resultMood,portrait:captureBeautyCustomer(),headPortrait:captureBeautyHead(),details:isReturningZombie?returningStatus():null});
 }
 function startBeautyResult(){
+ if(isReturningZombie)clearReturningReactions();
  if(!ready||finishing||briefing||!beautyLessonDone)return;cancelGesture();updateBeautyScore();finishing=true;beautyPhase='result';beautyResultActive=true;
  clearTimeout(actionMoodTimer);requestAnimationSerial++;
  resultMood=isReturningZombie?(returningStatus().success?'satisfied':'angry'):beautyResultMood(B,shapeProgress,totalSatisfaction);

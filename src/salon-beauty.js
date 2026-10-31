@@ -37,6 +37,20 @@ const masks={eyes:new Uint8Array(W*H),brain:new Uint8Array(W*H),face:new Uint8Ar
 const sculptAnchors=new Uint8Array(W*H);
 let eyeWasCovered=false,eyeReactionCount=0,reactionTimer=0,reactionTick=0,reactionOpen=false,areaWarned=false,overflowWarned=false,lastAreaRatio=1;
 const eyeReaction=document.createElement('div');eyeReaction.className='beautyEyeReaction';eyeReaction.hidden=true;eyeReaction.setAttribute('role','status');eyeReaction.setAttribute('aria-live','polite');beautyScreen.append(eyeReaction);
+const returningReactionSeen=new Set(),returningReactionQueue=[];let returningReactionTimer=0;
+function queueReturningReaction(key){
+ if(!isReturningZombie||returningReactionSeen.has(key)||finishing)return;
+ const lines=GUEST.returningReactions?.[key];if(!lines?.length)return;returningReactionSeen.add(key);returningReactionQueue.push(...lines.map(text=>({text,key})));if(!returningReactionTimer)playReturningReaction();
+}
+function playReturningReaction(){
+ if(finishing||!beautyActive){clearReturningReactions();return;}
+ if(briefing){returningReactionTimer=setTimeout(playReturningReaction,120);return;}
+ const item=returningReactionQueue.shift();if(!item){returningReactionTimer=0;return;}
+ showBeautyReaction(item.text,item.key==='returnCut'||item.key==='returnGrow'?'angry':'sigh');
+ const duration=Math.min(4400,Math.max(1800,item.text.length*65+600));
+ returningReactionTimer=setTimeout(()=>{clearTimeout(reactionTimer);clearInterval(reactionTick);eyeReaction.hidden=true;reactionOpen=false;returningReactionTimer=0;playReturningReaction();},duration);
+}
+function clearReturningReactions(){clearTimeout(returningReactionTimer);returningReactionTimer=0;returningReactionQueue.length=0;clearTimeout(reactionTimer);clearInterval(reactionTick);eyeReaction.hidden=true;reactionOpen=false;}
 function showEyeReaction(){
  if(eyeReactionCount>=2)return;
  eyeReactionCount++;
@@ -297,6 +311,7 @@ portrait.addEventListener('pointerup',e=>{
  if(beautyPhase==='cut'){history.draw=[];history.attach=[];syncUndo();}
  if(g.kind==='hammer')send('sound',{key:'hammer'});
  updateBeautyScore(true);renderPortrait();beautyLessonStroke(g);
+ if(isReturningZombie){const key=returningStrokeReaction(g,current,paint,B,W,H,PIX);if(key)queueReturningReaction(key);}
  if(coffeeTutorial){const changed=current.some((v,i)=>v!==g.snapshot[i])||paint.some((v,i)=>v!==g.paint[i]);if(changed){if(['scissors','hammer'].includes(g.kind))coffeeActions.cut=true;if(g.kind==='grow')coffeeActions.grow=true;if(g.kind==='paint')coffeeActions.draw=true;}coffeeAction('stroke',{tool:g.kind,changed});}
 });
 function removeCutFragments(before){
@@ -324,6 +339,7 @@ function placeSticker(sticker,x,y){
  if(!ready||finishing||briefing||beautyPhase!=='attach'||placements.length>=5)return;
  resetActionMood();pushUndo();const region=B.attachRegions.find(r=>inBeautyRegion(x,y,r))?.key||'Other';
  placements.push({sticker,region,x,y});touched.attach=true;updateBeautyScore(true);renderPortrait();beautyLessonSticker();
+ if(isReturningZombie&&B.attachRegions.find(r=>r.key===region)?.stickerIDs.includes(sticker.id))queueReturningReaction((GUEST.returnBranch||'employed')+region);
  if(coffeeTutorial){coffeeActions.attach=true;coffeeAction('sticker',{sticker:sticker.id,x,y,requirement:region});}
 }
 let stickerDrag=null;
@@ -566,7 +582,7 @@ if(coffeeTutorial){
 }
 addEventListener('message',e=>{if(e.source!==parent||e.data?.token!==GUEST.token)return;if(e.data.type==='beauty-request-done'){finishBeautyRequest(e.data.requestId,e.data.detail);return;}if(e.data.type!=='beauty-speaking')return;talking=!!e.data.speaking;mouthFrame=!!e.data.open;beautyCustomer.dataset.talking=String(talking);renderPortrait();});
 prepareBeauty().catch(error=>{hint.textContent='미용 리소스를 불러오지 못했어요. 새로고침해 주세요.';console.error(error);});
-window.beautyDebug={get tutorial(){return {active:!beautyLessonDone,step:beautyLessonSteps[beautyLessonIndex]?.id,passed:beautyLessonPassed};},get shape(){return structuredClone(shapeProgress);},get reaction(){return {count:eyeReactionCount,visible:!eyeReaction.hidden,text:eyeReaction.textContent};},get result(){return {active:beautyResultActive,revealed:resultRevealed,mood:resultMood};},get ready(){return ready;},get material(){return Array.from(current);},get paint(){return Array.from(paint);},get original(){return Array.from(original);},get toolSize(){return brushRadius;},get opacity(){return paintOpacity;},get masks(){return masks;},get expression(){return expression;},get scores(){return {cut:cutScore,draw:drawScore,attach:attachScore,total:totalSatisfaction,live:liveSatisfaction};},get placements(){return placements.map(p=>({id:p.sticker.id,x:p.x,y:p.y}));},get historyLength(){return history[beautyPhase]?.length||0;},get briefing(){return briefing;},get mouthFrame(){return mouthFrame;}};
+window.beautyDebug={get tutorial(){return {active:!beautyLessonDone,step:beautyLessonSteps[beautyLessonIndex]?.id,passed:beautyLessonPassed};},get shape(){return structuredClone(shapeProgress);},get reaction(){return {count:eyeReactionCount,visible:!eyeReaction.hidden,text:eyeReaction.textContent,seen:[...returningReactionSeen],queued:returningReactionQueue.length};},get result(){return {active:beautyResultActive,revealed:resultRevealed,mood:resultMood};},get ready(){return ready;},get material(){return Array.from(current);},get paint(){return Array.from(paint);},get original(){return Array.from(original);},get toolSize(){return brushRadius;},get opacity(){return paintOpacity;},get masks(){return masks;},get expression(){return expression;},get scores(){return {cut:cutScore,draw:drawScore,attach:attachScore,total:totalSatisfaction,live:liveSatisfaction};},get placements(){return placements.map(p=>({id:p.sticker.id,x:p.x,y:p.y}));},get historyLength(){return history[beautyPhase]?.length||0;},get briefing(){return briefing;},get mouthFrame(){return mouthFrame;}};
 
 
 // F also reaches the parent speech bubble while the salon iframe has focus.

@@ -3,7 +3,7 @@ export function beautyAttachScore(placements,b){
  if(b.attachRequireAll){
   const covered=new Set();let penalties=0;
   for(const p of placements){const region=b.attachRegions.find(r=>r.key===p.region);
-   if(p.sticker.tag!==b.attachTag||!region?.stickerIDs.includes(p.sticker.id)||covered.has(region.key))penalties+=b.attachWrong;
+   if((!b.attachMatchByID&&p.sticker.tag!==b.attachTag)||!region?.stickerIDs.includes(p.sticker.id)||covered.has(region.key))penalties+=b.attachWrong;
    else covered.add(region.key);
   }
   return Math.max(0,b.weights.attach*covered.size/Math.max(1,b.attachRegions.length)-penalties);
