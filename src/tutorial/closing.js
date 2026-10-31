@@ -13,7 +13,7 @@ export function createCoffeeTutorialVisit({portrait=null,headPortrait=null,skipp
   portrait:coffeeSafePortrait(portrait),headPortrait:coffeeSafePortrait(headPortrait),tutorial:true,review:{...COFFEE_TUTORIAL_REVIEW}};
 }
 export function coffeeTutorialClosingInit(token,visit,socialChoices={}){
- return {source:'yachacha-story',type:'init',token,day:0,tutorial:true,autoClose:true,
+ return {source:'yachacha-story',type:'init',token,day:0,tutorial:true,autoClose:!visit?.skipped,
   records:[createCoffeeTutorialVisit(visit)],socialChoices};
 }
 export function coffeeSaveHandoff(visit,socialChoices={},storage=globalThis.sessionStorage){

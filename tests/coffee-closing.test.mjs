@@ -52,3 +52,11 @@ test('handoff does not trust stored reward amounts or require browser storage',(
  assert.equal(coffeeReadHandoff('complete',blocked).visit.gain,100);
  assert.equal(coffeeReadHandoff('ordinary',saved),null);
 });
+
+test('completed closing previews replay coffee review; an explicitly skipped visit does not auto-close',()=>{
+ const preview=coffeeTutorialClosingInit('preview',createCoffeeTutorialVisit());
+ assert.equal(preview.autoClose,true);assert.equal(preview.records[0].skipped,false);
+ assert.equal(reviewPost(runFromStory(preview.records,0).visits[0]).user,'coffee_ghost');
+ const skip=coffeeTutorialClosingInit('skip',createCoffeeTutorialVisit({skipped:true}));
+ assert.equal(skip.autoClose,false);assert.equal(skip.records[0].skipped,true);
+});

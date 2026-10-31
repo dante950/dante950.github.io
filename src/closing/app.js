@@ -9,7 +9,7 @@ const DEFAULT_COPY=Object.fromEntries(Object.entries(REVIEW_COPY).map(([id,c])=>
 let choices={...DEFAULT_CHOICES},copies=structuredClone(DEFAULT_COPY),settings=structuredClone(DEFAULT_SETTINGS);
 const storyToken=new URLSearchParams(location.search).get('story');
 const storyMode=!!storyToken&&parent!==window;
-let storyInitialized=false,tutorialMode=false;
+let storyInitialized=false,tutorialMode=false,closeAfterRegistration=false;
 function storyMessage(type){parent.postMessage({source:'yachacha-closing',token:storyToken,type,socialChoices:phone.selected},location.origin);}
 if(storyMode){document.body.classList.add('story-mode');$('settingsOpen').hidden=true;$('restart').hidden=true;document.querySelector('.toolbar .title b').textContent='오늘의 영업 마감';document.querySelector('.lab-label').textContent='본편 플레이';}
 const DEFAULT_SPEED=1.5;
@@ -75,7 +75,7 @@ $('phone').querySelector('.phone-app-title').textContent='monstagram';
 // The receipt sequence can only be advanced with its dedicated review button.
 $('phone').querySelectorAll('[data-review-home],[data-review-back]').forEach(button=>{button.disabled=true;button.setAttribute('aria-label',button.getAttribute('aria-label')+' · 정산 중 사용 불가');});
 let managementReviewed=false,exitPending=false;
-const phone=createSocialPhone(stage,{getRun:()=>run,onManagement:()=>action(openManagement)(),onExit:()=>action(exitPhone)(),onRegistration:()=>storyMessage('registration-complete')});
+const phone=createSocialPhone(stage,{getRun:()=>run,onManagement:()=>action(openManagement)(),onExit:()=>action(exitPhone)(),onRegistration:()=>{if(closeAfterRegistration){phone.hide();action(close)();}else storyMessage('registration-complete');}});
 function phoneHome(initialView='home'){busy=false;show('settlement',false);show('finishBanner',false);phase('phone');phone.show(managementReviewed,initialView);setStatus('몬스타그램을 둘러보거나 가게 관리에서 오늘의 정산을 확인하세요.');}
 async function openManagement(){if(busy||managementReviewed)return;busy=true;phone.hide();await openReview(epoch);}
 async function exitPhone(){if(busy)return;exitPending=true;if(closingExitAction(managementReviewed)==='management')await openManagement();else{phone.hide();await advanceDay(epoch);}}
@@ -159,6 +159,6 @@ addEventListener('message',e=>{
  if(!([1,2].includes(m.day)||(m.day===0&&m.tutorial===true))||!Array.isArray(m.records))return;
  storyInitialized=true;tutorialMode=m.day===0&&m.tutorial===true;document.body.classList.toggle('tutorial-mode',tutorialMode);phone.setWeather(m.day,m.weather);run=runFromStory(m.records,m.day);phone.restore(m.socialChoices);settings=run.settings;clearScene();show('loading',false);renderSalon();resize();
  if(tutorialMode){document.querySelector('.toolbar .title b').textContent='첫 손님의 하루 마감';document.querySelector('.lab-label').textContent='튜토리얼';document.querySelector('#closeBanner .mini-calendar small').textContent='TUTORIAL';}
- if(tutorialMode&&m.registration===true){show('closeShop',false);show('visitPanel',false);phase('registration');phone.showRegistration();return;}
+ if(tutorialMode&&m.registration===true){closeAfterRegistration=m.autoClose===true&&run.visits.some(v=>v.guestId==='coffee'&&!v.skipped);show('closeShop',false);show('visitPanel',false);phase('registration');phone.showRegistration();return;}
  if(tutorialMode&&m.autoClose===true)action(close)();
 });
