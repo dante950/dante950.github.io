@@ -37,3 +37,8 @@
 /* The dialogue overlays the lower portion of the cutscene. */
 #labStage[data-state=intro] #introArt{height:100%;}
 #labStage[data-state=intro] #introPicture{align-items:center;}
+
+#businessCloseBanner{position:absolute;inset:31% 0 auto;z-index:35;min-height:30%;padding:clamp(18px,4vw,48px);display:grid;align-content:center;justify-items:center;gap:14px;background:#241322f2;border-block:4px solid #a77c69;box-shadow:0 10px #140f1755;text-align:center}
+#businessCloseBanner small{color:#e7b68e;font-size:clamp(12px,1.5vw,18px)}
+#businessCloseBanner strong{color:#fff1c6;font-size:clamp(24px,3.6vw,46px)}
+#businessCloseBanner span{color:#ef7790;font-size:clamp(12px,1.7vw,22px);letter-spacing:2px}

@@ -30,7 +30,7 @@ jobs:
             intro_only=true
             while IFS= read -r file; do
               case "$file" in
-                src/combat/cursor-engine.js|src/combat/cursor-scene.js|src/combat/tutorial.js|src/combat/story-stage.css|src/tutorial/combat-data.js|tests/coffee-combat.test.mjs|tests/cursor-combat.test.mjs|tests/coffee-tutorial-input.test.mjs|scripts/build.mjs|src/closing/app.js|src/tutorial/closing.js|tests/coffee-closing.test.mjs|src/index.html|public/tutorial-variants.html|src/tutorial/scene.js|tests/room-briefing.test.mjs|src/tutorial/presentation*|src/tutorial/app.js|src/tutorial/index.html|src/tutorial/guest.js|src/tutorial/narrative.js|src/beauty-shape.js|public/media/intro/pt/*|tests/presentation*.test.mjs|tests/coffee-beauty.test.mjs|docs/*|.github/workflows/pages.yml) ;;
+                src/combat/cursor-engine.js|src/combat/cursor-scene.js|src/combat/tutorial.js|src/combat/story-stage.css|src/tutorial/combat-data.js|tests/coffee-combat.test.mjs|tests/cursor-combat.test.mjs|tests/coffee-tutorial-input.test.mjs|scripts/build.mjs|src/closing/app.js|src/tutorial/closing.js|tests/coffee-closing.test.mjs|src/index.html|public/tutorial-variants.html|src/tutorial/scene.js|tests/room-briefing.test.mjs|src/tutorial/presentation*|src/tutorial/app.js|src/tutorial/index.html|src/tutorial/style.css|src/tutorial/guest.js|src/tutorial/narrative.js|src/beauty-shape.js|public/media/intro/pt/*|tests/presentation*.test.mjs|tests/coffee-beauty.test.mjs|docs/*|.github/workflows/pages.yml) ;;
                 *) intro_only=false ;;
               esac
             done < <(git diff --name-only "$BEFORE" HEAD)
