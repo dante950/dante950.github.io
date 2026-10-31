@@ -24,7 +24,7 @@ test('skip omits goals and warning, retaining the three-line guest invitation',a
 test('default presentation retains the original three business slides and wrap-up',()=>{
  const p=actor();p.roomBriefing=false;assert.equal(p.slides.length,3);let raised=false;p.raise=()=>{raised=true;};p.endSlides();assert.equal(raised,true);
 });
-test('remote cue plays once during raising and is not repeated on the first line',async()=>{const p=actor();const sounds=[];p.sound=k=>sounds.push(k);await p.raiseToRoom(0);const pose=p.room.briefing;p.next();assert.deepEqual(sounds,['remote']);assert.equal(p.room.briefing,pose);});
+test('remote animation is scheduled after screen raising and is not restarted by dialogue',async()=>{const p=actor();const sounds=[];p.sound=k=>sounds.push(k);await p.raiseToRoom(0);const pose=p.room.briefing;assert.equal(p.remoteAt,1650);p.next();assert.deepEqual(sounds,[]);assert.equal(p.remoteAt,1650);assert.equal(p.room.briefing,pose);});
 
 test('public URL variants resolve without a localhost requirement',()=>{
  assert.equal(introVariant('?intro=1'),1);assert.equal(introVariant('?intro=2'),2);assert.equal(introVariant('?intro=3'),3);

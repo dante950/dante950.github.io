@@ -1,7 +1,8 @@
+import {REMOTE_SPRITE,REMOTE_DURATION,drawRemote} from './presentation-remote.js';
 // Choreography made from supplied sprites. No new character artwork is generated.
 export class TutorialRoom{
  constructor(canvas,assets,guest){this.canvas=canvas;this.ctx=canvas.getContext('2d');this.assets=assets;this.guest=guest;this.images=new Map();this.pose='idle';this.since=performance.now();this.player={x:380,y:450,direction:'front',frame:0};this.keys=new Set();this.interactive=false;this.disposed=false;this.last=performance.now();this.result=null;this.sprites={front:'./media/a60f39797ec2a08be94bb830.png',back:'./media/a8779e7993df7187d998345f.png',left:'./media/855ab40978f1cafb6734db12.png',right:'./media/f3c56ecc6e0e4af16a6051d8.png'};}
- async load(){const room=this.assets.room,l=this.guest.skin.layers,sources=[room.wall,room.floor,room.carpet,...room.layers.map(p=>p.src),this.assets.minion.full,this.assets.zombieHead,this.assets.sansHead,...Object.values(this.sprites),...Object.entries(this.assets.minion.animation.front).filter(([k])=>["body","head","hair"].includes(k)).map(([,v])=>v)];for(const key of ['head','material','body','hands'])if(l[key])sources.push(l[key].src);for(const key of ['eyes','mouth'])for(const a of Object.values(l[key]||{}))sources.push(a.src);await Promise.all([...new Set(sources)].map(async src=>{const image=new Image();image.src=src;await image.decode();if(src===l.material.src&&l.material.whiteKey){const canvas=document.createElement('canvas');canvas.width=image.width;canvas.height=image.height;const ctx=canvas.getContext('2d');ctx.drawImage(image,0,0);const pixels=ctx.getImageData(0,0,canvas.width,canvas.height);for(let i=0;i<pixels.data.length;i+=4)if(pixels.data[i]>=250&&pixels.data[i+1]>=250&&pixels.data[i+2]>=250)pixels.data[i+3]=0;ctx.putImageData(pixels,0,0);this.images.set(src,canvas);}else this.images.set(src,image);}));this.loop(performance.now());}
+ async load(){const room=this.assets.room,l=this.guest.skin.layers,sources=[REMOTE_SPRITE,room.wall,room.floor,room.carpet,...room.layers.map(p=>p.src),this.assets.minion.full,this.assets.zombieHead,this.assets.sansHead,...Object.values(this.sprites),...Object.entries(this.assets.minion.animation.front).filter(([k])=>["body","head","hair"].includes(k)).map(([,v])=>v)];for(const key of ['head','material','body','hands'])if(l[key])sources.push(l[key].src);for(const key of ['eyes','mouth'])for(const a of Object.values(l[key]||{}))sources.push(a.src);await Promise.all([...new Set(sources)].map(async src=>{const image=new Image();image.src=src;await image.decode();if(src===l.material.src&&l.material.whiteKey){const canvas=document.createElement('canvas');canvas.width=image.width;canvas.height=image.height;const ctx=canvas.getContext('2d');ctx.drawImage(image,0,0);const pixels=ctx.getImageData(0,0,canvas.width,canvas.height);for(let i=0;i<pixels.data.length;i+=4)if(pixels.data[i]>=250&&pixels.data[i+1]>=250&&pixels.data[i+2]>=250)pixels.data[i+3]=0;ctx.putImageData(pixels,0,0);this.images.set(src,canvas);}else this.images.set(src,image);}));this.loop(performance.now());}
  setPose(pose){this.pose=pose;this.since=performance.now();this.keys.clear();}
  async setPortrait(src){if(!src){this.result=null;return;}const image=new Image();image.src=src;await image.decode();this.result=image;}
  drawLayer(ctx,a){if(!a)return;const image=this.images.get(a.src);if(!image)return;if(a.sw)ctx.drawImage(image,a.sx||0,a.sy||0,a.sw,a.sh,a.x,a.y,a.w,a.h);else ctx.drawImage(image,a.x,a.y,a.w,a.h);}
@@ -21,18 +22,11 @@ export class TutorialRoom{
  dispose(){this.disposed=true;cancelAnimationFrame(this.raf);this.keys.clear();}
  drawBriefing(now){
   const c=this.ctx,{index:beat,since,variant}=this.briefing,index=variant===2?beat:([0,1,2,5,3,4][beat]??beat),age=Math.max(0,now-since),t=Math.min(1,age/850);
+  if((index===0||this.remoteAge!=null&&this.remoteAge<REMOTE_DURATION)&&drawRemote(c,this.images.get(REMOTE_SPRITE),690,425,210,this.remoteAge??REMOTE_DURATION))return;
   // Keep the supplied minion; omit its baked-in tiny ghost while this larger pose acts.
   c.save();c.translate(610,215);c.scale(1.4,1.4);c.beginPath();c.rect(0,0,115,150);c.rect(0,0,33,50);c.clip('evenodd');c.drawImage(this.images.get(this.assets.minion.full),0,0);c.restore();
   const polygon=(points,fill,stroke='#0c6467')=>{c.beginPath();points.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.closePath();c.fillStyle=fill;c.fill();if(stroke){c.strokeStyle=stroke;c.lineWidth=2.5;c.stroke();}};
   const star=(x,y,r,fill='#ffe26c')=>{const pts=[];for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rr=i%2?r*.43:r;pts.push([x+Math.cos(a)*rr,y+Math.sin(a)*rr]);}polygon(pts,fill,'#967235');};
-  if(index===0){
-   // A raised remote, a button press and a short signal towards the projector.
-   c.save();c.translate(730,323);c.rotate(-.55*Math.min(1,t*3));
-   polygon([[0,0],[13,-4],[20,-30],[8,-34]],'#272433','#171622');
-   polygon([[5,-31],[20,-31],[20,-60],[5,-60]],'#303d4b','#161c26');
-   c.fillStyle=age<550?'#ffdc83':'#b34f52';c.fillRect(9,-54,7,6);c.restore();
-   if(age<1000){c.save();c.globalAlpha=Math.sin(Math.min(1,age/1000)*Math.PI);c.strokeStyle='#fff4aa';c.lineWidth=3;for(let i=0;i<3;i++){c.beginPath();c.arc(737,271,12+i*9,-Math.PI*.85,-Math.PI*.3);c.stroke();}c.font='bold 15px Malgun Gothic';c.fillStyle='#fff4aa';c.fillText('삑',756,249);c.restore();}return;
-  }
   // Temporary cup-ghost acting poses based on the user's five-panel storyboard.
   const rise=index===1?1-Math.pow(1-t,3):1,bob=Math.sin(age/480)*2;
   c.save();c.translate(615,303+bob);c.scale(1,Math.max(.05,rise));c.globalAlpha=Math.min(1,rise*2);

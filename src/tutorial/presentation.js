@@ -1,3 +1,4 @@
+import {REMOTE_SPRITE,REMOTE_CLICK_AT,drawRemote} from './presentation-remote.js';
 import {PRESENTATION_HELLO,PRESENTATION_REFUSALS,PRESENTATION_STORY,PRESENTATION_SLIDES,INTRO_HOLD_MS,ROOM_BRIEFING,LOCAL_PRESENTATION_SLIDES,ROOM_BRIEFING_V2} from './presentation-data.js';
 
 export class MinionPresentation{
@@ -28,7 +29,7 @@ export class MinionPresentation{
  }
  setMode(mode){this.mode=mode;this.root.dataset.mode=mode;this.modeSince=this.clock;}
  wait(ms){return new Promise(resolve=>this.waiters.push({at:this.clock+ms,resolve}));}
- cancel(){this.generation++;this.active=false;this.root.hidden=true;this.cancelHold();for(const w of this.waiters)w.resolve(false);this.waiters=[];this.onLinesDone=null;this.lines=null;if(this.roomBriefing)this.room.briefing=null;}
+ cancel(){this.remoteAt=null;if(this.room)this.room.remoteAge=null;this.generation++;this.active=false;this.root.hidden=true;this.cancelHold();for(const w of this.waiters)w.resolve(false);this.waiters=[];this.onLinesDone=null;this.lines=null;if(this.roomBriefing)this.room.briefing=null;}
  pause(on){this.paused=on;this.cancelHold();}
  async start({story=false,slides=false,customer=false}={}){
   this.cancel();this.active=true;this.paused=false;this.clock=0;this.root.hidden=false;this.refusals=0;this.screenDown=false;this.skipping=false;this.storyY=0;this.storyTarget=0;this.bow=0;this.bowTarget=0;this.mirror=0;this.mirrorTarget=0;this.sighAt=null;this.revealed=false;this.actorX=475;this.actorScale=.45;this.actorFeet=215;
@@ -85,6 +86,7 @@ export class MinionPresentation{
   this.lines=null;this.root.querySelector('.presentation-speech').hidden=true;this.root.querySelector('.presentation-title').hidden=true;
   this.root.classList.remove('screen-down','projecting');this.setMode('raising');this.returning=true;this.skip.hidden=true;this.cancelHold();
   if(this.screenDown)this.sound('motor');this.screenDown=false;
+  this.startRemote(skipped?1600:1700);
   this.speak(['갑자기 장사를 하라니 당황스러우실 법도 합니다.','하지만 당신은 뭔가 다를 것 같다는 느낌이 듭니다.','말로 설명드리는 것보다는,\n직접 확인하시는 편이 낫겠지요.','마침 소개해 드릴 손님이 있습니다.'],()=>this.offerCustomer());
   if(!await this.wait(skipped?1600:1700))return;
   this.setMode('wrapup');
@@ -110,6 +112,7 @@ export class MinionPresentation{
   this.actorX=475;this.actorScale=1.75;this.actorFeet=365;
   this.offerCustomer();
  }
+ startRemote(delay=0){this.remoteAt=this.clock+delay;this.remoteSoundPlayed=false;this.room.remoteAge=0;}
  async raiseToRoom(index){
   this.lines=null;this.root.querySelector('.presentation-speech').hidden=true;
   this.root.querySelector('.presentation-title').hidden=true;
@@ -118,7 +121,7 @@ export class MinionPresentation{
   this.revealed=true;this.setMode('raising');this.cancelHold();
   if(this.screenDown)this.sound('motor');this.screenDown=false;
   this.room.setPose('briefing');this.room.briefing={index,variant:this.variant,since:performance.now()};
-  if(index===0)this.sound('remote');
+  this.startRemote(1650);
   if(!await this.wait(1650))return;
   this.briefingBeat(index);
  }
@@ -139,6 +142,7 @@ export class MinionPresentation{
    this.clock+=dt;const ready=this.waiters.filter(w=>w.at<=this.clock);this.waiters=this.waiters.filter(w=>w.at>this.clock);for(const w of ready)w.resolve(true);
    if(this.lines&&!this.forcedText)this.text.textContent=this.fullText.slice(0,Math.floor((this.clock-this.lineSince)/27));
    if(this.hold){const p=Math.min(1,(this.clock-this.hold.at)/INTRO_HOLD_MS);this.skip.style.setProperty('--hold',`${p*100}%`);if(p===1)this.skipIntro();}
+   if(this.remoteAt!=null){this.room.remoteAge=Math.max(0,this.clock-this.remoteAt);if(!this.remoteSoundPlayed&&this.room.remoteAge>=REMOTE_CLICK_AT){this.remoteSoundPlayed=true;this.sound('remote');}}
    this.drawActor();this.drawStory(dt);
   }
   this.frame=requestAnimationFrame(t=>this.tick(t));
@@ -152,6 +156,7 @@ export class MinionPresentation{
   const scale=this.actorScale,feet=this.actorFeet;
   c.save();c.globalAlpha=enter?Math.min(1,t*2):1;c.translate(this.actorX,feet+bob);c.scale(scale,scale);
   c.fillStyle='#0004';c.beginPath();c.ellipse(0,-2,32,5,0,0,Math.PI*2);c.fill();
+  if(this.remoteAt!=null&&drawRemote(c,this.room.images.get(REMOTE_SPRITE),0,0,175,Math.max(0,this.clock-this.remoteAt))){c.restore();return;}
   const a=this.room.assets.minion.animation.front,frame=walk?Math.floor(this.clock/a.frameMs)%a.count:0;
   for(const key of ['body','head','hair']){const im=this.room.images.get(a[key]);if(im)c.drawImage(im,frame*a.fw,0,a.fw,a.fh,-a.fw/2,-a.fh,a.fw,a.fh);}
   // Temporary remote prop; supplied walking sprites are retained unchanged.
