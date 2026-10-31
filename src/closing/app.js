@@ -101,7 +101,7 @@ async function review(which,token,first=false){
  }
  $('reviewIndex').textContent=`${String(index+1).padStart(2,'0')} / ${String(summary.visits.length).padStart(2,'0')}`;
  $('currentName').textContent=visit.name+'의 후기';
- $('bonusLabel').textContent=visit.protectedAmount>0?`스타 안전장치 · ${fmt(visit.protectedAmount)}명 감소 방지`:visit.bonus?`기본 ${fmt(visit.base)} + 야차 보너스 ${fmt(visit.bonus)}`:visit.gain<0?'미용 · 야차 실패로 팔로워 감소':'기본 팔로워 '+fmt(visit.base);
+ $('bonusLabel').textContent=visit.protectedAmount>0?`스타 안전장치 · ${fmt(visit.protectedAmount)}명 감소 방지`:visit.bonus?`미용 ${fmt(visit.base)} + 야차 보너스 ${fmt(visit.bonus)}`:visit.gain<0?'미용 · 야차 실패로 팔로워 감소':'미용 '+fmt(visit.base);
  displayed(visit.before,0);
  $('nextReview').textContent=visit.protectedAmount>0&&visit.gain===0?'스타 안전장치 적용 중…':visit.gain<0?'팔로워 변동 반영 중…':'팔로워가 모이는 중…';
  $('reviewHint').textContent=visit.protectedAmount>0?'획득한 스타의 기준 팔로워 수 아래로는 감소하지 않습니다.':visit.gain<0?'팔로워가 감소해도 획득한 스타와 외관은 유지됩니다.':'후기를 통해 새 팔로워가 찾아오고 있어요.';
