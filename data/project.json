@@ -3188,7 +3188,7 @@
           {
             "DialogueID": 900151,
             "GroupID": 80093,
-            "Order": 1,
+            "Order": 4,
             "Speaker": "몬스터",
             "Text": "<size=0.85>……사원증은 뒤집고 가야겠다.</size>",
             "Notes": "재등장 좀비"
@@ -3196,7 +3196,7 @@
           {
             "DialogueID": 900153,
             "GroupID": 80095,
-            "Order": 1,
+            "Order": 4,
             "Speaker": "몬스터",
             "Text": "<size=0.85>……인사팀에서 못 알아보진 않겠지.</size>",
             "Notes": "재등장 좀비"
@@ -3220,7 +3220,7 @@
           {
             "DialogueID": 900156,
             "GroupID": 80097,
-            "Order": 1,
+            "Order": 4,
             "Speaker": "몬스터",
             "Text": "<size=0.85>……내일 출근인데.</size>",
             "Notes": "재등장 좀비"
@@ -3244,7 +3244,7 @@
           {
             "DialogueID": 900159,
             "GroupID": 80099,
-            "Order": 1,
+            "Order": 4,
             "Speaker": "몬스터",
             "Text": "<size=0.85>……일단 바닥을 잘 보고 다니세요.</size>",
             "Notes": "재등장 좀비"
@@ -3268,7 +3268,7 @@
           {
             "DialogueID": 900165,
             "GroupID": 80103,
-            "Order": 1,
+            "Order": 4,
             "Speaker": "몬스터",
             "Text": "<size=0.85>……다른 데서 고치면 되니까.</size>",
             "Notes": "재등장 좀비"
@@ -3638,7 +3638,7 @@
             "GroupID": 80126,
             "Order": 1,
             "Speaker": "플레이어",
-            "Text": "네. 이제 사원증만 숨기시면 되겠어요.",
+            "Text": "신입인데 허세는 벌써 회장님이네요.",
             "Notes": "재등장 좀비"
           },
           {
@@ -3646,7 +3646,7 @@
             "GroupID": 80126,
             "Order": 2,
             "Speaker": "몬스터",
-            "Text": "……그건 회사에서 달고 다니라더군요.",
+            "Text": "크흠. 포부가 직급보다 좀 클 수도 있죠.",
             "Notes": "재등장 좀비"
           },
           {
@@ -3670,7 +3670,7 @@
             "GroupID": 80128,
             "Order": 1,
             "Speaker": "플레이어",
-            "Text": "인사팀에서 새로 오신 분인 줄 알겠어요.",
+            "Text": "신입인데 벌써 퇴사 직전 얼굴이네요.",
             "Notes": "재등장 좀비"
           },
           {
@@ -3678,7 +3678,7 @@
             "GroupID": 80128,
             "Order": 2,
             "Speaker": "몬스터",
-            "Text": "으어…? 아, 아니. 그 정도는 아니죠?",
+            "Text": "으어…! 아직 수습도 안 끝났거든요?",
             "Notes": "재등장 좀비"
           },
           {
@@ -3702,7 +3702,7 @@
             "GroupID": 80130,
             "Order": 1,
             "Speaker": "플레이어",
-            "Text": "네. 복권 주우러 다니실 분 같지는 않아요.",
+            "Text": "부자 냄새요? 그냥 운 좋은 백수 같은데요.",
             "Notes": "재등장 좀비"
           },
           {
@@ -3710,7 +3710,7 @@
             "GroupID": 80130,
             "Order": 2,
             "Speaker": "몬스터",
-            "Text": "……기회는 언제 어디서 올지 모르는 거예요.",
+            "Text": "백수라니요. 평생 휴가 중인 겁니다.",
             "Notes": "재등장 좀비"
           },
           {
@@ -3734,7 +3734,7 @@
             "GroupID": 80132,
             "Order": 1,
             "Speaker": "플레이어",
-            "Text": "네. 고치는 비용도 신경 안 쓰실 것 같아요.",
+            "Text": "돈으로 취향까지 살 수는 없나 봐요.",
             "Notes": "재등장 좀비"
           },
           {
@@ -3742,7 +3742,7 @@
             "GroupID": 80132,
             "Order": 2,
             "Speaker": "몬스터",
-            "Text": "……물론이죠. 그 정도야.",
+            "Text": "……지금 이 취향, 여기서 만들어주신 거잖아요.",
             "Notes": "재등장 좀비"
           },
           {
@@ -3764,7 +3764,7 @@
           {
             "DialogueID": 900237,
             "GroupID": 80101,
-            "Order": 1,
+            "Order": 4,
             "Speaker": "몬스터",
             "Text": "이게 부자의 여유라는 겁니다. 머리 정도는 없어도 돼요.",
             "Notes": "재등장 좀비"
@@ -3772,7 +3772,7 @@
           {
             "DialogueID": 900238,
             "GroupID": 80101,
-            "Order": 2,
+            "Order": 5,
             "Speaker": "몬스터",
             "Text": "부자가 되는 주파수라도 알려드릴까요?",
             "Notes": "재등장 좀비"
@@ -3780,10 +3780,154 @@
           {
             "DialogueID": 900239,
             "GroupID": 80101,
-            "Order": 3,
+            "Order": 6,
             "Speaker": "몬스터",
             "Text": "<wait=0.65>…지금은 잘 안 잡히네.",
             "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900240,
+            "GroupID": 80093,
+            "Order": 1,
+            "Speaker": "플레이어",
+            "Text": "그런데… 야차는 안 하세요?",
+            "Notes": "재등장 좀비 · 야차 없이 퇴장"
+          },
+          {
+            "DialogueID": 900241,
+            "GroupID": 80093,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "음? 야차요? 하하. 이제 사회인이잖아요.",
+            "Notes": "재등장 좀비 · 야차 없이 퇴장"
+          },
+          {
+            "DialogueID": 900242,
+            "GroupID": 80093,
+            "Order": 3,
+            "Speaker": "몬스터",
+            "Text": "저는 주먹보다 인사평가가 더 무서워서요.",
+            "Notes": "재등장 좀비 · 야차 없이 퇴장"
+          },
+          {
+            "DialogueID": 900243,
+            "GroupID": 80097,
+            "Order": 1,
+            "Speaker": "플레이어",
+            "Text": "그런데… 야차는 안 하세요?",
+            "Notes": "재등장 좀비 · 야차 없이 퇴장"
+          },
+          {
+            "DialogueID": 900244,
+            "GroupID": 80097,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "음? 야차요? 하하. 이제 사회인이잖아요.",
+            "Notes": "재등장 좀비 · 야차 없이 퇴장"
+          },
+          {
+            "DialogueID": 900245,
+            "GroupID": 80097,
+            "Order": 3,
+            "Speaker": "몬스터",
+            "Text": "저는 주먹보다 인사평가가 더 무서워서요.",
+            "Notes": "재등장 좀비 · 야차 없이 퇴장"
+          },
+          {
+            "DialogueID": 900246,
+            "GroupID": 80095,
+            "Order": 1,
+            "Speaker": "플레이어",
+            "Text": "그런데… 야차는 안 하세요?",
+            "Notes": "재등장 좀비 · 야차 없이 퇴장"
+          },
+          {
+            "DialogueID": 900247,
+            "GroupID": 80095,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "음? 야차요? 하하. 이제 사회인이잖아요.",
+            "Notes": "재등장 좀비 · 야차 없이 퇴장"
+          },
+          {
+            "DialogueID": 900248,
+            "GroupID": 80095,
+            "Order": 3,
+            "Speaker": "몬스터",
+            "Text": "저는 주먹보다 인사평가가 더 무서워서요.",
+            "Notes": "재등장 좀비 · 야차 없이 퇴장"
+          },
+          {
+            "DialogueID": 900249,
+            "GroupID": 80099,
+            "Order": 1,
+            "Speaker": "플레이어",
+            "Text": "그런데… 야차는 안 하세요?",
+            "Notes": "재등장 좀비 · 야차 없이 퇴장"
+          },
+          {
+            "DialogueID": 900250,
+            "GroupID": 80099,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "음? 야차요? 하하하. 마음이 풍족하니 그런 건 이제 중요하지 않아요.",
+            "Notes": "재등장 좀비 · 야차 없이 퇴장"
+          },
+          {
+            "DialogueID": 900251,
+            "GroupID": 80099,
+            "Order": 3,
+            "Speaker": "몬스터",
+            "Text": "이제 주먹보다 잔고를 믿습니다.",
+            "Notes": "재등장 좀비 · 야차 없이 퇴장"
+          },
+          {
+            "DialogueID": 900252,
+            "GroupID": 80103,
+            "Order": 1,
+            "Speaker": "플레이어",
+            "Text": "그런데… 야차는 안 하세요?",
+            "Notes": "재등장 좀비 · 야차 없이 퇴장"
+          },
+          {
+            "DialogueID": 900253,
+            "GroupID": 80103,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "음? 야차요? 하하하. 마음이 풍족하니 그런 건 이제 중요하지 않아요.",
+            "Notes": "재등장 좀비 · 야차 없이 퇴장"
+          },
+          {
+            "DialogueID": 900254,
+            "GroupID": 80103,
+            "Order": 3,
+            "Speaker": "몬스터",
+            "Text": "이제 주먹보다 잔고를 믿습니다.",
+            "Notes": "재등장 좀비 · 야차 없이 퇴장"
+          },
+          {
+            "DialogueID": 900255,
+            "GroupID": 80101,
+            "Order": 1,
+            "Speaker": "플레이어",
+            "Text": "그런데… 야차는 안 하세요?",
+            "Notes": "재등장 좀비 · 야차 없이 퇴장"
+          },
+          {
+            "DialogueID": 900256,
+            "GroupID": 80101,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "음? 야차요? 하하하. 마음이 풍족하니 그런 건 이제 중요하지 않아요.",
+            "Notes": "재등장 좀비 · 야차 없이 퇴장"
+          },
+          {
+            "DialogueID": 900257,
+            "GroupID": 80101,
+            "Order": 3,
+            "Speaker": "몬스터",
+            "Text": "이제 주먹보다 잔고를 믿습니다.",
+            "Notes": "재등장 좀비 · 야차 없이 퇴장"
           }
         ]
       },
@@ -7224,7 +7368,7 @@
             "event": "employedSuccessAgree"
           },
           {
-            "text": "네. 이제 사원증만 숨기시면 되겠어요.",
+            "text": "신입인데 허세는 벌써 회장님이네요.",
             "event": "employedSuccessTease"
           }
         ],
@@ -7234,7 +7378,7 @@
             "event": "employedFailAgree"
           },
           {
-            "text": "인사팀에서 새로 오신 분인 줄 알겠어요.",
+            "text": "신입인데 벌써 퇴사 직전 얼굴이네요.",
             "event": "employedFailTease"
           }
         ],
@@ -7244,7 +7388,7 @@
             "event": "lotterySuccessAgree"
           },
           {
-            "text": "네. 복권 주우러 다니실 분 같지는 않아요.",
+            "text": "부자 냄새요? 그냥 운 좋은 백수 같은데요.",
             "event": "lotterySuccessTease"
           }
         ],
@@ -7254,7 +7398,7 @@
             "event": "lotteryFailAgree"
           },
           {
-            "text": "네. 고치는 비용도 신경 안 쓰실 것 같아요.",
+            "text": "돈으로 취향까지 살 수는 없나 봐요.",
             "event": "lotteryFailTease"
           }
         ]

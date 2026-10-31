@@ -75,3 +75,15 @@ test('result options resolve all eight replies and do not contain reward mutatio
  const attach=p.combat.sheets.find(s=>s.name==='미용 대사 연결').rows.find(r=>r.MonsterID===guest.id&&r.Stage==='attach');
  for(const line of p.combat.sheets.find(s=>s.name==='대사').rows.filter(l=>[attach.RequestGroupID,attach.DetailGroupID].includes(l.GroupID)))assert(!/금목걸이|선글라스|T_/.test(line.Text));
 });
+
+test('all six exits explain the lack of Yacha before their original final line',()=>{
+ const rows=p.combat.sheets.find(s=>s.name==='대사').rows;
+ for(const branch of ['employed','lottery'])for(const suffix of ['SuccessLeave','FailLeave','HairFailLeave']){const lines=rows.filter(r=>r.GroupID===guest.bindings[branch+suffix]).sort((a,b)=>a.Order-b.Order);assert.equal(lines[0].Speaker,'플레이어');assert.equal(lines[0].Text,'그런데… 야차는 안 하세요?');assert(lines[1].Text.includes('야차요'));assert(lines[2].Text.includes(branch==='employed'?'인사평가':'잔고'));assert(lines.length>=4);assert.deepEqual(lines.map(l=>l.Order),lines.map((_,i)=>i+1));}
+ assert.equal(guest.battle,'none');
+ assert(rows.some(r=>r.GroupID===guest.bindings.employedHairFailLeave&&r.Text.includes('인사팀에서 못 알아보진 않겠지')));
+ assert(rows.some(r=>r.GroupID===guest.bindings.lotteryHairFailLeave&&r.Text.includes('지금은 잘 안 잡히네')));
+});
+test('each stronger tease is the same in the button and spoken reply group',()=>{
+ const rows=p.combat.sheets.find(s=>s.name==='대사').rows;
+ for(const options of Object.values(guest.returningChoices)){const option=options[1],lines=rows.filter(r=>r.GroupID===guest.bindings[option.event]).sort((a,b)=>a.Order-b.Order);assert.equal(lines[0].Speaker,'플레이어');assert.equal(lines[0].Text,option.text);assert.equal(lines[1].Speaker,'몬스터');assert(lines[1].Text.length);}
+});
