@@ -1,7 +1,8 @@
 import {updateSpeakerAvatar} from './speaker-avatar.js';
 import {BEAUTY_REACTIONS,beautyReactionLines,beautyReactionText,beautyWithDialogue} from './beauty-reaction-dialogue.js';
 import {mountStoryIntro} from './story-intro.js';
-import {recordStoryVisit} from './story-progress.js';
+import {recordStoryVisit,storyVisitGain} from './story-progress.js';
+import {showBattleResult} from './battle-result.js';
 import {coffeeReadHandoff,coffeeApplyHandoff} from './tutorial/closing.js';
 import {migrateSalonDialogues,salonDialogueGroup,salonDialogueLink,salonDialogueText,salonRequestAtEnd} from './salon-dialogue.js';
 import {combatForWorkbook,mergeWorkshopDialogues} from './workshop-dialogue.js';
@@ -220,12 +221,18 @@ function showStoryIntro(done){
  host.setAttribute('role','dialog');host.setAttribute('aria-modal','true');host.setAttribute('aria-labelledby','introTitle');
  storyIntroDispose=mountStoryIntro(host,cards,()=>{if(story!==activeStory)return;closeModal();done();});
 }
-function startCustomer(){gameAudio.music('salon');document.body.classList.remove('inBattle');el('phoneButton').hidden=true;el('battleHost').hidden=true;const id=story.project.schedule[story.day-1][story.index];story.guest=story.project.guests.find(g=>g.id===id);story.lastScore=0;story.portrait=null;story.headPortrait=null;story.outcome=null;story.resultRecorded=false;story.forcedBattle=story.guest.battle==='forced';story.lastMood=null;updateStoryHud('손님 맞이');loadSalon(story.guest);}
+function startCustomer(){gameAudio.music('salon');document.body.classList.remove('inBattle');el('phoneButton').hidden=true;el('battleHost').hidden=true;const id=story.project.schedule[story.day-1][story.index];story.guest=story.project.guests.find(g=>g.id===id);story.lastScore=0;story.portrait=null;story.headPortrait=null;story.outcome=null;story.resultRecorded=false;story.lossAccepted=false;story.forcedBattle=story.guest.battle==='forced';story.lastMood=null;updateStoryHud('손님 맞이');loadSalon(story.guest);}
 function arrival(){if(!story||story.arrivalBusy)return;story.arrivalBusy=true;updateStoryHud('손님과 대화');say('arrival',()=>{story.arrivalBusy=false;if(stageForGuest(story.guest)==='beauty'){updateStoryHud('미용');sendSalon('beauty-start');el('salon').focus();}else startBattle();});}
 function beautyResult(score,portrait,mood,headPortrait){if(!story)return;story.lastScore=score;story.lastMood=mood;story.portrait=portrait;story.headPortrait=headPortrait;if(story.preview){modal(`<span class="eyebrow">BEAUTY TEST</span><h2>미용 시험 완료</h2><p>이 시험 결과는 본편 영업 기록에 들어가지 않습니다.</p><div class="actions">${btn('returnBeauty','편집기로 돌아가기',true)}</div>`);el('modalCard').classList.add('beautyPreviewComplete');el('returnBeauty').onclick=()=>{closeModal();story=null;background();openEditor('beauty');};return;}updateStoryHud('미용 결과');say(mood?(mood==='satisfied'?'best':mood==='angry'?'fail':'normal'):score>=80?'best':score>=40?'normal':'fail',()=>{if(story.guest.battle==='none'){story.outcome='beauty';finishCustomer();return;}if(story.guest.battle==='forced'||score<40)battleChoice(true);else say('proposal',()=>battleChoice(false));});}
 function battleChoice(forced){story.forcedBattle=forced;modal(`<span class="eyebrow">YACHA CHALLENGE</span><h2>${forced?'손님이 야차를 신청했습니다.':'연습 야차 한 판, 어떠세요?'}</h2><p>${forced?'이번 손님은 야차로 이야기를 이어갑니다.':'제안을 수락하면 야차를 진행하고, 거절해도 미용 후기와 기본 팔로워는 유지됩니다. 승리하면 팔로워 200명이 추가됩니다.'}</p><div class="actions">${!forced?btn('declineBattle','이번엔 정중히 거절'):''}${btn('acceptBattle','야차 시작',true)}</div>`);el('acceptBattle').onclick=()=>{closeModal();startBattle();};if(el('declineBattle'))el('declineBattle').onclick=()=>{closeModal();story.outcome='declined';finishCustomer();};}
 function startBattle(){gameAudio.music(story.guest.id===10003?'sans':'battle');document.body.classList.add('inBattle');updateStoryHud('야차');el('battleHost').hidden=false;mountCombat(el('storyBattle'),'story',story.guest);}
-function battleEnd(outcome,stats){if(!story||story.outcome)return;story.outcome=outcome;story.stats=stats;gameAudio.music('salon');document.body.classList.remove('inBattle');el('storyBattle').srcdoc='';combatFrame=null;el('battleHost').hidden=true;sendSalon('salon-return');updateStoryHud(outcome==='victory'?'야차 승리 · 미용실로':'야차 패배');if(outcome==='defeat'){modal('<h2>잠깐 숨을 고를까요?</h2><p>다시 도전하면 현재 손님의 야차를 처음부터 시작합니다. 앞서 마친 미용 결과는 유지됩니다.</p><div class="actions">'+(story.forcedBattle?'':btn('lossContinue','패배 결과로 계속'))+btn('retryBattle','다시 도전',true)+'</div>');el('retryBattle').onclick=()=>{closeModal();story.outcome=null;startBattle();};if(el('lossContinue'))el('lossContinue').onclick=()=>{closeModal();say('afterLoss',finishCustomer);};}else say('afterWin',()=>{if(story.guest.id===10002)soulTutorial();else finishCustomer();});}
+function battleEnd(outcome,stats){
+ if(!story||story.outcome)return;story.outcome=outcome;story.stats=stats;gameAudio.music('salon');document.body.classList.remove('inBattle');el('storyBattle').srcdoc='';combatFrame=null;el('battleHost').hidden=true;sendSalon('salon-return');updateStoryHud(outcome==='victory'?'야차 승리 · 미용실로':'야차 패배');
+ const lastGuest=story.index===story.project.schedule[story.day-1].length-1;
+ showBattleResult({outcome,monsterID:story.guest.id,portrait:skin(story.guest).full,canAccept:story.guest.id!==10004,gain:storyVisitGain({...story,lossAccepted:true}).gain,lastGuest,
+ onRetry:()=>{story.outcome=null;startBattle();},
+ onContinue:()=>{if(outcome==='defeat'){story.lossAccepted=true;say('afterLoss',finishCustomer);}else say('afterWin',()=>{if(story.guest.id===10002)soulTutorial();else finishCustomer();});}});
+}
 function soulTutorial(){story.soulUnlocked=true;modal(`<span class="eyebrow">MONSTER SOUL · FIRST LESSON</span><h2>잊고 있던 손끝의 감각</h2><p>취객의 가업은 몬스터의 소울에 남은 힘을 <b>장비와 기술</b>로 빚어내는 일입니다. 야차를 마치고 미용실로 돌아온 지금, 그 이야기가 시작됩니다.</p><div class="mutedbox">① 소울에 남은 특성을 살펴보기<br>② 장비 또는 기술로 다듬기<br>③ 다음 야차에 사용할 힘 고르기</div><p class="minor">이 빌드에서는 해금 연출과 안내까지 연결했습니다. 소울의 실제 제작·장착 시스템은 후속 구현 영역입니다.</p><div class="actions">${btn('soulDone','기억해 둘게요',true)}</div>`);el('soulDone').onclick=()=>{closeModal();finishCustomer();};}
 function finishCustomer(){const g=story.guest;story=recordStoryVisit(story,story.portrait||skin(g).full);updateStoryHud('손님 배웅');sendSalon('followers',{value:story.followers});say('leave',()=>{if(g.id===10003&&story.outcome==='victory')departed();else sendSalon('depart',{portrait:story.portrait||skin(g).full});});}
 function departed(){if(!story)return;story.index++;if(story.index<story.project.schedule[story.day-1].length)startCustomer();else settlement();}
@@ -237,8 +244,8 @@ function settlement(){
 addEventListener('message',e=>{
  const frame=document.getElementById('storyClosing'),m=e.data;
  if(!story||!frame||e.source!==frame.contentWindow||e.origin!==location.origin||m?.source!=='yachacha-closing'||m.token!==closingToken)return;
- if(m.type==='ready')frame.contentWindow.postMessage({source:'yachacha-story',type:'init',token:closingToken,day:story.day,records:copy(story.records),weather:weatherForDay(),socialChoices:story.socialChoices||{}},location.origin);
- if(m.type==='next-day'){story.socialChoices=m.socialChoices||{};frame.remove();closingToken='';story.day++;story.index=0;startCustomer();}
+ if(m.type==='ready')frame.contentWindow.postMessage({source:'yachacha-story',type:'init',token:closingToken,day:story.day,records:copy(story.records),stars:story.stars||0,weather:weatherForDay(),socialChoices:story.socialChoices||{}},location.origin);
+ if(m.type==='next-day'){story.socialChoices=m.socialChoices||{};story.stars=Math.max(story.stars||0,m.stars||0);frame.remove();closingToken='';story.day++;story.index=0;startCustomer();}
  if(m.type==='home')homeNow();
 });
 function openPhone(){if(!story)return;toast('몬스타그램은 하루 마감 때 확인할 수 있어요.');}

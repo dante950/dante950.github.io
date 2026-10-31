@@ -1,3 +1,5 @@
+import {starThresholds,retainedStars} from '../star-progress.js';
+
 /** Rules for the closing-screen experiment, separate from the public story data. */
 export const GUESTS = Object.freeze([
   Object.freeze({ id: 'zombie', name: '취준좀비', day: 1, base: 1500 }),
@@ -35,6 +37,7 @@ export function normalizeSettings(input = {}) {
   const base = value.base && typeof value.base === 'object' ? value.base : {};
   return {
     threshold: wholeNumber(value.threshold, DEFAULT_SETTINGS.threshold, 1),
+    ...(Array.isArray(value.starThresholds)?{starThresholds:starThresholds(value)}:{}),
     bonus: wholeNumber(value.bonus, DEFAULT_SETTINGS.bonus),
     base: Object.fromEntries(GUESTS.map(guest => [
       guest.id, wholeNumber(base[guest.id], DEFAULT_SETTINGS.base[guest.id]),
@@ -55,7 +58,7 @@ export function createRun(settings = DEFAULT_SETTINGS) {
 }
 
 // Adapt completed story visits only; jumping to a later customer never invents rewards.
-export function runFromStory(records,day){
+export function runFromStory(records,day,progress={}){
  const ids={10001:'zombie',10003:'sans',10004:'minion',10005:'coffee'};
  const visits=records.filter(r=>ids[r.id]&&r.day<=day).map(r=>({
   ...r,id:`day-${r.day}-${ids[r.id]}`,guestId:ids[r.id],
@@ -63,7 +66,7 @@ export function runFromStory(records,day){
  }));
  const today=visits.filter(r=>r.day===day);
  const total=visits.at(-1)?.after||0;
- return {...createRun(),day,total,dayStart:today[0]?.before??total,visits};
+ return {...createRun(progress.settings),day,total,dayStart:today[0]?.before??total,visits,stars:Math.max(0,Math.floor(progress.stars||0))};
 }
 
 export function dayVisits(run) {
@@ -137,7 +140,7 @@ export function closingSummary(run) {
 export function closeDay(run) {
   if (!canClose(run)) return run;
   const { eligibleForStar } = closingSummary(run);
-  return { ...run, status: 'closed', stars: eligibleForStar ? 1 : run.stars };
+  return { ...run, status: 'closed', stars: eligibleForStar ? retainedStars(run.stars,run.total,starThresholds(run.settings)) : run.stars };
 }
 
 export function nextDay(run) {

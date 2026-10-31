@@ -1,0 +1,22 @@
+@font-face{font-family:YachaResultPixel;src:url('./media/closing-pixel.woff2') format('woff2');font-display:swap}
+.yacha-result{position:fixed;inset:0;z-index:1000;background:#000;display:flex;align-items:center;justify-content:center;font-family:YachaResultPixel,'Gulim',sans-serif;color:#e9dfbc}
+.yacha-result-board{position:relative;width:min(100vw,177.7778vh);aspect-ratio:16/9;overflow:hidden;container-type:inline-size;background:#000}
+.yacha-result-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none}
+.yacha-result-sprite{position:absolute;object-fit:contain;image-rendering:pixelated;pointer-events:none;right:3.5%;top:22%;width:42%;height:69%;object-position:center}
+.yacha-result-sprite[data-monster='10003']{right:6%;top:28%;width:37%;height:59%}
+.yacha-result-sprite[data-monster='10004']{right:8%;top:25%;width:31%;height:65%}
+.yacha-result[data-outcome='victory'] .yacha-result-sprite{left:6.5%;right:auto;top:18%;width:43%;height:85%;object-position:center top}
+.yacha-result-menu{position:absolute;left:4%;top:75%;width:51%;display:flex;gap:2%;align-items:flex-start}
+.yacha-result-choice{position:relative;flex:1;min-width:0;padding:0;border:0;border-radius:0;box-shadow:none;background:transparent;color:#625e6b;text-align:center;font:inherit;cursor:pointer;outline:none!important}
+.yacha-result-choice:hover,.yacha-result-choice:focus{background:transparent;box-shadow:none}
+.yacha-result-choice>span{position:relative;display:inline-block;padding:0 0 .85cqw;font-size:2.15cqw;line-height:1.5;white-space:nowrap;border-bottom:.22cqw solid transparent}
+.yacha-result-choice.selected{color:#ebe1bb}
+.yacha-result-choice.selected>span{border-color:#e40050}
+.yacha-result-choice.selected>span:before{content:'';position:absolute;left:-3.1cqw;top:.4cqw;width:0;height:0;border-left:2.3cqw solid #e91c5e;border-top:1.1cqw solid transparent;border-bottom:1.1cqw solid transparent}
+.yacha-result-choice>small{display:block;min-height:3.2em;margin-top:.8cqw;color:#817988;font-size:1.25cqw;line-height:1.6;white-space:pre-line;visibility:hidden}
+.yacha-result-choice.selected>small{visibility:visible}
+.yacha-result-next{position:absolute;right:2.8%;bottom:2.8%;padding:0;border:0;background:transparent;color:#eee;font:inherit;font-size:1.3cqw;cursor:pointer}
+.yacha-result-next:hover,.yacha-result-next:focus{background:transparent;color:#fff}
+
+.yacha-result[data-outcome='defeat'] .yacha-result-sprite[data-monster='10001']{transform:scaleX(-1)}
+.yacha-result-choice{flex:0 0 49%}

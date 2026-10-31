@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       intro_only: ${{ steps.scope.outputs.intro_only }}
+      result_only: ${{ steps.scope.outputs.result_only }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -26,9 +27,15 @@ jobs:
           BEFORE: ${{ github.event.before }}
         run: |
           intro_only=false
+          result_only=false
           if [ "$EVENT" = push ] && git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
             intro_only=true
+            result_only=true
             while IFS= read -r file; do
+              case "$file" in
+                src/battle-result.js|src/battle-result.css|src/battle-results-preview.html|src/star-progress.js|src/app.js|src/story-progress.js|src/closing/app.js|src/closing/model.js|src/tutorial/app.js|scripts/build.mjs|tests/battle-result.test.mjs|public/media/battle-results/*|docs/release-battle-results/*|.github/workflows/pages.yml) ;;
+                *) result_only=false ;;
+              esac
               case "$file" in
                 src/combat/cursor-engine.js|src/combat/cursor-scene.js|src/combat/tutorial.js|src/combat/story-stage.css|src/tutorial/combat-data.js|tests/coffee-combat.test.mjs|tests/cursor-combat.test.mjs|tests/coffee-tutorial-input.test.mjs|scripts/build.mjs|src/closing/app.js|src/tutorial/closing.js|tests/coffee-closing.test.mjs|src/index.html|public/tutorial-variants.html|src/tutorial/scene.js|tests/room-briefing.test.mjs|src/tutorial/presentation*|src/tutorial/app.js|src/tutorial/index.html|src/tutorial/style.css|src/tutorial/guest.js|src/tutorial/narrative.js|src/beauty-shape.js|public/media/intro/pt/*|tests/presentation*.test.mjs|tests/coffee-beauty.test.mjs|docs/*|.github/workflows/pages.yml) ;;
                 *) intro_only=false ;;
@@ -36,6 +43,7 @@ jobs:
             done < <(git diff --name-only "$BEFORE" HEAD)
           fi
           echo "intro_only=$intro_only" >> "$GITHUB_OUTPUT"
+          echo "result_only=$result_only" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -43,14 +51,17 @@ jobs:
       - name: Check changed presentation flow
         if: steps.scope.outputs.intro_only == 'true'
         run: node --test tests/presentation*.test.mjs tests/room-briefing.test.mjs tests/coffee-beauty.test.mjs tests/beauty-shape.test.mjs tests/coffee-closing.test.mjs tests/closing.test.mjs tests/social.test.mjs tests/coffee-combat.test.mjs tests/cursor-combat.test.mjs tests/coffee-tutorial-input.test.mjs
+      - name: Check battle results and retained stars
+        if: steps.scope.outputs.result_only == 'true'
+        run: node --test tests/battle-result.test.mjs tests/story-progress.test.mjs tests/closing.test.mjs tests/coffee-closing.test.mjs tests/social.test.mjs
       - run: npm test
-        if: steps.scope.outputs.intro_only != 'true'
+        if: steps.scope.outputs.intro_only != 'true' && steps.scope.outputs.result_only != 'true'
       - uses: actions/upload-pages-artifact@v4
         with:
           path: dist
   browser-checks:
     needs: build
-    if: needs.build.outputs.intro_only != 'true'
+    if: needs.build.outputs.intro_only != 'true' && needs.build.outputs.result_only != 'true'
     name: Check ${{ matrix.suite }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
