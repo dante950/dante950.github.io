@@ -47,7 +47,7 @@ function playReturningReaction(){
  if(briefing){returningReactionTimer=setTimeout(playReturningReaction,120);return;}
  const item=returningReactionQueue.shift();if(!item){returningReactionTimer=0;return;}
  showBeautyReaction(item.text,item.key==='returnCut'||item.key==='returnGrow'?'angry':'sigh');
- const duration=Math.min(4400,Math.max(1800,item.text.length*65+600));
+ const duration=Math.min(2400,Math.max(1500,item.text.length*55+400));
  returningReactionTimer=setTimeout(()=>{clearTimeout(reactionTimer);clearInterval(reactionTick);eyeReaction.hidden=true;reactionOpen=false;returningReactionTimer=0;playReturningReaction();},duration);
 }
 function clearReturningReactions(){clearTimeout(returningReactionTimer);returningReactionTimer=0;returningReactionQueue.length=0;clearTimeout(reactionTimer);clearInterval(reactionTick);eyeReaction.hidden=true;reactionOpen=false;}

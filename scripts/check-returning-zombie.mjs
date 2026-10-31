@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import http from 'node:http';
 import path from 'node:path';
-const root=path.resolve('dist'),out=path.resolve('docs/returning-zombie-040');
+const root=path.resolve('dist'),out=path.resolve('docs/returning-zombie-041');
 await fs.mkdir(out,{recursive:true});
 const server=http.createServer(async(req,res)=>{try{const file=path.resolve(root,'.'+(new URL(req.url,'http://localhost').pathname.replace(/\/$/,'/index.html')));if(!file.startsWith(root+path.sep))throw Error();res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.json':'application/json','.css':'text/css','.png':'image/png','.woff2':'font/woff2'})[path.extname(file)]||'application/octet-stream');res.end(await fs.readFile(file));}catch{res.writeHead(404).end();}});
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
@@ -27,10 +27,17 @@ try{
   if(success){
    await stage(f,'draw');await f.locator('[data-color="#FDFF81"]').click();await f.locator('#sculptSize').fill('4');await f.locator('#sculptSize').dispatchEvent('input');
    for(const xy of [[164,151],[168,151],[164,155],[168,155]])await stroke(f,xy);
-   await stage(f,'attach');await f.locator('[data-sticker="ST-HIP-SUNGLASSES-RED"]').click();await stroke(f,[160,108]);await f.locator('[data-sticker="ST-RESOURCE-T_necklace"]').click();await stroke(f,[160,216]);await f.locator('[data-sticker="ST-RESOURCE-T_Crown3"]').click();await stroke(f,[160,35]);
+   await stage(f,'attach');await f.locator('[data-sticker="'+(branch==='employed'?'ST-HIP-SUNGLASSES-BLACK':'ST-RESOURCE-T_Movieglasses')+'"]').click();await stroke(f,[160,108]);await f.locator('[data-sticker="ST-RESOURCE-T_necklace"]').click();await stroke(f,[160,216]);await f.locator('[data-sticker="'+(branch==='employed'?'ST-STRONG-CROWN-01':'ST-STRONG-CROWN-02')+'"]').click();await stroke(f,[160,35]);
+   if(branch==='employed'){
+    for(const id of ['ST-STRONG-CROWN-02','ST-RESOURCE-T_Crown3','ST-RESOURCE-T_SoftHatBig','ST-RESOURCE-T_SoftHatLong','ST-RESOURCE-T_tara','ST-STRONG-CROWN-01']){await stroke(f,[160,35]);await f.locator('[data-sticker="'+id+'"]').click();await stroke(f,[160,35]);assert.equal(await f.evaluate(()=>beautyDebug.scores.attach),30,id);}
+    for(const id of ['ST-RESOURCE-T_Movieglasses','ST-HIP-SUNGLASSES-RED','ST-HIP-SUNGLASSES-BLACK']){await stroke(f,[160,108]);await f.locator('[data-sticker="'+id+'"]').click();await stroke(f,[160,108]);assert.equal(await f.evaluate(()=>beautyDebug.scores.attach),30,id);}
+   }
    assert.equal(await f.evaluate(()=>returningStatus().success),true);const seen=await f.evaluate(()=>beautyDebug.reaction.seen);for(const slot of ['HeadTop','Eye','Neck'])assert(seen.includes(branch+slot));assert(!/금목걸이|선글라스/.test(await f.locator('.requestText').innerText()));
   }else{
-   assert.equal(await f.locator('[data-sticker]').count(),59);await f.locator('[data-tool="grow"]').click();await stroke(f,[45,120]);assert.equal(await f.evaluate(()=>beautyDebug.material.some((v,i)=>v&&!beautyDebug.original[i])),true);assert((await f.evaluate(()=>beautyDebug.reaction.seen)).includes('returnGrow'));await f.locator('[data-tool="scissors"]').click();await f.locator('#sculptSize').fill('30');await f.locator('#sculptSize').dispatchEvent('input');
+   await f.locator('[data-tool="grow"]').click();
+   for(const xy of [[132,128],[180,132],[165,151],[160,175]]){await stroke(f,xy);assert.equal(await f.evaluate(([x,y])=>!!beautyDebug.material[Math.floor(y/2)*160+Math.floor(x/2)],xy),true,'face growth '+xy);}
+   await p.screenshot({path:path.join(out,branch+'-face-growth.png')});
+   assert.equal(await f.locator('[data-sticker]').count(),43);await f.locator('[data-tool="grow"]').click();await stroke(f,[45,120]);assert.equal(await f.evaluate(()=>beautyDebug.material.some((v,i)=>v&&!beautyDebug.original[i])),true);assert((await f.evaluate(()=>beautyDebug.reaction.seen)).includes('returnGrow'));await f.locator('[data-tool="scissors"]').click();await f.locator('#sculptSize').fill('30');await f.locator('#sculptSize').dispatchEvent('input');
    for(const y of [20,45,70,95])await stroke(f,[55,y],[240,y]);
    assert.equal(await f.evaluate(()=>returningStatus().hairRuined),true);assert((await f.evaluate(()=>beautyDebug.reaction.seen)).includes('returnCut'));await stage(f,'draw');await f.locator('[data-color="#483ADF"]').click();await stroke(f,[145,185]);assert(!(await f.evaluate(()=>beautyDebug.reaction.seen)).includes('returnWrongTooth'));await stroke(f,[165,151]);assert((await f.evaluate(()=>beautyDebug.reaction.seen)).includes('returnWrongTooth'));await f.locator('[data-color="#00DC0A"]').click();await stroke(f,[165,151]);assert.equal((await f.evaluate(()=>beautyDebug.reaction.seen)).filter(x=>x==='returnWrongTooth').length,1);await stage(f,'attach');const before=await f.evaluate(()=>beautyDebug.reaction.seen);await f.locator('[data-sticker="ST-CUTE-HEART-PINK"]').click();await stroke(f,[50,165]);assert.deepEqual(await f.evaluate(()=>beautyDebug.reaction.seen),before);
   }

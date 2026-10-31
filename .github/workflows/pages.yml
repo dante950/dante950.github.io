@@ -36,7 +36,7 @@ jobs:
             returning_only=true
             while IFS= read -r file; do
               case "$file" in
-                src/returning-zombie.js|src/app.js|src/model.js|src/index.html|src/style.css|src/beauty-rules.js|src/salon.html|src/salon-beauty.js|src/salon-beauty-result.js|src/story-progress.js|src/closing/app.js|src/closing/model.js|src/closing/social-model.js|src/closing/social-ui.js|data/project.json|data/assets.json|scripts/build.mjs|scripts/check-returning-zombie.mjs|scripts/check-story-starts.mjs|tests/returning-zombie.test.mjs|tests/story-start.test.mjs|tests/salon-dialogue.test.mjs|tests/workshop-dialogue.test.mjs|public/media/returning-zombie/*|docs/returning-zombie/*|docs/returning-zombie-040/*|public/media/stickers/*|.github/workflows/pages.yml) ;;
+                src/returning-zombie.js|src/app.js|src/model.js|src/index.html|src/style.css|src/beauty-rules.js|src/salon.html|src/salon-beauty.js|src/salon-beauty-result.js|src/story-progress.js|src/closing/app.js|src/closing/model.js|src/closing/social-model.js|src/closing/social-ui.js|data/project.json|data/assets.json|scripts/build.mjs|scripts/check-returning-zombie.mjs|scripts/check-story-starts.mjs|tests/returning-zombie.test.mjs|tests/story-start.test.mjs|tests/salon-dialogue.test.mjs|tests/workshop-dialogue.test.mjs|public/media/returning-zombie/*|docs/returning-zombie/*|docs/returning-zombie-040/*|docs/returning-zombie-041/*|src/tutorial/stickers.js|public/media/stickers/*|.github/workflows/pages.yml) ;;
                 *) returning_only=false ;;
               esac
               case "$file" in

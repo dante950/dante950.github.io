@@ -25,6 +25,83 @@
   "phoneAlarm": "./media/439a3a115c8f6d06715eb37b.png",
   "stickers": [
     {
+      "id": "ST-FUN-NOSE-RED",
+      "name": "광대 코",
+      "tag": "Tag_Fun",
+      "region": "Nose",
+      "src": "./media/bf3eb786d67b326665e8dcb7.png",
+      "w": 38,
+      "h": 36,
+      "styleTags": [
+        "웃긴"
+      ],
+      "placementNote": "코 근처",
+      "tagSource": "https://app.notion.com/p/404648bf677880f5a304c62262c5a3ce",
+      "resourceFile": "T_JesterNose.png"
+    },
+    {
+      "id": "ST-STRONG-FLAME-BLUE",
+      "name": "파란색 불꽃",
+      "tag": "Tag_Strong",
+      "region": "HeadTop",
+      "src": "./media/30383902a18f70046e3dfbf8.png",
+      "w": 40,
+      "h": 54,
+      "styleTags": [
+        "무서운",
+        "터프한"
+      ],
+      "placementNote": "위치 상관 없음",
+      "tagSource": "https://app.notion.com/p/404648bf677880f5a304c62262c5a3ce",
+      "resourceFile": "T_FireBlue.png"
+    },
+    {
+      "id": "ST-GENTLE-GLASSES-HORN",
+      "name": "안경",
+      "tag": "Tag_Gentle",
+      "region": "Eye",
+      "src": "./media/dccca78caf700f0bfd06372c.png",
+      "w": 82,
+      "h": 42,
+      "styleTags": [
+        "단정한"
+      ],
+      "placementNote": "눈 근처",
+      "tagSource": "https://app.notion.com/p/404648bf677880f5a304c62262c5a3ce",
+      "resourceFile": "T_Glasses.png"
+    },
+    {
+      "id": "ST-GENTLE-MOUSTACHE",
+      "name": "단정한 수염",
+      "tag": "Tag_Gentle",
+      "region": "UnderNose",
+      "src": "./media/3b5333952446137687059bfa.png",
+      "w": 58,
+      "h": 34,
+      "styleTags": [
+        "단정한",
+        "터프한"
+      ],
+      "placementNote": "코 근처",
+      "tagSource": "https://app.notion.com/p/404648bf677880f5a304c62262c5a3ce",
+      "resourceFile": "T_Beard.png"
+    },
+    {
+      "id": "ST-GENTLE-BOWTIE-BLACK",
+      "name": "단정한 리본",
+      "tag": "Tag_Gentle",
+      "region": "Neck",
+      "src": "./media/96c0454ac3b7ae0b90eac8b1.png",
+      "w": 56,
+      "h": 36,
+      "styleTags": [
+        "단정한"
+      ],
+      "placementNote": "목 근처",
+      "tagSource": "https://app.notion.com/p/404648bf677880f5a304c62262c5a3ce",
+      "resourceFile": "T_Bowtie.png"
+    },
+    {
       "id": "ST-RESOURCE-T_AngelRing",
       "name": "엔젤링",
       "src": "./media/stickers/T_AngelRing.png",
@@ -115,7 +192,7 @@
     },
     {
       "id": "ST-STRONG-CROWN-01",
-      "name": "왕관 1",
+      "name": "왕관",
       "tag": "Tag_Strong",
       "region": "HeadTop",
       "src": "./media/stickers/T_Crown1.png",
@@ -132,7 +209,7 @@
     },
     {
       "id": "ST-STRONG-CROWN-02",
-      "name": "왕관 2",
+      "name": "티아라",
       "tag": "Tag_Strong",
       "region": "HeadTop",
       "src": "./media/stickers/T_Crown2.png",
@@ -341,16 +418,6 @@
       "resourceFile": "T_hairtie_L.png"
     },
     {
-      "id": "ST-RESOURCE-T_hairtie_R",
-      "name": "오른쪽 머리끈",
-      "src": "./media/stickers/T_hairtie_R.png",
-      "w": 16,
-      "h": 12,
-      "resourceFile": "T_hairtie_R.png",
-      "styleTags": [],
-      "tagStatus": "태그 미지정"
-    },
-    {
       "id": "ST-RESOURCE-T_Hat",
       "name": "힙한 모자",
       "src": "./media/stickers/T_Hat.png",
@@ -371,7 +438,7 @@
     },
     {
       "id": "ST-CUTE-HEART-PINK",
-      "name": "하트",
+      "name": "분홍 하트",
       "tag": "Tag_Cute",
       "region": "Cheek",
       "src": "./media/stickers/T_Heart.png",
@@ -421,28 +488,8 @@
       "resourceFile": "T_hornBig_R.png"
     },
     {
-      "id": "ST-RESOURCE-T_hornSmall_L",
-      "name": "왼쪽 작은 뿔",
-      "src": "./media/stickers/T_hornSmall_L.png",
-      "w": 14,
-      "h": 20,
-      "resourceFile": "T_hornSmall_L.png",
-      "styleTags": [],
-      "tagStatus": "태그 미지정"
-    },
-    {
-      "id": "ST-RESOURCE-T_hornSmall_R",
-      "name": "오른쪽 작은 뿔",
-      "src": "./media/stickers/T_hornSmall_R.png",
-      "w": 14,
-      "h": 20,
-      "resourceFile": "T_hornSmall_R.png",
-      "styleTags": [],
-      "tagStatus": "태그 미지정"
-    },
-    {
       "id": "ST-STRONG-SCAR-01",
-      "name": "흉터 1",
+      "name": "상처",
       "tag": "Tag_Strong",
       "region": "CheekLeft",
       "src": "./media/stickers/T_Hurt_L.png",
@@ -456,20 +503,6 @@
       "placementNote": "위치 상관 없음",
       "tagSource": "https://app.notion.com/p/404648bf677880f5a304c62262c5a3ce",
       "resourceFile": "T_Hurt_L.png"
-    },
-    {
-      "id": "ST-STRONG-SCAR-02",
-      "name": "흉터 2",
-      "tag": "Tag_Strong",
-      "region": "CheekRight",
-      "src": "./media/stickers/T_Hurt_R.png",
-      "w": 26,
-      "h": 58,
-      "resourceFile": "T_Hurt_R.png",
-      "styleTags": [
-        "터프한"
-      ],
-      "tagStatus": "기존 설정 유지 · 신규 기획 확인 필요"
     },
     {
       "id": "ST-RESOURCE-T_Hurt2",
@@ -527,7 +560,7 @@
     },
     {
       "id": "ST-RESOURCE-T_necklace",
-      "name": "금목걸이",
+      "name": "금 목걸이",
       "src": "./media/stickers/T_necklace.png",
       "w": 80,
       "h": 32,
@@ -564,26 +597,6 @@
       "placementNote": "위치 상관 없음",
       "tagSource": "https://app.notion.com/p/404648bf677880f5a304c62262c5a3ce",
       "resourceFile": "T_Nose.png"
-    },
-    {
-      "id": "ST-RESOURCE-T_Piercing1",
-      "name": "피어싱 1",
-      "src": "./media/stickers/T_Piercing1.png",
-      "w": 8,
-      "h": 8,
-      "resourceFile": "T_Piercing1.png",
-      "styleTags": [],
-      "tagStatus": "태그 미지정"
-    },
-    {
-      "id": "ST-RESOURCE-T_Piercing2",
-      "name": "피어싱 2",
-      "src": "./media/stickers/T_Piercing2.png",
-      "w": 6,
-      "h": 8,
-      "resourceFile": "T_Piercing2.png",
-      "styleTags": [],
-      "tagStatus": "태그 미지정"
     },
     {
       "id": "ST-RESOURCE-T_pinkStar",
@@ -627,7 +640,7 @@
     },
     {
       "id": "ST-CUTE-RIBBON-PINK",
-      "name": "분홍 리본",
+      "name": "분홍리본",
       "tag": "Tag_Cute",
       "region": "HeadTop",
       "src": "./media/stickers/T_RibbonPink.png",
@@ -642,46 +655,6 @@
       "placementNote": "위치 상관 없음",
       "tagSource": "https://app.notion.com/p/404648bf677880f5a304c62262c5a3ce",
       "resourceFile": "T_RibbonPink.png"
-    },
-    {
-      "id": "ST-RESOURCE-T_screw_L",
-      "name": "왼쪽 나사",
-      "src": "./media/stickers/T_screw_L.png",
-      "w": 12,
-      "h": 12,
-      "resourceFile": "T_screw_L.png",
-      "styleTags": [],
-      "tagStatus": "태그 미지정"
-    },
-    {
-      "id": "ST-RESOURCE-T_screw_R",
-      "name": "오른쪽 나사",
-      "src": "./media/stickers/T_screw_R.png",
-      "w": 12,
-      "h": 12,
-      "resourceFile": "T_screw_R.png",
-      "styleTags": [],
-      "tagStatus": "태그 미지정"
-    },
-    {
-      "id": "ST-RESOURCE-T_skeleton",
-      "name": "해골",
-      "src": "./media/stickers/T_skeleton.png",
-      "w": 18,
-      "h": 16,
-      "resourceFile": "T_skeleton.png",
-      "styleTags": [],
-      "tagStatus": "태그 미지정"
-    },
-    {
-      "id": "ST-RESOURCE-T_SmallRose",
-      "name": "작은 장미",
-      "src": "./media/stickers/T_SmallRose.png",
-      "w": 24,
-      "h": 18,
-      "resourceFile": "T_SmallRose.png",
-      "styleTags": [],
-      "tagStatus": "태그 미지정"
     },
     {
       "id": "ST-RESOURCE-T_SoftHatBig",
@@ -718,18 +691,8 @@
       "resourceFile": "T_SoftHatLong.png"
     },
     {
-      "id": "ST-RESOURCE-T_SoftHatSmall",
-      "name": "작은 중절모",
-      "src": "./media/stickers/T_SoftHatSmall.png",
-      "w": 48,
-      "h": 36,
-      "resourceFile": "T_SoftHatSmall.png",
-      "styleTags": [],
-      "tagStatus": "태그 미지정"
-    },
-    {
       "id": "ST-HIP-SUNGLASSES-BLACK",
-      "name": "검정 선글라스",
+      "name": "힙한 선글라스",
       "tag": "Tag_Hip",
       "region": "Eye",
       "src": "./media/stickers/T_Sunglasses.png",
@@ -737,33 +700,20 @@
       "h": 34,
       "resourceFile": "T_Sunglasses.png",
       "styleTags": [
-        "힙한"
+        "웃긴",
+        "터프한",
+        "예쁜",
+        "섹시한",
+        "단정한",
+        "무서운",
+        "귀여운"
       ],
-      "tagStatus": "기존 설정 유지 · 신규 기획 확인 필요"
-    },
-    {
-      "id": "ST-RESOURCE-T_Sunglasses2",
-      "name": "선글라스 2",
-      "src": "./media/stickers/T_Sunglasses2.png",
-      "w": 52,
-      "h": 14,
-      "resourceFile": "T_Sunglasses2.png",
-      "styleTags": [],
-      "tagStatus": "태그 미지정"
-    },
-    {
-      "id": "ST-RESOURCE-T_Sunglasses3",
-      "name": "선글라스 3",
-      "src": "./media/stickers/T_Sunglasses3.png",
-      "w": 54,
-      "h": 12,
-      "resourceFile": "T_Sunglasses3.png",
-      "styleTags": [],
-      "tagStatus": "태그 미지정"
+      "placementNote": "눈 근처",
+      "tagSource": "https://app.notion.com/p/404648bf677880f5a304c62262c5a3ce"
     },
     {
       "id": "ST-HIP-SUNGLASSES-RED",
-      "name": "빨간 선글라스",
+      "name": "드레스로자 선글라스",
       "tag": "Tag_Hip",
       "region": "Eye",
       "src": "./media/stickers/T_SunglassesRed.png",
@@ -781,31 +731,6 @@
       "placementNote": "눈 근처",
       "tagSource": "https://app.notion.com/p/404648bf677880f5a304c62262c5a3ce",
       "resourceFile": "T_SunglassesRed.png"
-    },
-    {
-      "id": "ST-RESOURCE-T_SunglassesStar",
-      "name": "별 선글라스",
-      "src": "./media/stickers/T_SunglassesStar.png",
-      "w": 56,
-      "h": 24,
-      "resourceFile": "T_SunglassesStar.png",
-      "styleTags": [],
-      "tagStatus": "태그 미지정"
-    },
-    {
-      "id": "ST-RESOURCE-T_tara",
-      "name": "세련된 티아라",
-      "src": "./media/stickers/T_tara.png",
-      "w": 50,
-      "h": 26,
-      "styleTags": [
-        "터프한",
-        "섹시한",
-        "무서운"
-      ],
-      "placementNote": "모자",
-      "tagSource": "https://app.notion.com/p/404648bf677880f5a304c62262c5a3ce",
-      "resourceFile": "T_tara.png"
     },
     {
       "id": "ST-RESOURCE-T_Unicorn",
@@ -827,96 +752,19 @@
       "resourceFile": "T_Unicorn.png"
     },
     {
-      "id": "ST-RESOURCE-T_WhiteStar",
-      "name": "하얀 별",
-      "src": "./media/stickers/T_WhiteStar.png",
-      "w": 14,
-      "h": 14,
-      "resourceFile": "T_WhiteStar.png",
-      "styleTags": [],
-      "tagStatus": "태그 미지정"
-    },
-    {
-      "id": "ST-RESOURCE-T_yellowStar",
-      "name": "노란 별",
-      "src": "./media/stickers/T_yellowStar.png",
-      "w": 14,
-      "h": 14,
-      "resourceFile": "T_yellowStar.png",
-      "styleTags": [],
-      "tagStatus": "태그 미지정"
-    },
-    {
-      "id": "ST-FUN-NOSE-RED",
-      "name": "빨간 코 장식",
-      "tag": "Tag_Fun",
-      "region": "Nose",
-      "src": "./media/bf3eb786d67b326665e8dcb7.png",
-      "w": 38,
-      "h": 36,
+      "id": "ST-RESOURCE-T_tara",
+      "name": "세련된 티아라",
+      "src": "./media/stickers/T_tara.png",
+      "w": 50,
+      "h": 26,
       "styleTags": [
-        "웃긴"
+        "터프한",
+        "섹시한",
+        "무서운"
       ],
-      "placementNote": "코 근처",
-      "tagSource": "https://app.notion.com/p/404648bf677880f5a304c62262c5a3ce"
-    },
-    {
-      "id": "ST-GENTLE-BOWTIE-BLACK",
-      "name": "검정 나비넥타이",
-      "tag": "Tag_Gentle",
-      "region": "Neck",
-      "src": "./media/96c0454ac3b7ae0b90eac8b1.png",
-      "w": 56,
-      "h": 36,
-      "styleTags": [
-        "단정한"
-      ],
-      "placementNote": "목 근처",
-      "tagSource": "https://app.notion.com/p/404648bf677880f5a304c62262c5a3ce"
-    },
-    {
-      "id": "ST-GENTLE-GLASSES-HORN",
-      "name": "뿔테안경",
-      "tag": "Tag_Gentle",
-      "region": "Eye",
-      "src": "./media/dccca78caf700f0bfd06372c.png",
-      "w": 82,
-      "h": 42,
-      "styleTags": [
-        "단정한"
-      ],
-      "placementNote": "눈 근처",
-      "tagSource": "https://app.notion.com/p/404648bf677880f5a304c62262c5a3ce"
-    },
-    {
-      "id": "ST-GENTLE-MOUSTACHE",
-      "name": "콧수염",
-      "tag": "Tag_Gentle",
-      "region": "UnderNose",
-      "src": "./media/3b5333952446137687059bfa.png",
-      "w": 58,
-      "h": 34,
-      "styleTags": [
-        "단정한",
-        "터프한"
-      ],
-      "placementNote": "코 근처",
-      "tagSource": "https://app.notion.com/p/404648bf677880f5a304c62262c5a3ce"
-    },
-    {
-      "id": "ST-STRONG-FLAME-BLUE",
-      "name": "푸른 불꽃",
-      "tag": "Tag_Strong",
-      "region": "HeadTop",
-      "src": "./media/30383902a18f70046e3dfbf8.png",
-      "w": 40,
-      "h": 54,
-      "styleTags": [
-        "무서운",
-        "터프한"
-      ],
-      "placementNote": "위치 상관 없음",
-      "tagSource": "https://app.notion.com/p/404648bf677880f5a304c62262c5a3ce"
+      "placementNote": "모자",
+      "tagSource": "https://app.notion.com/p/404648bf677880f5a304c62262c5a3ce",
+      "resourceFile": "T_tara.png"
     }
   ],
   "room": {

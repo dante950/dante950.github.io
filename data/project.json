@@ -3526,15 +3526,7 @@
             "GroupID": 80114,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "으어어?! 머, 머리는 그대로 두라고 했는데…!",
-            "Notes": "재등장 좀비"
-          },
-          {
-            "DialogueID": 900204,
-            "GroupID": 80114,
-            "Order": 2,
-            "Speaker": "몬스터",
-            "Text": "크흠. 그래요… 성공한 사람은 존재감이 좀 커야죠.",
+            "Text": "으어어?! 존재감이 너무 커지는데요!",
             "Notes": "재등장 좀비"
           },
           {
@@ -3542,37 +3534,13 @@
             "GroupID": 80115,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "으어어?! 제 말 들으신 거 맞죠?!",
-            "Notes": "재등장 좀비"
-          },
-          {
-            "DialogueID": 900206,
-            "GroupID": 80115,
-            "Order": 2,
-            "Speaker": "몬스터",
-            "Text": "잠깐만요. 머리는 건드리지 말라고…",
-            "Notes": "재등장 좀비"
-          },
-          {
-            "DialogueID": 900207,
-            "GroupID": 80115,
-            "Order": 3,
-            "Speaker": "몬스터",
-            "Text": "크흠. 뭐, 이미 시작하셨으니까요.",
+            "Text": "으어어?! 머리는 그대로라니까요!",
             "Notes": "재등장 좀비"
           },
           {
             "DialogueID": 900208,
             "GroupID": 80116,
             "Order": 1,
-            "Speaker": "몬스터",
-            "Text": "허허. 이 정도면 웃을 때마다 재력보다 이빨이 먼저 보이겠네요.",
-            "Notes": "재등장 좀비"
-          },
-          {
-            "DialogueID": 900209,
-            "GroupID": 80116,
-            "Order": 2,
             "Speaker": "몬스터",
             "Text": "……원래 색으로 해달라니까?",
             "Notes": "재등장 좀비"
@@ -6749,7 +6717,6 @@
             "stickerIDs": [
               "ST-STRONG-FLAME-BLUE",
               "ST-STRONG-SCAR-01",
-              "ST-STRONG-SCAR-02",
               "ST-STRONG-CROWN-01",
               "ST-STRONG-CROWN-02"
             ]
@@ -7049,9 +7016,9 @@
           "attach": true
         },
         "weights": {
-          "cut": 30,
-          "draw": 30,
-          "attach": 40
+          "cut": 10,
+          "draw": 60,
+          "attach": 30
         },
         "designVersion": 2,
         "returningZombie": true,
@@ -7068,7 +7035,8 @@
             "y": 0,
             "w": 280,
             "h": 270
-          }
+          },
+          "allowFace": true
         },
         "cutRegions": [
           {
@@ -7080,7 +7048,7 @@
             "h": 210,
             "kind": "good",
             "shape": "rect",
-            "points": 30,
+            "points": 10,
             "stickerIDs": [],
             "rule": "preserve",
             "tolerance": 0.03
@@ -7096,7 +7064,7 @@
             "h": 10,
             "kind": "good",
             "shape": "rect",
-            "points": 30,
+            "points": 60,
             "stickerIDs": [],
             "requiredCoverage": 0.85
           },
@@ -7109,7 +7077,7 @@
             "h": 35,
             "kind": "bad",
             "shape": "rect",
-            "points": 30,
+            "points": 60,
             "stickerIDs": [],
             "tolerance": 0.12
           }
@@ -7141,8 +7109,8 @@
               "ST-RESOURCE-T_SoftHatBig",
               "ST-RESOURCE-T_SoftHatLong",
               "ST-RESOURCE-T_tara",
-              "ST-RESOURCE-T_Crown1",
-              "ST-RESOURCE-T_Crown2"
+              "ST-STRONG-CROWN-01",
+              "ST-STRONG-CROWN-02"
             ]
           },
           {
@@ -7157,7 +7125,7 @@
             "points": 0,
             "stickerIDs": [
               "ST-RESOURCE-T_Movieglasses",
-              "ST-RESOURCE-T_SoftHatLong",
+              "ST-HIP-SUNGLASSES-BLACK",
               "ST-HIP-SUNGLASSES-RED"
             ]
           },
