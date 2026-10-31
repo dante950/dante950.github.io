@@ -10,7 +10,7 @@ const resultHand=document.createElement('canvas');resultHand.width=28;resultHand
 // Temporary code-drawn pixel hands. Bone joints and a blue cuff distinguish Sans.
 function drawResultHand(){
  const c=resultHand.getContext('2d');c.clearRect(0,0,28,40);
- const palette=GUEST.skin?.layers?{edge:'#03051B',shade:'#636072',base:'#B8AFAB',light:'#F2D6B9',cuff:'#403F54'}:bone?{edge:'#45425E',shade:'#A6A0BA',base:'#E9E2D6',light:'#FFF6DE',cuff:'#526BA4'}:{edge:'#204659',shade:'#29988F',base:'#5BDEC7',light:'#9CF3D6',cuff:'#B7C8CF'};
+ const palette=isReturningZombie?{edge:'#204659',shade:'#29988F',base:'#5BDEC7',light:'#9CF3D6',cuff:'#193343'}:GUEST.skin?.layers?{edge:'#03051B',shade:'#636072',base:'#B8AFAB',light:'#F2D6B9',cuff:'#403F54'}:bone?{edge:'#45425E',shade:'#A6A0BA',base:'#E9E2D6',light:'#FFF6DE',cuff:'#526BA4'}:{edge:'#204659',shade:'#29988F',base:'#5BDEC7',light:'#9CF3D6',cuff:'#B7C8CF'};
  const rect=(color,x,y,w,h)=>{c.fillStyle=palette[color];c.fillRect(x,y,w,h);};
  c.fillStyle=palette.edge;c.beginPath();for(const [i,p] of [[10,2],[15,2],[17,5],[17,14],[23,14],[26,17],[26,29],[23,33],[22,39],[4,39],[4,31],[2,28],[2,20],[5,17],[8,16],[8,5]].entries())i?c.lineTo(...p):c.moveTo(...p);c.closePath();c.fill();
  rect('base',10,5,5,14);rect('light',10,5,2,10);rect('shade',13,5,2,12);
@@ -38,12 +38,12 @@ function revealBeautyResult(){
 function advanceBeautyResult(){
  if(!beautyResultActive)return;clearTimeout(resultRevealTimer);clearTimeout(resultEndTimer);revealBeautyResult();
  beautyResultActive=false;resultContinue.hidden=true;beautyScreen.classList.add('resultSettled');
- send('beauty-result',{score:totalSatisfaction,mood:resultMood,portrait:captureBeautyCustomer(),headPortrait:captureBeautyHead()});
+ send('beauty-result',{score:totalSatisfaction,mood:resultMood,portrait:captureBeautyCustomer(),headPortrait:captureBeautyHead(),details:isReturningZombie?returningStatus():null});
 }
 function startBeautyResult(){
  if(!ready||finishing||briefing||!beautyLessonDone)return;cancelGesture();updateBeautyScore();finishing=true;beautyPhase='result';beautyResultActive=true;
  clearTimeout(actionMoodTimer);requestAnimationSerial++;
- resultMood=beautyResultMood(B,shapeProgress,totalSatisfaction);
+ resultMood=isReturningZombie?(returningStatus().success?'satisfied':'angry'):beautyResultMood(B,shapeProgress,totalSatisfaction);
  eyeReaction.hidden=true;clearTimeout(reactionTimer);clearInterval(reactionTick);reactionOpen=false;
  expression='neutral';talking=false;mouthFrame=false;zonesVisible=false;fallingPieces=[];renderPortrait(false);
  next.disabled=true;finish.disabled=true;state.keys.clear();

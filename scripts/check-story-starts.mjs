@@ -15,7 +15,7 @@ export async function checkStoryStarts(page,{screenshotPath,checkContinuation=fa
  await page.locator('#home').click();
  await page.locator('#soundToggle').click();
  await page.locator('#playChapter').click();
- assert.equal(await page.locator('[data-start-guest]').count(),3);
+ assert.equal(await page.locator('[data-start-guest]').count(),4);
  assert.equal(await page.evaluate(()=>window.fullflow.story),null);
  if(screenshotPath)await page.screenshot({path:screenshotPath});
  await page.keyboard.press('Escape');

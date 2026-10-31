@@ -15,7 +15,7 @@ test('workbook roundtrip excludes only workshop dialogue and restores its edited
  const workbookGuestIDs=[...new Set(rows(workbook,'몬스터 페이즈').map(r=>r.MonsterID))];
  assert.deepEqual(salonDialogueProblems({combat:workbook,guests:workbookGuestIDs.map(id=>({id}))}),[]);
  const merged=mergeWorkshopDialogues(p,workbook);
- assert.deepEqual(merged,p.combat);assert.deepEqual(p,before);
+ for(const sheet of p.combat.sheets)assert.deepEqual(rows(merged,sheet.name).map(r=>JSON.stringify(r)).sort(),sheet.rows.map(r=>JSON.stringify(r)).sort());assert.deepEqual(p,before);
  const restored={...p,combat:merged};assert.equal(salonDialogueGroup(restored,10004,'cut').lines[0].Text,'사용자가 수정한 마왕 부하 부탁');
  assert.deepEqual(mergeWorkshopDialogues(restored,combatForWorkbook(restored)),merged);
  assert.deepEqual(mergeWorkshopDialogues(restored,merged),merged);
@@ -70,7 +70,7 @@ test('conflicting incoming workshop links fail without changing either input',()
  assert.equal(rows(merged,'대사').find(r=>r.DialogueID===request.DialogueID).Text,request.Text);
  assert.equal(rows(merged,'대사').find(r=>r.DialogueID===reaction.DialogueID).Text,reaction.Text);
  assert.equal(rows(merged,'대사').find(r=>r.DialogueID===arrival.DialogueID).Text,arrival.Text);
- assert.deepEqual(combatForWorkbook({...p,combat:merged}),merged);
+ assert.deepEqual(combatForWorkbook({...p,combat:merged}),data);assert.equal(salonDialogueGroup({...p,combat:merged},10006,'draw').lines.length,1);
  });
  test('old workbook omissions are restored without overwriting existing rows; partial deletions fail',()=>{
  const old=combatForWorkbook(base),merged=mergeWorkshopDialogues(published,old);

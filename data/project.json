@@ -3176,6 +3176,230 @@
             "Text": "왔을 때보다 뿔이 더 많군요. “요구 이상의 성과”라고 적기에는 방향이 반대입니다만.",
             "Notes": "마왕 부하 · 처음보다 뿔이 더 많아졌을 때",
             "__source": null
+          },
+          {
+            "DialogueID": 900144,
+            "GroupID": 80090,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "저 기억하시죠? 면접, 붙었습니다.",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900145,
+            "GroupID": 80090,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "입사 축하금도 받았으니, 오늘은 좀 격에 맞게 부탁드릴게요.",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900146,
+            "GroupID": 80090,
+            "Order": 3,
+            "Speaker": "몬스터",
+            "Text": "아, 제가 뽑는다는 건 아니고요. 곧 그럴 수도 있으니까.ㅋ",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900147,
+            "GroupID": 80091,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "면접이요? 대차게 말아먹었죠.",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900148,
+            "GroupID": 80091,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "터덜터덜 집에 가다가 복권 한 장을 주웠는데… 그게 1등이더라고요.",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900149,
+            "GroupID": 80091,
+            "Order": 3,
+            "Speaker": "몬스터",
+            "Text": "취업이요? 이제 제가 회사를 사면 되죠.",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900150,
+            "GroupID": 80092,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "이 정도면 신입이 아니라 임원으로 보이겠는데요?",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900151,
+            "GroupID": 80093,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "<size=0.85>……사원증은 뒤집고 가야겠다.</size>",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900152,
+            "GroupID": 80094,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "신입이 너무 앞서가도 곤란한데.",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900153,
+            "GroupID": 80095,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "<size=0.85>……인사팀에서 못 알아보진 않겠지.</size>",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900154,
+            "GroupID": 80096,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "음… 제가 요청한 내용하고는 좀 다른데요.",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900155,
+            "GroupID": 80096,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "뭐, 윗사람은 이런 것도 품어줄 줄 알아야죠.",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900156,
+            "GroupID": 80097,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "<size=0.85>……내일 출근인데.</size>",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900157,
+            "GroupID": 80098,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "이제야 얼굴이 통장 잔고를 따라오네요.",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900158,
+            "GroupID": 80098,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "부자가 되는 주파수라도 알려드릴까요?",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900159,
+            "GroupID": 80099,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "<size=0.85>……일단 바닥을 잘 보고 다니세요.</size>",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900160,
+            "GroupID": 80100,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "이게 부자의 여유라는 겁니다. 머리 정도는 없어도 돼요.",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900161,
+            "GroupID": 80100,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "부자가 되는 주파수라도 알려드릴까요?",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900162,
+            "GroupID": 80101,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "<size=0.85>…지금은 잘 안 잡히네.</size>",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900163,
+            "GroupID": 80102,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "제가 말한 거랑 좀 다르긴 한데… 뭐, 괜찮습니다.",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900164,
+            "GroupID": 80102,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "이게 부자의 여유라는 겁니다.",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900165,
+            "GroupID": 80103,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "<size=0.85>……다른 데서 고치면 되니까.</size>",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900166,
+            "GroupID": 80104,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "머리는 절대 건드리지 마세요. 이게 제 성공의 상징이거든요.",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900167,
+            "GroupID": 80105,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "지금 머리 그대로요. 자르지도, 더 기르지도 말아 주세요.",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900168,
+            "GroupID": 80106,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "빠진 이빨만 좀 그려 주세요. 원래 치아색이랑 똑같이.",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900169,
+            "GroupID": 80107,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "여기 앞니 빠진 자리 보이죠? 남아 있는 이빨과 같은 연노란색으로 자연스럽게 채워 주세요. 금니 말고요.",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900170,
+            "GroupID": 80108,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "금목걸이에 힙한 선글라스. 딱 보면 성공한 사람 같게요.",
+            "Notes": "재등장 좀비"
+          },
+          {
+            "DialogueID": 900171,
+            "GroupID": 80109,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "목에는 금목걸이 하나, 눈에는 힙한 선글라스 하나. 두 개 다 부탁드립니다.",
+            "Notes": "재등장 좀비"
           }
         ]
       },
@@ -4469,6 +4693,266 @@
             "ActorEffect": "없음",
             "FinishEffect": "없음",
             "__source": null
+          },
+          {
+            "GroupID": 80090,
+            "Name": "재등장 좀비 · employedArrival",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 200,
+            "Notes": "시뮬레이터 대사 초안 / 기존 확정 실패 대사 포함",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80091,
+            "Name": "재등장 좀비 · lotteryArrival",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 200,
+            "Notes": "시뮬레이터 대사 초안 / 기존 확정 실패 대사 포함",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80092,
+            "Name": "재등장 좀비 · employedSuccess",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 200,
+            "Notes": "시뮬레이터 대사 초안 / 기존 확정 실패 대사 포함",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80093,
+            "Name": "재등장 좀비 · employedSuccessLeave",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 200,
+            "Notes": "시뮬레이터 대사 초안 / 기존 확정 실패 대사 포함",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80094,
+            "Name": "재등장 좀비 · employedHairFail",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 200,
+            "Notes": "시뮬레이터 대사 초안 / 기존 확정 실패 대사 포함",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80095,
+            "Name": "재등장 좀비 · employedHairFailLeave",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 200,
+            "Notes": "시뮬레이터 대사 초안 / 기존 확정 실패 대사 포함",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80096,
+            "Name": "재등장 좀비 · employedFail",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 200,
+            "Notes": "시뮬레이터 대사 초안 / 기존 확정 실패 대사 포함",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80097,
+            "Name": "재등장 좀비 · employedFailLeave",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 200,
+            "Notes": "시뮬레이터 대사 초안 / 기존 확정 실패 대사 포함",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80098,
+            "Name": "재등장 좀비 · lotterySuccess",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 200,
+            "Notes": "시뮬레이터 대사 초안 / 기존 확정 실패 대사 포함",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80099,
+            "Name": "재등장 좀비 · lotterySuccessLeave",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 200,
+            "Notes": "시뮬레이터 대사 초안 / 기존 확정 실패 대사 포함",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80100,
+            "Name": "재등장 좀비 · lotteryHairFail",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 200,
+            "Notes": "시뮬레이터 대사 초안 / 기존 확정 실패 대사 포함",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80101,
+            "Name": "재등장 좀비 · lotteryHairFailLeave",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 200,
+            "Notes": "시뮬레이터 대사 초안 / 기존 확정 실패 대사 포함",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80102,
+            "Name": "재등장 좀비 · lotteryFail",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 200,
+            "Notes": "시뮬레이터 대사 초안 / 기존 확정 실패 대사 포함",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80103,
+            "Name": "재등장 좀비 · lotteryFailLeave",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 200,
+            "Notes": "시뮬레이터 대사 초안 / 기존 확정 실패 대사 포함",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80104,
+            "Name": "재등장 좀비 · cut",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 200,
+            "Notes": "시뮬레이터 대사 초안 / 기존 확정 실패 대사 포함",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80105,
+            "Name": "재등장 좀비 · cutDetail",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 200,
+            "Notes": "시뮬레이터 대사 초안 / 기존 확정 실패 대사 포함",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80106,
+            "Name": "재등장 좀비 · draw",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 200,
+            "Notes": "시뮬레이터 대사 초안 / 기존 확정 실패 대사 포함",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80107,
+            "Name": "재등장 좀비 · drawDetail",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 200,
+            "Notes": "시뮬레이터 대사 초안 / 기존 확정 실패 대사 포함",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80108,
+            "Name": "재등장 좀비 · attach",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 200,
+            "Notes": "시뮬레이터 대사 초안 / 기존 확정 실패 대사 포함",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 80109,
+            "Name": "재등장 좀비 · attachDetail",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 200,
+            "Notes": "시뮬레이터 대사 초안 / 기존 확정 실패 대사 포함",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
           }
         ]
       },
@@ -5205,6 +5689,24 @@
             "RequestGroupID": 80078,
             "DetailGroupID": 80079,
             "__source": null
+          },
+          {
+            "MonsterID": 10006,
+            "Stage": "cut",
+            "RequestGroupID": 80104,
+            "DetailGroupID": 80105
+          },
+          {
+            "MonsterID": 10006,
+            "Stage": "draw",
+            "RequestGroupID": 80106,
+            "DetailGroupID": 80107
+          },
+          {
+            "MonsterID": 10006,
+            "Stage": "attach",
+            "RequestGroupID": 80108,
+            "DetailGroupID": 80109
           }
         ]
       }
@@ -5820,6 +6322,169 @@
       "battle": "none",
       "note": "중간 점검 과제: 승인된 적 없는 반차를 받을 수 있는 인상 만들기. 뿔·세 다크서클·빨간 코 판정과 수치 유지. 현 시연은 미용만 연결.",
       "workbookExcluded": false
+    },
+    {
+      "id": 10006,
+      "name": "취업 성공 좀비",
+      "beauty": {
+        "enabled": true,
+        "steps": {
+          "cut": true,
+          "draw": true,
+          "attach": true
+        },
+        "weights": {
+          "cut": 30,
+          "draw": 30,
+          "attach": 40
+        },
+        "designVersion": 2,
+        "returningZombie": true,
+        "cutTool": "scissors",
+        "hairTolerance": 0.03,
+        "ruinedHairRatio": 0.35,
+        "growth": {
+          "enabled": true,
+          "material": "hair",
+          "mask": "original",
+          "color": "#71EE8C",
+          "outline": "#045112",
+          "region": {
+            "x": 30,
+            "y": 0,
+            "w": 260,
+            "h": 210
+          }
+        },
+        "cutRegions": [
+          {
+            "key": "KeepHair",
+            "label": "머리는 그대로",
+            "x": 30,
+            "y": 0,
+            "w": 260,
+            "h": 210,
+            "kind": "good",
+            "shape": "rect",
+            "points": 30,
+            "stickerIDs": [],
+            "rule": "preserve",
+            "tolerance": 0.03
+          }
+        ],
+        "drawRegions": [
+          {
+            "key": "Tooth",
+            "label": "빠진 앞니",
+            "x": 161,
+            "y": 148,
+            "w": 10,
+            "h": 10,
+            "kind": "good",
+            "shape": "rect",
+            "points": 30,
+            "stickerIDs": [],
+            "requiredCoverage": 0.85
+          },
+          {
+            "key": "MouthSpill",
+            "label": "입 주변은 그대로",
+            "x": 121,
+            "y": 138,
+            "w": 80,
+            "h": 35,
+            "kind": "bad",
+            "shape": "rect",
+            "points": 30,
+            "stickerIDs": [],
+            "tolerance": 0.12
+          }
+        ],
+        "drawColors": [
+          "#FDFF81"
+        ],
+        "attachTag": "Tag_Hip",
+        "attachFirst": 20,
+        "attachExtra": 20,
+        "attachWrong": 20,
+        "attachMisplaced": 20,
+        "attachCount": 2,
+        "attachRequireAll": true,
+        "stickerScale": 1,
+        "attachRegions": [
+          {
+            "key": "Eye",
+            "label": "힙한 선글라스",
+            "x": 106,
+            "y": 88,
+            "w": 110,
+            "h": 40,
+            "kind": "good",
+            "shape": "rect",
+            "points": 0,
+            "stickerIDs": [
+              "ST-HIP-SUNGLASSES-BLACK",
+              "ST-HIP-SUNGLASSES-RED"
+            ]
+          },
+          {
+            "key": "Neck",
+            "label": "금목걸이",
+            "x": 110,
+            "y": 190,
+            "w": 100,
+            "h": 65,
+            "kind": "good",
+            "shape": "rect",
+            "points": 0,
+            "stickerIDs": [
+              "ST-RESOURCE-T_necklace"
+            ]
+          }
+        ],
+        "requestNotes": {
+          "cut": "머리는 그대로 보존",
+          "draw": "빠진 이빨을 원래 치아색으로",
+          "attach": "금목걸이와 힙한 선글라스"
+        },
+        "requestBriefNotes": {
+          "cut": "머리는 절대 건드리지 않기",
+          "draw": "빠진 이빨을 자연스럽게",
+          "attach": "금목걸이와 힙한 선글라스"
+        },
+        "resultLines": {
+          "satisfied": "오, 이제 좀 제 격에 맞네요.",
+          "angry": "…잠깐. 거울이 이상한 건가?",
+          "neutral": "음…"
+        },
+        "basePay": 0,
+        "tipRate": 0
+      },
+      "bindings": {
+        "employedArrival": 80090,
+        "lotteryArrival": 80091,
+        "employedSuccess": 80092,
+        "employedSuccessLeave": 80093,
+        "employedHairFail": 80094,
+        "employedHairFailLeave": 80095,
+        "employedFail": 80096,
+        "employedFailLeave": 80097,
+        "lotterySuccess": 80098,
+        "lotterySuccessLeave": 80099,
+        "lotteryHairFail": 80100,
+        "lotteryHairFailLeave": 80101,
+        "lotteryFail": 80102,
+        "lotteryFailLeave": 80103,
+        "arrival": 80090,
+        "best": 80092,
+        "normal": 80096,
+        "fail": 80096,
+        "leave": 80097
+      },
+      "battle": "none",
+      "workbookExcluded": true,
+      "note": "3일차 재등장. 첫날 미용 결과로 취업/로또 분기. 머리3%·치아85%·훼손35%와 성공1100/실패0은 시뮬레이터 검토값.",
+      "returningZombie": true
     }
   ],
   "schedule": [
@@ -5829,6 +6494,9 @@
     ],
     [
       10004
+    ],
+    [
+      10006
     ]
   ],
   "storyIntro": [

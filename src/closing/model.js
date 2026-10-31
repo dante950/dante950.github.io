@@ -60,7 +60,7 @@ export function createRun(settings = DEFAULT_SETTINGS) {
 
 // Adapt completed story visits only; jumping to a later customer never invents rewards.
 export function runFromStory(records,day,progress={}){
- const ids={10001:'zombie',10003:'sans',10004:'minion',10005:'coffee'};
+ const ids={10001:'zombie',10003:'sans',10004:'minion',10005:'coffee',10006:'returningZombie'};
  const visits=records.filter(r=>ids[r.id]&&r.day<=day).map(r=>({
   ...r,id:`day-${r.day}-${ids[r.id]}`,guestId:ids[r.id],
   reviewKind:r.forced?'battle':'beauty',

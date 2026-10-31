@@ -6,8 +6,8 @@ import {DialoguePlayer} from '../src/combat/dialogue.js';
 const project=JSON.parse(await fs.readFile(new URL('../data/project.json',import.meta.url),'utf8'));
 test('stage links resolve ordered request groups with no legacy shadow text',()=>{
  assert.deepEqual(salonDialogueProblems(project),[]);
- assert.equal(project.combat.sheets.find(s=>s.name==='미용 대사 연결').rows.length,9);
- for(const id of [10001,10003,10004])for(const stage of ['cut','draw','attach'])for(const detail of [false,true])assert.ok(salonDialogueGroup(project,id,stage,detail).lines.length);
+ assert.equal(project.combat.sheets.find(s=>s.name==='미용 대사 연결').rows.length,12);
+ for(const id of [10001,10003,10004,10006])for(const stage of ['cut','draw','attach'])for(const detail of [false,true])assert.ok(salonDialogueGroup(project,id,stage,detail).lines.length);
  for(const g of project.guests.filter(g=>g.beauty.enabled)){assert.equal(g.beauty.request,undefined);assert.equal(g.beauty.requestDetails,undefined);assert.equal(g.bindings.cut,undefined);}
 });
 test('Excel-linked text is authoritative and separate groups cannot advance into clarification',()=>{

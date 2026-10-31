@@ -16,6 +16,7 @@ jobs:
     outputs:
       intro_only: ${{ steps.scope.outputs.intro_only }}
       result_only: ${{ steps.scope.outputs.result_only }}
+      returning_only: ${{ steps.scope.outputs.returning_only }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -28,10 +29,16 @@ jobs:
         run: |
           intro_only=false
           result_only=false
+          returning_only=false
           if [ "$EVENT" = push ] && git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
             intro_only=true
             result_only=true
+            returning_only=true
             while IFS= read -r file; do
+              case "$file" in
+                src/returning-zombie.js|src/app.js|src/model.js|src/index.html|src/style.css|src/beauty-rules.js|src/salon.html|src/salon-beauty.js|src/salon-beauty-result.js|src/story-progress.js|src/closing/app.js|src/closing/model.js|src/closing/social-model.js|data/project.json|data/assets.json|scripts/build.mjs|scripts/check-returning-zombie.mjs|scripts/check-story-starts.mjs|tests/returning-zombie.test.mjs|tests/story-start.test.mjs|tests/salon-dialogue.test.mjs|tests/workshop-dialogue.test.mjs|public/media/returning-zombie/*|docs/returning-zombie/*|.github/workflows/pages.yml) ;;
+                *) returning_only=false ;;
+              esac
               case "$file" in
                 src/battle-result.js|src/battle-result.css|src/battle-results-preview.html|src/star-progress.js|src/app.js|src/story-progress.js|src/closing/app.js|src/closing/model.js|src/tutorial/app.js|scripts/build.mjs|tests/battle-result.test.mjs|public/media/battle-results/*|docs/release-battle-results/*|.github/workflows/pages.yml) ;;
                 *) result_only=false ;;
@@ -44,6 +51,7 @@ jobs:
           fi
           echo "intro_only=$intro_only" >> "$GITHUB_OUTPUT"
           echo "result_only=$result_only" >> "$GITHUB_OUTPUT"
+          echo "returning_only=$returning_only" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -54,14 +62,17 @@ jobs:
       - name: Check battle results and retained stars
         if: steps.scope.outputs.result_only == 'true'
         run: node --test tests/battle-result.test.mjs tests/story-progress.test.mjs tests/closing.test.mjs tests/coffee-closing.test.mjs tests/social.test.mjs
+      - name: Check returning guest and shared beauty flow
+        if: steps.scope.outputs.returning_only == 'true'
+        run: node --test tests/returning-zombie.test.mjs tests/story-start.test.mjs tests/story-progress.test.mjs tests/beauty-shape.test.mjs tests/salon-dialogue.test.mjs tests/workshop-dialogue.test.mjs tests/closing.test.mjs tests/social.test.mjs tests/coffee-beauty.test.mjs
       - run: npm test
-        if: steps.scope.outputs.intro_only != 'true' && steps.scope.outputs.result_only != 'true'
+        if: steps.scope.outputs.intro_only != 'true' && steps.scope.outputs.result_only != 'true' && steps.scope.outputs.returning_only != 'true'
       - uses: actions/upload-pages-artifact@v4
         with:
           path: dist
   browser-checks:
     needs: build
-    if: needs.build.outputs.intro_only != 'true' && needs.build.outputs.result_only != 'true'
+    if: needs.build.outputs.intro_only != 'true' && needs.build.outputs.result_only != 'true' && needs.build.outputs.returning_only != 'true'
     name: Check ${{ matrix.suite }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -88,9 +99,23 @@ jobs:
       - run: npx playwright install --with-deps chromium webkit
       - run: npm run build
       - run: node ${{ matrix.script }}
+  returning-browser:
+    needs: build
+    if: needs.build.outputs.returning_only == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - run: node scripts/check-returning-zombie.mjs
   deploy:
-    if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.build.result == 'success' && (needs.browser-checks.result == 'success' || needs.browser-checks.result == 'skipped')
-    needs: [build, browser-checks]
+    if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.build.result == 'success' && (needs.browser-checks.result == 'success' || needs.browser-checks.result == 'skipped') && (needs.returning-browser.result == 'success' || needs.returning-browser.result == 'skipped')
+    needs: [build, browser-checks, returning-browser]
     runs-on: ubuntu-latest
     permissions:
       pages: write

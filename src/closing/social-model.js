@@ -22,6 +22,7 @@ export function reviewVariant(visit){
  return ['victory','forcedWin','offerWin'].includes(visit.outcome)?'battle':null;
 }
 export function reviewPost(visit){
+ if(visit.guestId==='returningZombie')return {id:visit.id,user:visit.returnBranch==='lottery'?'Lucky_Zom':'Rookie_Zom',place:'몬스터 헤어살롱 · 재방문',text:'재등장 좀비의 후기 문구와 성공·실패별 게시 여부는 검토 중입니다.',photo:visit.portrait||null,wholePortrait:true,guest:'returningZombie',kind:null,title:'재방문 기록',symbol:'✦',comments:[],draft:true};
  if(visit.guestId==='coffee')return {id:visit.id,user:visit.review?.user||'coffee_ghost',place:visit.review?.place||'몬스터 헤어살롱 · 첫 손님',text:visit.review?.text||'첫 변신을 마쳤어요! 부하님을 조금 닮았나요? #몬스터헤어살롱',photo:visit.portrait||null,wholePortrait:true,guest:'coffee',kind:'beauty',title:'첫 손님의 첫 변신',symbol:'☕',comments:[],draft:true};
  const kind=reviewVariant(visit),copy=REVIEW_COPY[visit.guestId];
  return {id:visit.id,user:copy.user,place:copy.place,text:kind?copy[kind]:'이 결과의 후기 원문은 아직 준비 중입니다.',photo:kind?`./media/social/${visit.guestId}-${kind}.webp`:null,guest:visit.guestId,kind,portrait:visit.headPortrait||null,comments:kind&&visit.guestId==='minion'?COLLEAGUE_COMMENTS:[],choices:kind?REVIEW_CHOICES[visit.guestId]?.[kind]:undefined,draft:!kind};

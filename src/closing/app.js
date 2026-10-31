@@ -10,7 +10,7 @@ const DEFAULT_COPY=Object.fromEntries(Object.entries(REVIEW_COPY).map(([id,c])=>
 let choices={...DEFAULT_CHOICES},copies=structuredClone(DEFAULT_COPY),settings=structuredClone(DEFAULT_SETTINGS);
 const storyToken=new URLSearchParams(location.search).get('story');
 const storyMode=!!storyToken&&parent!==window;
-let storyInitialized=false,tutorialMode=false,closeAfterRegistration=false,receiptStars=0;
+let storyInitialized=false,tutorialMode=false,closeAfterRegistration=false,receiptStars=0,storyLastDay=2;
 function storyMessage(type){parent.postMessage({source:'yachacha-closing',token:storyToken,type,stars:run.stars,followerFloor:run.followerFloor||0,settings:run.settings,socialChoices:phone.selected},location.origin);}
 if(storyMode){document.body.classList.add('story-mode');$('settingsOpen').hidden=true;$('restart').hidden=true;document.querySelector('.toolbar .title b').textContent='오늘의 영업 마감';document.querySelector('.lab-label').textContent='본편 플레이';}
 const DEFAULT_SPEED=1.5;
@@ -114,7 +114,7 @@ async function review(which,token,first=false){
 }
 function prepareClosingSummary(){receiptStars=run.stars;summary=closingSummary(run);if(storyMode){summary.eligibleForStar=run.day===2&&run.total>=settings.threshold;const stars=summary.eligibleForStar?retainedStars(run.stars,run.total,starThresholds(settings)):run.stars;run={...run,status:'closed',stars,followerFloor:stars>run.stars?starThresholds(settings)[stars-1]:run.followerFloor||0};}else run=closeDay(run);}
 async function close(){if(busy||(!storyMode&&!canClose(run)))return;busy=true;const token=epoch;prepareClosingSummary();phase('closing');show('closeShop',false);show('visitPanel',false);$('closedDay').textContent=tutorialMode?'연습':run.day;$('closingGreeting').textContent='수고했어요, '+phone.selected.__state.nickname+'님!';show('closeBanner');setStatus('오늘의 영업이 끝났습니다.');beep(220,.2,'triangle',.07);await pause(1600,token);show('closeBanner',false);phoneHome('management');}
-async function advanceDay(token){busy=true;phone.hide();$('blackout').classList.add('dark');await pause(750,token);show('settlement',false);show('finishBanner',false);phase('calendar');$('oldDay').textContent=tutorialMode?'튜토리얼':run.day;$('newDay').textContent=run.day+1;show('calendarScreen');$('calendarLeaf').classList.remove('flip');await pause(500,token);$('calendarLeaf').classList.add('flip');beep(150,.1,'triangle',.08);await pause(1700,token);if(tutorialMode){storyMessage('next-day');return;}run=nextDay(run);show('calendarScreen',false);if(run.status==='ending'){await ending(token);}else if(storyMode){storyMessage('next-day');}else{clearScene();prepareDay();busy=false;}}
+async function advanceDay(token){busy=true;phone.hide();$('blackout').classList.add('dark');await pause(750,token);show('settlement',false);show('finishBanner',false);phase('calendar');$('oldDay').textContent=tutorialMode?'튜토리얼':run.day;$('newDay').textContent=run.day+1;show('calendarScreen');$('calendarLeaf').classList.remove('flip');await pause(500,token);$('calendarLeaf').classList.add('flip');beep(150,.1,'triangle',.08);await pause(1700,token);if(tutorialMode){storyMessage('next-day');return;}if(storyMode&&storyLastDay>2){show('calendarScreen',false);if(run.stars>receiptStars)await upgradeLoading(token);storyMessage(run.day<storyLastDay?'next-day':'build-complete');return;}run=nextDay(run);show('calendarScreen',false);if(run.status==='ending'){await ending(token);}else if(storyMode){storyMessage('next-day');}else{clearScene();prepareDay();busy=false;}}
 async function upgradeLoading(token){
  phase('upgrading');
  const message='미용실 업그레이드 중...',letters=Array.from(message),cycle=letters.length*240+720;
@@ -159,8 +159,8 @@ action(async()=>{await Promise.all([ART.salon,ART.upgrade,ART.zombie,ART.sans,AR
 
 addEventListener('message',e=>{
  const m=e.data;if(!storyMode||storyInitialized||e.source!==parent||e.origin!==location.origin||m?.source!=='yachacha-story'||m.token!==storyToken||m.type!=='init')return;
- if(!([1,2].includes(m.day)||(m.day===0&&m.tutorial===true))||!Array.isArray(m.records))return;
- storyInitialized=true;tutorialMode=m.day===0&&m.tutorial===true;document.body.classList.toggle('tutorial-mode',tutorialMode);phone.setWeather(m.day,m.weather);run=runFromStory(m.records,m.day,{stars:m.stars,followerFloor:m.followerFloor,settings:m.settings});receiptStars=run.stars;phone.restore(m.socialChoices);settings=run.settings;clearScene();show('loading',false);renderSalon();resize();
+ if(!([1,2,3].includes(m.day)||(m.day===0&&m.tutorial===true))||!Array.isArray(m.records))return;
+ storyInitialized=true;storyLastDay=Math.max(2,Math.min(3,Number(m.lastDay)||2));tutorialMode=m.day===0&&m.tutorial===true;document.body.classList.toggle('tutorial-mode',tutorialMode);phone.setWeather(m.day,m.weather);run=runFromStory(m.records,m.day,{stars:m.stars,followerFloor:m.followerFloor,settings:m.settings});receiptStars=run.stars;phone.restore(m.socialChoices);settings=run.settings;clearScene();show('loading',false);renderSalon();resize();
  if(tutorialMode){document.querySelector('.toolbar .title b').textContent='첫 손님의 하루 마감';document.querySelector('.lab-label').textContent='튜토리얼';document.querySelector('#closeBanner .mini-calendar small').textContent='TUTORIAL';}
  if(tutorialMode&&m.registration===true){closeAfterRegistration=m.autoClose===true&&run.visits.some(v=>v.guestId==='coffee'&&!v.skipped);show('closeShop',false);show('visitPanel',false);phase('registration');phone.showRegistration();return;}
  if(tutorialMode&&m.autoClose===true)action(close)();

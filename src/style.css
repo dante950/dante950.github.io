@@ -89,3 +89,18 @@ body.playing #talkLayer.beautyRequest .talkbox:after{display:none}body.playing #
 @media(max-width:700px){#talkLayer .talkbox.guestSpeech,body.playing #talkLayer:not(.beautyRequest) .talkbox.guestSpeech{grid-template-columns:54px minmax(0,1fr);gap:0 13px;padding:15px 17px 40px}}
 
 body:after{content:"";position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;z-index:10000;transition:opacity .9s}body.starting-business:after{opacity:1;pointer-events:auto}.chapter-entry{margin:14px 0;background:transparent;font-size:12px;color:#b8bba6;border:0}
+
+/* Restore one compact entry for every available start point. */
+.storyStartModal{width:min(1100px,96vw);max-height:92vh;overflow:auto}
+.storyStartModal .startGuests{grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.storyStartModal .startGuest{min-width:0;padding:16px 12px}
+.storyStartModal .startGuest strong{font-size:17px}
+.storyStartModal .startPortrait{height:115px}
+.startBeginning{border-color:#e9c77a!important}
+.returnBranchChoices{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0}
+.returnBranchChoices button{text-align:left;padding:24px;display:grid;gap:12px}
+.returnBranchChoices strong{font-size:22px;color:#f3d39c}
+.returnBranchChoices span{font-size:14px;line-height:1.7}
+@media(max-width:760px){.storyStartModal .startGuests{grid-template-columns:repeat(2,minmax(0,1fr))}.returnBranchChoices{grid-template-columns:1fr}.storyStartModal .startPortrait{height:80px}}
+
+.storyStartModal .startPortrait img{max-height:100%;height:100%;width:auto}.storyStartModal .startGuest{display:flex}

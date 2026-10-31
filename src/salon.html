@@ -468,7 +468,7 @@ const oldInteraction=updateInteraction;updateInteraction=()=>{oldInteraction();i
 let departure=false;addEventListener('message',e=>{if(e.source!==parent||e.data?.token!==GUEST.token)return;const c=e.data;
  if(c.type==='beauty-start'){customerState.phase='seated';seatedCustomer.style.display='block';openShopBtn.style.display='none';enterBeauty();}
  if(c.type==='salon-return'){beautyActive=false;dialogueState.active=false;beautyScreen.style.display='none';interact.style.display='none';}
- if(c.type==='depart'&&!departure){departure=true;beautyActive=false;dialogueState.active=false;beautyScreen.style.display='none';seatedCustomer.style.display='none';customerState.phase='closed';interact.style.display='none';openShopBtn.style.display='none';const img=document.createElement('img');img.className='departingGuest';img.src=c.portrait||GUEST.skin?.full||document.querySelector('#zombiePortrait img').src;gameWorld.append(img);setTimeout(()=>send('departed'),2250);}
+ if(c.type==='depart'&&!departure){departure=true;beautyActive=false;dialogueState.active=false;beautyScreen.style.display='none';seatedCustomer.style.display='none';customerState.phase='closed';interact.style.display='none';openShopBtn.style.display='none';if(!GUEST.returningZombie){const img=document.createElement('img');img.className='departingGuest';img.src=c.portrait||GUEST.skin?.full||document.querySelector('#zombiePortrait img').src;gameWorld.append(img);setTimeout(()=>send('departed'),2250);}}
  if(c.type==='pause'){state.keys.clear();openSettings();}
  if(c.type==='resume')closeSettings();
 });
@@ -523,6 +523,22 @@ const normalStartDialogue=startDialogue;startDialogue=()=>{if(!entrance)normalSt
 startEntrance();
 
 const cinematicInteraction=updateInteraction;updateInteraction=()=>{cinematicInteraction();if(GUEST.id===10002&&customerState.phase==='seated'&&!entrance){interactionAvailable=inGame()&&!settingsOpen()&&!dialogueState.active&&!beautyActive&&Math.hypot(state.x-693,state.y-446)<=135;interactPrompt.style.display=interactionAvailable?'flex':'none';}};
+
+// The supplied layered walk sheets share a single 84 × 131 frame grid.
+if(GUEST.returningZombie&&GUEST.skin.animation){
+ const walkImages={};let leaving=false,exitWaiting=false,exitDone=false,leaveStarted=0,exitCanvas=null,exitHead=null;
+ const makeCanvas=()=>{const c=document.createElement('canvas');c.width=84;c.height=131;c.style.imageRendering='pixelated';return c;};
+ const walkCanvas=makeCanvas();walkCanvas.className='guestWalk';walkCanvas.style.cssText='position:absolute;width:84px;height:131px;left:0;top:-26px;image-rendering:pixelated';customer.replaceChildren(walkCanvas);
+ const readyWalk=Promise.all(Object.values(GUEST.skin.animation).flatMap(a=>['body','head','hair'].map(async k=>{if(walkImages[a[k]])return;const im=new Image();im.src=a[k];await im.decode();walkImages[a[k]]=im;})));
+ function drawWalk(canvas,dir,frame){const a=GUEST.skin.animation[dir],cx=canvas.getContext('2d');cx.imageSmoothingEnabled=false;cx.clearRect(0,0,84,131);for(const key of ['body','head','hair']){const im=walkImages[a[key]];if(im)cx.drawImage(im,frame*a.fw,0,a.fw,a.fh,0,0,84,131);}}
+ readyWalk.then(()=>{function tick(t){if(!document.body.isConnected)return;drawWalk(walkCanvas,'back',customerState.phase==='walking'?Math.floor(t/140)%4:0);
+ if(leaving&&exitCanvas&&!exitDone){const elapsed=t-leaveStarted,progress=Math.min(1,elapsed/1550);exitCanvas.style.left=(53+25*progress)+'%';exitCanvas.style.top=(57+30*progress)+'%';const a=GUEST.skin.animation.front,frame=exitWaiting?0:Math.floor(elapsed/140)%4,cx=exitCanvas.getContext('2d');cx.imageSmoothingEnabled=false;cx.clearRect(0,0,84,131);if(walkImages[a.body])cx.drawImage(walkImages[a.body],frame*84,0,84,131,0,0,84,131);if(exitHead)cx.drawImage(exitHead,6.8,.4,64,70);if(progress===1&&!exitWaiting){exitWaiting=true;setTimeout(()=>send('departure-line'),450);}}
+ requestAnimationFrame(tick);}requestAnimationFrame(tick);});
+ addEventListener('message',e=>{if(e.source!==parent||e.data?.token!==GUEST.token)return;
+ if(e.data.type==='depart'&&!leaving){leaving=true;leaveStarted=performance.now();exitHead=offscreen();renderPortrait(false,exitHead.getContext('2d'),false);exitCanvas=makeCanvas();exitCanvas.className='returnZombieDeparture';exitCanvas.style.cssText='position:absolute;left:53%;top:57%;width:100px;height:156px;z-index:70;transform:translate(-50%,-100%);image-rendering:pixelated';gameWorld.append(exitCanvas);}
+ if(e.data.type==='depart-finish'&&exitWaiting&&!exitDone){exitDone=true;exitCanvas.style.transition='opacity .3s';exitCanvas.style.opacity='0';setTimeout(()=>send('departed'),350);}
+ });
+}
 </script>
 </body>
 </html>

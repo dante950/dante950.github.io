@@ -167,6 +167,15 @@
       "src": "./media/bf3eb786d67b326665e8dcb7.png",
       "w": 38,
       "h": 36
+    },
+    {
+      "id": "ST-RESOURCE-T_necklace",
+      "name": "금목걸이",
+      "tag": "Tag_Hip",
+      "region": "Neck",
+      "src": "./media/stickers/T_necklace.png",
+      "w": 80,
+      "h": 32
     }
   ],
   "room": {
@@ -855,6 +864,160 @@
         "head": "./media/minion-walk-back-head.png",
         "hair": "./media/minion-walk-back-hair.png",
         "target": "./media/minion-walk-back-target.png"
+      }
+    }
+  },
+  "returningZombie": {
+    "head": "./media/returning-zombie/T_Successzombie_head.png",
+    "hair": "./media/returning-zombie/T_Successzombie_hair.png",
+    "full": "./media/returning-zombie/front.png",
+    "layers": {
+      "head": {
+        "src": "./media/returning-zombie/T_Successzombie_head.png",
+        "x": 86,
+        "y": 38,
+        "w": 145,
+        "h": 155
+      },
+      "material": {
+        "src": "./media/returning-zombie/T_Successzombie_hair.png",
+        "x": 61,
+        "y": 3,
+        "w": 170,
+        "h": 190
+      },
+      "eyes": {
+        "neutral": {
+          "src": "./media/returning-zombie/T_Successzombie_Eye_Normal.png",
+          "x": 86,
+          "y": 38,
+          "w": 145,
+          "h": 155
+        },
+        "satisfied": {
+          "src": "./media/returning-zombie/T_Successzombie_Eye_Happy.png",
+          "x": 86,
+          "y": 38,
+          "w": 145,
+          "h": 155
+        },
+        "angry": {
+          "src": "./media/returning-zombie/T_Successzombie_Eye_Angry.png",
+          "x": 86,
+          "y": 38,
+          "w": 145,
+          "h": 155
+        }
+      },
+      "mouth": {
+        "neutral_open": {
+          "src": "./media/returning-zombie/T_Successzombie_mouth_Normal.png",
+          "x": 86,
+          "y": 38,
+          "w": 145,
+          "h": 155,
+          "sx": 0,
+          "sy": 0,
+          "sw": 29,
+          "sh": 31
+        },
+        "neutral_closed": {
+          "src": "./media/returning-zombie/T_Successzombie_mouth_Normal.png",
+          "x": 86,
+          "y": 38,
+          "w": 145,
+          "h": 155,
+          "sx": 29,
+          "sy": 0,
+          "sw": 29,
+          "sh": 31
+        },
+        "satisfied_open": {
+          "src": "./media/returning-zombie/T_Successzombie_mouth_Happy.png",
+          "x": 86,
+          "y": 38,
+          "w": 145,
+          "h": 155,
+          "sx": 0,
+          "sy": 0,
+          "sw": 29,
+          "sh": 31
+        },
+        "satisfied_closed": {
+          "src": "./media/returning-zombie/T_Successzombie_mouth_Happy.png",
+          "x": 86,
+          "y": 38,
+          "w": 145,
+          "h": 155,
+          "sx": 29,
+          "sy": 0,
+          "sw": 29,
+          "sh": 31
+        },
+        "angry_open": {
+          "src": "./media/returning-zombie/T_Successzombie_mouth_Angry.png",
+          "x": 86,
+          "y": 38,
+          "w": 145,
+          "h": 155,
+          "sx": 0,
+          "sy": 0,
+          "sw": 29,
+          "sh": 31
+        },
+        "angry_closed": {
+          "src": "./media/returning-zombie/T_Successzombie_mouth_Angry.png",
+          "x": 86,
+          "y": 38,
+          "w": 145,
+          "h": 155,
+          "sx": 29,
+          "sy": 0,
+          "sw": 29,
+          "sh": 31
+        },
+        "open": {
+          "src": "./media/returning-zombie/T_Successzombie_mouth_Normal.png",
+          "x": 86,
+          "y": 38,
+          "w": 145,
+          "h": 155,
+          "sx": 0,
+          "sy": 0,
+          "sw": 29,
+          "sh": 31
+        },
+        "closed": {
+          "src": "./media/returning-zombie/T_Successzombie_mouth_Normal.png",
+          "x": 86,
+          "y": 38,
+          "w": 145,
+          "h": 155,
+          "sx": 0,
+          "sy": 0,
+          "sw": 29,
+          "sh": 31
+        }
+      }
+    },
+    "animation": {
+      "front": {
+        "fw": 84,
+        "fh": 131,
+        "count": 4,
+        "frameMs": 140,
+        "body": "./media/returning-zombie/T_Successzombie_walk_Body_front-Sheet.png",
+        "head": "./media/returning-zombie/T_Successzombie_walk_head_front-Sheet.png",
+        "hair": "./media/returning-zombie/T_Successzombie_walk_hair_front-Sheet.png"
+      },
+      "back": {
+        "fw": 84,
+        "fh": 131,
+        "count": 4,
+        "frameMs": 140,
+        "body": "./media/returning-zombie/T_Successzombie_walk_Body_back-Sheet.png",
+        "head": "./media/returning-zombie/T_Successzombie_walk_Head_back-Sheet.png",
+        "hair": "./media/returning-zombie/T_Successzombie_walk_Hair_back-Sheet.png"
       }
     }
   }

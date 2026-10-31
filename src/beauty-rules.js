@@ -1,5 +1,15 @@
 export function beautyInside(x,y,r){if(r.shape==='ellipse')return ((x-r.x-r.w/2)/(r.w/2))**2+((y-r.y-r.h/2)/(r.h/2))**2<=1;return x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h;}
-export function beautyAttachScore(placements,b){let score=0,valid=0;const seen=new Set();for(const p of placements){const duplicate=seen.has(p.sticker.id);seen.add(p.sticker.id);if(duplicate||p.sticker.tag!==b.attachTag)score-=b.attachWrong;else if(!b.attachRegions.find(r=>r.key===p.region)?.stickerIDs.includes(p.sticker.id))score-=b.attachMisplaced;else score+=valid++===0?b.attachFirst:b.attachExtra;}return Math.max(0,Math.min(b.weights.attach,score));}
+export function beautyAttachScore(placements,b){
+ if(b.attachRequireAll){
+  const covered=new Set();let penalties=0;
+  for(const p of placements){const region=b.attachRegions.find(r=>r.key===p.region);
+   if(p.sticker.tag!==b.attachTag||!region?.stickerIDs.includes(p.sticker.id)||covered.has(region.key))penalties+=b.attachWrong;
+   else covered.add(region.key);
+  }
+  return Math.max(0,b.weights.attach*covered.size/Math.max(1,b.attachRegions.length)-penalties);
+ }
+ let score=0,valid=0;const seen=new Set();for(const p of placements){const duplicate=seen.has(p.sticker.id);seen.add(p.sticker.id);if(duplicate||p.sticker.tag!==b.attachTag)score-=b.attachWrong;else if(!b.attachRegions.find(r=>r.key===p.region)?.stickerIDs.includes(p.sticker.id))score-=b.attachMisplaced;else score+=valid++===0?b.attachFirst:b.attachExtra;}return Math.max(0,Math.min(b.weights.attach,score));
+}
 export function beautyDrawScore(pixels,b,width=320,height=350){
  const totals=b.drawRegions.map(()=>0),painted=totals.slice(),correct=totals.slice(),colors=b.drawColors.map(h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)));
  for(let y=0;y<height;y++)for(let x=0;x<width;x++){

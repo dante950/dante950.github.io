@@ -1,6 +1,8 @@
 // Beauty only. The room, guest order, and combat bridge live in salon.html.
 const B=GUEST.beauty,W=160,H=175,PIX=2;
 const coffeeTutorial=GUEST.coffeeTutorial===true;
+const isReturningZombie=GUEST.returningZombie===true;
+function returningStatus(){return returningBeautyStatus(original,current,B,{cut:cutScore,draw:drawScore,attach:attachScore},placements);}
 const coffeeActions={cut:false,grow:false,draw:false,attach:false,guide:false,returned:false};
 let coffeeCompletionNotified=false;
 function coffeeProgress(){
@@ -354,6 +356,7 @@ function updateBeautyScore(action=false){
  const shape=scoreShape(current,original,B,W,H,masks);shapeProgress=shape;cutScore=shape.score;
  attachScore=beautyAttachScore(placements,B);
  if(B.weights.draw){const full=new Uint8ClampedArray(320*350*4);for(let y=0;y<350;y++)for(let x=0;x<320;x++){const n=(Math.floor(y/2)*W+Math.floor(x/2))*4;full.set(paint.subarray(n,n+4),(y*320+x)*4);}drawScore=beautyDrawScore(full,B);}else drawScore=0;
+ if(isReturningZombie){const status=returningStatus();cutScore=status.hairOK?B.weights.cut:0;shapeProgress.hardFailure=!status.hairOK;for(const d of shapeProgress.details)d.fulfilled=status.hairOK?1:0;}
  totalSatisfaction=beautyTotal({cut:cutScore,draw:drawScore,attach:attachScore},B);
  const scores={cut:cutScore,draw:drawScore,attach:attachScore};
  const live=BEAUTY_STAGES.reduce((s,k)=>s+(B.steps[k]?(touched[k]?scores[k]:B.weights[k]*.5):0),0);
@@ -381,7 +384,8 @@ function paintFace(){
   if(coffeeTutorial)drawPortraitLayer(f,portraitLayers.body);
   drawPortraitLayer(f,portraitLayers.head);
   drawPortraitLayer(f,portraitLayers.eyes?.[expression]||portraitLayers.eyes?.neutral);
-  drawPortraitLayer(f,portraitLayers.mouth?.[(talking&&mouthFrame||!eyeReaction.hidden&&reactionOpen)?'open':'closed']||portraitLayers.mouth?.open);
+  const mouthPose=(talking&&mouthFrame||!eyeReaction.hidden&&reactionOpen)?'open':'closed';
+  drawPortraitLayer(f,isReturningZombie?portraitLayers.mouth[expression+'_'+(talking?mouthPose:'open')]:portraitLayers.mouth?.[mouthPose]||portraitLayers.mouth?.open);
   return;
  }
  if(faceFeatures){
@@ -501,7 +505,7 @@ function renderRequestStatus(){
 }
 function setBeautyPhase(phase,announce=true){
  if(finishing||briefing)return;const previousPhase=beautyPhase;cancelStickerDrag();cancelGesture();resetActionMood();requestAnimationSerial++;beautyScreen.classList.remove('requestReveal');beautyPhase=phase;
- if(phase==='draw'&&B.growth?.material==='horn'&&!heardRequests.draw){brushRadius=4;document.getElementById('sculptSize').value=4;document.getElementById('sculptSizeValue').value=4;}
+ if(phase==='draw'&&(B.growth?.material==='horn'||isReturningZombie)&&!heardRequests.draw){brushRadius=4;document.getElementById('sculptSize').value=4;document.getElementById('sculptSizeValue').value=4;}
  const names={cut:'형태 만들기',draw:'색·무늬 꾸미기',attach:'장식 붙이기'},stages=beautyStageOrder(B);
  stageTag.textContent=(stages.indexOf(phase)+1)+'. '+names[phase];
  panel.querySelector('h3').textContent=names[phase];
