@@ -55,3 +55,18 @@
 .nickname-phone{width:min(360px,90%);max-height:95%;overflow:auto;border:9px solid #3d3b48;border-radius:34px;background:#fbf6e9;color:#393b3f;box-shadow:0 24px 75px #0009;padding:26px}.nickname-phone .phone-notch{height:5px;background:#4a4552;width:65px;border-radius:6px;margin:0 auto 25px}.nickname-phone .nickname-logo{font-size:26px;letter-spacing:-1px;color:#92616a}.nickname-phone h2{font-size:22px;margin:22px 0 8px}.nickname-phone p{font-size:12px;line-height:1.8;color:#77746e}.nickname-phone label{display:block;font-size:12px;margin:22px 0 7px}.nickname-phone input{width:100%;font:inherit;font-size:20px;padding:12px;background:#fff;border:2px solid #b6ada2;border-radius:7px;color:#292c30}.nickname-preview{padding:16px 10px;margin:18px 0;background:#eee9df;border-radius:8px;font-size:12px}.nickname-preview b{display:block;color:#a4626d}.nickname-phone button{width:100%;background:#b47382;color:#fff;border:0;margin-top:8px}.nickname-phone #nicknameError{min-height:20px;color:#a2383d}.nickname-phone .nickname-note{font-size:10px}
 @media(max-width:700px){.projection-screen{left:3%;width:94%;height:60%;top:9%}.presentation-speech{width:92%;left:4%;bottom:6%}.hold-skip{font-size:10px;top:9px;right:9px}.room-revealed .presentation-speech{padding:12px 14px}}
 @media(max-height:650px){#labStage{min-height:460px}.nickname-phone{padding:15px 25px}.nickname-phone h2{margin-top:12px}.nickname-phone label{margin-top:8px}.nickname-phone .phone-notch{margin-bottom:15px}.nickname-preview{margin:8px 0}}
+
+/* Local in-room comparison: retained character sprites and a short dialogue box. */
+.room-briefing .presenter{display:none}
+.room-briefing .presentation-dark{opacity:0}
+.room-briefing .presentation-speech{left:21%;width:58%;bottom:3%;min-height:0;background:#fff6df;color:#342f2e;text-shadow:none;border:3px solid #b3a57e;border-radius:9px;padding:13px 20px;box-shadow:0 3px 0 #342b22}
+.room-briefing .presentation-speaker{color:#79664e;margin-bottom:5px}
+.room-briefing .presentation-speech p{font-size:clamp(13px,1.3vw,19px);line-height:1.55;min-height:0}
+.room-briefing .presentation-next{color:#493e2e;margin-top:4px}
+.room-briefing .presentation-choices{gap:12px;margin-top:10px}
+.room-briefing .presentation-choices button{font-size:17px;background:#6c8bd3;color:white;border:2px solid #5368a3;border-radius:4px;padding:5px 20px}
+.room-briefing .presentation-choices button.selected{background:#355ab0;border-color:#fff0ae;box-shadow:0 0 0 2px #b28f44}
+.room-briefing .choice-hint{color:#79664e;font-size:10px;margin-top:6px}
+@media(max-width:700px){.room-briefing .presentation-speech{left:4%;width:92%;padding:12px 16px}.room-briefing .presentation-speech p{word-break:keep-all;overflow-wrap:break-word}}
+
+.variant-back{font-size:12px;padding:7px 11px;border:1px solid #446c64;border-radius:6px;text-decoration:none;white-space:nowrap;align-self:center}@media(max-width:600px){.labbar{gap:6px;padding:0 8px}.labtitle strong{font-size:11px}.labbar nav{gap:4px}.labbar nav button,.variant-back{font-size:10px;padding:5px}.brand span{display:none}}

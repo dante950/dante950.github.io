@@ -37,5 +37,34 @@ export const PRESENTATION_SLIDES=[
  ]}
 ];
 export const INTRO_HOLD_MS=1200;
+// Local comparison: finish the goal in PT, then introduce freedom and the first guest.
+export const LOCAL_PRESENTATION_SLIDES=[
+ {...PRESENTATION_SLIDES[0],lines:[
+  '이 미용실을 맡아 주십시오.',
+  '마왕님은 별 세 개를 얻지 못한 가게에는 발도 들이지 않으십니다.',
+  '방문 예정일인 5일차까지, 이곳을 3스타 미용실로 만들어야 합니다.'
+ ]},
+ {...PRESENTATION_SLIDES[2],lines:[
+  '그리고 당신의 미용으로 마왕님을 만족시켜 주신다면…',
+  '책임지고 원래 세계로 돌려보내 드리겠습니다.'
+ ]}
+];
+export const ROOM_BRIEFING=[
+ ['이상… 발표를 마치겠습니다.','그래서 당신이 이곳에 소환된 겁니다.'],
+ ['손님의 부탁은 들어주시되,','당신만의 미적 감각을 표현하시는 건 자유입니다.'],
+ ['다만, 머리 모양이 너무 마음에 들지 않으면…\n손님이 야차를 걸어올 수도 있습니다.'],
+ ['말로 설명드리는 것보다는,\n직접 확인하시는 편이 낫겠지요.'],
+ ['마침 소개해 드릴 손님이 있습니다.','첫 손님을 받아 보시겠습니까?']
+];
 export function normalizeNickname(value){return String(value??'').normalize('NFC').trim().replace(/\s+/gu,' ');}
 export function nicknameProblem(value){const name=normalizeNickname(value);if(!name)return '몬스타그램에서 사용할 이름을 입력해 주세요.';if([...name].length>16)return '닉네임은 16자 이내로 입력해 주세요.';if(/[<>\p{Cc}\p{Cf}]/u.test(name))return '꺾쇠나 보이지 않는 제어 문자는 사용할 수 없어요.';return '';}
+
+export const ROOM_BRIEFING_V2=[
+ ['그래서 당신이 소환된 겁니다.','이 미용실을 맡아 주십시오.','당신의 미용으로 마왕님을 만족시켜 주신다면…','책임지고 원래 세계로 돌려보내 드리겠습니다.'],
+ ['하지만 마왕님은 별 세 개를 얻지 못한 가게에는\n발도 들이지 않으십니다.','방문 예정일인 5일차까지,','이곳을 3스타 미용실로 만들어야 합니다.'],
+ ['손님의 부탁을 들어주고 좋은 후기를 얻으십시오.','팔로워가 모이면, 미용실의 별도 올라갈 겁니다.'],
+ ['2일차에는 제가 먼저 방문하겠습니다.','마왕님을 맡겨도 될 실력인지,\n직접 확인해야 하니까요.'],
+ ['말로 설명드리는 것 보다는,\n직접 확인하시는 편이 낫겠지요.','마침 소개해 드릴 손님이 있습니다.','첫 손님을 받아 보시겠습니까?']
+];
+export function introVariant(search){const value=new URLSearchParams(search).get('intro');return value==='2'?2:value==='3'||value==='room-v1'?3:1;}
+export const INTRO_VARIANT_LABELS={1:'1안 · PT 통합 설명',2:'2안 · 미용실에서 목표 설명',3:'3안 · PT 목표 설명 + 야차 예고'};

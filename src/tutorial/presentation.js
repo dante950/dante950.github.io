@@ -1,7 +1,11 @@
-import {PRESENTATION_HELLO,PRESENTATION_REFUSALS,PRESENTATION_STORY,PRESENTATION_SLIDES,INTRO_HOLD_MS} from './presentation-data.js';
+import {PRESENTATION_HELLO,PRESENTATION_REFUSALS,PRESENTATION_STORY,PRESENTATION_SLIDES,INTRO_HOLD_MS,ROOM_BRIEFING,LOCAL_PRESENTATION_SLIDES,ROOM_BRIEFING_V2} from './presentation-data.js';
 
 export class MinionPresentation{
- constructor(host,room,{sound,done}){
+ get slides(){return this.roomBriefing&&this.variant!==2?LOCAL_PRESENTATION_SLIDES:PRESENTATION_SLIDES;}
+ get briefingLines(){return this.variant===2?ROOM_BRIEFING_V2:ROOM_BRIEFING;}
+ get invitationIndex(){return this.variant===2?4:3;}
+ constructor(host,room,{sound,done,roomBriefing=false,variant=roomBriefing?3:1}){
+  this.roomBriefing=variant!==1;this.variant=variant;
   this.room=room;this.sound=sound;this.done=done;this.clock=0;this.generation=0;this.waiters=[];this.active=false;this.paused=false;
   this.root=document.createElement('section');this.root.id='presentation';this.root.hidden=true;
   this.root.innerHTML=`<div class="presentation-dark"></div><canvas class="presenter" width="950" height="531" aria-label="발표하는 마왕 부하"></canvas>
@@ -23,21 +27,21 @@ export class MinionPresentation{
  }
  setMode(mode){this.mode=mode;this.root.dataset.mode=mode;this.modeSince=this.clock;}
  wait(ms){return new Promise(resolve=>this.waiters.push({at:this.clock+ms,resolve}));}
- cancel(){this.generation++;this.active=false;this.root.hidden=true;this.cancelHold();for(const w of this.waiters)w.resolve(false);this.waiters=[];this.onLinesDone=null;this.lines=null;}
+ cancel(){this.generation++;this.active=false;this.root.hidden=true;this.cancelHold();for(const w of this.waiters)w.resolve(false);this.waiters=[];this.onLinesDone=null;this.lines=null;if(this.roomBriefing)this.room.briefing=null;}
  pause(on){this.paused=on;this.cancelHold();}
  async start({story=false,slides=false,customer=false}={}){
   this.cancel();this.active=true;this.paused=false;this.clock=0;this.root.hidden=false;this.refusals=0;this.screenDown=false;this.skipping=false;this.storyY=0;this.storyTarget=0;this.bow=0;this.bowTarget=0;this.mirror=0;this.mirrorTarget=0;this.sighAt=null;this.revealed=false;this.actorX=475;this.actorScale=.45;this.actorFeet=215;
   this.root.className='resetting';this.root.querySelector('.presentation-speech').hidden=true;this.root.querySelector('.presentation-title').hidden=false;
   void this.root.offsetHeight;this.root.classList.remove('resetting');
   this.skip.hidden=false;this.returning=false;this.choiceHint.hidden=true;this.businessLayers.forEach(layer=>layer.style.opacity=0);this.setMode('enter');
-  if(customer){this.endSlides();return;}
-  if(slides){this.storyY=4;this.storyTarget=4;this.slide(0);return;}
+  if(customer){this.roomBriefing?this.raiseToRoom(this.invitationIndex):this.endSlides();return;}
+  if(slides){if(this.roomBriefing){this.raiseToRoom(0);return;}this.storyY=4;this.storyTarget=4;this.slide(0);return;}
   if(story){this.actorX=785;this.beginStory();return;}
   if(!await this.wait(3450))return;
   this.setMode('greeting');this.speak(PRESENTATION_HELLO,()=>this.offer());
  }
  speak(lines,done){this.lines=lines;this.lineIndex=0;this.onLinesDone=done;this.root.querySelector('.presentation-speech').hidden=false;this.choices.hidden=true;this.choiceHint.hidden=true;this.nextButton.hidden=false;this.showLine();}
- showLine(){this.fullText=this.lines[this.lineIndex];this.lineSince=this.clock;this.forcedText=false;this.text.textContent='';}
+ showLine(){this.fullText=this.lines[this.lineIndex];this.lineSince=this.clock;this.forcedText=false;this.text.textContent='';if(this.roomBriefing&&this.mode==='briefing'){this.finishTyping();if(this.briefingIndex===4&&this.lineIndex===this.briefingLines[4].length-1)this.offerCustomer();}}
  finishTyping(){this.forcedText=true;this.text.textContent=this.fullText||'';}
  next(){
   if(!this.active||this.paused||!this.lines||['lowering','raising','revealing','clicking','enter'].includes(this.mode))return;
@@ -49,8 +53,8 @@ export class MinionPresentation{
  showChoices(mode,labels){this.setMode(mode);this.lines=null;this.nextButton.hidden=true;this.choices.hidden=false;this.choiceHint.hidden=false;this.choiceButtons.forEach((b,i)=>b.textContent=labels[i]);this.selectChoice(0);}
  selectChoice(index,focus=true){this.choiceIndex=index;this.choiceButtons.forEach((b,i)=>{b.classList.toggle('selected',i===index);b.setAttribute('aria-pressed',String(i===index));});if(focus)this.choiceButtons[index].focus();}
  confirmChoice(index=this.choiceIndex){if(!this.active||this.paused)return;if(this.mode==='choice'){index===0?this.listen():this.refuse();}else if(this.mode==='customer-choice'){this.choices.hidden=true;this.choiceHint.hidden=true;index===0?this.enterRoom():this.complete('skip');}}
- offerCustomer(){this.fullText='첫 손님을 받아 보시겠습니까?';this.finishTyping();this.showChoices('customer-choice',['손님 받기','안 받기']);}
- async enterRoom(){this.lines=null;this.root.querySelector('.presentation-speech').hidden=true;this.setMode('revealing');this.revealed=true;this.root.classList.add('room-revealed');this.room.setPose('idle');if(!await this.wait(1600))return;this.complete('accept');}
+ offerCustomer(){this.fullText=this.roomBriefing?this.briefingLines[4].at(-1):'첫 손님을 받아 보시겠습니까?';this.finishTyping();this.showChoices('customer-choice',['손님 받기','안 받기']);}
+ async enterRoom(){if(this.roomBriefing){this.complete('accept');return;}this.lines=null;this.root.querySelector('.presentation-speech').hidden=true;this.setMode('revealing');this.revealed=true;this.root.classList.add('room-revealed');this.room.setPose('idle');if(!await this.wait(1600))return;this.complete('accept');}
  refuse(){
   this.refusals++;this.choices.hidden=true;this.setMode('refusal');
   if(this.refusals<3)this.speak([PRESENTATION_REFUSALS[this.refusals-1]],()=>this.offer());
@@ -69,7 +73,7 @@ export class MinionPresentation{
   this.setMode('story');
   this.sighAt=null;
   if(b.sigh)this.queueSigh();
-  this.speak([b.text],()=>{if(++this.storyIndex<PRESENTATION_STORY.length)this.storyBeat();else this.slide(0);});
+  this.speak([b.text],()=>{if(++this.storyIndex<PRESENTATION_STORY.length)this.storyBeat();else if(this.variant===2)this.raiseToRoom(0);else this.slide(0);});
  }
  async queueSigh(){
   const index=this.storyIndex,generation=this.generation;
@@ -88,21 +92,40 @@ export class MinionPresentation{
   this.slideIndex=index;this.screenDown=true;this.storyTarget=4+index;
   this.root.querySelector('.presentation-title').hidden=true;this.root.classList.add('screen-down','projecting');
   this.setMode('slides');this.slideSince=this.clock;this.sound('click');
-  this.speak(PRESENTATION_SLIDES[index].lines,()=>{if(index+1<PRESENTATION_SLIDES.length)this.slide(index+1);else this.endSlides();});
+  this.speak(this.slides[index].lines,()=>{if(index+1<this.slides.length)this.slide(index+1);else this.endSlides();});
  }
  endSlides(){
-  return this.raise(false);
+  return this.roomBriefing?this.raiseToRoom(0):this.raise(false);
  }
  skipIntro(){
   if(!this.active||this.skipping)return;
   this.skipping=true;this.generation++;for(const w of this.waiters)w.resolve(false);this.waiters=[];this.cancelHold();this.skip.hidden=true;this.sighAt=null;
   this.lines=null;this.onLinesDone=null;this.returning=true;
+  if(this.roomBriefing){this.raiseToRoom(this.invitationIndex);return;}
   this.root.classList.remove('screen-down','projecting');
   this.root.querySelector('.presentation-title').hidden=true;
   this.root.querySelector('.presentation-speech').hidden=false;
   if(this.screenDown)this.sound('motor');this.screenDown=false;
   this.actorX=475;this.actorScale=1.75;this.actorFeet=365;
   this.offerCustomer();
+ }
+ async raiseToRoom(index){
+  this.lines=null;this.root.querySelector('.presentation-speech').hidden=true;
+  this.root.querySelector('.presentation-title').hidden=true;
+  this.root.classList.remove('screen-down','projecting');
+  this.root.classList.add('room-revealed','room-briefing');
+  this.revealed=true;this.setMode('raising');this.cancelHold();
+  if(this.screenDown)this.sound('motor');this.screenDown=false;
+  this.room.setPose('briefing');this.room.briefing={index,variant:this.variant,since:performance.now()};
+  if(index===0)this.sound('remote');
+  if(!await this.wait(1650))return;
+  this.briefingBeat(index);
+ }
+ briefingBeat(index){
+  this.briefingIndex=index;this.setMode('briefing');
+  this.skip.hidden=index===4;
+  if(this.room.briefing?.index!==index)this.room.briefing={index,variant:this.variant,since:performance.now()};
+  this.speak(this.briefingLines[index],()=>index<4?this.briefingBeat(index+1):this.offerCustomer());
  }
  complete(result){this.cancel();this.done(result);}
  beginHold(source){if(!this.active||this.paused||this.skipping||this.skip.hidden||this.hold)return;this.hold={at:this.clock,source};}
@@ -142,7 +165,7 @@ export class MinionPresentation{
    panel(1,'<div class="story-art-frame">'+art('pt/sigh.png','한숨 쉬는 마왕','sigh-layer')+art('pt/mirror.png','나라의 일보다 거울을 들여다보는 마왕','mirror-layer')+'<svg class="king-sigh" viewBox="0 0 120 72" aria-label="마왕의 한숨"><path d="M8 49 Q28 41 34 30 Q40 17 53 23 Q61 6 76 17 Q98 13 102 32 Q117 38 105 51 Q84 64 66 54 Q48 66 34 54 Z" fill="#dceaf4"/><path d="M20 49 Q33 46 40 40" stroke="#dceaf4" stroke-width="5" fill="none"/><text x="62" y="43" text-anchor="middle" fill="#7d8fa5" font-size="16">후우…</text></svg></div>'),
    panel(2,art('pt/reflection.png','거울 속 모습에도 만족하지 못하는 마왕')),
    panel(3,'<div class="scroll-reveal" data-reveal="summon"><div class="reveal-camera"><div class="reveal-before">'+art('pt/summoner.png','소환을 준비하는 마왕 부하')+'</div><div class="reveal-after">'+art('pt/summoning.png','마법진을 펼쳐 플레이어를 소환하는 마왕 부하')+'</div></div></div>','full-art'),
-   ...PRESENTATION_SLIDES.map((slide,i)=>panel(4+i,i===2?'<div class="scroll-reveal" data-reveal="king"><div class="reveal-camera"><div class="reveal-before calendar-only">'+art('pt/king-arrival.png','5일차 달력')+'</div><div class="reveal-after">'+art('pt/king-arrival.png','5일차에 찾아오는 마왕과 보라색 기운')+'</div></div></div>':(slide.art||[]).map((src,j)=>'<div class="business-layer" data-slide="'+i+'" data-step="'+j+'">'+art(src,slide.headline)+'</div>').join(''),'business-art'))
+   ...this.slides.map((slide,i)=>panel(4+i,slide.kind==='promise'?'<div class="scroll-reveal" data-reveal="king"><div class="reveal-camera"><div class="reveal-before calendar-only">'+art('pt/king-arrival.png','5일차 달력')+'</div><div class="reveal-after">'+art('pt/king-arrival.png','5일차에 찾아오는 마왕과 보라색 기운')+'</div></div></div>':(slide.art||[]).map((src,j)=>'<div class="business-layer" data-slide="'+i+'" data-step="'+j+'">'+art(src,slide.headline)+'</div>').join(''),'business-art'))
   ].join('');
   this.bowLayer=this.story.querySelector('.bowing-layer');this.mirrorLayer=this.story.querySelector('.mirror-layer');this.sighLayer=this.story.querySelector('.sigh-layer');this.sighIcon=this.story.querySelector('.king-sigh');
   this.businessLayers=[...this.story.querySelectorAll('.business-layer')];
@@ -164,7 +187,7 @@ export class MinionPresentation{
  }
  drawReveals(){
   for(const scene of this.revealScenes||[]){
-   const summon=scene.kind==='summon',active=summon?this.mode==='story'&&this.storyIndex===PRESENTATION_STORY.length-1:this.mode==='slides'&&this.slideIndex===2;
+   const summon=scene.kind==='summon',active=summon?this.mode==='story'&&this.storyIndex===PRESENTATION_STORY.length-1:this.mode==='slides'&&this.slides[this.slideIndex]?.kind==='promise';
    const past=summon?this.mode==='slides'||this.returning:this.returning;
    const elapsed=active?this.clock-(summon?this.modeSince:this.slideSince):past?5000:0;
    const t=Math.max(0,Math.min(1,(elapsed-1400)/2800)),p=t*t*(3-2*t);

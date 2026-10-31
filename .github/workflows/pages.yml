@@ -30,7 +30,7 @@ jobs:
             intro_only=true
             while IFS= read -r file; do
               case "$file" in
-                src/tutorial/presentation*|src/tutorial/app.js|src/tutorial/index.html|src/tutorial/guest.js|src/tutorial/narrative.js|src/beauty-shape.js|public/media/intro/pt/*|tests/presentation.test.mjs|tests/coffee-beauty.test.mjs|docs/*|.github/workflows/pages.yml) ;;
+                src/index.html|public/tutorial-variants.html|src/tutorial/scene.js|tests/room-briefing.test.mjs|src/tutorial/presentation*|src/tutorial/app.js|src/tutorial/index.html|src/tutorial/guest.js|src/tutorial/narrative.js|src/beauty-shape.js|public/media/intro/pt/*|tests/presentation.test.mjs|tests/coffee-beauty.test.mjs|docs/*|.github/workflows/pages.yml) ;;
                 *) intro_only=false ;;
               esac
             done < <(git diff --name-only "$BEFORE" HEAD)
@@ -42,7 +42,7 @@ jobs:
       - run: npm run build
       - name: Check changed presentation flow
         if: steps.scope.outputs.intro_only == 'true'
-        run: node --test tests/presentation.test.mjs tests/coffee-beauty.test.mjs tests/beauty-shape.test.mjs
+        run: node --test tests/presentation.test.mjs tests/room-briefing.test.mjs tests/coffee-beauty.test.mjs tests/beauty-shape.test.mjs
       - run: npm test
         if: steps.scope.outputs.intro_only != 'true'
       - uses: actions/upload-pages-artifact@v4
