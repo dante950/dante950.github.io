@@ -9,37 +9,37 @@ class IntegratedCursorScene extends CursorScene{
   // UI arrangement from the user's actual 2026-10-16 Unity build screenshot.
   // Viewer count and chat are presentation samples, not a live service.
   g.fillStyle='#221b29c9';g.fillRect(18,20,216,36);g.fillStyle='#f34055';g.fillRect(30,32,12,12);
-  g.textAlign='left';g.fillStyle='#fff';g.font='bold 14px Malgun Gothic';g.fillText('LIVE',50,44);g.fillStyle='#90c9ff';g.fillRect(112,31,14,14);g.fillStyle='#fff';g.fillText('시청자 128',136,44);
-  g.textAlign='center';g.font='bold 23px Malgun Gothic';g.fillText(b?.monster?.Name||'손님',640,39);
+  g.textAlign='left';g.fillStyle='#fff';g.font='bold 14px Galmuri9';g.fillText('LIVE',50,44);g.fillStyle='#90c9ff';g.fillRect(112,31,14,14);g.fillStyle='#fff';g.fillText('시청자 128',136,44);
+  g.textAlign='center';g.font='bold 23px Galmuri9';g.fillText(b?.monster?.Name||'손님',640,39);
   if(b?.usesHeartBoards){
    // Paper boards cover the HP display; stagger stays visible below them.
    g.fillStyle='#392b28';g.fillRect(390,87,520,12);drawHeartBoards(g,b);
   }else{
    bar(435,57,370,18,b?.enemyHP??0,b?.monster?.MaxHP??1,'#ef3b55');
-   g.fillStyle='#fff';g.textAlign='right';g.font='bold 16px Malgun Gothic';g.fillText('HP',417,73);
-   g.textAlign='left';g.font='bold 13px monospace';g.fillText(`${Math.ceil(b?.enemyHP??0)} / ${b?.monster?.MaxHP??0}`,832,72);
+   g.fillStyle='#fff';g.textAlign='right';g.font='bold 16px Galmuri9';g.fillText('HP',417,73);
+   g.textAlign='left';g.font='bold 13px Galmuri9';g.fillText(`${Math.ceil(b?.enemyHP??0)} / ${b?.monster?.MaxHP??0}`,832,72);
   }
   const gaugeY=b?.usesHeartBoards?157:85;
   bar(435,gaugeY,370,15,b?.staggerRemaining??100,b?.settings.staggerMax??100,'#ffbe2e');
-  g.fillStyle='#fff';g.textAlign='right';g.font='bold 16px Malgun Gothic';g.fillText('무력화',417,gaugeY+14);
-  g.textAlign='left';g.font='bold 13px monospace';g.fillText(`${Math.ceil(b?.staggerRemaining??100)} / ${b?.settings.staggerMax??100}`,832,gaugeY+14);
+  g.fillStyle='#fff';g.textAlign='right';g.font='bold 16px Galmuri9';g.fillText('무력화',417,gaugeY+14);
+  g.textAlign='left';g.font='bold 13px Galmuri9';g.fillText(`${Math.ceil(b?.staggerRemaining??100)} / ${b?.settings.staggerMax??100}`,832,gaugeY+14);
   // The supplied player sheet includes transparent headroom above the figure.
   const player=this.playerPosition??this.point(b?.pos??5),py=player.y-170;
   bar(player.x-100,py,200,18,b?.hp??100,b?.player?.MaxHP??100,'#36d39a');
-  g.fillStyle='#fff';g.font='bold 12px monospace';g.fillText(`${Math.ceil(b?.hp??100)} / ${b?.player?.MaxHP??100}`,player.x+106,py+14);
-  g.fillStyle='#38212ca6';g.fillRect(970,520,290,40);g.fillRect(895,570,365,31);g.fillStyle='#fff';g.font='bold 16px Malgun Gothic';g.fillText('라이브 채팅',994,546);g.font='13px Malgun Gothic';g.fillText('몬스타팬: 가위 소리, 은근히 중독성이 ...',910,590);
-  g.fillStyle='#15131bdc';g.fillRect(0,609,1280,41);g.fillStyle='#f6e4c8';g.font='16px Malgun Gothic';
+  g.fillStyle='#fff';g.font='bold 12px Galmuri9';g.fillText(`${Math.ceil(b?.hp??100)} / ${b?.player?.MaxHP??100}`,player.x+106,py+14);
+  g.fillStyle='#38212ca6';g.fillRect(970,520,290,40);g.fillRect(895,570,365,31);g.fillStyle='#fff';g.font='bold 16px Galmuri9';g.fillText('라이브 채팅',994,546);g.font='13px Galmuri9';g.fillText('몬스타팬: 가위 소리, 은근히 중독성이 ...',910,590);
+  g.fillStyle='#15131bdc';g.fillRect(0,609,1280,41);g.fillStyle='#f6e4c8';g.font='16px Galmuri9';
   let message='WASD 이동 · 몬스터 클릭 · 빈틈에는 누른 채 좌우로 긁기';
   if(b?.state==='opening')message=`${b.opportunities<=b.monster.PlayerDodgeMissCount?'이번 기회는 MISS · ':''}가위로 좌우로 긁기 · ${Math.max(0,(b.groggyEnd-b.time)/1000).toFixed(1)}초 · ${b.openingResult.attempts}타`;
   if(b?.state==='staggerBreak')message='무력화 붕괴! 잠시 뒤 가위로 긁어 주세요.';
   if(b?.rush)message=b.rush.stage==='aim'?`비석 왼쪽 ${b.rush.stone-1}번 칸으로 유도!`:'조준 고정 · 다른 줄로 피할 수 있어요';
   if(b?.dialogueBlocking)message='대화 중 · Enter로 다음 대사';
   g.fillText(message,30,636);
-  if(b&&!['opening','staggerBreak'].includes(b.state)){bar(1010,621,235,7,b.attackProgress,1,'#d5c5ff');g.font='12px Malgun Gothic';g.textAlign='right';g.fillText(b.attackReady?'클릭 준비 완료':'공격 준비 중',1244,644);}
-  if(b?.paused&&!combatLessonActive()){g.fillStyle='#12131bbb';g.fillRect(0,0,1280,650);g.textAlign='center';g.fillStyle='#fff2da';g.font='bold 30px Malgun Gothic';g.fillText('잠시 쉬어가기',640,300);g.font='18px Malgun Gothic';g.fillText('계속하기 또는 Esc',640,340);}
-  const miss=b?.cues.filter(c=>c.kind==='miss').at(-1);if(miss&&b.visualTime-miss.visualTime<700){g.textAlign='center';g.fillStyle='#fff0b8';g.font='bold 38px monospace';g.fillText('MISS',this.enemy?.x??962,(this.enemy?.y??534)-280);}
+  if(b&&!['opening','staggerBreak'].includes(b.state)){bar(1010,621,235,7,b.attackProgress,1,'#d5c5ff');g.font='12px Galmuri9';g.textAlign='right';g.fillText(b.attackReady?'클릭 준비 완료':'공격 준비 중',1244,644);}
+  if(b?.paused&&!combatLessonActive()){g.fillStyle='#12131bbb';g.fillRect(0,0,1280,650);g.textAlign='center';g.fillStyle='#fff2da';g.font='bold 30px Galmuri9';g.fillText('잠시 쉬어가기',640,300);g.font='18px Galmuri9';g.fillText('계속하기 또는 Esc',640,340);}
+  const miss=b?.cues.filter(c=>c.kind==='miss').at(-1);if(miss&&b.visualTime-miss.visualTime<700){g.textAlign='center';g.fillStyle='#fff0b8';g.font='bold 38px Galmuri9';g.fillText('MISS',this.enemy?.x??962,(this.enemy?.y??534)-280);}
   drawCombatLesson(g,b,this);
-  if(this.pointer&&(!b?.paused||combatLessonActive())){const p=this.pointer,opening=b?.state==='opening',active=b&&!b.dialogueBlocking&&(opening||b.canPunch()||combatLessonActive())&&insideBox(p,this.attackBox);g.globalAlpha=active?1:.4;g.font='34px sans-serif';g.textAlign='center';g.fillStyle=active?'#fff8d5':'#a7a0a3';g.fillText(opening?'✂':'✊',p.x,p.y+8);if(b&&!opening){g.strokeStyle=b.attackReady?'#b0f4cb':'#b5b0df';g.lineWidth=3;g.beginPath();g.arc(p.x,p.y,26,-Math.PI/2,-Math.PI/2+Math.PI*2*b.attackProgress);g.stroke();}}
+  if(this.pointer&&(!b?.paused||combatLessonActive())){const p=this.pointer,opening=b?.state==='opening',active=b&&!b.dialogueBlocking&&(opening||b.canPunch()||combatLessonActive())&&insideBox(p,this.attackBox);g.globalAlpha=active?1:.4;g.font='34px Galmuri9';g.textAlign='center';g.fillStyle=active?'#fff8d5':'#a7a0a3';g.fillText(opening?'✂':'✊',p.x,p.y+8);if(b&&!opening){g.strokeStyle=b.attackReady?'#b0f4cb':'#b5b0df';g.lineWidth=3;g.beginPath();g.arc(p.x,p.y,26,-Math.PI/2,-Math.PI/2+Math.PI*2*b.attackProgress);g.stroke();}}
   g.restore();
  }
 }

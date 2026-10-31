@@ -25,7 +25,7 @@ async function emit(name,ext,content){const filename=`${name}.${hash(content)}.$
 async function bundle(prefix,names){return (await Promise.all(names.map(f=>read(prefix+f)))).map(code).join('\n');}
 
 let combat=await read('src/combat/index.html');
-const speechStyle=await read('src/guest-speech.css');
+const speechStyle=(await read('src/ingame-font.css'))+'\n'+await read('src/guest-speech.css');
 const css=speechStyle+'\n'+(await Promise.all(['style.css','story.css','story-stage.css'].map(f=>read('src/combat/'+f)))).join('\n');
 const combatScript=await bundle('src/combat/',['../media.js','text-effects.js','dialogue.js','engine.js','cursor-engine.js','../beauty-reaction-dialogue.js','../salon-dialogue.js','workbook-xml.js','workbook.js','versions.js','scene.js','story-scene.js','cursor-scene.js','cursor-ui.js','app.js','tutorial.js','bridge.js']);
 const wb=(await fs.readFile(path.join(root,'data/source.xlsx'))).toString('base64');
@@ -39,7 +39,7 @@ const reactionStyle=await read('src/beauty-reaction.css');
 const appURL=await emit('app','js',parentBundle),styleURL=await emit('style','css',speechStyle+'\n'+reactionStyle+'\n'+await read('src/style.css')+'\n'+await read('src/battle-result.css'));
 const beautyResultRuntime=await read('src/salon-beauty-result.js'),beautyTutorialRuntime=await read('src/salon-tutorial.js');
 const beautyRules=await bundle('src/',['beauty-rules.js','returning-zombie.js','coffee-beauty.js','beauty-shape.js','beauty-lesson-targets.js','beauty-action-feedback.js']),beautyRuntime=(await read('src/salon-beauty.js')).replace('/*__BEAUTY_RESULT__*/',()=>beautyResultRuntime).replace('/*__BEAUTY_TUTORIAL__*/',()=>beautyTutorialRuntime);
-const salonStyle=await read('src/salon-beauty.css')+'\n'+reactionStyle;
+const salonStyle=await read('src/salon-beauty.css')+'\n'+reactionStyle+'\n'+await read('src/ingame-font.css');
 const inputs={
  'flow-assets':[await emit('assets','json',await read('data/assets.json')),'json'],
  'flow-default':[await emit('project','json',JSON.stringify(project)),'json'],
@@ -51,7 +51,7 @@ const closingModelURL=await emit('closing-model','js',(await read('src/closing/m
 const socialModelURL=await emit('social-model','js',await read('src/closing/social-model.js'));
 const socialUIURL=await emit('social-ui','js',(await read('src/closing/social-ui.js')).replace("from './social-model.js'",`from '${socialModelURL}'`));
 const closingAppURL=await emit('closing-app','js',(await read('src/closing/app.js')).replace("from '../star-progress.js'",`from '${starProgressURL}'`).replace("from './model.js'",`from '${closingModelURL}'`).replace("from './social-model.js'",`from '${socialModelURL}'`).replace("from './social-ui.js'",`from '${socialUIURL}'`));
-const closingStyleURL=await emit('closing-style','css',(await read('src/closing/style.css'))+'\n'+(await read('src/closing/social.css'))+'\n'+(await read('src/closing/social-refinements.css')));
+const closingStyleURL=await emit('closing-style','css',(await read('src/ingame-font.css'))+'\n'+(await read('src/closing/style.css'))+'\n'+(await read('src/closing/social.css'))+'\n'+(await read('src/closing/social-refinements.css')));
 const closingHTML=(await read('src/closing/index.html')).replace('href="style.css"',`href="${closingStyleURL}"`).replace('src="app.js"',`src="${closingAppURL}"`);
 await fs.writeFile(path.join(dist,'closing.html'),closingHTML);
 // The first-customer lab shares the runtime templates but owns its draft data and state.
@@ -62,7 +62,7 @@ const tutorialConfig={assets:inputs['flow-assets'][0],project:inputs['flow-defau
 const tutorialHTML=(await read('src/tutorial/index.html')).replace('href="style.css"',`href="${tutorialStyleURL}"`).replace('src="app.js"',`src="${tutorialAppURL}"`).replace('__TUTORIAL_CONFIG__',()=>safe(JSON.stringify(tutorialConfig)));
 await fs.writeFile(path.join(dist,'tutorial.html'),tutorialHTML);
 const resultJS=await emit('battle-result','js',await read('src/battle-result.js'));
-const resultCSS=await emit('battle-result-style','css',await read('src/battle-result.css'));
+const resultCSS=await emit('battle-result-style','css',speechStyle+'\n'+await read('src/battle-result.css'));
 await fs.writeFile(path.join(dist,'battle-results.html'),(await read('src/battle-results-preview.html')).replace('__RESULT_CSS__',resultCSS).replace('__RESULT_JS__',resultJS));
 const releaseId=hash(JSON.stringify(files));
 const boot=`const inputs=${JSON.stringify(inputs)};

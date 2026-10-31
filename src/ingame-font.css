@@ -1,0 +1,9 @@
+/* Supplied Galmuri9; SIL OFL 1.1 is shipped beside the original font. */
+@font-face{font-family:Galmuri9;src:url('./media/fonts/Galmuri9.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
+/* Scope the font to playable surfaces, including their form controls.
+   Main menus, workshop controls and laboratory toolbars retain their fonts. */
+:is(body.playing,body.salonGame,body.storyMode,#labStage,.closingGame #stage,.yacha-result),
+:is(body.playing,body.salonGame,body.storyMode,#labStage,.closingGame #stage,.yacha-result) :where(*){font-family:Galmuri9,'Malgun Gothic',sans-serif!important}
+
+/* Keep the follower label on one line with the wider pixel glyphs. */
+body.salonGame .beautyMoney{width:230px;font-size:18px;white-space:nowrap}

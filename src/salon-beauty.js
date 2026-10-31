@@ -466,7 +466,7 @@ function renderPortrait(includeGuides=true,target=ctx,includeCape=true){
  for(const p of placements){const image=stickerImages.get(p.sticker.id),scale=B.stickerScale??1;if(image?.complete&&image.naturalWidth)target.drawImage(image,p.x/2-p.sticker.w*.375*scale,p.y/2-p.sticker.h*.375*scale,p.sticker.w*.75*scale,p.sticker.h*.75*scale);}
  if(coffeeTutorial)drawPortraitLayer(target,portraitLayers.hands);
  if(includeGuides&&zonesVisible){
-  target.save();target.lineWidth=.8;target.font='5px sans-serif';
+  target.save();target.lineWidth=.8;target.font='5px Galmuri9';
   const allRegions=beautyPhase==='cut'?B.cutRegions:beautyPhase==='attach'?B.attachRegions:B.drawRegions;
   const regions=allRegions;
   if(beautyPhase==='cut'){target.strokeStyle='#92713F';target.setLineDash([2,2]);target.strokeRect(growthRegion.x/2,growthRegion.y/2,growthRegion.w/2,growthRegion.h/2);target.setLineDash([]);}
