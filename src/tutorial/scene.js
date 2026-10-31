@@ -20,7 +20,7 @@ export class TutorialRoom{
  nearest(){return ['coffee','minion'].filter(actor=>this.canTalk(actor)).sort((a,b)=>this.distanceTo(a)-this.distanceTo(b))[0]||null;}
  dispose(){this.disposed=true;cancelAnimationFrame(this.raf);this.keys.clear();}
  drawBriefing(now){
-  const c=this.ctx,{index,since,variant}=this.briefing,age=Math.max(0,now-since),t=Math.min(1,age/850);
+  const c=this.ctx,{index:beat,since,variant}=this.briefing,index=variant===2?beat:([0,1,2,5,3,4][beat]??beat),age=Math.max(0,now-since),t=Math.min(1,age/850);
   // Keep the supplied minion; omit its baked-in tiny ghost while this larger pose acts.
   c.save();c.translate(610,215);c.scale(1.4,1.4);c.beginPath();c.rect(0,0,115,150);c.rect(0,0,33,50);c.clip('evenodd');c.drawImage(this.images.get(this.assets.minion.full),0,0);c.restore();
   const polygon=(points,fill,stroke='#0c6467')=>{c.beginPath();points.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.closePath();c.fillStyle=fill;c.fill();if(stroke){c.strokeStyle=stroke;c.lineWidth=2.5;c.stroke();}};
@@ -39,7 +39,7 @@ export class TutorialRoom{
   c.beginPath();c.moveTo(25,0);c.bezierCurveTo(-13,-7,-3,-31,-18,-42);c.bezierCurveTo(-43,-52,-35,-85,-19,-94);c.bezierCurveTo(-9,-104,-19,-115,-10,-121);c.bezierCurveTo(9,-116,7,-103,4,-99);c.bezierCurveTo(33,-101,42,-77,30,-56);c.bezierCurveTo(16,-40,38,-27,25,0);c.closePath();c.fillStyle='#65e3b3';c.fill();c.strokeStyle='#126d76';c.lineWidth=3;c.stroke();
   c.fillStyle='#c7ffe2';c.beginPath();c.ellipse(-15,-82,7,4,-.4,0,Math.PI*2);c.fill();
   // Clearly readable eyes and a smile; no floating explanatory text.
-  if(index!==4&&(index!==2||variant===2)){c.fillStyle='#174e52';c.fillRect(-17,-76,6,12);c.fillRect(9,-76,6,12);}
+  if(index!==4&&index!==5&&(index!==2||variant===2)){c.fillStyle='#174e52';c.fillRect(-17,-76,6,12);c.fillRect(9,-76,6,12);}
   c.beginPath();if(index===2&&variant!==2){c.moveTo(-8,-51);c.lineTo(7,-51);}else c.arc(-1,-57,8,0,Math.PI);c.strokeStyle='#174e52';c.lineWidth=3;c.stroke();
   if(index===1&&variant!==2){
    // Open palm: inviting the player's own aesthetic choices.
@@ -70,6 +70,23 @@ export class TutorialRoom{
   if(variant===2&&index===3){
    const reach=Math.min(1,age/500);c.save();c.translate(22,-59);c.scale(Math.max(.1,reach),1);
    polygon([[0,0],[26,-3],[27,-10],[38,-10],[39,-7],[62,-7],[66,-3],[63,1],[44,1],[44,6],[38,12],[24,11],[0,9]],'#91f5cb');c.restore();
+  }
+  if(index===5){
+   // Lift a phone, pose with a wink and a V sign, then flash once.
+   c.strokeStyle='#174e52';c.lineWidth=3;
+   c.beginPath();c.moveTo(-20,-73);c.lineTo(-13,-76);c.lineTo(-7,-73);c.stroke();
+   c.fillStyle='#174e52';c.fillRect(9,-76,6,11);
+   const lift=1-Math.pow(1-t,3);
+   c.save();c.translate(-33,-43-lift*20);c.rotate(-.18*lift);
+   polygon([[8,8],[-20,4],[-33,-10],[-27,-20],[-13,-6],[8,-1]],'#91f5cb');
+   polygon([[-42,-37],[-19,-37],[-19,2],[-42,2]],'#344958','#152b39');
+   c.fillStyle='#7c9ca8';c.fillRect(-39,-34,17,32);
+   c.fillStyle='#102732';c.beginPath();c.arc(-35,-29,3.5,0,Math.PI*2);c.fill();
+   polygon([[-23,-9],[-16,-12],[-12,-8],[-14,1],[-22,4]],'#91f5cb');
+   const flash=1-Math.abs((age-1050)/170);
+   if(flash>0){c.save();c.globalAlpha=flash;star(-35,-29,19,'#fffbe0');c.restore();}
+   c.restore();
+   polygon([[25,-51],[35,-53],[37,-65],[36,-81],[40,-83],[44,-69],[49,-84],[53,-83],[50,-63],[45,-55],[40,-46],[27,-42]],'#91f5cb');
   }
   if(index===4){
    for(const x of [-14,12]){const pulse=1+.18*Math.sin(age/150);c.save();c.translate(x,-70);c.scale(pulse,pulse);polygon([[0,-11],[4,-4],[9,0],[4,4],[0,11],[-4,4],[-9,0],[-4,-4]],'#fff4a6','#408a77');c.restore();}

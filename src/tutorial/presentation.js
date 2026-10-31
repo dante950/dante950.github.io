@@ -3,7 +3,8 @@ import {PRESENTATION_HELLO,PRESENTATION_REFUSALS,PRESENTATION_STORY,PRESENTATION
 export class MinionPresentation{
  get slides(){return this.roomBriefing&&this.variant!==2?LOCAL_PRESENTATION_SLIDES:PRESENTATION_SLIDES;}
  get briefingLines(){return this.variant===2?ROOM_BRIEFING_V2:ROOM_BRIEFING;}
- get invitationIndex(){return this.variant===2?4:3;}
+ get invitationIndex(){return 4;}
+ get finalBriefingIndex(){return this.briefingLines.length-1;}
  constructor(host,room,{sound,done,roomBriefing=false,variant=roomBriefing?3:1}){
   this.roomBriefing=variant!==1;this.variant=variant;
   this.room=room;this.sound=sound;this.done=done;this.clock=0;this.generation=0;this.waiters=[];this.active=false;this.paused=false;
@@ -41,7 +42,7 @@ export class MinionPresentation{
   this.setMode('greeting');this.speak(PRESENTATION_HELLO,()=>this.offer());
  }
  speak(lines,done){this.lines=lines;this.lineIndex=0;this.onLinesDone=done;this.root.querySelector('.presentation-speech').hidden=false;this.choices.hidden=true;this.choiceHint.hidden=true;this.nextButton.hidden=false;this.showLine();}
- showLine(){this.fullText=this.lines[this.lineIndex];this.lineSince=this.clock;this.forcedText=false;this.text.textContent='';if(this.roomBriefing&&this.mode==='briefing'){this.finishTyping();if(this.briefingIndex===4&&this.lineIndex===this.briefingLines[4].length-1)this.offerCustomer();}}
+ showLine(){this.fullText=this.lines[this.lineIndex];this.lineSince=this.clock;this.forcedText=false;this.text.textContent='';if(this.roomBriefing&&this.mode==='briefing'){this.finishTyping();if(this.briefingIndex===this.finalBriefingIndex&&this.lineIndex===this.briefingLines[this.finalBriefingIndex].length-1)this.offerCustomer();}}
  finishTyping(){this.forcedText=true;this.text.textContent=this.fullText||'';}
  next(){
   if(!this.active||this.paused||!this.lines||['lowering','raising','revealing','clicking','enter'].includes(this.mode))return;
@@ -53,7 +54,7 @@ export class MinionPresentation{
  showChoices(mode,labels){this.setMode(mode);this.lines=null;this.nextButton.hidden=true;this.choices.hidden=false;this.choiceHint.hidden=false;this.choiceButtons.forEach((b,i)=>b.textContent=labels[i]);this.selectChoice(0);}
  selectChoice(index,focus=true){this.choiceIndex=index;this.choiceButtons.forEach((b,i)=>{b.classList.toggle('selected',i===index);b.setAttribute('aria-pressed',String(i===index));});if(focus)this.choiceButtons[index].focus();}
  confirmChoice(index=this.choiceIndex){if(!this.active||this.paused)return;if(this.mode==='choice'){index===0?this.listen():this.refuse();}else if(this.mode==='customer-choice'){this.choices.hidden=true;this.choiceHint.hidden=true;index===0?this.enterRoom():this.complete('skip');}}
- offerCustomer(){this.fullText=this.roomBriefing?this.briefingLines[4].at(-1):'첫 손님을 받아 보시겠습니까?';this.finishTyping();this.showChoices('customer-choice',['손님 받기','안 받기']);}
+ offerCustomer(){this.fullText=this.roomBriefing?this.briefingLines[this.finalBriefingIndex].at(-1):'첫 손님을 받아 보시겠습니까?';this.finishTyping();this.showChoices('customer-choice',['손님 받기','안 받기']);}
  async enterRoom(){if(this.roomBriefing){this.complete('accept');return;}this.lines=null;this.root.querySelector('.presentation-speech').hidden=true;this.setMode('revealing');this.revealed=true;this.root.classList.add('room-revealed');this.room.setPose('idle');if(!await this.wait(1600))return;this.complete('accept');}
  refuse(){
   this.refusals++;this.choices.hidden=true;this.setMode('refusal');
@@ -123,9 +124,9 @@ export class MinionPresentation{
  }
  briefingBeat(index){
   this.briefingIndex=index;this.setMode('briefing');
-  this.skip.hidden=index===4;
+  this.skip.hidden=index===this.finalBriefingIndex;
   if(this.room.briefing?.index!==index)this.room.briefing={index,variant:this.variant,since:performance.now()};
-  this.speak(this.briefingLines[index],()=>index<4?this.briefingBeat(index+1):this.offerCustomer());
+  this.speak(this.briefingLines[index],()=>index<this.finalBriefingIndex?this.briefingBeat(index+1):this.offerCustomer());
  }
  complete(result){this.cancel();this.done(result);}
  beginHold(source){if(!this.active||this.paused||this.skipping||this.skip.hidden||this.hold)return;this.hold={at:this.clock,source};}

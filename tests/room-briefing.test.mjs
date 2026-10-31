@@ -11,15 +11,15 @@ test('local PT continues from summoning through goals before revealing room',asy
  }
  await Promise.resolve();assert.equal(p.mode,'briefing');assert.equal(p.revealed,true);assert.equal(p.text.textContent,ROOM_BRIEFING[0][0]);
 });
-test('eight room bullets advance once per F and warning has its own fighting pose',()=>{
- const p=actor();assert.deepEqual(ROOM_BRIEFING.map(x=>x.length),[2,2,1,1,2]);p.briefingBeat(0);let count=0;
- for(let i=0;i<5;i++){const pose=p.room.briefing;for(const line of ROOM_BRIEFING[i]){assert.equal(p.room.briefing,pose);assert.equal(p.text.textContent,line);count++;if(count<8)p.keyDown({key:'f',preventDefault(){},repeat:false});}}
+test('ten room bullets advance once per F and warning has its own fighting pose',()=>{
+ const p=actor();assert.deepEqual(ROOM_BRIEFING.map(x=>x.length),[2,2,1,2,1,2]);p.briefingBeat(0);let count=0;
+ for(let i=0;i<ROOM_BRIEFING.length;i++){const pose=p.room.briefing;for(const line of ROOM_BRIEFING[i]){assert.equal(p.room.briefing,pose);assert.equal(p.text.textContent,line);count++;if(count<10)p.keyDown({key:'f',preventDefault(){},repeat:false});}}
  assert.equal(p.mode,'customer-choice');assert.equal(p.choices.hidden,false);
 });
 test('skip omits goals and warning, retaining the three-line guest invitation',async()=>{
  const p=actor();Object.assign(p,{waiters:[],generation:0,screenDown:true});p.skipIntro();await Promise.resolve();
- assert.equal(p.briefingIndex,3);assert.equal(p.text.textContent,ROOM_BRIEFING[3][0]);
- p.next();assert.equal(p.text.textContent,ROOM_BRIEFING[4][0]);p.next();assert.equal(p.mode,'customer-choice');
+ assert.equal(p.briefingIndex,4);assert.equal(p.text.textContent,ROOM_BRIEFING[4][0]);
+ p.next();assert.equal(p.text.textContent,ROOM_BRIEFING[5][0]);p.next();assert.equal(p.mode,'customer-choice');
 });
 test('default presentation retains the original three business slides and wrap-up',()=>{
  const p=actor();p.roomBriefing=false;assert.equal(p.slides.length,3);let raised=false;p.raise=()=>{raised=true;};p.endSlides();assert.equal(raised,true);
