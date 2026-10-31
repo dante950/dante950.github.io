@@ -1609,5 +1609,25 @@
         "hair": "./media/returning-zombie/T_Successzombie_walk_Hair_back-Sheet.png"
       }
     }
+  },
+  "sansWalk": {
+    "fw": 340,
+    "fh": 153,
+    "count": 8,
+    "frameMs": 100,
+    "crop": {
+      "x": 128,
+      "y": 24,
+      "w": 80,
+      "h": 112
+    },
+    "back": {
+      "body": "./media/sans-walk/T_sans_Body_walk_Back-Sheet.png",
+      "head": "./media/sans-walk/T_sans_Head_walk_Back-Sheet.png"
+    },
+    "front": {
+      "body": "./media/sans-walk/T_sans_Body_walk_Front-Sheet.png",
+      "head": "./media/sans-walk/T_sans_Head_walk_Front-Sheet.png"
+    }
   }
 }

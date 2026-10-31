@@ -65,7 +65,7 @@ function mountMinionPreview(){
  minionAnimationFrame=requestAnimationFrame(draw);
 }
 
-function skin(g){if(g.id===RETURNING_ZOMBIE_ID)return ASSETS.returningZombie;if(g.id===10004)return ASSETS.minion;return {features:g.id===10003?ASSETS.sansFace:null,head:g.id===10003?ASSETS.sansHeadCropped:ASSETS.zombieHead,hair:g.id===10001?ASSETS.zombieHair:'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',full:g.id===10003?ASSETS.sans:g.id===10002?ASSETS.drunkFull:ASSETS.zombie};}
+function skin(g){if(g.id===RETURNING_ZOMBIE_ID)return ASSETS.returningZombie;if(g.id===10004)return ASSETS.minion;return {walk:g.id===10003?ASSETS.sansWalk:null,features:g.id===10003?ASSETS.sansFace:null,head:g.id===10003?ASSETS.sansHeadCropped:ASSETS.zombieHead,hair:g.id===10001?ASSETS.zombieHair:'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',full:g.id===10003?ASSETS.sans:g.id===10002?ASSETS.drunkFull:ASSETS.zombie};}
 // Reserved for a separately planned tutorial guest; current customers start with their requests.
 const BEAUTY_TUTORIAL_ENABLED=false;
 function loadSalon(g,mode='story',afterReady=null){salonToken=token();pendingSalon=afterReady;mount(el('salon'),SALON_TEMPLATE,'__GUEST_JSON__',{...copy(g),beauty:beautyWithDialogue(story?.project||draft,g),skin:skin(g),stickers:ASSETS.stickers,returnBranch:story?.returnBranch||'employed',returningReactions:g.returningZombie?Object.fromEntries(Object.keys(g.bindings).map(key=>[key,beautyReactionLines(story?.project||draft,g,key).map(l=>l.Text)])):null,mode,token:salonToken,tutorialBeauty:BEAUTY_TUTORIAL_ENABLED&&mode==='story'&&!story?.guidesSeen?.beauty,day:story?.day||1,money:story?.money||0,followers:story?.followers||0});}
@@ -255,7 +255,7 @@ function battleEnd(outcome,stats){
  onContinue:()=>{if(outcome==='defeat'){story.lossAccepted=true;say('afterLoss',finishCustomer);}else say('afterWin',()=>{if(story.guest.id===10002)soulTutorial();else finishCustomer();});}});
 }
 function soulTutorial(){story.soulUnlocked=true;modal(`<span class="eyebrow">MONSTER SOUL · FIRST LESSON</span><h2>잊고 있던 손끝의 감각</h2><p>취객의 가업은 몬스터의 소울에 남은 힘을 <b>장비와 기술</b>로 빚어내는 일입니다. 야차를 마치고 미용실로 돌아온 지금, 그 이야기가 시작됩니다.</p><div class="mutedbox">① 소울에 남은 특성을 살펴보기<br>② 장비 또는 기술로 다듬기<br>③ 다음 야차에 사용할 힘 고르기</div><p class="minor">이 빌드에서는 해금 연출과 안내까지 연결했습니다. 소울의 실제 제작·장착 시스템은 후속 구현 영역입니다.</p><div class="actions">${btn('soulDone','기억해 둘게요',true)}</div>`);el('soulDone').onclick=()=>{closeModal();finishCustomer();};}
-function finishCustomer(){const g=story.guest;story=recordStoryVisit(story,story.portrait||skin(g).full);updateStoryHud('손님 배웅');sendSalon('followers',{value:story.followers});if(g.returningZombie){sendSalon('depart',{portrait:story.portrait||skin(g).full});}else say('leave',()=>{if(g.id===10003&&story.outcome==='victory')departed();else sendSalon('depart',{portrait:story.portrait||skin(g).full});});}
+function finishCustomer(){const g=story.guest;story=recordStoryVisit(story,story.portrait||skin(g).full);updateStoryHud('손님 배웅');sendSalon('followers',{value:story.followers});if(g.returningZombie){sendSalon('depart',{portrait:story.portrait||skin(g).full});}else say('leave',()=>{sendSalon('depart',{portrait:story.portrait||skin(g).full});});}
 function departed(){if(!story)return;story.index++;if(story.index<story.project.schedule[story.day-1].length)startCustomer();else settlement();}
 let closingToken='';
 function settlement(){

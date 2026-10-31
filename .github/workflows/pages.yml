@@ -14,6 +14,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
+      walk_only: ${{ steps.scope.outputs.walk_only }}
       font_only: ${{ steps.scope.outputs.font_only }}
       intro_only: ${{ steps.scope.outputs.intro_only }}
       result_only: ${{ steps.scope.outputs.result_only }}
@@ -28,16 +29,22 @@ jobs:
           EVENT: ${{ github.event_name }}
           BEFORE: ${{ github.event.before }}
         run: |
+          walk_only=false
           font_only=false
           intro_only=false
           result_only=false
           returning_only=false
           if [ "$EVENT" = push ] && git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            walk_only=true
             font_only=true
             intro_only=true
             result_only=true
             returning_only=true
             while IFS= read -r file; do
+              case "$file" in
+                src/app.js|src/salon.html|data/assets.json|public/media/sans-walk/*|scripts/check-sans-walk.mjs|docs/sans-walk/*|.github/workflows/pages.yml) ;;
+                *) walk_only=false ;;
+              esac
               case "$file" in
                 src/ingame-font.css|src/salon.html|src/salon-beauty.js|src/closing/index.html|src/tutorial/scene.js|src/combat/cursor-scene.js|src/combat/cursor-ui.js|src/combat/story-scene.js|src/combat/bridge.js|scripts/build.mjs|scripts/check-ingame-font.mjs|public/media/fonts/*|docs/ingame-galmuri9/*|.github/workflows/pages.yml) ;;
                 *) font_only=false ;;
@@ -56,6 +63,7 @@ jobs:
               esac
             done < <(git diff --name-only "$BEFORE" HEAD)
           fi
+          echo "walk_only=$walk_only" >> "$GITHUB_OUTPUT"
           echo "font_only=$font_only" >> "$GITHUB_OUTPUT"
           echo "intro_only=$intro_only" >> "$GITHUB_OUTPUT"
           echo "result_only=$result_only" >> "$GITHUB_OUTPUT"
@@ -74,13 +82,13 @@ jobs:
         if: steps.scope.outputs.returning_only == 'true'
         run: node --test tests/returning-zombie.test.mjs tests/story-start.test.mjs tests/story-progress.test.mjs tests/beauty-shape.test.mjs tests/salon-dialogue.test.mjs tests/workshop-dialogue.test.mjs tests/closing.test.mjs tests/social.test.mjs tests/coffee-beauty.test.mjs
       - run: npm test
-        if: steps.scope.outputs.font_only != 'true' && steps.scope.outputs.intro_only != 'true' && steps.scope.outputs.result_only != 'true' && steps.scope.outputs.returning_only != 'true'
+        if: steps.scope.outputs.walk_only != 'true' && steps.scope.outputs.font_only != 'true' && steps.scope.outputs.intro_only != 'true' && steps.scope.outputs.result_only != 'true' && steps.scope.outputs.returning_only != 'true'
       - uses: actions/upload-pages-artifact@v4
         with:
           path: dist
   browser-checks:
     needs: build
-    if: needs.build.outputs.font_only != 'true' && needs.build.outputs.intro_only != 'true' && needs.build.outputs.result_only != 'true' && needs.build.outputs.returning_only != 'true'
+    if: needs.build.outputs.walk_only != 'true' && needs.build.outputs.font_only != 'true' && needs.build.outputs.intro_only != 'true' && needs.build.outputs.result_only != 'true' && needs.build.outputs.returning_only != 'true'
     name: Check ${{ matrix.suite }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -122,6 +130,20 @@ jobs:
       - run: npm run build
       - run: node scripts/check-returning-dialogue.mjs
       - run: node scripts/check-returning-zombie.mjs
+  walk-browser:
+    needs: build
+    if: needs.build.outputs.walk_only == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - run: node scripts/check-sans-walk.mjs
   font-browser:
     needs: build
     if: needs.build.outputs.font_only == 'true'
@@ -137,8 +159,8 @@ jobs:
       - run: npm run build
       - run: node scripts/check-ingame-font.mjs
   deploy:
-    if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.build.result == 'success' && (needs.browser-checks.result == 'success' || needs.browser-checks.result == 'skipped') && (needs.returning-browser.result == 'success' || needs.returning-browser.result == 'skipped') && (needs.font-browser.result == 'success' || needs.font-browser.result == 'skipped')
-    needs: [build, browser-checks, returning-browser, font-browser]
+    if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.build.result == 'success' && (needs.browser-checks.result == 'success' || needs.browser-checks.result == 'skipped') && (needs.returning-browser.result == 'success' || needs.returning-browser.result == 'skipped') && (needs.font-browser.result == 'success' || needs.font-browser.result == 'skipped') && (needs.walk-browser.result == 'success' || needs.walk-browser.result == 'skipped')
+    needs: [build, browser-checks, returning-browser, font-browser, walk-browser]
     runs-on: ubuntu-latest
     permissions:
       pages: write

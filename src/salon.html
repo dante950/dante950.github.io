@@ -468,7 +468,7 @@ const oldInteraction=updateInteraction;updateInteraction=()=>{oldInteraction();i
 let departure=false;addEventListener('message',e=>{if(e.source!==parent||e.data?.token!==GUEST.token)return;const c=e.data;
  if(c.type==='beauty-start'){customerState.phase='seated';seatedCustomer.style.display='block';openShopBtn.style.display='none';enterBeauty();}
  if(c.type==='salon-return'){beautyActive=false;dialogueState.active=false;beautyScreen.style.display='none';interact.style.display='none';}
- if(c.type==='depart'&&!departure){departure=true;beautyActive=false;dialogueState.active=false;beautyScreen.style.display='none';seatedCustomer.style.display='none';customerState.phase='closed';interact.style.display='none';openShopBtn.style.display='none';if(!GUEST.returningZombie){const img=document.createElement('img');img.className='departingGuest';img.src=c.portrait||GUEST.skin?.full||document.querySelector('#zombiePortrait img').src;gameWorld.append(img);setTimeout(()=>send('departed'),2250);}}
+ if(c.type==='depart'&&!departure){departure=true;beautyActive=false;dialogueState.active=false;beautyScreen.style.display='none';seatedCustomer.style.display='none';customerState.phase='closed';interact.style.display='none';openShopBtn.style.display='none';if(!GUEST.returningZombie&&!GUEST.skin?.walk){const img=document.createElement('img');img.className='departingGuest';img.src=c.portrait||GUEST.skin?.full||document.querySelector('#zombiePortrait img').src;gameWorld.append(img);setTimeout(()=>send('departed'),2250);}}
  if(c.type==='pause'){state.keys.clear();openSettings();}
  if(c.type==='resume')closeSettings();
 });
@@ -537,6 +537,47 @@ if(GUEST.returningZombie&&GUEST.skin.animation){
  addEventListener('message',e=>{if(e.source!==parent||e.data?.token!==GUEST.token)return;
  if(e.data.type==='depart'&&!leaving){leaving=true;leaveStarted=performance.now();exitHead=offscreen();renderPortrait(false,exitHead.getContext('2d'),false);exitCanvas=makeCanvas();exitCanvas.className='returnZombieDeparture';exitCanvas.style.cssText='position:absolute;left:53%;top:57%;width:100px;height:156px;z-index:70;transform:translate(-50%,-100%);image-rendering:pixelated';gameWorld.append(exitCanvas);}
  if(e.data.type==='depart-finish'&&exitWaiting&&!exitDone){exitDone=true;exitCanvas.style.transition='opacity .3s';exitCanvas.style.opacity='0';setTimeout(()=>send('departed'),350);}
+ });
+}
+
+// Layered walking sheets: keep the room's existing path and seating interaction.
+if(GUEST.skin?.walk){
+ const a=GUEST.skin.walk,crop=a.crop,images={};
+ let leaving=false,leaveAt=0,exitCanvas=null,exitHead=null,done=false;
+ const makeWalk=()=>{const c=document.createElement('canvas');c.width=crop.w;c.height=crop.h;return c;};
+ const walking=makeWalk();walking.className='guestWalk';walking.dataset.direction='back';
+ walking.style.cssText='position:absolute;left:0;top:-7px;width:78px;height:109px;image-rendering:pixelated';customer.replaceChildren(walking);
+ function drawWalk(c,dir,frame){
+  const cx=c.getContext('2d');cx.imageSmoothingEnabled=false;cx.clearRect(0,0,c.width,c.height);c.dataset.frame=frame;
+  for(const part of ['body','head']){
+   if(part==='head'&&dir==='front'&&exitHead){
+    // The editable face is 74px wide; the walking head is 29px wide.
+    // Keep stickers and sculpting in the same head coordinates while it bobs.
+    const scale=29/74,headY=[44,44,31,31,44,44,31,31][frame];
+    cx.drawImage(exitHead,153-crop.x-43*scale,headY-crop.y-14*scale,W*scale,H*scale);
+   }else if(images[dir+part])cx.drawImage(images[dir+part],frame*a.fw+crop.x,crop.y,crop.w,crop.h,0,0,crop.w,crop.h);
+  }
+ }
+ const loaded=Promise.all(['back','front'].flatMap(dir=>['body','head'].map(async part=>{const im=new Image();im.src=a[dir][part];await im.decode();images[dir+part]=im;})));
+ loaded.then(()=>{function tick(t){
+  if(!document.body.isConnected)return;
+  drawWalk(walking,'back',customerState.phase==='walking'?Math.floor(t/a.frameMs)%a.count:0);
+  if(leaving&&exitCanvas&&!done){const elapsed=t-leaveAt,p=Math.min(1,elapsed/2200);
+   exitCanvas.style.left=(53+25*p)+'%';exitCanvas.style.top=(57+38*p)+'%';
+   exitCanvas.style.opacity=String(Math.min(1,(1-p)*6));
+   drawWalk(exitCanvas,'front',Math.floor(elapsed/a.frameMs)%a.count);
+   if(p===1){done=true;exitCanvas.remove();doorSignal.classList.remove('open');send('departed');}
+  }
+  requestAnimationFrame(tick);
+ }requestAnimationFrame(tick);}).catch(()=>{walking.replaceWith(Object.assign(document.createElement('img'),{className:'guestWalk',src:GUEST.skin.full}));});
+ addEventListener('message',async e=>{
+  if(e.source!==parent||e.data?.token!==GUEST.token||e.data.type!=='depart'||leaving)return;
+  leaving=true;
+  try{await loaded;}catch{send('departed');return;}
+  if(ready&&e.data.portrait){exitHead=offscreen();renderPortrait(false,exitHead.getContext('2d'),false);}
+  leaveAt=performance.now();exitCanvas=makeWalk();exitCanvas.className='sansDeparture';exitCanvas.dataset.direction='front';
+  exitCanvas.style.cssText='position:absolute;left:53%;top:57%;width:80px;height:112px;z-index:70;image-rendering:pixelated';
+  drawWalk(exitCanvas,'front',0);gameWorld.append(exitCanvas);doorSignal.classList.add('open');
  });
 }
 </script>
