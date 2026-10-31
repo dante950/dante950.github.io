@@ -53,6 +53,7 @@ export function createRun(settings = DEFAULT_SETTINGS) {
     visits: [],
     status: 'salon',
     stars: 0,
+    followerFloor: 0,
     settings: normalizeSettings(settings),
   };
 }
@@ -66,7 +67,7 @@ export function runFromStory(records,day,progress={}){
  }));
  const today=visits.filter(r=>r.day===day);
  const total=visits.at(-1)?.after||0;
- return {...createRun(progress.settings),day,total,dayStart:today[0]?.before??total,visits,stars:Math.max(0,Math.floor(progress.stars||0))};
+ return {...createRun(progress.settings),day,total,dayStart:today[0]?.before??total,visits,stars:Math.max(0,Math.floor(progress.stars||0)),followerFloor:Math.max(0,progress.followerFloor||0)};
 }
 
 export function dayVisits(run) {
@@ -140,7 +141,9 @@ export function closingSummary(run) {
 export function closeDay(run) {
   if (!canClose(run)) return run;
   const { eligibleForStar } = closingSummary(run);
-  return { ...run, status: 'closed', stars: eligibleForStar ? retainedStars(run.stars,run.total,starThresholds(run.settings)) : run.stars };
+  const stars=eligibleForStar?retainedStars(run.stars,run.total,starThresholds(run.settings)):run.stars;
+  const followerFloor=stars>run.stars?starThresholds(run.settings)[stars-1]:run.followerFloor;
+  return {...run,status:'closed',stars,followerFloor:followerFloor||0};
 }
 
 export function nextDay(run) {

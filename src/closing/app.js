@@ -11,7 +11,7 @@ let choices={...DEFAULT_CHOICES},copies=structuredClone(DEFAULT_COPY),settings=s
 const storyToken=new URLSearchParams(location.search).get('story');
 const storyMode=!!storyToken&&parent!==window;
 let storyInitialized=false,tutorialMode=false,closeAfterRegistration=false,receiptStars=0;
-function storyMessage(type){parent.postMessage({source:'yachacha-closing',token:storyToken,type,stars:run.stars,socialChoices:phone.selected},location.origin);}
+function storyMessage(type){parent.postMessage({source:'yachacha-closing',token:storyToken,type,stars:run.stars,followerFloor:run.followerFloor||0,settings:run.settings,socialChoices:phone.selected},location.origin);}
 if(storyMode){document.body.classList.add('story-mode');$('settingsOpen').hidden=true;$('restart').hidden=true;document.querySelector('.toolbar .title b').textContent='오늘의 영업 마감';document.querySelector('.lab-label').textContent='본편 플레이';}
 const DEFAULT_SPEED=1.5;
 let run=createRun(),summary=null,index=0,epoch=0,busy=false,quick=true,startDay=1,speed=DEFAULT_SPEED,sound=false,audio=null;
@@ -101,10 +101,10 @@ async function review(which,token,first=false){
  }
  $('reviewIndex').textContent=`${String(index+1).padStart(2,'0')} / ${String(summary.visits.length).padStart(2,'0')}`;
  $('currentName').textContent=visit.name+'의 후기';
- $('bonusLabel').textContent=visit.bonus?`기본 ${fmt(visit.base)} + 야차 보너스 ${fmt(visit.bonus)}`:visit.gain<0?'미용 · 야차 실패로 팔로워 감소':'기본 팔로워 '+fmt(visit.base);
+ $('bonusLabel').textContent=visit.protectedAmount>0?`스타 안전장치 · ${fmt(visit.protectedAmount)}명 감소 방지`:visit.bonus?`기본 ${fmt(visit.base)} + 야차 보너스 ${fmt(visit.bonus)}`:visit.gain<0?'미용 · 야차 실패로 팔로워 감소':'기본 팔로워 '+fmt(visit.base);
  displayed(visit.before,0);
- $('nextReview').textContent=visit.gain<0?'팔로워 변동 반영 중…':'팔로워가 모이는 중…';
- $('reviewHint').textContent=visit.gain<0?'팔로워가 감소해도 획득한 스타와 외관은 유지됩니다.':'후기를 통해 새 팔로워가 찾아오고 있어요.';
+ $('nextReview').textContent=visit.protectedAmount>0&&visit.gain===0?'스타 안전장치 적용 중…':visit.gain<0?'팔로워 변동 반영 중…':'팔로워가 모이는 중…';
+ $('reviewHint').textContent=visit.protectedAmount>0?'획득한 스타의 기준 팔로워 수 아래로는 감소하지 않습니다.':visit.gain<0?'팔로워가 감소해도 획득한 스타와 외관은 유지됩니다.':'후기를 통해 새 팔로워가 찾아오고 있어요.';
  await pause(650,token);$('receipt').classList.add('visible');await pause(300,token);
  await animateCount(visit,token);
  beep(880,.18,'triangle',.05);busy=false;$('nextReview').disabled=false;
@@ -112,7 +112,7 @@ async function review(which,token,first=false){
  $('reviewHint').textContent=index<summary.visits.length-1?'후기를 읽고, 다음 손님의 이야기로 넘어가세요.':'오늘 도착한 후기를 모두 확인했어요.';
  setStatus(`${visit.name} · ${signed(visit.gain)}명. 다음 진행을 기다리고 있어요.`);
 }
-function prepareClosingSummary(){receiptStars=run.stars;summary=closingSummary(run);if(storyMode){summary.eligibleForStar=run.day===2&&run.total>=settings.threshold;run={...run,status:'closed',stars:summary.eligibleForStar?retainedStars(run.stars,run.total,starThresholds(settings)):run.stars};}else run=closeDay(run);}
+function prepareClosingSummary(){receiptStars=run.stars;summary=closingSummary(run);if(storyMode){summary.eligibleForStar=run.day===2&&run.total>=settings.threshold;const stars=summary.eligibleForStar?retainedStars(run.stars,run.total,starThresholds(settings)):run.stars;run={...run,status:'closed',stars,followerFloor:stars>run.stars?starThresholds(settings)[stars-1]:run.followerFloor||0};}else run=closeDay(run);}
 async function close(){if(busy||(!storyMode&&!canClose(run)))return;busy=true;const token=epoch;prepareClosingSummary();phase('closing');show('closeShop',false);show('visitPanel',false);$('closedDay').textContent=tutorialMode?'연습':run.day;$('closingGreeting').textContent='수고했어요, '+phone.selected.__state.nickname+'님!';show('closeBanner');setStatus('오늘의 영업이 끝났습니다.');beep(220,.2,'triangle',.07);await pause(1600,token);show('closeBanner',false);phoneHome('management');}
 async function advanceDay(token){busy=true;phone.hide();$('blackout').classList.add('dark');await pause(750,token);show('settlement',false);show('finishBanner',false);phase('calendar');$('oldDay').textContent=tutorialMode?'튜토리얼':run.day;$('newDay').textContent=run.day+1;show('calendarScreen');$('calendarLeaf').classList.remove('flip');await pause(500,token);$('calendarLeaf').classList.add('flip');beep(150,.1,'triangle',.08);await pause(1700,token);if(tutorialMode){storyMessage('next-day');return;}run=nextDay(run);show('calendarScreen',false);if(run.status==='ending'){await ending(token);}else if(storyMode){storyMessage('next-day');}else{clearScene();prepareDay();busy=false;}}
 async function upgradeLoading(token){
@@ -160,7 +160,7 @@ action(async()=>{await Promise.all([ART.salon,ART.upgrade,ART.zombie,ART.sans,AR
 addEventListener('message',e=>{
  const m=e.data;if(!storyMode||storyInitialized||e.source!==parent||e.origin!==location.origin||m?.source!=='yachacha-story'||m.token!==storyToken||m.type!=='init')return;
  if(!([1,2].includes(m.day)||(m.day===0&&m.tutorial===true))||!Array.isArray(m.records))return;
- storyInitialized=true;tutorialMode=m.day===0&&m.tutorial===true;document.body.classList.toggle('tutorial-mode',tutorialMode);phone.setWeather(m.day,m.weather);run=runFromStory(m.records,m.day,{stars:m.stars,settings:m.settings});receiptStars=run.stars;phone.restore(m.socialChoices);settings=run.settings;clearScene();show('loading',false);renderSalon();resize();
+ storyInitialized=true;tutorialMode=m.day===0&&m.tutorial===true;document.body.classList.toggle('tutorial-mode',tutorialMode);phone.setWeather(m.day,m.weather);run=runFromStory(m.records,m.day,{stars:m.stars,followerFloor:m.followerFloor,settings:m.settings});receiptStars=run.stars;phone.restore(m.socialChoices);settings=run.settings;clearScene();show('loading',false);renderSalon();resize();
  if(tutorialMode){document.querySelector('.toolbar .title b').textContent='첫 손님의 하루 마감';document.querySelector('.lab-label').textContent='튜토리얼';document.querySelector('#closeBanner .mini-calendar small').textContent='TUTORIAL';}
  if(tutorialMode&&m.registration===true){closeAfterRegistration=m.autoClose===true&&run.visits.some(v=>v.guestId==='coffee'&&!v.skipped);show('closeShop',false);show('visitPanel',false);phase('registration');phone.showRegistration();return;}
  if(tutorialMode&&m.autoClose===true)action(close)();

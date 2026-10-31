@@ -10,3 +10,11 @@ export function starProgress(total,earned=0,thresholds=[5000]){
  if(next==null)return {stars,floor,next:null,ratio:0,remaining:null,max:false};
  return {stars,floor,next,ratio:Math.max(0,Math.min(1,(total-floor)/(next-floor))),remaining:Math.max(0,next-total),max:false};
 }
+
+/** Only an earned star protects its threshold; nominal rewards remain unchanged. */
+export function followerChange(total,requestedGain,earned=0,thresholds=[5000],savedFloor=0){
+ const floor=earned>0?(savedFloor>0?savedFloor:thresholds[Math.floor(earned)-1]??0):0;
+ const unprotected=total+requestedGain;
+ const after=requestedGain<0&&floor>0?Math.max(floor,unprotected):unprotected;
+ return {before:total,after,gain:after-total,requestedGain,protectedAmount:Math.max(0,after-unprotected),followerFloor:floor};
+}

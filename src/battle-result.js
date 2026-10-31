@@ -1,11 +1,11 @@
 const RESULT_ART='./media/battle-results/';
-export function resultFollowerMessage(gain,lastGuest=false){
+export function resultFollowerMessage(gain,lastGuest=false,protectedAmount=0){
  const next=lastGuest?'영업을 마칩니다.':'다음 손님으로 넘어갑니다.';
  if(gain<0)return '팔로워 '+Math.abs(gain).toLocaleString('ko-KR')+'명 감소 후\n'+next;
  if(gain>0)return '팔로워 '+gain.toLocaleString('ko-KR')+'명 획득 후\n'+next;
- return '팔로워 변동 없이\n'+next;
+ return (protectedAmount>0?'스타 안전장치로 팔로워 유지 후\n':'팔로워 변동 없이\n')+next;
 }
-export function showBattleResult({outcome,monsterID=10001,portrait='',canAccept=true,gain=0,lastGuest=false,onRetry=()=>{},onContinue=()=>{}}={}){
+export function showBattleResult({outcome,monsterID=10001,portrait='',canAccept=true,gain=0,protectedAmount=0,lastGuest=false,onRetry=()=>{},onContinue=()=>{}}={}){
  const win=outcome==='victory',previous=document.activeElement,root=document.createElement('section');
  root.className='yacha-result';root.setAttribute('role','dialog');root.setAttribute('aria-modal','true');root.setAttribute('aria-label',win?'야차 승리':'야차 패배');root.dataset.outcome=outcome;
  const board=document.createElement('div');board.className='yacha-result-board';root.append(board);
@@ -19,7 +19,7 @@ export function showBattleResult({outcome,monsterID=10001,portrait='',canAccept=
  if(win){const next=document.createElement('button');next.className='yacha-result-next';next.setAttribute('aria-label','클릭하여 넘어가기');next.textContent='';next.style.width='18%';next.style.height='8%';next.onclick=()=>finish(onContinue);board.append(next);board.onclick=()=>finish(onContinue);}
  else {
   const options=[['retryBattle','야차 재도전','재도전해도 팔로워는 감소하지 않습니다.',onRetry]];
-  if(canAccept)options.push(['lossContinue',lastGuest?'패배 인정 · 영업 마치기':'패배 인정 다음 손님',resultFollowerMessage(gain,lastGuest),onContinue]);
+  if(canAccept)options.push(['lossContinue',lastGuest?'패배 인정 · 영업 마치기':'패배 인정 다음 손님',resultFollowerMessage(gain,lastGuest,protectedAmount),onContinue]);
   for(const [id,label,help,action] of options){const button=document.createElement('button');button.id=id;button.className='yacha-result-choice';const title=document.createElement('span');title.textContent=label;const description=document.createElement('small');description.textContent=help;button.append(title,description);button.onclick=()=>finish(action);button.onfocus=()=>select(button);button.onpointerenter=()=>button.focus({preventScroll:true});menu.append(button);}
  }
  function select(active){for(const button of menu.children){const focused=button===active;button.classList.toggle('selected',focused);button.setAttribute('aria-pressed',String(focused));}}

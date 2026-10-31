@@ -229,7 +229,8 @@ function startBattle(){gameAudio.music(story.guest.id===10003?'sans':'battle');d
 function battleEnd(outcome,stats){
  if(!story||story.outcome)return;story.outcome=outcome;story.stats=stats;gameAudio.music('salon');document.body.classList.remove('inBattle');el('storyBattle').srcdoc='';combatFrame=null;el('battleHost').hidden=true;sendSalon('salon-return');updateStoryHud(outcome==='victory'?'야차 승리 · 미용실로':'야차 패배');
  const lastGuest=story.index===story.project.schedule[story.day-1].length-1;
- showBattleResult({outcome,monsterID:story.guest.id,portrait:skin(story.guest).full,canAccept:story.guest.id!==10004,gain:storyVisitGain({...story,lossAccepted:true}).gain,lastGuest,
+ const resultGain=storyVisitGain({...story,lossAccepted:true});
+ showBattleResult({outcome,monsterID:story.guest.id,portrait:skin(story.guest).full,canAccept:story.guest.id!==10004,gain:resultGain.gain,protectedAmount:resultGain.protectedAmount,lastGuest,
  onRetry:()=>{story.outcome=null;startBattle();},
  onContinue:()=>{if(outcome==='defeat'){story.lossAccepted=true;say('afterLoss',finishCustomer);}else say('afterWin',()=>{if(story.guest.id===10002)soulTutorial();else finishCustomer();});}});
 }
@@ -244,8 +245,8 @@ function settlement(){
 addEventListener('message',e=>{
  const frame=document.getElementById('storyClosing'),m=e.data;
  if(!story||!frame||e.source!==frame.contentWindow||e.origin!==location.origin||m?.source!=='yachacha-closing'||m.token!==closingToken)return;
- if(m.type==='ready')frame.contentWindow.postMessage({source:'yachacha-story',type:'init',token:closingToken,day:story.day,records:copy(story.records),stars:story.stars||0,weather:weatherForDay(),socialChoices:story.socialChoices||{}},location.origin);
- if(m.type==='next-day'){story.socialChoices=m.socialChoices||{};story.stars=Math.max(story.stars||0,m.stars||0);frame.remove();closingToken='';story.day++;story.index=0;startCustomer();}
+ if(m.type==='ready')frame.contentWindow.postMessage({source:'yachacha-story',type:'init',token:closingToken,day:story.day,records:copy(story.records),stars:story.stars||0,followerFloor:story.followerFloor||0,settings:story.starSettings,weather:weatherForDay(),socialChoices:story.socialChoices||{}},location.origin);
+ if(m.type==='next-day'){story.socialChoices=m.socialChoices||{};story.stars=Math.max(story.stars||0,m.stars||0);story.followerFloor=Math.max(story.followerFloor||0,m.followerFloor||0);story.starSettings=m.settings||story.starSettings;frame.remove();closingToken='';story.day++;story.index=0;startCustomer();}
  if(m.type==='home')homeNow();
 });
 function openPhone(){if(!story)return;toast('몬스타그램은 하루 마감 때 확인할 수 있어요.');}
