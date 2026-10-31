@@ -12,11 +12,11 @@ export function createCoffeeGuest(assets){
  const coffeeTrimPolygon=[[6,0],[17,0],[20,9],[22,13],[18,15],[15,19],[13,23],[10,20],[7,16],[6,11]].map(([x,y])=>({x:coffeeHair.x+x*4,y:coffeeHair.y+y*4}));
  const coffeeLayer=(file,box,frame)=>({src:coffeeMedia+file,...box,...(frame===undefined?{}:{sx:frame*36,sy:0,sw:36,sh:29})});
  const coffeeRegion=(key,label,x,y,w,h,extra={})=>({key,label,x,y,w,h,shape:'rect',kind:'good',points:0,stickerIDs:[],...extra});
- const coffeeSkin={head:coffeeMedia+'head-base.png',hair:coffeeMedia+'hair.png',full:coffeeMedia+'head-base.png',layers:{
+ const coffeeSkin={head:coffeeMedia+'head-base.png',hair:coffeeMedia+'hair-v2.png',full:coffeeMedia+'head-base.png',layers:{
   body:coffeeLayer('body.png',{x:116,y:192,w:88,h:112}),
   hands:coffeeLayer('hands.png',{x:52,y:164,w:216,h:72}),
   head:coffeeLayer('head-base.png',coffeeHead),
-  material:{...coffeeLayer('hair.png',coffeeHair),whiteKey:true},
+  material:{...coffeeLayer('hair-v2.png',coffeeHair),whiteKey:true},
   target:coffeeLayer('hair-complete.png',coffeeHair),
   eyes:{neutral:coffeeLayer('eyes-normal.png',coffeeHead),satisfied:coffeeLayer('eyes-happy.png',coffeeHead),angry:coffeeLayer('eyes-angry.png',coffeeHead)},
   mouth:{open:coffeeLayer('mouth-normal-sheet.png',coffeeHead,0),closed:coffeeLayer('mouth-normal-sheet.png',coffeeHead,1)}
