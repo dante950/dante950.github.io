@@ -336,7 +336,7 @@ portrait.addEventListener('pointercancel',cancelGesture);portrait.addEventListen
 addEventListener('blur',cancelGesture);
 addEventListener('keydown',e=>{if(!beautyActive)return;if(e.key==='Escape')cancelGesture();if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();undoBeauty();}},true);
 function placeSticker(sticker,x,y){
- if(!ready||finishing||briefing||beautyPhase!=='attach'||placements.length>=5)return;
+ if(!ready||finishing||briefing||beautyPhase!=='attach'||placements.length>=10)return;
  resetActionMood();pushUndo();const region=B.attachRegions.find(r=>inBeautyRegion(x,y,r))?.key||'Other';
  placements.push({sticker,region,x,y});touched.attach=true;updateBeautyScore(true);renderPortrait();beautyLessonSticker();
  if(isReturningZombie&&B.attachRegions.find(r=>r.key===region)?.stickerIDs.includes(sticker.id))queueReturningReaction((GUEST.returnBranch||'employed')+region);
