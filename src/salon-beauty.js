@@ -37,7 +37,7 @@ const masks={eyes:new Uint8Array(W*H),brain:new Uint8Array(W*H),face:new Uint8Ar
 const sculptAnchors=new Uint8Array(W*H);
 let eyeWasCovered=false,eyeReactionCount=0,reactionTimer=0,reactionTick=0,reactionOpen=false,areaWarned=false,overflowWarned=false,lastAreaRatio=1;
 const eyeReaction=document.createElement('div');eyeReaction.className='beautyEyeReaction';eyeReaction.hidden=true;eyeReaction.setAttribute('role','status');eyeReaction.setAttribute('aria-live','polite');beautyScreen.append(eyeReaction);
-const returningReactionSeen=new Set(),returningReactionQueue=[];let returningReactionTimer=0;
+const returningActions={cut:false},returningReactionSeen=new Set(),returningReactionQueue=[];let returningReactionTimer=0;
 function queueReturningReaction(key){
  if(!isReturningZombie||returningReactionSeen.has(key)||finishing)return;
  const lines=GUEST.returningReactions?.[key];if(!lines?.length)return;returningReactionSeen.add(key);returningReactionQueue.push(...lines.map(text=>({text,key})));if(!returningReactionTimer)playReturningReaction();
@@ -311,7 +311,7 @@ portrait.addEventListener('pointerup',e=>{
  if(beautyPhase==='cut'){history.draw=[];history.attach=[];syncUndo();}
  if(g.kind==='hammer')send('sound',{key:'hammer'});
  updateBeautyScore(true);renderPortrait();beautyLessonStroke(g);
- if(isReturningZombie){const key=returningStrokeReaction(g,current,paint,B,W,H,PIX);if(key)queueReturningReaction(key);}
+ if(isReturningZombie){const key=returningStrokeReaction(g,current,paint,B,W,H,PIX,returningActions);if(key)queueReturningReaction(key);}
  if(coffeeTutorial){const changed=current.some((v,i)=>v!==g.snapshot[i])||paint.some((v,i)=>v!==g.paint[i]);if(changed){if(['scissors','hammer'].includes(g.kind))coffeeActions.cut=true;if(g.kind==='grow')coffeeActions.grow=true;if(g.kind==='paint')coffeeActions.draw=true;}coffeeAction('stroke',{tool:g.kind,changed});}
 });
 function removeCutFragments(before){
@@ -372,7 +372,7 @@ function updateBeautyScore(action=false){
  const shape=scoreShape(current,original,B,W,H,masks);shapeProgress=shape;cutScore=shape.score;
  attachScore=beautyAttachScore(placements,B);
  if(B.weights.draw){const full=new Uint8ClampedArray(320*350*4);for(let y=0;y<350;y++)for(let x=0;x<320;x++){const n=(Math.floor(y/2)*W+Math.floor(x/2))*4;full.set(paint.subarray(n,n+4),(y*320+x)*4);}drawScore=beautyDrawScore(full,B);}else drawScore=0;
- if(isReturningZombie){const status=returningStatus();cutScore=status.hairOK?B.weights.cut:0;shapeProgress.hardFailure=!status.hairOK;for(const d of shapeProgress.details)d.fulfilled=status.hairOK?1:0;}
+ if(isReturningZombie){const status=returningStatus();cutScore=status.hairOK?B.weights.cut:0;shapeProgress.hardFailure=false;for(const d of shapeProgress.details)d.fulfilled=status.hairOK?1:0;}
  totalSatisfaction=beautyTotal({cut:cutScore,draw:drawScore,attach:attachScore},B);
  const scores={cut:cutScore,draw:drawScore,attach:attachScore};
  const live=BEAUTY_STAGES.reduce((s,k)=>s+(B.steps[k]?(touched[k]?scores[k]:B.weights[k]*.5):0),0);
@@ -582,7 +582,7 @@ if(coffeeTutorial){
 }
 addEventListener('message',e=>{if(e.source!==parent||e.data?.token!==GUEST.token)return;if(e.data.type==='beauty-request-done'){finishBeautyRequest(e.data.requestId,e.data.detail);return;}if(e.data.type!=='beauty-speaking')return;talking=!!e.data.speaking;mouthFrame=!!e.data.open;beautyCustomer.dataset.talking=String(talking);renderPortrait();});
 prepareBeauty().catch(error=>{hint.textContent='미용 리소스를 불러오지 못했어요. 새로고침해 주세요.';console.error(error);});
-window.beautyDebug={get tutorial(){return {active:!beautyLessonDone,step:beautyLessonSteps[beautyLessonIndex]?.id,passed:beautyLessonPassed};},get shape(){return structuredClone(shapeProgress);},get reaction(){return {count:eyeReactionCount,visible:!eyeReaction.hidden,text:eyeReaction.textContent,seen:[...returningReactionSeen],queued:returningReactionQueue.length};},get result(){return {active:beautyResultActive,revealed:resultRevealed,mood:resultMood};},get ready(){return ready;},get material(){return Array.from(current);},get paint(){return Array.from(paint);},get original(){return Array.from(original);},get toolSize(){return brushRadius;},get opacity(){return paintOpacity;},get masks(){return masks;},get expression(){return expression;},get scores(){return {cut:cutScore,draw:drawScore,attach:attachScore,total:totalSatisfaction,live:liveSatisfaction};},get placements(){return placements.map(p=>({id:p.sticker.id,x:p.x,y:p.y}));},get historyLength(){return history[beautyPhase]?.length||0;},get briefing(){return briefing;},get mouthFrame(){return mouthFrame;}};
+window.beautyDebug={get tutorial(){return {active:!beautyLessonDone,step:beautyLessonSteps[beautyLessonIndex]?.id,passed:beautyLessonPassed};},get shape(){return structuredClone(shapeProgress);},get reaction(){return {count:eyeReactionCount,visible:!eyeReaction.hidden,text:eyeReaction.textContent,seen:[...returningReactionSeen],queued:returningReactionQueue.length,cutUsed:returningActions.cut};},get result(){return {active:beautyResultActive,revealed:resultRevealed,mood:resultMood};},get ready(){return ready;},get material(){return Array.from(current);},get paint(){return Array.from(paint);},get original(){return Array.from(original);},get toolSize(){return brushRadius;},get opacity(){return paintOpacity;},get masks(){return masks;},get expression(){return expression;},get scores(){return {cut:cutScore,draw:drawScore,attach:attachScore,total:totalSatisfaction,live:liveSatisfaction};},get placements(){return placements.map(p=>({id:p.sticker.id,x:p.x,y:p.y}));},get historyLength(){return history[beautyPhase]?.length||0;},get briefing(){return briefing;},get mouthFrame(){return mouthFrame;}};
 
 
 // F also reaches the parent speech bubble while the salon iframe has focus.

@@ -14,7 +14,10 @@ export function returningBeautyStatus(original,current,b,scores,placements){
  const hairOK=changeRatio<=(b.hairTolerance??.03);
  const teethOK=scores.draw>=b.weights.draw-1e-9;
  const accessoriesOK=placements.length===(b.attachCount??b.attachRegions.length)&&scores.attach>=b.weights.attach-1e-9;
- return {success:hairOK&&teethOK&&accessoriesOK,hairOK,teethOK,accessoriesOK,lossRatio,changeRatio,hairRuined:lossRatio>=(b.ruinedHairRatio??.35)};
+ // Hair preservation contributes its 10 points, but is no longer a veto.
+ const scoreTotal=Math.max(0,Math.min(100,(hairOK?b.weights.cut:0)+scores.draw+scores.attach));
+ const mood=scoreTotal>=80?'satisfied':scoreTotal>=40?'neutral':'angry';
+ return {success:mood!=='angry',mood,total:scoreTotal,hairOK,teethOK,accessoriesOK,lossRatio,changeRatio,hairRuined:lossRatio>=(b.ruinedHairRatio??.35)};
 }
 export function returningDialogueEvent(branch,success,hairRuined,event){
  const prefix=branch==='lottery'?'lottery':'employed';
@@ -35,8 +38,12 @@ export async function prepareReturningZombieSkin(sk){
  sk.portrait=canvas.toDataURL();
 }
 
-export function returningStrokeReaction(gesture,current,paint,b,width,height,pixelSize){
- if(['grow','scissors'].includes(gesture.kind))return current.some((v,i)=>v!==gesture.snapshot[i])?(gesture.kind==='grow'?'returnGrow':'returnCut'):null;
+export function returningStrokeReaction(gesture,current,paint,b,width,height,pixelSize,actions={cut:false}){
+ if(gesture.kind==='scissors'){
+  if(!current.some((v,i)=>gesture.snapshot[i]&&!v))return null;
+  actions.cut=true;return 'returnCut';
+ }
+ if(gesture.kind==='grow')return !actions.cut&&current.some((v,i)=>v!==gesture.snapshot[i])?'returnGrow':null;
  if(gesture.kind!=='paint')return null;
  const r=b.toothReactionRegion||b.drawRegions.find(r=>r.key==='Tooth'),colors=b.drawColors.map(h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)));
  for(let n=0;n<width*height;n++){const x=(n%width+.5)*pixelSize,y=(Math.floor(n/width)+.5)*pixelSize,i=n*4;if(x<r.x||x>r.x+r.w||y<r.y||y>r.y+r.h||paint[i+3]===0)continue;if(!paint.subarray(i,i+4).some((v,k)=>v!==gesture.paint[i+k]))continue;if(!colors.some(c=>c.every((v,j)=>Math.abs(v-paint[i+j])<10)))return 'returnWrongTooth';}

@@ -42,12 +42,12 @@ test('matching tooth color succeeds; wrong color and painting the whole mouth do
  const paint=(color,whole=false)=>{const pixels=new Uint8ClampedArray(320*350*4),r=b.drawRegions[whole?1:0];for(let y=r.y;y<=r.y+r.h;y++)for(let x=r.x;x<=r.x+r.w;x++)pixels.set([...color,255],(y*320+x)*4);return beautyDrawScore(pixels,b);};
  assert.equal(paint([253,255,129]),60);assert.equal(paint([255,211,66]),0);assert.equal(paint([253,255,129],true),0);
 });
-test('hair damage overrides otherwise good work, and restoration restores the success path',()=>{
+test('satisfied and neutral totals succeed even when a request is incomplete',()=>{
  const original=new Uint8Array(100).fill(1),current=original.slice(),scores={draw:60,attach:30},placements=[{},{},{}];
  assert(returningBeautyStatus(original,current,b,scores,placements).success);
- current.fill(0,0,40);const bad=returningBeautyStatus(original,current,b,scores,placements);assert(!bad.success);assert(bad.hairRuined);
+ current.fill(0,0,40);const bad=returningBeautyStatus(original,current,b,scores,placements);assert(bad.success);assert.equal(bad.mood,'satisfied');assert.equal(bad.total,90);assert(bad.hairRuined);
  current.set(original);assert(returningBeautyStatus(original,current,b,scores,placements).success);
- assert(!returningBeautyStatus(original,current,b,{draw:0,attach:30},placements).success);
+ const normal=returningBeautyStatus(original,current,b,{draw:0,attach:30},placements);assert(normal.success);assert.equal(normal.mood,'neutral');assert.equal(normal.total,40);
 });
 test('return visit records once, never enters battle, and survives day-three closing adaptation',()=>{
  for(const success of [true,false]){
@@ -86,4 +86,33 @@ test('all six exits explain the lack of Yacha before their original final line',
 test('each stronger tease is the same in the button and spoken reply group',()=>{
  const rows=p.combat.sheets.find(s=>s.name==='대사').rows;
  for(const options of Object.values(guest.returningChoices)){const option=options[1],lines=rows.filter(r=>r.GroupID===guest.bindings[option.event]).sort((a,b)=>a.Order-b.Order);assert.equal(lines[0].Speaker,'플레이어');assert.equal(lines[0].Text,option.text);assert.equal(lines[1].Speaker,'몬스터');assert(lines[1].Text.length);}
+});
+
+
+test('mood boundaries carry the same success through result dialogue, reward, and closing',()=>{
+ const original=new Uint8Array(100).fill(1),current=new Uint8Array(100),placements=[{},{},{}];
+ for(const [total,mood,success] of [[0,'angry',false],[39.99,'angry',false],[40,'neutral',true],[79.99,'neutral',true],[80,'satisfied',true],[90,'satisfied',true]]){
+  const result=returningBeautyStatus(original,current,b,{draw:Math.min(total,60),attach:Math.max(0,total-60)},placements);
+  assert.equal(result.mood,mood);assert.equal(result.success,success);assert.equal(result.total,total);
+  for(const branch of ['employed','lottery']){
+   assert.equal(returningDialogueEvent(branch,result.success,result.hairRuined,'leave'),branch+(success?'SuccessLeave':'HairFailLeave'));
+   const state={guest,day:3,records:[],followers:0,returnBranch:branch,lastScore:total,lastMood:mood,beautyDetails:result,outcome:'beauty'};
+   const next=recordStoryVisit(state,'portrait');assert.equal(next.followers,success?1100:0);
+   assert.equal(runFromStory(next.records,3).visits[0].beautySuccess,success);
+  }
+ }
+});
+
+test('cut history suppresses later growth protests, including after restoration; empty scissors do not',()=>{
+ const W=160,H=175,original=new Uint8Array(W*H),paint=new Uint8ClampedArray(W*H*4);original[10]=1;
+ const actions={cut:false},removed=original.slice();removed[10]=0;
+ assert.equal(returningStrokeReaction({kind:'scissors',snapshot:original},original,paint,b,W,H,2,actions),null);
+ assert.equal(actions.cut,false);
+ const grown=original.slice();grown[11]=1;
+ assert.equal(returningStrokeReaction({kind:'grow',snapshot:original},grown,paint,b,W,H,2,actions),'returnGrow');
+ assert.equal(returningStrokeReaction({kind:'scissors',snapshot:original},removed,paint,b,W,H,2,actions),'returnCut');
+ assert.equal(actions.cut,true);
+ assert.equal(returningStrokeReaction({kind:'grow',snapshot:removed},original,paint,b,W,H,2,actions),null);
+ assert.equal(returningStrokeReaction({kind:'grow',snapshot:original},grown,paint,b,W,H,2,actions),null);
+ const freshVisit={cut:false};assert.equal(returningStrokeReaction({kind:'grow',snapshot:original},grown,paint,b,W,H,2,freshVisit),'returnGrow');
 });
