@@ -14,6 +14,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
+      dialogue_only: ${{ steps.scope.outputs.dialogue_only }}
       walk_only: ${{ steps.scope.outputs.walk_only }}
       font_only: ${{ steps.scope.outputs.font_only }}
       intro_only: ${{ steps.scope.outputs.intro_only }}
@@ -29,18 +30,24 @@ jobs:
           EVENT: ${{ github.event_name }}
           BEFORE: ${{ github.event.before }}
         run: |
+          dialogue_only=false
           walk_only=false
           font_only=false
           intro_only=false
           result_only=false
           returning_only=false
           if [ "$EVENT" = push ] && git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            dialogue_only=true
             walk_only=true
             font_only=true
             intro_only=true
             result_only=true
             returning_only=true
             while IFS= read -r file; do
+              case "$file" in
+                src/app.js|src/model.js|src/workshop-dialogue.js|src/combat/dialogue.js|src/tutorial/dialogues.js|src/tutorial/app.js|src/tutorial/narrative.js|scripts/build.mjs|scripts/check-coffee-dialogue.mjs|tests/coffee-dialogue.test.mjs|tests/workshop-dialogue.test.mjs|tests/minion.test.mjs|tests/release.test.mjs|scripts/check-minion.mjs|docs/coffee-dialogue-editor/*|.github/workflows/pages.yml) ;;
+                *) dialogue_only=false ;;
+              esac
               case "$file" in
                 src/app.js|src/salon.html|data/assets.json|public/media/sans-walk/*|scripts/check-sans-walk.mjs|docs/sans-walk/*|.github/workflows/pages.yml) ;;
                 *) walk_only=false ;;
@@ -63,6 +70,7 @@ jobs:
               esac
             done < <(git diff --name-only "$BEFORE" HEAD)
           fi
+          echo "dialogue_only=$dialogue_only" >> "$GITHUB_OUTPUT"
           echo "walk_only=$walk_only" >> "$GITHUB_OUTPUT"
           echo "font_only=$font_only" >> "$GITHUB_OUTPUT"
           echo "intro_only=$intro_only" >> "$GITHUB_OUTPUT"
@@ -88,7 +96,7 @@ jobs:
           path: dist
   browser-checks:
     needs: build
-    if: needs.build.outputs.walk_only != 'true' && needs.build.outputs.font_only != 'true' && needs.build.outputs.intro_only != 'true' && needs.build.outputs.result_only != 'true' && needs.build.outputs.returning_only != 'true'
+    if: needs.build.outputs.dialogue_only != 'true' && needs.build.outputs.walk_only != 'true' && needs.build.outputs.font_only != 'true' && needs.build.outputs.intro_only != 'true' && needs.build.outputs.result_only != 'true' && needs.build.outputs.returning_only != 'true'
     name: Check ${{ matrix.suite }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -115,6 +123,20 @@ jobs:
       - run: npx playwright install --with-deps chromium webkit
       - run: npm run build
       - run: node ${{ matrix.script }}
+  dialogue-browser:
+    needs: build
+    if: needs.build.outputs.dialogue_only == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium webkit
+      - run: npm run build
+      - run: node scripts/check-coffee-dialogue.mjs
   returning-browser:
     needs: build
     if: needs.build.outputs.returning_only == 'true'
@@ -159,8 +181,8 @@ jobs:
       - run: npm run build
       - run: node scripts/check-ingame-font.mjs
   deploy:
-    if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.build.result == 'success' && (needs.browser-checks.result == 'success' || needs.browser-checks.result == 'skipped') && (needs.returning-browser.result == 'success' || needs.returning-browser.result == 'skipped') && (needs.font-browser.result == 'success' || needs.font-browser.result == 'skipped') && (needs.walk-browser.result == 'success' || needs.walk-browser.result == 'skipped')
-    needs: [build, browser-checks, returning-browser, font-browser, walk-browser]
+    if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.build.result == 'success' && (needs.dialogue-browser.result == 'success' || needs.dialogue-browser.result == 'skipped') && (needs.browser-checks.result == 'success' || needs.browser-checks.result == 'skipped') && (needs.returning-browser.result == 'success' || needs.returning-browser.result == 'skipped') && (needs.font-browser.result == 'success' || needs.font-browser.result == 'skipped') && (needs.walk-browser.result == 'success' || needs.walk-browser.result == 'skipped')
+    needs: [build, browser-checks, dialogue-browser, returning-browser, font-browser, walk-browser]
     runs-on: ubuntu-latest
     permissions:
       pages: write

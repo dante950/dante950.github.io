@@ -134,7 +134,7 @@ async function openPreview(page, engine) {
   await page.locator('#playChapter').click();
   assert.equal(await page.locator('[data-start-guest="10004"]').count(), 1);
   assert.equal(await page.locator('[data-start-guest="10002"]').count(), 0);
-  assert.equal(await page.locator('[data-start-guest]').count(), 3);
+  assert.deepEqual(await page.locator('[data-start-guest]').evaluateAll(nodes=>nodes.map(n=>Number(n.dataset.startGuest))), [10001,10003,10004,10006]);
   await page.locator('#cancelStoryStart').click();
   await page.locator('#developer').click();
   if (await page.locator('#updateOK').isVisible()) await page.locator('#updateOK').click();
