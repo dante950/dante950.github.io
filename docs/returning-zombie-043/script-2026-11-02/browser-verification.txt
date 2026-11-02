@@ -1,0 +1,13 @@
+open main
+menu ready
+employed true 신입인데 허세는 벌써 회장님이네요. no Yacha / closing passed
+open main
+menu ready
+employed false 신입인데 벌써 퇴사 직전 얼굴이네요. no Yacha / closing passed
+open main
+menu ready
+lottery true 부자 냄새요? 그냥 운 좋은 백수 같은데요. no Yacha / closing passed
+open main
+menu ready
+lottery false 돈으로 취향까지 살 수는 없나 봐요. no Yacha / closing passed
+Four result choices and no-Yacha exits passed (beauty result injected).

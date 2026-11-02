@@ -1,3 +1,4 @@
+import {parseDialogueText} from '../src/text-effects.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -36,7 +37,7 @@ test('main and tutorial expose only the 43 specified stickers with valid referen
 });
 test('face growth stays free; tooth restoration dominates satisfaction; protests are one short line',()=>{
  assert.equal(b.growth.allowFace,true);assert.notEqual(b.growth.mask,'original');assert.deepEqual(b.weights,{cut:10,draw:60,attach:30});
- const dialogues=p.combat.sheets.find(s=>s.name==='대사').rows;for(const key of ['returnGrow','returnCut','returnWrongTooth']){const lines=dialogues.filter(r=>r.GroupID===guest.bindings[key]);assert.equal(lines.length,1);assert(lines[0].Text.length<=30);}
+ const dialogues=p.combat.sheets.find(s=>s.name==='대사').rows;for(const key of ['returnGrow','returnCut','returnWrongTooth']){const lines=dialogues.filter(r=>r.GroupID===guest.bindings[key]);assert.equal(lines.length,1);assert(parseDialogueText(lines[0].Text).plain.length<=30);}
 });
 test('matching tooth color succeeds; wrong color and painting the whole mouth do not',()=>{
  const paint=(color,whole=false)=>{const pixels=new Uint8ClampedArray(320*350*4),r=b.drawRegions[whole?1:0];for(let y=r.y;y<=r.y+r.h;y++)for(let x=r.x;x<=r.x+r.w;x++)pixels.set([...color,255],(y*320+x)*4);return beautyDrawScore(pixels,b);};
@@ -78,14 +79,14 @@ test('result options resolve all eight replies and do not contain reward mutatio
 
 test('all six exits explain the lack of Yacha before their original final line',()=>{
  const rows=p.combat.sheets.find(s=>s.name==='대사').rows;
- for(const branch of ['employed','lottery'])for(const suffix of ['SuccessLeave','FailLeave','HairFailLeave']){const lines=rows.filter(r=>r.GroupID===guest.bindings[branch+suffix]).sort((a,b)=>a.Order-b.Order);assert.equal(lines[0].Speaker,'플레이어');assert.equal(lines[0].Text,'그런데… 야차는 안 하세요?');assert(lines[1].Text.includes('야차요'));assert(lines[2].Text.includes(branch==='employed'?'인사평가':'잔고'));assert(lines.length>=4);assert.deepEqual(lines.map(l=>l.Order),lines.map((_,i)=>i+1));}
+ for(const branch of ['employed','lottery'])for(const suffix of ['SuccessLeave','FailLeave','HairFailLeave']){const lines=rows.filter(r=>r.GroupID===guest.bindings[branch+suffix]).sort((a,b)=>a.Order-b.Order);assert.equal(lines[0].Speaker,'플레이어');assert.equal(parseDialogueText(lines[0].Text).plain,'그런데… 야차는 안 하세요?');assert(lines[1].Text.includes('야차요'));assert(lines[2].Text.includes(branch==='employed'?'인사평가':'잔고'));assert(lines.length>=4);assert.deepEqual(lines.map(l=>l.Order),lines.map((_,i)=>i+1));}
  assert.equal(guest.battle,'none');
  assert(rows.some(r=>r.GroupID===guest.bindings.employedHairFailLeave&&r.Text.includes('인사팀에서 못 알아보진 않겠지')));
  assert(rows.some(r=>r.GroupID===guest.bindings.lotteryHairFailLeave&&r.Text.includes('지금은 잘 안 잡히네')));
 });
 test('each stronger tease is the same in the button and spoken reply group',()=>{
  const rows=p.combat.sheets.find(s=>s.name==='대사').rows;
- for(const options of Object.values(guest.returningChoices)){const option=options[1],lines=rows.filter(r=>r.GroupID===guest.bindings[option.event]).sort((a,b)=>a.Order-b.Order);assert.equal(lines[0].Speaker,'플레이어');assert.equal(lines[0].Text,option.text);assert.equal(lines[1].Speaker,'몬스터');assert(lines[1].Text.length);}
+ for(const options of Object.values(guest.returningChoices)){const option=options[1],lines=rows.filter(r=>r.GroupID===guest.bindings[option.event]).sort((a,b)=>a.Order-b.Order);assert.equal(lines[0].Speaker,'플레이어');assert.equal(parseDialogueText(lines[0].Text).plain,option.text);assert.equal(lines[1].Speaker,'몬스터');assert(lines[1].Text.length);}
 });
 
 
