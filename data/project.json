@@ -3928,6 +3928,286 @@
             "Speaker": "몬스터",
             "Text": "이제<wait=0.35> <size=20>주먹</size><wait=0.25>보다<wait=0.35> <size=20>잔고</size>를<wait=0.35> 믿습니다.",
             "Notes": "재등장 좀비 · 야차 없이 퇴장"
+          },
+          {
+            "DialogueID": 1000001,
+            "GroupID": 90001,
+            "Order": 1,
+            "Speaker": "마왕 부하",
+            "Text": "첫 손님입니다.",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000002,
+            "GroupID": 90002,
+            "Order": 1,
+            "Speaker": "커피 유령",
+            "Text": "<wave=2.5>저도 부하님처럼 되고 싶어요!</wave>",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000003,
+            "GroupID": 90002,
+            "Order": 2,
+            "Speaker": "마왕 부하",
+            "Text": "…이 아이를 먼저 부탁드리겠습니다.",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000004,
+            "GroupID": 90003,
+            "Order": 1,
+            "Speaker": "마왕 부하",
+            "Text": "이 아이를 먼저 부탁드립니다.",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000005,
+            "GroupID": 90003,
+            "Order": 2,
+            "Speaker": "마왕 부하",
+            "Text": "당황스러우시겠지만, 부탁드립니다.",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000006,
+            "GroupID": 90003,
+            "Order": 3,
+            "Speaker": "마왕 부하",
+            "Text": "아이에게 다가가 말을 걸어보시겠습니까?",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000007,
+            "GroupID": 90004,
+            "Order": 1,
+            "Speaker": "커피 유령",
+            "Text": "<wave=2.5>부하님은 눈도 셋이고,<wait=0.25> 뿔도 멋있고…<wait=0.35> 저도 그렇게 되고 싶어요!</wave>",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000008,
+            "GroupID": 90005,
+            "Order": 1,
+            "Speaker": "커피 유령",
+            "Text": "부하님처럼 단정하게!<wait=0.35> 삐죽한 곳은 자르고,<wait=0.25> 푹 파인 곳은 채워주세요.<wait=0.35> 아,<wait=0.25> 앞도 잘 보였으면 좋겠어요!",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000009,
+            "GroupID": 90006,
+            "Order": 1,
+            "Speaker": "커피 유령",
+            "Text": "왼쪽으로 솟은 머리 끝은 잘라주시고,<wait=0.25> 오른쪽에 빈 곳은 발모제로 길러주세요!<wait=0.35> 눈을 덮은 앞머리도 잘라주시고요.",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000010,
+            "GroupID": 90007,
+            "Order": 1,
+            "Speaker": "커피 유령",
+            "Text": "왼쪽 튀어나온 부분은 둥근 머리선까지요.<wait=0.35> 오른쪽 파인 곳은 주변 머리랑 이어지게 채워주세요.<wait=0.35> 앞머리는 두 눈이 다 보이게요!",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000011,
+            "GroupID": 90008,
+            "Order": 1,
+            "Speaker": "커피 유령",
+            "Text": "<wave=2.5>저도 부하님처럼 보는 눈이 많았으면 좋겠어요!</wave>",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000012,
+            "GroupID": 90009,
+            "Order": 1,
+            "Speaker": "커피 유령",
+            "Text": "눈을 하나 더 그려주세요!",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000013,
+            "GroupID": 90010,
+            "Order": 1,
+            "Speaker": "커피 유령",
+            "Text": "지금 있는 두 눈 사이,<wait=0.25> 조금 위쪽에 검은 눈을 그려주세요.<wait=0.35> 진짜로 보이지 않아도 괜찮아요!",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000014,
+            "GroupID": 90011,
+            "Order": 1,
+            "Speaker": "커피 유령",
+            "Text": "뿔도요!<wait=0.35> <wave=2.5>부하님처럼!</wave>",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000015,
+            "GroupID": 90012,
+            "Order": 1,
+            "Speaker": "커피 유령",
+            "Text": "얼굴 양쪽에 큰 뿔을 하나씩 붙여주세요!",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000016,
+            "GroupID": 90013,
+            "Order": 1,
+            "Speaker": "커피 유령",
+            "Text": "왼쪽 큰 뿔은 얼굴 왼쪽에, <wait=0.25>오른쪽 큰 뿔은 얼굴 오른쪽에요!<wait=0.35> 부하님처럼 양쪽으로 뻗으면 좋겠어요.",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000017,
+            "GroupID": 90014,
+            "Order": 1,
+            "Speaker": "커피 유령",
+            "Text": "<wave=2.5>오,<wait=0.25> 싹둑!<wait=0.35></wave> 눈을 가린 앞머리도 잘라주시고,<wait=0.25> 오른쪽 파인 곳은 발모제로 채워주세요.",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000018,
+            "GroupID": 90015,
+            "Order": 1,
+            "Speaker": "커피 유령",
+            "Text": "<wave=2.5>와,<wait=0.25> 이제 잘 보여요!<wait=0.35></wave> 오른쪽에 파인 머리도 발모제로 채워주실래요?",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000019,
+            "GroupID": 90016,
+            "Order": 1,
+            "Speaker": "커피 유령",
+            "Text": "<wave=2.5>우와,<wait=0.25> 자란다!<wait=0.35></wave> 비어 있는 곳이 주변 머리랑 이어지게 채워주세요.<wait=0.35> 삐죽한 쪽은 가위로 정리해주시고요.",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000020,
+            "GroupID": 90017,
+            "Order": 1,
+            "Speaker": "커피 유령",
+            "Text": "저…<wait=0.35> {미완료요구}도 조금만 더 봐주실래요?<wait=0.35> 손질 가이드에 표시해둘게요.",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000021,
+            "GroupID": 90018,
+            "Order": 1,
+            "Speaker": "커피 유령",
+            "Text": "<wave=2.5>눈도 셋이고…<wait=0.35> 뿔도 있고…!<wait=0.35> 이제 저도 부하님처럼 강해 보이죠?</wave>",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000022,
+            "GroupID": 90018,
+            "Order": 2,
+            "Speaker": "마왕 부하",
+            "Text": "보이는 것만으로 강해지는 것은 아닙니다.",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000023,
+            "GroupID": 90018,
+            "Order": 3,
+            "Speaker": "커피 유령",
+            "Text": "그럼 야차도 해볼래요!<wait=0.35> <wave=2.5>제가 얼마나 멋있어졌는지 봐주세요!</wave>",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000024,
+            "GroupID": 90018,
+            "Order": 4,
+            "Speaker": "마왕 부하",
+            "Text": "제가 지켜보겠습니다.<wait=0.35> 이 아이와 먼저 몸을 풀어보시죠.",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000025,
+            "GroupID": 90019,
+            "Order": 1,
+            "Speaker": "커피 유령",
+            "Text": "<wave=2.5>눈도 셋이고…<wait=0.35> 뿔도 있고…!<wait=0.35> 이제 저도 부하님처럼 강해 보이죠?</wave>",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000026,
+            "GroupID": 90019,
+            "Order": 2,
+            "Speaker": "마왕 부하",
+            "Text": "보이는 것만으로 강해지는 것은 아닙니다.",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000027,
+            "GroupID": 90019,
+            "Order": 3,
+            "Speaker": "커피 유령",
+            "Text": "그럼 야차도 해볼래요!<wait=0.35><wave=2.5> 제가 얼마나 멋있어졌는지 봐주세요!</wave>",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000028,
+            "GroupID": 90019,
+            "Order": 4,
+            "Speaker": "마왕 부하",
+            "Text": "이곳에서는 야차를 청하는 손님도 만날 겁니다.<wait=0.35> 제가 지켜보겠습니다.<wait=0.35> 이 아이와 먼저 몸을 풀어보시죠.",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000029,
+            "GroupID": 90020,
+            "Order": 1,
+            "Speaker": "커피 유령",
+            "Text": "<wave=2.5>한 번만 더요!<wait=0.35></wave> 이번엔 저도 제대로 해볼게요!",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000030,
+            "GroupID": 90021,
+            "Order": 1,
+            "Speaker": "커피 유령",
+            "Text": "휴우…<wait=0.35> 모습은 닮았는데,<wait=0.25> 야차는 아직 멀었네요!",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000031,
+            "GroupID": 90022,
+            "Order": 1,
+            "Speaker": "커피 유령",
+            "Text": "앗,<wait=0.25> 가위를 놓치셨네요!<wait=0.35> 괜찮아요.<wait=0.35> 다시 해봐요!",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000032,
+            "GroupID": 90023,
+            "Order": 1,
+            "Speaker": "커피 유령",
+            "Text": "대련은 졌지만,<wait=0.25> <wave=2.5>오늘 정말 멋있어졌어요!<wait=0.35></wave> 후기 꼭 남길게요!",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000033,
+            "GroupID": 90023,
+            "Order": 2,
+            "Speaker": "마왕 부하",
+            "Text": "고생하셨습니다.<wait=0.35> 오늘은 여기까지 하고 가보겠습니다.",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000034,
+            "GroupID": 90023,
+            "Order": 3,
+            "Speaker": "마왕 부하",
+            "Text": "저는 말씀드린 대로 2일차에 다시 방문하도록 하겠습니다.",
+            "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000035,
+            "GroupID": 90023,
+            "Order": 4,
+            "Speaker": "커피 유령",
+            "Text": "<wave=2.5>부하님,<wait=0.25> 같이 가요!<wait=0.35> 눈이 셋이라 길도 세 번 잘 보인다니까요!</wave>",
+            "Notes": "커피 유령 튜토리얼"
           }
         ]
       },
@@ -5780,6 +6060,305 @@
             "ActorEffect": "없음",
             "FinishEffect": "없음",
             "Name": "재등장 좀비 · lotteryFail · 살짝 놀리기"
+          },
+          {
+            "GroupID": 90001,
+            "Name": "커피 유령 · 첫 손님 소개",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 43.47826086956522,
+            "HoldMs": 1400,
+            "GapMs": 0,
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "Notes": "튜토리얼 전용 · 프로젝트 JSON 보관"
+          },
+          {
+            "GroupID": 90002,
+            "Name": "커피 유령 · 손님 등장",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 43.47826086956522,
+            "HoldMs": 1400,
+            "GapMs": 0,
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "Notes": "튜토리얼 전용 · 프로젝트 JSON 보관"
+          },
+          {
+            "GroupID": 90003,
+            "Name": "커피 유령 · 착석 후 · 마왕 부하 말걸기",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 43.47826086956522,
+            "HoldMs": 1400,
+            "GapMs": 0,
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "Notes": "튜토리얼 전용 · 프로젝트 JSON 보관"
+          },
+          {
+            "GroupID": 90004,
+            "Name": "커피 유령 · 착석 후 · 커피 유령 말걸기",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 43.47826086956522,
+            "HoldMs": 1400,
+            "GapMs": 0,
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "Notes": "튜토리얼 전용 · 프로젝트 JSON 보관"
+          },
+          {
+            "GroupID": 90005,
+            "Name": "커피 유령 · 형태 만들기 요청 · 처음",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 43.47826086956522,
+            "HoldMs": 1400,
+            "GapMs": 0,
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "Notes": "튜토리얼 전용 · 프로젝트 JSON 보관"
+          },
+          {
+            "GroupID": 90006,
+            "Name": "커피 유령 · 형태 만들기 요청 · 네? 1회",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 43.47826086956522,
+            "HoldMs": 1400,
+            "GapMs": 0,
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "Notes": "튜토리얼 전용 · 프로젝트 JSON 보관"
+          },
+          {
+            "GroupID": 90007,
+            "Name": "커피 유령 · 형태 만들기 요청 · 네? 2회",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 43.47826086956522,
+            "HoldMs": 1400,
+            "GapMs": 0,
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "Notes": "튜토리얼 전용 · 프로젝트 JSON 보관"
+          },
+          {
+            "GroupID": 90008,
+            "Name": "커피 유령 · 색·무늬 요청 · 처음",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 43.47826086956522,
+            "HoldMs": 1400,
+            "GapMs": 0,
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "Notes": "튜토리얼 전용 · 프로젝트 JSON 보관"
+          },
+          {
+            "GroupID": 90009,
+            "Name": "커피 유령 · 색·무늬 요청 · 네? 1회",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 43.47826086956522,
+            "HoldMs": 1400,
+            "GapMs": 0,
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "Notes": "튜토리얼 전용 · 프로젝트 JSON 보관"
+          },
+          {
+            "GroupID": 90010,
+            "Name": "커피 유령 · 색·무늬 요청 · 네? 2회",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 43.47826086956522,
+            "HoldMs": 1400,
+            "GapMs": 0,
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "Notes": "튜토리얼 전용 · 프로젝트 JSON 보관"
+          },
+          {
+            "GroupID": 90011,
+            "Name": "커피 유령 · 장식 요청 · 처음",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 43.47826086956522,
+            "HoldMs": 1400,
+            "GapMs": 0,
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "Notes": "튜토리얼 전용 · 프로젝트 JSON 보관"
+          },
+          {
+            "GroupID": 90012,
+            "Name": "커피 유령 · 장식 요청 · 네? 1회",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 43.47826086956522,
+            "HoldMs": 1400,
+            "GapMs": 0,
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "Notes": "튜토리얼 전용 · 프로젝트 JSON 보관"
+          },
+          {
+            "GroupID": 90013,
+            "Name": "커피 유령 · 장식 요청 · 네? 2회",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 43.47826086956522,
+            "HoldMs": 1400,
+            "GapMs": 0,
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "Notes": "튜토리얼 전용 · 프로젝트 JSON 보관"
+          },
+          {
+            "GroupID": 90014,
+            "Name": "커피 유령 · 미용 중 · 첫 가위 사용",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 43.47826086956522,
+            "HoldMs": 1400,
+            "GapMs": 0,
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "Notes": "튜토리얼 전용 · 프로젝트 JSON 보관"
+          },
+          {
+            "GroupID": 90015,
+            "Name": "커피 유령 · 미용 중 · 눈을 드러낸 첫 가위 사용",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 43.47826086956522,
+            "HoldMs": 1400,
+            "GapMs": 0,
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "Notes": "튜토리얼 전용 · 프로젝트 JSON 보관"
+          },
+          {
+            "GroupID": 90016,
+            "Name": "커피 유령 · 미용 중 · 첫 발모제 사용",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 43.47826086956522,
+            "HoldMs": 1400,
+            "GapMs": 0,
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "Notes": "튜토리얼 전용 · 프로젝트 JSON 보관"
+          },
+          {
+            "GroupID": 90017,
+            "Name": "커피 유령 · 미용 중 · 미완료 요구 안내",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 43.47826086956522,
+            "HoldMs": 1400,
+            "GapMs": 0,
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "Notes": "튜토리얼 전용 · 프로젝트 JSON 보관"
+          },
+          {
+            "GroupID": 90018,
+            "Name": "커피 유령 · 미용 완료 · 야차 제안 (3안)",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 43.47826086956522,
+            "HoldMs": 1400,
+            "GapMs": 0,
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "Notes": "튜토리얼 전용 · 프로젝트 JSON 보관"
+          },
+          {
+            "GroupID": 90019,
+            "Name": "커피 유령 · 미용 완료 · 야차 제안 (1·2안)",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 43.47826086956522,
+            "HoldMs": 1400,
+            "GapMs": 0,
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "Notes": "튜토리얼 전용 · 프로젝트 JSON 보관"
+          },
+          {
+            "GroupID": 90020,
+            "Name": "커피 유령 · 야차 · 2페이즈 시작",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 43.47826086956522,
+            "HoldMs": 1400,
+            "GapMs": 0,
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "Notes": "튜토리얼 전용 · 프로젝트 JSON 보관"
+          },
+          {
+            "GroupID": 90021,
+            "Name": "커피 유령 · 야차 · 대련 마무리",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 43.47826086956522,
+            "HoldMs": 1400,
+            "GapMs": 0,
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "Notes": "튜토리얼 전용 · 프로젝트 JSON 보관"
+          },
+          {
+            "GroupID": 90022,
+            "Name": "커피 유령 · 야차 · 빈틈 재도전",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 43.47826086956522,
+            "HoldMs": 1400,
+            "GapMs": 0,
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "Notes": "튜토리얼 전용 · 프로젝트 JSON 보관"
+          },
+          {
+            "GroupID": 90023,
+            "Name": "커피 유령 · 야차 후 · 후기 약속과 퇴장",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 43.47826086956522,
+            "HoldMs": 1400,
+            "GapMs": 0,
+            "ActorEffect": "없음",
+            "FinishEffect": "없음",
+            "Notes": "튜토리얼 전용 · 프로젝트 JSON 보관"
           }
         ]
       },
@@ -7439,6 +8018,56 @@
         "lotteryHairFail": "로또 · 머리 훼손 반응",
         "lotteryHairFailLeave": "로또 · 머리 훼손 뒤 퇴장"
       }
+    },
+    {
+      "id": 10005,
+      "name": "커피 유령",
+      "dialogueOnly": true,
+      "workbookExcluded": true,
+      "battle": "none",
+      "bindings": {
+        "introduce": 90001,
+        "arrival": 90002,
+        "minionTalk": 90003,
+        "coffeeTalk": 90004,
+        "cut": 90005,
+        "cutDetail1": 90006,
+        "cutDetail2": 90007,
+        "draw": 90008,
+        "drawDetail1": 90009,
+        "drawDetail2": 90010,
+        "attach": 90011,
+        "attachDetail1": 90012,
+        "attachDetail2": 90013,
+        "cutReaction": 90014,
+        "cutEyesReaction": 90015,
+        "growReaction": 90016,
+        "incomplete": 90017,
+        "proposal": 90018,
+        "proposalLegacy": 90019,
+        "battlePhase2": 90020,
+        "battleVictory": 90021,
+        "battleRetry": 90022,
+        "leave": 90023
+      },
+      "beauty": {
+        "enabled": false,
+        "steps": {
+          "cut": false,
+          "draw": false,
+          "attach": false
+        },
+        "weights": {
+          "cut": 0,
+          "draw": 0,
+          "attach": 0
+        },
+        "cutRegions": [],
+        "drawRegions": [],
+        "attachRegions": [],
+        "drawColors": []
+      },
+      "note": "인트로·튜토리얼 전용 대사. 본편 영업 일정에는 포함하지 않습니다."
     }
   ],
   "schedule": [

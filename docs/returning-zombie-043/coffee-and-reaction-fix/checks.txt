@@ -1,0 +1,13 @@
+open main
+menu ready
+returnGrow effects rendered, reading time preserved
+returnCut effects rendered, reading time preserved
+returnWrongTooth effects rendered, reading time preserved
+employedNeck effects rendered, reading time preserved
+employedEye effects rendered, reading time preserved
+employedHeadTop effects rendered, reading time preserved
+lotteryNeck effects rendered, reading time preserved
+lotteryNeck effects rendered, reading time preserved
+lotteryEye effects rendered, reading time preserved
+lotteryHeadTop effects rendered, reading time preserved
+PASS: all reaction lines, waits, sizes, waves, cleanup, and coffee tutorial renderer

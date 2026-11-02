@@ -39,7 +39,7 @@ const parentBundle=await bundle('src/',['text-effects.js','combat/dialogue.js','
 const reactionStyle=await read('src/beauty-reaction.css');
 const styleURL=await emit('style','css',speechStyle+'\n'+reactionStyle+'\n'+await read('src/style.css')+'\n'+await read('src/battle-result.css'));
 const beautyResultRuntime=await read('src/salon-beauty-result.js'),beautyTutorialRuntime=await read('src/salon-tutorial.js');
-const beautyRules=await bundle('src/',['beauty-rules.js','returning-zombie.js','coffee-beauty.js','beauty-shape.js','beauty-lesson-targets.js','beauty-action-feedback.js']),beautyRuntime=(await read('src/salon-beauty.js')).replace('/*__BEAUTY_RESULT__*/',()=>beautyResultRuntime).replace('/*__BEAUTY_TUTORIAL__*/',()=>beautyTutorialRuntime);
+const beautyRules=await bundle('src/',['text-effects.js','beauty-rules.js','returning-zombie.js','coffee-beauty.js','beauty-shape.js','beauty-lesson-targets.js','beauty-action-feedback.js']),beautyRuntime=(await read('src/salon-beauty.js')).replace('/*__BEAUTY_RESULT__*/',()=>beautyResultRuntime).replace('/*__BEAUTY_TUTORIAL__*/',()=>beautyTutorialRuntime);
 const salonStyle=await read('src/salon-beauty.css')+'\n'+reactionStyle+'\n'+await read('src/ingame-font.css');
 const inputs={
  'flow-assets':[await emit('assets','json',await read('data/assets.json')),'json'],

@@ -35,7 +35,7 @@ const current=new Uint8Array(W*H),original=new Uint8Array(W*H),paint=new Uint8Cl
 const sourcePixels=new Uint8ClampedArray(W*H*4),originalBorder=new Uint8Array(W*H);
 const masks={eyes:new Uint8Array(W*H),brain:new Uint8Array(W*H),face:new Uint8Array(W*H),protectedFace:new Uint8Array(W*H)};
 const sculptAnchors=new Uint8Array(W*H);
-let eyeWasCovered=false,eyeReactionCount=0,reactionTimer=0,reactionTick=0,reactionOpen=false,areaWarned=false,overflowWarned=false,lastAreaRatio=1;
+let eyeWasCovered=false,eyeReactionCount=0,reactionTimer=0,reactionTick=0,reactionFrame=0,reactionOpen=false,areaWarned=false,overflowWarned=false,lastAreaRatio=1;
 const eyeReaction=document.createElement('div');eyeReaction.className='beautyEyeReaction';eyeReaction.hidden=true;eyeReaction.setAttribute('role','status');eyeReaction.setAttribute('aria-live','polite');beautyScreen.append(eyeReaction);
 const returningActions={cut:false},returningReactionSeen=new Set(),returningReactionQueue=[];let returningReactionTimer=0;
 function queueReturningReaction(key){
@@ -46,22 +46,27 @@ function playReturningReaction(){
  if(finishing||!beautyActive){clearReturningReactions();return;}
  if(briefing){returningReactionTimer=setTimeout(playReturningReaction,120);return;}
  const item=returningReactionQueue.shift();if(!item){returningReactionTimer=0;return;}
- showBeautyReaction(item.text,item.key==='returnCut'||item.key==='returnGrow'?'angry':'sigh');
- const duration=Math.min(2400,Math.max(1500,item.text.length*55+400));
- returningReactionTimer=setTimeout(()=>{clearTimeout(reactionTimer);clearInterval(reactionTick);eyeReaction.hidden=true;reactionOpen=false;returningReactionTimer=0;playReturningReaction();},duration);
+ const duration=showBeautyReaction(item.text,item.key==='returnCut'||item.key==='returnGrow'?'angry':'sigh');
+ returningReactionTimer=setTimeout(()=>{clearTimeout(reactionTimer);clearInterval(reactionTick);cancelAnimationFrame(reactionFrame);eyeReaction.hidden=true;reactionOpen=false;returningReactionTimer=0;playReturningReaction();},duration);
 }
-function clearReturningReactions(){clearTimeout(returningReactionTimer);returningReactionTimer=0;returningReactionQueue.length=0;clearTimeout(reactionTimer);clearInterval(reactionTick);eyeReaction.hidden=true;reactionOpen=false;}
+function clearReturningReactions(){clearTimeout(returningReactionTimer);returningReactionTimer=0;returningReactionQueue.length=0;clearTimeout(reactionTimer);clearInterval(reactionTick);cancelAnimationFrame(reactionFrame);eyeReaction.hidden=true;reactionOpen=false;}
 function showEyeReaction(){
  if(eyeReactionCount>=2)return;
  eyeReactionCount++;
  showBeautyReaction(eyeReactionCount===1?B.eyeContactLine||'잠깐, 그건 눈입니다.':B.eyeContactSecondLine||'하아…… 눈은 좀 남겨 주십시오.',eyeReactionCount===1?'angry':'sigh');
 }
 function showBeautyReaction(text,tone){
- eyeReaction.replaceChildren(...Array.from(text).map((letter,i)=>{const span=document.createElement('span');span.textContent=letter;span.style.setProperty('--letter',i);return span;}));eyeReaction.dataset.tone=tone;eyeReaction.hidden=false;
- clearTimeout(reactionTimer);clearInterval(reactionTick);
+ clearTimeout(reactionTimer);clearInterval(reactionTick);cancelAnimationFrame(reactionFrame);
+ const rich=parseDialogueText(text,1000/23),started=performance.now();
+ const spans=rich.glyphs.map(g=>{const span=document.createElement('span');span.textContent=g.char;span.style.visibility='hidden';if(g.style.wave||g.style.shake||g.style.pulse)span.style.animation='none';return span;});
+ eyeReaction.replaceChildren(...spans);eyeReaction.dataset.tone=tone;eyeReaction.hidden=false;
+ const draw=()=>{const clock=performance.now()-started;rich.glyphs.forEach((g,i)=>{const s=spans[i],v=dialogueGlyphStyle(g,i,clock);s.style.visibility=g.at<=clock?'visible':'hidden';s.style.color=v.color.toUpperCase()==='#F0EEE3'?'inherit':v.color;s.style.fontSize=v.fontSize/17+'em';s.style.opacity=v.opacity;s.style.transform='translate('+v.x+'px,'+v.y+'px) scale('+v.scale+')';s.style.setProperty('--letter',i);});reactionFrame=requestAnimationFrame(draw);};draw();
  reactionTick=setInterval(()=>{reactionOpen=!reactionOpen;renderPortrait();},160);
- reactionTimer=setTimeout(()=>{eyeReaction.hidden=true;reactionOpen=false;clearInterval(reactionTick);renderPortrait();},5500);
+ const duration=Math.max(1500,rich.duration+1400);
+ reactionTimer=setTimeout(()=>{eyeReaction.hidden=true;reactionOpen=false;clearInterval(reactionTick);cancelAnimationFrame(reactionFrame);renderPortrait();},duration);
+ return duration;
 }
+
 let fallingPieces=[],fallingFrame=0;
 const heardDetails={},heardRequests={};
 let liveSatisfaction=50,shapeProgress={details:[]};

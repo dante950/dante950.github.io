@@ -1,3 +1,4 @@
+import {parseDialogueText} from '../src/text-effects.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -21,7 +22,7 @@ test('coffee appears only in dialogue workshop; schedule and existing authored r
  p.schedule[0].push(10005);assert(projectProblems(p).some(x=>x.includes('본편 일정')));
 });
 test('three request levels retain the exact tutorial wording; edits and intentionally empty groups survive reseeding',()=>{
- const p=make();for(const [stage,lines] of Object.entries(COFFEE_REQUESTS))lines.forEach((text,i)=>assert.equal(coffeeRequestText(p,stage,i),text));
+ const p=make();for(const [stage,lines] of Object.entries(COFFEE_REQUESTS))lines.forEach((text,i)=>assert.equal(parseDialogueText(coffeeRequestText(p,stage,i)).plain,text));
  const id=p.guests.find(g=>g.id===10005).bindings.arrival;
  rows(p,'대사').find(l=>l.GroupID===id).Text='수정한 등장 대사';ensureCoffeeDialogues(p);
  assert.equal(coffeeDialogueLines(p,'arrival')[0][1],'수정한 등장 대사');
@@ -30,7 +31,7 @@ test('three request levels retain the exact tutorial wording; edits and intentio
 });
 test('old saved projects receive coffee without losing existing edits; workbook roundtrip retains coffee event-only groups',()=>{
  const defaults=make(),old=structuredClone(base);rows(old,'대사')[0].Text='기존 손님 수정';
- addWorkshopGuests(old,defaults);assert.equal(rows(old,'대사')[0].Text,'기존 손님 수정');assert.equal(coffeeDialogueLines(old,'arrival')[0][1],'저도 부하님처럼 되고 싶어요!');
+ addWorkshopGuests(old,defaults);assert.equal(rows(old,'대사')[0].Text,'기존 손님 수정');assert.equal(parseDialogueText(coffeeDialogueLines(old,'arrival')[0][1]).plain,'저도 부하님처럼 되고 싶어요!');
  const before=structuredClone(old),workbook=combatForWorkbook(old);
  const ids=new Set(Object.values(old.guests.find(g=>g.id===10005).bindings));
  for(const id of ids)assert(workbook.sheets.find(s=>s.name==='대사').rows.some(l=>l.GroupID===id));
