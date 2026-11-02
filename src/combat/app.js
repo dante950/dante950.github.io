@@ -55,9 +55,9 @@ async function exportBook(asZip=false){
  try{
   if(!asZip&&!window.showDirectoryPicker)asZip=true;
   if(!asZip&&!versionRoot&&!(await chooseVersionFolder()))return;
-  if(!await requireCombatOwner())return;notice('엑셀 버전을 준비하고 있어요. 잠시 기다려 주세요.');await prepareVersionTables();const version=asZip?TableVersions.stamp():await TableVersions.uniqueVersion(versionRoot),result=await TableVersions.prepare(data,intent,version);
-  if(!await requireCombatOwner())return;if(asZip){const bytes=await TableVersions.zip(result),url=URL.createObjectURL(new Blob([bytes],{type:'application/zip'})),a=document.createElement('a');a.href=url;a.download=version+'_데이터테이블.zip';a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);notice('두 엑셀과 변경 이력을 ZIP으로 내려받습니다. 바탕화면 데이터테이블 폴더에 압축을 풀어 주세요. 버전: '+version);}
-  else{await TableVersions.writeDirectory(versionRoot,result);notice('두 엑셀과 변경 이력을 저장했어요: '+versionRoot.name+' / '+version);}
+  if(!await requireCombatOwner())return;notice('엑셀 버전을 준비하고 있어요. 잠시 기다려 주세요.');await prepareVersionTables();const version=asZip?TableVersions.stamp():await TableVersions.uniqueVersion(versionRoot),result=await TableVersions.prepare(data,intent,version,await requestProjectForExport());
+  if(!await requireCombatOwner())return;if(asZip){const bytes=await TableVersions.zip(result),url=URL.createObjectURL(new Blob([bytes],{type:'application/zip'})),a=document.createElement('a');a.href=url;a.download=version+'_데이터테이블.zip';a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);notice('두 엑셀과 변경 이력을 ZIP으로 내려받습니다. '+(result.meta.projectFile?'커피 유령·재등장 좀비를 포함한 전체 프로젝트 JSON도 함께 저장했습니다. 전달받은 ZIP은 개발실의 프로젝트 불러오기에서 여세요. ':'')+'버전: '+version);}
+  else{await TableVersions.writeDirectory(versionRoot,result);notice('두 엑셀과 변경 이력을 저장했어요: '+versionRoot.name+' / '+version+(result.meta.projectFile?' · 모든 손님의 대사가 담긴 전체 프로젝트 JSON 포함':''));}
   await TableVersions.commit(result);$('savedVersion').textContent='기준 버전: '+version;baseline=clone(data);history=[];persist();table();$('changeIntent').value='';
  }catch(e){notice(e.message,true);}finally{versionBusy=false;applyCombatOwnerControls();}
 }

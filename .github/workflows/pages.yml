@@ -45,7 +45,7 @@ jobs:
             returning_only=true
             while IFS= read -r file; do
               case "$file" in
-                src/app.js|src/model.js|src/workshop-dialogue.js|src/combat/dialogue.js|src/tutorial/dialogues.js|src/tutorial/app.js|src/tutorial/narrative.js|scripts/build.mjs|scripts/check-coffee-dialogue.mjs|tests/coffee-dialogue.test.mjs|tests/workshop-dialogue.test.mjs|tests/minion.test.mjs|tests/release.test.mjs|scripts/check-minion.mjs|docs/coffee-dialogue-editor/*|.github/workflows/pages.yml) ;;
+                src/project-archive.js|src/index.html|src/combat/app.js|src/combat/bridge.js|src/combat/versions.js|tests/project-archive.test.mjs|scripts/check-project-archive.mjs|docs/project-archive-fix/*|src/app.js|src/model.js|src/workshop-dialogue.js|src/combat/dialogue.js|src/tutorial/dialogues.js|src/tutorial/app.js|src/tutorial/narrative.js|scripts/build.mjs|scripts/check-coffee-dialogue.mjs|tests/coffee-dialogue.test.mjs|tests/workshop-dialogue.test.mjs|tests/minion.test.mjs|tests/release.test.mjs|scripts/check-minion.mjs|docs/coffee-dialogue-editor/*|.github/workflows/pages.yml) ;;
                 *) dialogue_only=false ;;
               esac
               case "$file" in
@@ -137,6 +137,7 @@ jobs:
       - run: npx playwright install --with-deps chromium webkit
       - run: npm run build
       - run: node scripts/check-coffee-dialogue.mjs
+      - run: node scripts/check-project-archive.mjs
   returning-browser:
     needs: build
     if: needs.build.outputs.returning_only == 'true'

@@ -1,3 +1,4 @@
+import {projectArchiveFiles,PROJECT_ARCHIVE_FILE} from '../project-archive.js';
 import {parseWorkbookXml} from './workbook-xml.js';
 import {salonDialogueProblems} from '../salon-dialogue.js';
 // Two workbook presentations share one set of game values and one version snapshot.
@@ -83,18 +84,20 @@ const TableVersions=(()=>{
   text.push('','다음 작업','이 버전의 작업용 XLSM을 수정하고 저장한 뒤 시뮬레이터에서 불러오세요.','변경 의도를 적고 버전 저장을 누르면 다음 시간 폴더에 두 파일과 이력이 함께 생성됩니다.','Unity용 XLSX를 불러와 조정해도 작업용 XLSM으로 역반영됩니다.','한 버전에서는 둘 중 한 파일을 기준으로 수정하세요. 서로 다른 파일을 동시에 수정한 내용은 자동 병합하지 않습니다.','엑셀에서 Ctrl+S만 누르면 현재 파일만 저장됩니다. 두 파일 동기화는 시뮬레이터의 버전 저장으로 완료합니다.');
   return '\uFEFF'+text.filter(x=>x!==undefined).join('\r\n')+'\r\n';
  }
- async function prepare(input,intent,version=stamp()){
+ async function prepare(input,intent,version=stamp(),project=null){
+  const projectFiles=project?projectArchiveFiles(project,version):[];
   if(!intent?.trim())throw Error('변경 의도를 적어 주세요. 예: 취객이 술에서 깨는 느낌을 주려고 후반 공격을 빠르게 조정.');
   const a=authorFrom(input),{u,drafts}=unityFrom(a);assertKeys(a);assertKeys(u);const check=validate(u);
   if(sheet(u,'미용 대사 연결'))check.errors.push(...salonDialogueProblems({combat:u,guests:[...new Set([...sheet(a,'몬스터 페이즈').rows.map(r=>r.MonsterID),...(schema.salonOnlyMonsterIDs||[])])].map(id=>({id}))}));
   if(check.errors.length)throw Error('저장 전 데이터를 확인하세요:\n'+check.errors.join('\n'));
   checkPair(a,u,drafts);const changes=diff(baseSnapshot,snapshot(a)),meta={format:1,version,parentVersion,intent:intent.trim(),snapshot:snapshot(a),drafts:drafts.map(r=>({MonsterID:r.MonsterID,PhaseID:r.PhaseID}))};
+  if(project)meta.projectFile=PROJECT_ARCHIVE_FILE;
   const aBytes=await stampBook(await authorBook.save(a),meta),uBytes=await stampBook(await unityBook.save(u),meta);
   // Reload both outputs before delivering, checking the serialized data as well as the in-memory projection.
   const ar=await OfflineBook.create().load(aBytes,authorFile),ur=await OfflineBook.create().load(uBytes,unityFile);checkPair(ar,ur,drafts);
-  const log=logText({version,intent:intent.trim(),changes,drafts,parent:parentVersion});
-  const manifest=JSON.stringify({format:1,version,parentVersion,intent:intent.trim(),author:`${authorFolder}/${authorFile}`,unity:`${unityFolder}/${unityFile}`,draftCount:drafts.length,changes},null,2);
-  return {version,files:[{path:`${authorFolder}/${authorFile}`,bytes:aBytes},{path:`${unityFolder}/${unityFile}`,bytes:uBytes},{path:'변경 이력.txt',bytes:log},{path:'버전 정보.json',bytes:manifest}],meta,changes,a,u};
+  const log=logText({version,intent:intent.trim(),changes,drafts,parent:parentVersion})+(project?'\r\n전체 대사·미용 설정 보관: '+PROJECT_ARCHIVE_FILE+'\r\n커피 유령·재등장 좀비를 포함한 전체 편집 내용은 위 JSON에 저장했습니다. 개발실의 프로젝트 불러오기에서 ZIP 또는 JSON을 여세요.\r\n':'');
+  const manifest=JSON.stringify({format:1,version,parentVersion,intent:intent.trim(),author:`${authorFolder}/${authorFile}`,unity:`${unityFolder}/${unityFile}`,draftCount:drafts.length,changes,...(project?{projectFile:PROJECT_ARCHIVE_FILE}: {})},null,2);
+  return {version,files:[{path:`${authorFolder}/${authorFile}`,bytes:aBytes},{path:`${unityFolder}/${unityFile}`,bytes:uBytes},{path:'변경 이력.txt',bytes:log},{path:'버전 정보.json',bytes:manifest},...projectFiles],meta,changes,a,u};
  }
  async function commit(result){authorBase=await authorBook.load(result.files[0].bytes,authorFile);unityBase=await unityBook.load(result.files[1].bytes,unityFile);baseSnapshot=result.meta.snapshot;parentVersion=result.version;knownDrafts=draftKeys(authorBase);}
  async function zip(result){const z=new JSZip();for(const f of result.files)z.file(result.version+'/'+f.path,f.bytes);z.file(result.version+'/저장 완료.txt','\uFEFF'+result.version+' — 작업용·Unity용·변경 이력을 포함한 버전 ZIP 생성 완료\r\n');return z.generateAsync({type:'uint8array',compression:'DEFLATE'});}
