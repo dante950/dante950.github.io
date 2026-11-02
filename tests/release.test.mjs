@@ -41,7 +41,7 @@ test('public play receives new deployment even if a visitor saved different data
 test('story guests and beauty-only guests pass their respective validation',()=>{
  assert.deepEqual(projectProblems(project),[]);
  for(const guest of project.guests.filter(g=>!g.previewOnly&&g.battle!=='none'))assert.deepEqual(validate(project.combat,{monsterID:guest.id}).errors,[],guest.name);
- assert.deepEqual(project.schedule,[[10001,10003],[10004]]);
+ assert.deepEqual(project.schedule,[[10001,10003],[10004],[10006]]);
  assert.equal(project.guests.find(g=>g.id===10002).beauty.enabled,false);
 });
 
@@ -84,7 +84,7 @@ test('page entry and all versioned boot assets exist',async()=>{
  assert.ok(html.includes('내 작업본으로 시험 플레이'));
  for(const filename of Object.values(version.files))assert.ok((await fs.stat(path.join(root,'dist',filename))).size>0);
  const app=await read('dist/'+version.files.app);
- assert.ok(app.includes("location.href='./tutorial.html?start=1'"));
+ assert.match(app,/location\.href='\.\/tutorial\.html\?intro=3&start=1&v=[a-f0-9]{16}'/);
  assert.ok(app.includes("el('playChapter').onclick=()=>chooseStoryStart(false)"));
  assert.ok(app.includes("el('playSaved').onclick=()=>chooseStoryStart(true)"));
 });
