@@ -17,7 +17,7 @@ async function stroke(f,a,b=a){const r=await f.locator('.sculptCanvas').bounding
 async function stage(f,name){await f.locator('[data-phase="'+name+'"]').click();await p.waitForTimeout(100);await talks();await f.waitForFunction(()=>!briefing);await p.waitForTimeout(850);}
 try{
  await begin();assert.equal(await p.locator('.startGuest').count(),5);await p.screenshot({path:path.join(out,'start-menu.png')});
- await p.locator('[data-start-intro]').click();await p.waitForURL('**/tutorial.html?intro=3&start=1');
+ await p.locator('[data-start-intro]').click();await p.waitForURL(u=>u.pathname.endsWith('/tutorial.html')&&u.searchParams.get('intro')==='3'&&u.searchParams.get('start')==='1');
  for(const id of [10001,10003,10004]){await begin();await p.locator('[data-start-guest="'+id+'"]').click();assert.equal(await p.evaluate(()=>fullflow.story.guest),id);assert(await p.locator('#modal').isHidden());}
  for(const branch of (process.argv.includes('--lottery-failure-only')?['lottery']:['employed','lottery']))for(const success of (process.argv.includes('--lottery-failure-only')?[false]:[true,false])){console.log('case',branch,success);
   await begin();await p.locator('[data-start-guest="10006"]').click();await p.locator(branch==='lottery'?'#returnLottery':'#returnEmployed').click();

@@ -11,3 +11,5 @@ open main
 menu ready
 lottery false 돈으로 취향까지 살 수는 없나 봐요. no Yacha / closing passed
 Four result choices and no-Yacha exits passed (beauty result injected).
+
+추가: 실제 포인터 입력으로 취업/복권 × 미용 성공/실패 네 분기, 퇴장, 3일차 마감 통과. 배포 캐시용 v 쿼리를 허용하도록 인트로 URL 검사만 수정.
