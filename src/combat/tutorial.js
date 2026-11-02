@@ -28,7 +28,8 @@ function finishCombatLesson({preserveCursor=false}={}){
  if(HOST.coffeeTutorial&&coffeeStep==='move')showCoffeeCoach('마왕 부하','좋습니다. 저 아이가 공격할 줄이 빛나면, 다른 줄로 피하십시오.');
 }
 function installBattleLessons(){
- if(HOST.mode!=='story'||!battle)return;
+ // Combat lessons belong only to the coffee ghost tutorial, including the first opening.
+ if(HOST.mode!=='story'||!HOST.coffeeTutorial||!battle)return;
  openingLessonSeen=!HOST.tutorialOpening;
  // Called at the transition itself, before any opening time can elapse.
  const open=battle.open.bind(battle);

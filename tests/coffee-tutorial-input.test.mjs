@@ -19,3 +19,18 @@ function harness(){
 test('coffee movement needs all four successful directions and resumes without buttons',()=>{const h=harness();h.run("showCombatLesson('move')");h.key('w');assert.equal(h.battle.paused,true);assert.equal(h.run('combatLesson.keys.size'),1);h.key('w');assert.equal(h.run('combatLesson.keys.size'),1);h.key('a');h.key('s');assert.equal(h.battle.paused,true);assert.equal(h.run('battleLessonPanel.innerHTML.includes("<button")'),false);h.key('d');assert.equal(h.battle.paused,false);assert.equal(h.run('combatLesson'),null);});
 test('coffee paused punch waits for the ghost then uses the same click as an attack',()=>{const h=harness();h.run("showCombatLesson('punch')");h.pointer('pointerdown',200,300);assert.equal(h.battle.paused,true);assert.equal(h.battle.hits,0);h.pointer('pointerdown',900,400);assert.equal(h.battle.paused,false);assert.equal(h.battle.hits,1);});
 test('coffee opening holds its timer until drag and preserves the held stroke across resume',()=>{const h=harness();h.battle.state='opening';h.run("showCombatLesson('opening');updateCursorInput()");h.pointer('pointerdown',850,400);h.run('updateCursorInput()');assert.equal(h.battle.paused,true);assert.equal(h.run('cursorPointerID'),7);h.pointer('pointermove',853,400);assert.equal(h.battle.paused,true);h.pointer('pointermove',860,400);assert.equal(h.battle.paused,false);assert.equal(h.run('cursorPointerID'),7);assert.equal(h.captured.has(7),true);h.pointer('pointermove',930,400);assert.equal(h.battle.scratches,1);h.battle.time+=100;h.pointer('pointermove',850,400);assert.equal(h.battle.scratches,2);h.pointer('pointerup',850,400);assert.equal(h.run('cursorPointerID'),null);assert.equal(h.captured.size,0);});
+
+test('ordinary monsters ignore legacy tutorial flags at entry and first opening',()=>{
+ for(const monsterID of [10001,10002,10003,10004]){
+  const h=harness();h.ctx.HOST.monsterID=monsterID;h.run('Object.assign(HOST,{mode:"story",coffeeTutorial:false,tutorialBattle:true,tutorialOpening:true});battle.open=function(){this.state="opening";return true;};');
+  const open=h.battle.open;h.run('installBattleLessons()');
+  assert.equal(h.battle.open,open);assert.equal(h.battle.paused,false);assert.equal(h.run('combatLesson'),null);
+  h.battle.open();assert.equal(h.battle.state,'opening');assert.equal(h.battle.paused,false);assert.equal(h.run('battleLessonPanel.hidden'),true);
+ }
+});
+test('coffee installation still teaches movement and the first opening',()=>{
+ const h=harness();h.run('Object.assign(HOST,{mode:"story",tutorialBattle:true,tutorialOpening:true});battle.open=function(){this.state="opening";return true;};battle.recover=function(){};battle.endOpening=function(){};battle.enter=function(){};installBattleLessons();');
+ assert.equal(h.run('combatLesson.id'),'move');
+ for(const key of ['w','a','s','d'])h.key(key);
+ assert.equal(h.battle.paused,false);h.battle.open();assert.equal(h.run('combatLesson.id'),'opening');assert.equal(h.battle.paused,true);
+});
