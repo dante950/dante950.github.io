@@ -61,3 +61,11 @@ test('coffee stays invulnerable through the attack tail and is idle when the cou
  assert.equal(b.dodgedPatterns,1);assert.equal(b.next-b.time,1700);
  b.paused=false;assert(b.basicAttack(true));assert.equal(b.enemyHP,hp-5);assert.equal(b.stagger,stagger+5);
 });
+
+test('coffee victory waits for the full cup-return animation after its dialogue',()=>{
+ const b=start();b.state='victory';b.dialogues.event('승리');
+ for(let n=0;n<8&&b.dialogues.active;n++)b.dialogues.advance();
+ assert.equal(b.finale?.type,'소멸');assert.equal(b.dialogueBlocking,true);
+ b.tick(1190);assert.equal(b.dialogueBlocking,true);assert.equal(b.actorDead,false);
+ b.tick(10);assert.equal(b.dialogueBlocking,false);assert.equal(b.actorDead,true);
+});

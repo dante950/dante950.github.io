@@ -19,7 +19,7 @@ class CursorScene extends GameScene {
  shadow(x,y,w){const g=this.ctx;g.fillStyle='#1a111788';g.beginPath();g.ellipse(x,y,w,14,0,0,Math.PI*2);g.fill();}
  actor(key,frame,x,feet,height,flip=false,alpha=1){const g=this.ctx;g.save();g.translate(x,0);if(flip)g.scale(-1,1);this.sprite(key,frame,0,feet,height,alpha);g.restore();}
  coffeeActor(asset,frame,x,feet,height,alpha=1){
-  if(asset==='coffee_attack'){this.actor(asset,frame,x,feet,height,false,alpha);return;}
+  if(['coffee_attack','coffee_hit','coffee_dead'].includes(asset)){const s=this.assets.images[asset],im=this.images[asset];if(!s||!im)return;const f=Math.max(0,Math.min(s.count-1,Math.floor(frame))),scale=height/100,anchorY=asset==='coffee_dead'?142:110,g=this.ctx;g.save();g.globalAlpha=alpha;g.imageSmoothingEnabled=false;g.drawImage(im,(f%s.cols)*s.fw,Math.floor(f/s.cols)*s.fh,s.fw,s.fh,x-52*scale,feet-anchorY*scale,s.fw*scale,s.fh*scale);g.restore();return;}
   // captureBeautyCustomer already contains the entire ghost, including its
   // body and hands. Drawing the raw pieces as well duplicates those parts.
   if(this.images.coffee_portrait){this.actor('coffee_portrait',0,x,feet+height*.13,height,false,alpha);return;}
@@ -125,6 +125,7 @@ class CursorScene extends GameScene {
    asset=character==='sans'?(b.pattern.RangeMode==='밀친 위치'?'sans_push':'sans_blaster'):character==='zombie'?'zombie_attack':asset;
    if(e.MotionKey){const custom=Object.keys(this.assets.images).find(k=>k===e.MotionKey||this.assets.images[k].file===e.MotionKey||this.assets.images[k].file.replace(/\.png$/i,'')===e.MotionKey);if(custom)asset=custom;}
    frame=p*(this.assets.images[asset]?.count??1);
+   if(asset==='coffee_attack')frame=t<plan.firstHit?Math.min(2,Math.floor((t-plan.motionStart)/Math.max(1,plan.firstHit-plan.motionStart)*3)):3+Math.min(2,Math.floor((t-plan.firstHit)/Math.max(1,plan.motionEnd-plan.firstHit)*3));
    if(asset==='zombie_attack')frame=t<plan.firstHit?Math.min(1,Math.floor((t-plan.motionStart)/Math.max(1,plan.firstHit-plan.motionStart)*2)):2+Math.min(4,(t-plan.firstHit)/Math.max(1,end-plan.firstHit)*5);
    if(asset==='sans_push'||asset==='sans_blaster')frame=t<plan.firstHit?Math.min(1,Math.floor((t-plan.motionStart)/Math.max(1,plan.firstHit-plan.motionStart)*2)):2;
    height=character==='sans'?325:character==='zombie'?325:280;
@@ -154,6 +155,10 @@ class CursorScene extends GameScene {
   if(b?.finale?.type==='소멸'){const p=Math.min(1,(vt-b.finale.start)/1200);if(character==='sans'){asset='sans_dead';frame=Math.min(6,Math.floor(p*7));height=325;}alpha*=Math.max(0,1-Math.max(0,p-.65)/.35);}
   const lastEnemyHit=this.cues.filter(c=>['basicHit','openingHit'].includes(c.kind)).at(-1),recoiling=lastEnemyHit&&vt-lastEnemyHit.visualTime<90;
   if(recoiling)ex+=Math.sin(vt/8)*5;
+  if(character==='coffee'){
+   if(b?.finale?.type==='소멸'){asset='coffee_dead';frame=Math.min(13,Math.floor((vt-b.finale.start)/Math.max(1,b.finale.end-b.finale.start)*14));height=280;alpha=1;}
+   else if(lastEnemyHit&&vt-lastEnemyHit.visualTime<180&&!attacking){asset='coffee_hit';frame=0;height=280;}
+  }
   this.enemy={x:ex,y:ey,height};
   this.box=monsterHitbox(character,{x:ex,y:ey});this.scratchBox=openingHitbox(this.box);
   const area=this.attackBox,opening=b?.state==='opening',hovering=insideBox(this.pointer,area),canTarget=b&&!b.paused&&!b.dialogueBlocking&&(opening||b.canPunch());

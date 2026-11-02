@@ -15,7 +15,9 @@ export function coffeeCombatAssets(baseURL='./',portraitLayers=null){
   coffee_body:image('body.png',22,28,1,coffeePose.body),coffee_hands:image('hands.png',54,18,1,coffeePose.hands),
   coffee_eyes:image('eyes-normal.png',36,29,1,coffeePose.eyes?.neutral||coffeePose.head),coffee_eyes_happy:image('eyes-happy.png',36,29,1,coffeePose.eyes?.satisfied||coffeePose.head),
   coffee_mouth:image('mouth-normal-sheet.png',36,29,2,coffeePose.mouth?.closed||coffeePose.head),
-  coffee_attack:image('attack-sheet.png',122,96,6)
+  coffee_attack:{...image('attack-v2-sheet.png',104,142,6),cols:3},
+  coffee_hit:image('hit.png',104,142),
+  coffee_dead:{...image('death-sheet.png',104,142,14),cols:4}
  }};
 }
 
@@ -32,7 +34,7 @@ export function createCoffeeCombatData(baseCombat){
   [89092,'대련 마무리','휴우… 모습은 닮았는데, 야차는 아직 멀었네요!'],
   [89093,'빈틈 다시 도전','앗, 가위를 놓치셨네요! 괜찮아요. 다시 해봐요!']
  ];
- set('대화 그룹',groups.map(([GroupID,Name])=>({GroupID,Name,PlaybackMode:'순서대로',PauseCombat:true,AdvanceMode:'입력',CPS:32,HoldMs:800,GapMs:0,ActorEffect:'없음',FinishEffect:'없음',Notes:'커피 유령 튜토리얼 초안'})));
+ set('대화 그룹',groups.map(([GroupID,Name])=>({GroupID,Name,PlaybackMode:'순서대로',PauseCombat:true,AdvanceMode:'입력',CPS:32,HoldMs:800,GapMs:0,ActorEffect:'없음',FinishEffect:GroupID===89092?'소멸':'없음',Notes:GroupID===89092?'대련 뒤 컵으로 돌아가는 제공 애니메이션':'커피 유령 튜토리얼 초안'})));
  set('대사',groups.map(([GroupID,,Text],i)=>({DialogueID:990091+i,GroupID,Order:1,Speaker:'몬스터',Text,Notes:'커피 유령 튜토리얼 초안'})));
  set('전투 대사 연결',[{TriggerID:109091,MonsterID:COFFEE_MONSTER_ID,PhaseID:null,EventType:'승리',PatternID:null,BeautyCondition:'공통',GroupID:89092,HPThresholdPct:null,CooldownMs:0,MaxPerBattle:1,Enabled:true,Notes:'대련 승리 뒤에도 유령은 남는다',EventCount:null}]);
  const salon=data.sheets.find(s=>s.name==='미용 대사 연결');if(salon)salon.rows=[];
