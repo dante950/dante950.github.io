@@ -34,7 +34,7 @@ export function combatForWorkbook(project){
 export function mergeWorkshopDialogues(project,newCombat){
  const data=restoreMissingSalonDialogues(project,newCombat),ids=workshopIDs(project);
  const sourceLinks=workshopRows(project.combat,'미용 대사 연결').filter(r=>ids.has(r.MonsterID));
- if(!sourceLinks.length)return data;
+ if(!sourceLinks.length&&!project.guests.some(g=>ids.has(g.id)&&Object.keys(g.bindings||{}).length))return data;
  for(const name of ['미용 대사 연결','대화 그룹','대사'])if(!data.sheets.some(s=>s.name===name)){
   const source=project.combat.sheets.find(s=>s.name===name);
   if(!source)throw Error('미용 시험 대사 보관용 시트가 없습니다: '+name);

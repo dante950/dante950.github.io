@@ -3,11 +3,12 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
 import {projectProblems} from '../src/model.js';
+import {ensureCoffeeDialogues} from '../src/tutorial/dialogues.js';
 import {validate} from '../src/combat/engine.js';
 
 const root=path.resolve(fileURLToPath(new URL('../',import.meta.url)));
 const read=f=>fs.readFile(path.join(root,f),'utf8');
-const project=JSON.parse(await read('data/project.json'));
+const project=ensureCoffeeDialogues(JSON.parse(await read('data/project.json')));
 const errors=projectProblems(project);
 for(const guest of (project.guests||[]).filter(g=>!g.previewOnly&&g.battle!=='none')) errors.push(...validate(project.combat,{monsterID:guest.id}).errors);
 if(errors.length)throw Error('배포 데이터 확인 필요:\n'+errors.join('\n'));
@@ -34,7 +35,7 @@ const schema=await read('data/schema.json'),assets=await read('src/combat/assets
 const zip=await read('vendor/jszip.min.js'),license=await read('vendor/JSZip-LICENSE.txt');
 combat=combat.replace('<link rel="stylesheet" href="style.css">',()=>`<style>${css}</style>`)
  .replace('<script type="module" src="app.js"></script>',()=>`<script id="host-data" type="application/json">__HOST_JSON__</script><script id="embedded-workbook" type="application/octet-stream">${wb}</script><script id="embedded-authoring" type="application/octet-stream">${au}</script><script id="embedded-schema" type="application/json">${safe(schema)}</script><script id="embedded-assets" type="application/json">${safe(assets)}</script><script>${safe(zip)}</script><script type="module">${safe(combatScript)}</script><script type="text/plain">${safe(license)}</script>`);
-const parentBundle=await bundle('src/',['text-effects.js','combat/dialogue.js','combat/engine.js','beauty-reaction-dialogue.js','salon-dialogue.js','model.js','returning-zombie.js','star-progress.js','story-progress.js','battle-result.js','workshop-dialogue.js','publishing.js','owner-access.js','speaker-avatar.js','media.js','audio.js','story-intro.js','tutorial/closing.js','app.js']);
+const parentBundle=await bundle('src/',['text-effects.js','combat/dialogue.js','combat/engine.js','beauty-reaction-dialogue.js','salon-dialogue.js','tutorial/narrative.js','tutorial/dialogues.js','model.js','returning-zombie.js','star-progress.js','story-progress.js','battle-result.js','workshop-dialogue.js','publishing.js','owner-access.js','speaker-avatar.js','media.js','audio.js','story-intro.js','tutorial/closing.js','app.js']);
 const reactionStyle=await read('src/beauty-reaction.css');
 const styleURL=await emit('style','css',speechStyle+'\n'+reactionStyle+'\n'+await read('src/style.css')+'\n'+await read('src/battle-result.css'));
 const beautyResultRuntime=await read('src/salon-beauty-result.js'),beautyTutorialRuntime=await read('src/salon-tutorial.js');
@@ -55,7 +56,7 @@ const closingStyleURL=await emit('closing-style','css',(await read('src/ingame-f
 const closingHTML=(await read('src/closing/index.html')).replace('href="style.css"',`href="${closingStyleURL}"`).replace('src="app.js"',`src="${closingAppURL}"`);
 await fs.writeFile(path.join(dist,'closing.html'),closingHTML);
 // The first-customer lab shares the runtime templates but owns its draft data and state.
-const tutorialScript=await bundle('src/',['battle-result.js','speaker-avatar.js','media.js','audio.js','tutorial/narrative.js','tutorial/presentation-remote.js','tutorial/scene.js','tutorial/stickers.js','tutorial/guest.js','tutorial/combat-data.js','tutorial/closing.js','tutorial/presentation-data.js','tutorial/presentation.js','tutorial/app.js']);
+const tutorialScript=await bundle('src/',['text-effects.js','battle-result.js','speaker-avatar.js','media.js','audio.js','tutorial/narrative.js','tutorial/dialogues.js','tutorial/presentation-remote.js','tutorial/scene.js','tutorial/stickers.js','tutorial/guest.js','tutorial/combat-data.js','tutorial/closing.js','tutorial/presentation-data.js','tutorial/presentation.js','tutorial/app.js']);
 const tutorialAppURL=await emit('tutorial-app','js',tutorialScript);
 const tutorialStyleURL=await emit('tutorial-style','css',speechStyle+'\n'+await read('src/tutorial/style.css')+'\n'+await read('src/tutorial/presentation.css')+'\n'+await read('src/battle-result.css'));
 const tutorialConfig={assets:inputs['flow-assets'][0],project:inputs['flow-default'][0],salon:inputs['flow-salon'][0],combat:inputs['flow-combat'][0]};
