@@ -1,0 +1,6 @@
+chromium: 야차차_마스터테이블_작업용.xlsm contains 131 event dialogue lines; edited workbook reimport passed
+chromium: 야차차_마스터테이블_Unity.xlsx contains 131 event dialogue lines; edited workbook reimport passed
+chromium: edited coffee/returning dialogue → JSON and table ZIP → fresh import; effects/bindings/current battle data preserved; folder archive and old ZIP rejection passed
+webkit: 야차차_마스터테이블_작업용.xlsm contains 131 event dialogue lines; edited workbook reimport passed
+webkit: 야차차_마스터테이블_Unity.xlsx contains 131 event dialogue lines; edited workbook reimport passed
+webkit: edited coffee/returning dialogue → JSON and table ZIP → fresh import; effects/bindings/current battle data preserved; folder archive and old ZIP rejection passed

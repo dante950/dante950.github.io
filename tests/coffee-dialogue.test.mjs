@@ -33,7 +33,7 @@ test('old saved projects receive coffee without losing existing edits; workbook 
  addWorkshopGuests(old,defaults);assert.equal(rows(old,'대사')[0].Text,'기존 손님 수정');assert.equal(coffeeDialogueLines(old,'arrival')[0][1],'저도 부하님처럼 되고 싶어요!');
  const before=structuredClone(old),workbook=combatForWorkbook(old);
  const ids=new Set(Object.values(old.guests.find(g=>g.id===10005).bindings));
- assert(!workbook.sheets.find(s=>s.name==='대사').rows.some(l=>ids.has(l.GroupID)));
+ for(const id of ids)assert(workbook.sheets.find(s=>s.name==='대사').rows.some(l=>l.GroupID===id));
  const restored={...old,combat:mergeWorkshopDialogues(old,workbook)};
  for(const [event] of COFFEE_DIALOGUE_EVENTS)assert.deepEqual(coffeeDialogueLines(restored,event),coffeeDialogueLines(before,event));
  assert.deepEqual(old,before);
@@ -46,4 +46,14 @@ test('edited battle dialogue reaches tutorial while death effect and combat rule
  assert.equal(data.sheets.find(s=>s.name==='대화 그룹').rows.find(g=>g.GroupID===89092).FinishEffect,'소멸');
  for(const s of original.sheets.filter(s=>!['대사','대화 그룹'].includes(s.name)))assert.deepEqual(data.sheets.find(t=>t.name===s.name),s);
  assert.deepEqual(validate(data,{monsterID:10005}).errors,[]);
+});
+
+test('both released guests export all dialogue and accept Excel edits; old omitted groups restore safely',()=>{
+ const p=make(),data=combatForWorkbook(p),ids=new Set();
+ for(const guest of p.guests.filter(g=>[10005,10006].includes(g.id)))for(const id of Object.values(guest.bindings)){ids.add(id);assert(data.sheets.find(s=>s.name==='대화 그룹').rows.some(g=>g.GroupID===id));assert(data.sheets.find(s=>s.name==='대사').rows.some(l=>l.GroupID===id));}
+ const lines=data.sheets.find(s=>s.name==='대사').rows;for(const l of lines.filter(l=>ids.has(l.GroupID)))l.Text='<wave=2>엑셀 수정 '+l.DialogueID+'</wave>';
+ const merged=mergeWorkshopDialogues(p,data);assert.deepEqual(merged,data);assert.deepEqual(combatForWorkbook({...p,combat:merged}),data);
+ const old=combatForWorkbook(p);for(const s of old.sheets)if(['대사','대화 그룹'].includes(s.name))s.rows=s.rows.filter(r=>!ids.has(r.GroupID));else if(s.name==='미용 대사 연결')s.rows=s.rows.filter(r=>r.MonsterID!==10006);
+ const restored=mergeWorkshopDialogues(p,old);for(const name of ['대사','대화 그룹','미용 대사 연결'])assert.deepEqual(restored.sheets.find(s=>s.name===name).rows.map(JSON.stringify).sort(),rows(p,name).map(JSON.stringify).sort());
+ const partial=structuredClone(data);partial.sheets.find(s=>s.name==='대화 그룹').rows=partial.sheets.find(s=>s.name==='대화 그룹').rows.filter(r=>r.GroupID!==p.guests.find(g=>g.id===10005).bindings.arrival);assert.throws(()=>mergeWorkshopDialogues(p,partial),/누락/);
 });

@@ -1,7 +1,10 @@
 // Only unfinished preview guests are excluded. Established beauty-only guests
 // keep their dialogue in workbooks without inventing combat phases.
 const workshopRows=(data,name)=>data.sheets.find(s=>s.name===name)?.rows||[];
-const workshopIDs=project=>new Set(project.guests.filter(g=>g.previewOnly===true||g.workbookExcluded===true).map(g=>g.id));
+// These released guests used to be marked JSON-only. Keep old projects compatible
+// while exporting their existing dialogue rows, without inventing combat phases.
+const releasedDialogueGuest=g=>[10005,10006].includes(g.id)&&!g.previewOnly;
+const workshopIDs=project=>new Set(project.guests.filter(g=>g.previewOnly===true||(g.workbookExcluded===true&&!releasedDialogueGuest(g))).map(g=>g.id));
 const workshopLinkKey=row=>row.MonsterID+'/'+row.Stage;
 const workshopGroupIDs=links=>new Set(links.flatMap(r=>[r.RequestGroupID,r.DetailGroupID]).filter(Number.isInteger));
 function workshopValue(value,ignored=new Set()){
@@ -87,11 +90,11 @@ export function restoreMissingSalonDialogues(project,incoming){
  for(const guest of project.guests.filter(g=>g.battle==='none'&&!excluded.has(g.id))){
   const sourceLinks=workshopRows(project.combat,'미용 대사 연결').filter(r=>r.MonsterID===guest.id);
   const links=workshopRows(data,'미용 대사 연결'),groups=workshopRows(data,'대화 그룹'),lines=workshopRows(data,'대사');
-  const present=links.some(r=>r.MonsterID===guest.id);
+  const present=links.some(r=>r.MonsterID===guest.id)||(guest.dialogueOnly&&Object.values(guest.bindings||{}).some(id=>groups.some(r=>r.GroupID===id)));
   const ids=new Set([...Object.values(guest.bindings||{}),...workshopGroupIDs(present?links.filter(r=>r.MonsterID===guest.id):sourceLinks)]);
   for(const id of ids){
    const target=groups.find(r=>r.GroupID===id),source=workshopRows(project.combat,'대화 그룹').find(r=>r.GroupID===id);
-   if(present&&target){if(!lines.some(r=>r.GroupID===id&&String(r.Text||'').trim()))throw Error('미용 대사 문장이 비어 있습니다: '+id);continue;}
+   if(present&&target){if(!guest.dialogueOnly&&!lines.some(r=>r.GroupID===id&&String(r.Text||'').trim()))throw Error('미용 대사 문장이 비어 있습니다: '+id);continue;}
    if(target){if(workshopGroupContent(data,id)!==workshopGroupContent(project.combat,id))throw Error('이전 엑셀과 미용 대화 ID가 충돌합니다: '+id);continue;}
    if(present)throw Error('미용 대화 그룹이 누락됐습니다: '+id);
    if(!source)throw Error('보관할 미용 대화 그룹이 없습니다: '+id);

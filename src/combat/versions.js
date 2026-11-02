@@ -87,7 +87,7 @@ const TableVersions=(()=>{
  async function prepare(input,intent,version=stamp(),project=null){
   const projectFiles=project?projectArchiveFiles(project,version):[];
   if(!intent?.trim())throw Error('변경 의도를 적어 주세요. 예: 취객이 술에서 깨는 느낌을 주려고 후반 공격을 빠르게 조정.');
-  const a=authorFrom(input),{u,drafts}=unityFrom(a);assertKeys(a);assertKeys(u);const check=validate(u);
+  const a=authorFrom(project?.combat||input),{u,drafts}=unityFrom(a);assertKeys(a);assertKeys(u);const check=validate(u);
   if(sheet(u,'미용 대사 연결'))check.errors.push(...salonDialogueProblems({combat:u,guests:[...new Set([...sheet(a,'몬스터 페이즈').rows.map(r=>r.MonsterID),...(schema.salonOnlyMonsterIDs||[])])].map(id=>({id}))}));
   if(check.errors.length)throw Error('저장 전 데이터를 확인하세요:\n'+check.errors.join('\n'));
   checkPair(a,u,drafts);const changes=diff(baseSnapshot,snapshot(a)),meta={format:1,version,parentVersion,intent:intent.trim(),snapshot:snapshot(a),drafts:drafts.map(r=>({MonsterID:r.MonsterID,PhaseID:r.PhaseID}))};
@@ -95,7 +95,7 @@ const TableVersions=(()=>{
   const aBytes=await stampBook(await authorBook.save(a),meta),uBytes=await stampBook(await unityBook.save(u),meta);
   // Reload both outputs before delivering, checking the serialized data as well as the in-memory projection.
   const ar=await OfflineBook.create().load(aBytes,authorFile),ur=await OfflineBook.create().load(uBytes,unityFile);checkPair(ar,ur,drafts);
-  const log=logText({version,intent:intent.trim(),changes,drafts,parent:parentVersion})+(project?'\r\n전체 대사·미용 설정 보관: '+PROJECT_ARCHIVE_FILE+'\r\n커피 유령·재등장 좀비를 포함한 전체 편집 내용은 위 JSON에 저장했습니다. 개발실의 프로젝트 불러오기에서 ZIP 또는 JSON을 여세요.\r\n':'');
+  const log=logText({version,intent:intent.trim(),changes,drafts,parent:parentVersion})+(project?'\r\n전체 대사·미용 설정 보관: '+PROJECT_ARCHIVE_FILE+'\r\n커피 유령·재등장 좀비의 대사·대화 그룹은 두 엑셀에도 저장했습니다. 선택지·사건 연결과 미용 설정을 포함한 전체 편집 내용은 위 JSON에 저장했습니다. 개발실의 프로젝트 불러오기에서 ZIP 또는 JSON을 여세요.\r\n':'');
   const manifest=JSON.stringify({format:1,version,parentVersion,intent:intent.trim(),author:`${authorFolder}/${authorFile}`,unity:`${unityFolder}/${unityFile}`,draftCount:drafts.length,changes,...(project?{projectFile:PROJECT_ARCHIVE_FILE}: {})},null,2);
   return {version,files:[{path:`${authorFolder}/${authorFile}`,bytes:aBytes},{path:`${unityFolder}/${unityFile}`,bytes:uBytes},{path:'변경 이력.txt',bytes:log},{path:'버전 정보.json',bytes:manifest},...projectFiles],meta,changes,a,u};
  }

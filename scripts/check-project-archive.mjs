@@ -23,11 +23,33 @@ try{for(const [name,type] of Object.entries({chromium,webkit})){
  const editedHP=await frame.evaluate(()=>{const row=lab.data.sheets.find(s=>s.name==='몬스터 페이즈').rows[0];return ++row.MaxHP;});
  await frame.locator('#changeIntent').fill('두 손님 대사 저장 왕복 검증');const download=page.waitForEvent('download',{timeout:90000});await frame.locator('#exportZip').click();const zipDownload=await download;const zipBytes=await fs.readFile(await zipDownload.path()),zip=await JSZip.loadAsync(zipBytes);const member=Object.keys(zip.files).find(n=>n.endsWith('/야차차_통합프로젝트.json'));assert(member,'ZIP contains full simulator project');const archived=JSON.parse(await zip.file(member).async('string'));
  assert.equal(lineFor(archived,10005,'arrival'),lineFor(authored,10005,'arrival'));assert.equal(lineFor(archived,10006,'employedArrival'),lineFor(authored,10006,'employedArrival'));assert.deepEqual(archived.guests,authored.guests);assert.equal(archived.combat.sheets.find(s=>s.name==='몬스터 페이즈').rows[0].MaxHP,editedHP);assert(Object.keys(zip.files).some(n=>n.endsWith('.xlsm')));assert(Object.keys(zip.files).some(n=>n.endsWith('.xlsx')));
+
+ // Check the actual serialized Excel pair, then edit and reload each representation alone.
+ for(const member of Object.keys(zip.files).filter(n=>/\.xls[mx]$/.test(n))){
+  const bytes=Array.from(await zip.file(member).async('uint8array')),filename=member.split('/').at(-1);
+  const checked=await frame.evaluate(async ({bytes,filename,project})=>{
+   const book=lab.OfflineBook.create(),data=await book.load(Uint8Array.from(bytes),filename);
+   const rows=n=>data.sheets.find(s=>s.name===n).rows,source=project.combat.sheets.find(s=>s.name==='대사').rows;
+   let count=0;for(const guest of project.guests.filter(g=>[10005,10006].includes(g.id)))for(const gid of Object.values(guest.bindings)){
+    if(!rows('대화 그룹').some(g=>g.GroupID===gid))throw Error('Excel group missing: '+gid);
+    const expected=source.filter(l=>l.GroupID===gid),actual=rows('대사').filter(l=>l.GroupID===gid);
+    if(JSON.stringify(actual.map(l=>[l.DialogueID,l.Order,l.Speaker,l.Text]))!==JSON.stringify(expected.map(l=>[l.DialogueID,l.Order,l.Speaker,l.Text])) )throw Error('Excel lines differ: '+gid);count+=actual.length;
+   }
+   for(const [id,event] of [[10005,'arrival'],[10006,'employedArrival']]){const gid=project.guests.find(g=>g.id===id).bindings[event];rows('대사').find(l=>l.GroupID===gid).Text='<wave=2>엑셀에서 수정 '+id+'</wave>';}
+   return {bytes:Array.from(await book.save(data)),count};
+  },{bytes,filename,project:authored});
+  assert(checked.count>0);const excelPage=await browser.newPage({viewport:{width:1440,height:900}});await openWorkshop(excelPage);await excelPage.locator('[data-editor="combat"]:visible').first().click();
+  const excelFrame=await(await excelPage.locator('#combatEditor').elementHandle()).contentFrame();await excelFrame.waitForFunction(()=>window.lab?.data);
+  await excelFrame.evaluate(async({bytes,filename})=>lab.loadBook(new File([Uint8Array.from(bytes)],filename)),{bytes:checked.bytes,filename});
+  assert((await excelFrame.locator('#notice').textContent()).includes('불러오기 완료'));await excelPage.locator('#editorBack').click();await excelPage.locator('#devScreen').waitFor({state:'visible'});await excelPage.locator('#devScreen [data-editor="dialogue"]').click();
+  for(const [id,event] of [[10005,'arrival'],[10006,'employedArrival']]){await excelPage.locator('#dialogueGuest').selectOption(String(id));await excelPage.locator('#dialogueEvent').selectOption(event);assert.equal(await excelPage.locator('[data-line-text]').first().inputValue(),'<wave=2>엑셀에서 수정 '+id+'</wave>');}
+  await excelPage.close();console.log(name+': '+filename+' contains '+checked.count+' event dialogue lines; edited workbook reimport passed');
+ }
  await frame.waitForFunction(()=>document.querySelector('#changeIntent').value==='');
  const activeDownload=page.waitForEvent('download');await page.locator('#editorExportProject').click();const active=JSON.parse(await fs.readFile(await(await activeDownload).path(),'utf8'));assert.equal(active.combat.sheets.find(s=>s.name==='몬스터 페이즈').rows[0].MaxHP,editedHP);
  const fresh=await browser.newPage({viewport:{width:1440,height:900}});fresh.on('pageerror',e=>errors.push(e.message));await openWorkshop(fresh);await fresh.locator('#projectFile').setInputFiles({name:'대사전달.zip',mimeType:'application/zip',buffer:zipBytes});await fresh.waitForFunction(()=>document.querySelector('#toast').textContent.includes('프로젝트를 불러왔어요'));const restored=await fresh.evaluate(()=>fullflow.project);assert.deepEqual(restored.combat,archived.combat);assert.deepEqual(restored.guests,archived.guests);
  await fresh.locator('[data-editor="dialogue"]:visible').first().click();await fresh.locator('#dialogueGuest').selectOption('10006');await fresh.locator('#dialogueEvent').selectOption('employedArrival');assert.equal(await fresh.locator('[data-line-text]').first().inputValue(),lineFor(authored,10006,'employedArrival'));
- await fs.mkdir(path.join(root,'docs/project-archive-fix'),{recursive:true});if(name==='chromium')await fresh.screenshot({path:path.join(root,'docs/project-archive-fix/restored-dialogue.png')});
+ await fs.mkdir(path.join(root,'docs/project-archive-fix'),{recursive:true});if(name==='chromium')await fresh.screenshot({path:path.join(root,'docs/project-archive-fix/excel-restored-dialogue.png')});
  const oldZip=new JSZip();oldZip.file('old/버전 정보.json','{}');await fresh.locator('#projectFile').setInputFiles({name:'old.zip',mimeType:'application/zip',buffer:Buffer.from(await oldZip.generateAsync({type:'uint8array'}))});await fresh.waitForFunction(()=>document.querySelector('#toast').textContent.includes('전체 프로젝트 JSON이 없습니다'));assert.deepEqual((await fresh.evaluate(()=>fullflow.project)).combat,restored.combat);
  const folderFiles=await frame.evaluate(async project=>{const result=await lab.TableVersions.prepare(lab.data,'폴더 저장 검증','2099-01-01_00-00-01',project),writes={};const directory=prefix=>({async getDirectoryHandle(name,options){if(!options?.create)throw new DOMException('missing','NotFoundError');return directory(prefix+name+'/');},async getFileHandle(name){return {async createWritable(){return {async write(value){writes[prefix+name]=typeof value==='string'?value:'binary';},async close(){},async abort(){}};}};}});await lab.TableVersions.writeDirectory(directory(''),result);return Object.keys(writes);},archived);assert(folderFiles.some(n=>n.endsWith('/야차차_통합프로젝트.json')));assert(folderFiles.at(-1).endsWith('/저장 완료.txt'));
  assert.deepEqual(errors,[]);console.log(name+': edited coffee/returning dialogue → JSON and table ZIP → fresh import; effects/bindings/current battle data preserved; folder archive and old ZIP rejection passed');
