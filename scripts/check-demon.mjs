@@ -22,9 +22,13 @@ try{
  await page.goto(url+'/demon.html');await page.waitForFunction(()=>window.demonLab?.ready);await page.locator('#sound').click();
  for(const stars of ['0','1','2','3']){
   await page.selectOption('#stars',stars);await page.locator('#open').click();await page.waitForFunction(()=>window.demonLab.mode==='cutscene');
+  if(stars==='3'&&name==='chromium'){
+   await page.evaluate(()=>{let n=0;while(window.demonLab.beat?.line?.[1]!=='이곳인가..'&&window.demonLab.mode==='cutscene'&&n++<30)window.demonLab.advance();window.demonLab.advance();});
+   await page.waitForTimeout(700);screenshots.push(['exterior',await page.locator('#stage').screenshot({type:'jpeg',quality:72})]);
+  }
   await page.evaluate(()=>{let n=0;while(window.demonLab.mode==='cutscene'&&n++<100)window.demonLab.advance();});
   await page.waitForFunction(()=>['room','ending'].includes(window.demonLab.mode));
-  if(stars==='3'){assert.equal(await page.evaluate(()=>window.demonLab.mode),'room');await page.waitForTimeout(1700);await page.keyboard.down('a');await page.waitForTimeout(500);await page.keyboard.up('a');await page.locator('#interact').click();await page.waitForFunction(()=>window.demonLab.mode==='beauty');await dismiss(page);}
+  if(stars==='3'){assert.equal(await page.evaluate(()=>window.demonLab.mode),'room');await page.waitForTimeout(1700);if(name==='chromium')screenshots.push(['room',await page.locator('#stage').screenshot({type:'jpeg',quality:72})]);await page.keyboard.down('a');await page.waitForTimeout(500);await page.keyboard.up('a');await page.locator('#interact').click();await page.waitForFunction(()=>window.demonLab.mode==='beauty');await dismiss(page);}
   else {await page.getByRole('heading',{name:'GAME OVER'}).waitFor();await page.locator('#restart').click();}
  }
  await preview(page,1);
@@ -49,6 +53,10 @@ try{
  assert.equal(await page.evaluate(()=>window.demonLab.phase),2);
  if(name==='chromium')await page.waitForTimeout(700);
  if(name==='chromium')screenshots.push(['face',await page.locator('#stage').screenshot({type:'jpeg',quality:72})]);
+ await page.locator('[data-tool="sticker"]').click();await page.locator('#stickers button').first().click();await page.locator('#stickers button.active').waitFor();
+ await page.locator('#portrait').click({position:{x:100,y:150}});
+ assert.match(await page.locator('#reaction').textContent(),/거추장스럽/);assert.equal(await page.evaluate(()=>window.demonLab.model.placements.length),1);
+ await page.locator('#clearStickers').click();assert.equal(await page.evaluate(()=>window.demonLab.model.placements.length),0);
  const phase2=await page.evaluate(()=>{
   const m=window.demonLab.model;
   for(let n=0;n<m.count;n++)if(m.trimMask[n])m.stroke(n%320,Math.floor(n/320),.4,'scissors');

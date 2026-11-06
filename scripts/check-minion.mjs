@@ -440,7 +440,9 @@ try {
     if (process.env.YACHA_MINION_ENGINE && process.env.YACHA_MINION_ENGINE !== name) continue;
     const browser = await engine.launch({ headless: true });
     try {
-      const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+      // Honor the app's reduced-motion mode so camera shake cannot move a pixel target mid-stroke.
+      // Expressions, complaints and actual pointer editing are still asserted below.
+      const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
       const errors = [];
       page.on('pageerror', error => errors.push(error.message));
       const salon = await openPreview(page, name);
