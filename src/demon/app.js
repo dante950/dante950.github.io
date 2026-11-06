@@ -112,7 +112,9 @@ function drawRoom(dt){
 }
 function makeLayer(name,box){const c=transparent(),x=c.getContext('2d');x.imageSmoothingEnabled=false;const im=imageOf(name);if(im)x.drawImage(im,...box);return c;}
 function pixels(c){return c.getContext('2d').getImageData(0,0,320,350).data;}
+const layerCache={};
 function makeLayers(p){
+ if(layerCache[p])return layerCache[p];
  const base=makeLayer(p===3?'goblin':'face',p===3?[0,0,320,320]:[-17,-7,371,371]);
  const ear=makeLayer('ears',[-17,-7,371,371]);
  if(p===2)base.getContext('2d').drawImage(ear,0,0);
@@ -120,7 +122,7 @@ function makeLayers(p){
  const stone=p===3?makeLayer('stones',[10,-6,300,300]):transparent();
  const target=transparent(),tx=target.getContext('2d');tx.drawImage(mat,0,0);
  if(p===1){const orig=pixels(mat),out=tx.getImageData(0,0,320,350);for(let y=0;y<117;y++)for(let x=185;x<292;x++){const s=(y*320+(318-x))*4,i=(y*320+x)*4;if(orig[s+3]>100&&orig[s+2]>110&&orig[s]<125&&orig[s+1]<145)out.data.set(orig.subarray(s,s+4),i);}tx.putImageData(out,0,0);}
- return {base:pixels(base),material:pixels(mat),stones:pixels(stone),ears:pixels(ear),hornTarget:pixels(target),baseCanvas:base,materialCanvas:mat,stoneCanvas:stone};
+ return layerCache[p]={base:pixels(base),material:pixels(mat),stones:pixels(stone),ears:pixels(ear),hornTarget:pixels(target),baseCanvas:base,materialCanvas:mat,stoneCanvas:stone};
 }
 const phaseText={
  1:{title:'1페이즈 · 투구 복원',notes:['투구를 깨끗이 복원','절대 얼굴을 보려하지 말 것'],line:'뿔과 전투의 흔적을 말끔히 복원해 주게. 다만… 내 얼굴을 보려 하지는 말게.'},
@@ -142,7 +144,7 @@ function renderColors(){
  const palette=[['투구색','#242236'],['검정','#18151f'],['뿔의 파랑','#4853f8'],['흰색','#ecebf4'],['분홍','#f48db4'],['빨강','#cb394f'],['금색','#e9b34d'],['초록','#4bb67d']];
  $('colors').innerHTML=palette.map(([n,v])=>'<button title="'+n+'" aria-label="'+n+'" data-color="'+v+'" style="background:'+v+'"></button>').join('')+'<input type="color" aria-label="직접 색 고르기" value="#18151f"><span>색 선택</span>';
  const pick=v=>{color=[1,3,5].map(n=>parseInt(v.slice(n,n+2),16));$('colors').querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.color===v));};
- $('colors').querySelectorAll('button').forEach(b=>b.onclick=()=>pick(b.dataset.color));$('colors input').oninput=e=>pick(e.target.value);pick(phase===1?'#242236':'#18151f');
+ $('colors').querySelectorAll('button').forEach(b=>b.onclick=()=>pick(b.dataset.color));document.querySelector('#colors input').oninput=e=>pick(e.target.value);pick(phase===1?'#242236':'#18151f');
 }
 function renderStickers(){
  const selected=(config.stickers||[]).filter(s=>/ribbon|star|nose|flower|crown|moustache/i.test(s.src)).slice(0,12);

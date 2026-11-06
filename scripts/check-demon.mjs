@@ -72,5 +72,5 @@ try{
  assert.deepEqual(errors,[]);assert.deepEqual(bad,[]);console.log(name+' day-four gate, repair, strict face paint, free ending and battle checks passed');
  }finally{await browser.close();}
  }
- for(const [name,data]of screenshots)console.log('DEMON_SCREENSHOT_'+name+'='+data.toString('base64'));
-}finally{await new Promise(r=>server.close(r));}
+ 
+}finally{for(const [name,data]of screenshots)console.log('DEMON_SCREENSHOT_'+name+'='+data.toString('base64'));await new Promise(r=>server.close(r));}
