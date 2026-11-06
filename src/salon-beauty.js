@@ -118,7 +118,7 @@ finish.style.display='none';next.disabled=true;
 next.addEventListener('click',()=>{const stages=beautyStageOrder(B),n=stages.indexOf(beautyPhase);if(n===stages.length-1)startBeautyResult();else setBeautyPhase(stages[n+1]);});
 finish.addEventListener('click',startBeautyResult);
 const shapeTools=document.getElementById('shapeTools');
-for(const [key,name] of (B.shapeTools?B.shapeTools.map(key=>[key,({scissors:'가위',hammer:'망치·정',grow:'발모제 · 머리 늘리기'})[key]]):[[hammer?'hammer':'scissors',hammer?'망치·정':'가위'],['grow',B.growth?.material==='horn'?'발모제 · 뿔 기르기':bone?'발모제 · 뼈 잇기':'발모제 · 머리 늘리기']])){
+for(const [key,name] of (B.shapeTools?B.shapeTools.map(key=>[key,({scissors:'가위',hammer:'망치·정',grow:'발모제 · 머리 늘리기'})[key]]):[[hammer?'hammer':'scissors',hammer?'망치·정':'가위'],['grow',GUEST.demon&&GUEST.demonPhase===1?'발모제 · 투구 복원':B.growth?.material==='horn'?'발모제 · 뿔 기르기':bone?'발모제 · 뼈 잇기':'발모제 · 머리 늘리기']])){
  if(key==='grow'&&B.growth?.enabled===false)continue;
  const button=document.createElement('button');button.className='sculptTool';button.dataset.tool=key;button.textContent=name;
  button.onclick=()=>{cancelGesture();activeTool=key;refreshTools();coffeeAction('tool',{tool:key});};shapeTools.append(button);
@@ -346,7 +346,7 @@ addEventListener('keydown',e=>{if(!beautyActive)return;if(e.key==='Escape')cance
 function placeSticker(sticker,x,y){
  if(!ready||finishing||briefing||beautyPhase!=='attach'||placements.length>=10)return;
  resetActionMood();pushUndo();const region=B.attachRegions.find(r=>inBeautyRegion(x,y,r))?.key||'Other';
- placements.push({sticker,region,x,y});if(isDemon)demonProtest('sticker');touched.attach=true;updateBeautyScore(true);renderPortrait();beautyLessonSticker();
+ placements.push({sticker,region,x,y});if(isDemon)demonStickerReaction();touched.attach=true;updateBeautyScore(true);renderPortrait();beautyLessonSticker();
  if(isReturningZombie&&B.attachRegions.find(r=>r.key===region)?.stickerIDs.includes(sticker.id))queueReturningReaction((GUEST.returnBranch||'employed')+region);
  if(coffeeTutorial){coffeeActions.attach=true;coffeeAction('sticker',{sticker:sticker.id,x,y,requirement:region});}
 }
@@ -523,8 +523,9 @@ function renderRequestStatus(){
  const notes=heardDetails[beautyPhase]?B.requestNotes:B.requestBriefNotes;
  const text=notes?.[beautyPhase]||B.requestNotes?.[beautyPhase]||({cut:bone?'얼굴 테두리 다듬기':'눈이 보이게 · 앞머리 손질',draw:B.weights.draw?'부탁한 색과 무늬로':'색·무늬는 자유롭게',attach:'손님에게 어울리는 장식'}[beautyPhase]);
  const demonCheck=isDemon?demonBeautyStatus():null;
- const checks=demonCheck?(demonPhase===1?[demonCheck.checks[0]&&demonCheck.checks[1],demonCheck.checks[2]]:demonPhase===3?[true]:demonCheck.checks):beautyRequirementChecks(B,beautyPhase,shapeProgress,{cut:cutScore,draw:drawScore,attach:attachScore},placements.length);
- const lines=(isDemon||beautyPhase==='cut')&&(!bone||heardDetails.cut)?text.split('\n').filter(Boolean):[text];
+ const checks=demonCheck?(demonMemoAll?['cut','draw','attach'].flatMap(k=>demonCheck.requirements[k]):demonCheck.requirements[beautyPhase]):beautyRequirementChecks(B,beautyPhase,shapeProgress,{cut:cutScore,draw:drawScore,attach:attachScore},placements.length);
+ const lines=isDemon?(demonMemoAll?['cut','draw','attach'].flatMap(k=>DEMON_REQUIREMENTS[demonPhase][k]):DEMON_REQUIREMENTS[demonPhase][beautyPhase]):beautyPhase==='cut'&&(!bone||heardDetails.cut)?text.split('\n').filter(Boolean):[text];
+ if(isDemon){const toggle=document.getElementById('demonAllOrders');if(toggle){toggle.textContent=demonMemoAll?'현재 단계만 보기':'전체 주문 보기';toggle.setAttribute('aria-expanded',String(demonMemoAll));}status.dataset.all=String(demonMemoAll);status.querySelector('.requestCaption').textContent='손님의 부탁 · '+lines.length+'개'+(demonMemoAll?' ↓':'');}
  const markup=lines.map((label,i)=>{
   const met=checks.length===lines.length?checks[i]:checks.every(Boolean),optional=beautyPhase==='draw'&&!B.weights.draw;
   return '<div class="requestItem'+(optional?' optional':met?' complete':'')+'"><span class="requestCheck" aria-label="'+(optional?'선택 사항':met?'달성':'진행 중')+'">'+(optional?'◇':met?'✓':'○')+'</span><span class="requestLabel">'+safeText(label)+'</span></div>';
@@ -533,6 +534,7 @@ function renderRequestStatus(){
 }
 function setBeautyPhase(phase,announce=true){
  if(finishing||briefing)return;const previousPhase=beautyPhase;cancelStickerDrag();cancelGesture();resetActionMood();requestAnimationSerial++;beautyScreen.classList.remove('requestReveal');beautyPhase=phase;
+ if(isDemon&&previousPhase!==phase)demonMemoAll=false;
  if(phase==='draw'&&(B.growth?.material==='horn'||isReturningZombie)&&!heardRequests.draw){brushRadius=4;document.getElementById('sculptSize').value=4;document.getElementById('sculptSizeValue').value=4;}
  const names={cut:'형태 만들기',draw:'색·무늬 꾸미기',attach:'장식 붙이기'},stages=beautyStageOrder(B);
  stageTag.textContent=(stages.indexOf(phase)+1)+'. '+names[phase];
@@ -553,6 +555,7 @@ function announceBeautyRequest(){
 }
 function animateRequestMemo(serial,textOnly=false){
  const rows=[...status.querySelectorAll('.requestItem')];let delay=0;
+ if(isDemon){for(const [i,row]of rows.entries())row.animate([{opacity:0,transform:'translateY(-6px)'},{opacity:1,transform:'translateY(0)'}],{duration:180,delay:Math.min(i*55,550),fill:'backwards'});return;}
  for(const row of rows){const check=row.querySelector('.requestCheck'),label=row.querySelector('.requestLabel'),text=label.dataset.fullText||label.textContent;label.dataset.fullText=text;check.style.opacity=textOnly?'1':'0';label.textContent='';
   if(!textOnly)setTimeout(()=>{if(serial!==requestAnimationSerial)return;check.style.opacity='1';check.animate([{transform:'scale(.3)'},{transform:'scale(1.25)'},{transform:'scale(1)'}],{duration:220});},delay);
   const interval=textOnly?28:60;delay+=textOnly?0:180;for(let n=1;n<=text.length;n++)setTimeout(()=>{if(serial===requestAnimationSerial&&label.isConnected)label.textContent=text.slice(0,n);},delay+n*interval);delay+=text.length*interval+(textOnly?100:450);

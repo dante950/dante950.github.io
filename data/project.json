@@ -4238,23 +4238,127 @@
             "GroupID": 90025,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "뿔과 전투의 흔적을 말끔히 복원해 주게. 다만… 내 얼굴을 보려 하지는 말게.",
+            "Text": "전장의 흔적은 지워주게. 위엄까지 지우지는 말고.",
             "Notes": "마왕 미용 · 웹 전용"
           },
           {
             "DialogueID": 1000040,
-            "GroupID": 90026,
-            "Order": 1,
+            "GroupID": 90025,
+            "Order": 2,
             "Speaker": "몬스터",
-            "Text": "투구에 남은 기스도 깨끗이 복원해 주게.",
+            "Text": "부러진 뿔을 반대쪽과 균형 있게 복원하게. 상단과 옆면의 장식은 그대의 안목을 보겠네.",
             "Notes": "마왕 미용 · 웹 전용"
           },
           {
             "DialogueID": 1000041,
+            "GroupID": 90025,
+            "Order": 3,
+            "Speaker": "몬스터",
+            "Text": "단, 투구 안을 들여다볼 생각은 버리게.",
+            "Notes": "마왕 미용 · 웹 전용"
+          },
+          {
+            "DialogueID": 1000042,
+            "GroupID": 90026,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "반대쪽 뿔을 보고 높이와 굵기를 맞추게. 발모제로 채우고 망치·정으로 다듬으면 되네.",
+            "Notes": "마왕 미용 · 웹 전용"
+          },
+          {
+            "DialogueID": 1000043,
+            "GroupID": 90026,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "얼굴 쪽에 낸 구멍은 작은 동안 메울 수 있네. 선을 넘으면 그 즉시 야차일세.",
+            "Notes": "마왕 미용 · 웹 전용"
+          },
+          {
+            "DialogueID": 1000044,
+            "GroupID": 90026,
+            "Order": 3,
+            "Speaker": "몬스터",
+            "Text": "상단·옆면 외형은 원래 투구 크기의 삼 할까지 늘려도 좋네.",
+            "Notes": "마왕 미용 · 웹 전용"
+          },
+          {
+            "DialogueID": 1000045,
             "GroupID": 90027,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "우선 이 모습부터 맡겨보지.",
+            "Text": "기스가 남아 보이지 않게 덮어주게.",
+            "Notes": "마왕 미용 · 웹 전용"
+          },
+          {
+            "DialogueID": 1000046,
+            "GroupID": 90027,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "짙은 바탕은 일곱 할 이상 남기고, 나머지 색과 무늬는 맡기지.",
+            "Notes": "마왕 미용 · 웹 전용"
+          },
+          {
+            "DialogueID": 1000047,
+            "GroupID": 90027,
+            "Order": 3,
+            "Speaker": "몬스터",
+            "Text": "눈이 보이는 틈은 가리지 말게. 앞을 볼 수는 있어야지.",
+            "Notes": "마왕 미용 · 웹 전용"
+          },
+          {
+            "DialogueID": 1000048,
+            "GroupID": 90028,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "기스가 남아 보이지 않게 덮어주게.",
+            "Notes": "마왕 미용 · 웹 전용"
+          },
+          {
+            "DialogueID": 1000049,
+            "GroupID": 90028,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "짙은 바탕은 일곱 할 이상 남기고, 나머지 색과 무늬는 맡기지.",
+            "Notes": "마왕 미용 · 웹 전용"
+          },
+          {
+            "DialogueID": 1000050,
+            "GroupID": 90028,
+            "Order": 3,
+            "Speaker": "몬스터",
+            "Text": "눈이 보이는 틈은 가리지 말게. 앞을 볼 수는 있어야지.",
+            "Notes": "마왕 미용 · 웹 전용"
+          },
+          {
+            "DialogueID": 1000051,
+            "GroupID": 90029,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "작은 장식은 두 개까지 허락하겠네. 안 붙여도 좋고.",
+            "Notes": "마왕 미용 · 웹 전용"
+          },
+          {
+            "DialogueID": 1000052,
+            "GroupID": 90029,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "눈이 보이는 틈을 가리거나, 투구보다 장식이 커서는 곤란하네.",
+            "Notes": "마왕 미용 · 웹 전용"
+          },
+          {
+            "DialogueID": 1000053,
+            "GroupID": 90030,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "작은 장식은 두 개까지 허락하겠네. 안 붙여도 좋고.",
+            "Notes": "마왕 미용 · 웹 전용"
+          },
+          {
+            "DialogueID": 1000054,
+            "GroupID": 90030,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "눈이 보이는 틈을 가리거나, 투구보다 장식이 커서는 곤란하네.",
             "Notes": "마왕 미용 · 웹 전용"
           }
         ]
@@ -6436,7 +6540,7 @@
           },
           {
             "GroupID": 90026,
-            "Name": "마왕 · draw",
+            "Name": "마왕 · cut 상세",
             "PlaybackMode": "순서대로",
             "PauseCombat": true,
             "AdvanceMode": "입력",
@@ -6449,7 +6553,46 @@
           },
           {
             "GroupID": 90027,
+            "Name": "마왕 · draw",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "마왕 미용 · 웹 전용",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 90028,
+            "Name": "마왕 · draw 상세",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "마왕 미용 · 웹 전용",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 90029,
             "Name": "마왕 · attach",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "마왕 미용 · 웹 전용",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 90030,
+            "Name": "마왕 · attach 상세",
             "PlaybackMode": "순서대로",
             "PauseCombat": true,
             "AdvanceMode": "입력",
@@ -7218,19 +7361,19 @@
             "MonsterID": 10007,
             "Stage": "cut",
             "RequestGroupID": 90025,
-            "DetailGroupID": 90025
-          },
-          {
-            "MonsterID": 10007,
-            "Stage": "draw",
-            "RequestGroupID": 90026,
             "DetailGroupID": 90026
           },
           {
             "MonsterID": 10007,
-            "Stage": "attach",
+            "Stage": "draw",
             "RequestGroupID": 90027,
-            "DetailGroupID": 90027
+            "DetailGroupID": 90028
+          },
+          {
+            "MonsterID": 10007,
+            "Stage": "attach",
+            "RequestGroupID": 90029,
+            "DetailGroupID": 90030
           }
         ]
       }
@@ -8197,11 +8340,38 @@
       "bindings": {
         "arrival": 90024
       },
-      "note": "기존 본편의 4일차 손님. 야차 미연결. 2페이즈 성공 후 3페이즈 자유 미용.",
+      "note": "4일차 마왕. 투구 복원과 미형 미용의 두 페이즈. 미용 성공은 미형 셀카, 고블린은 야차에서만 공개. 야차 전투 미연결.",
       "demonRequest": {
-        "cut": "뿔과 전투의 흔적을 말끔히 복원해 주게. 다만… 내 얼굴을 보려 하지는 말게.",
-        "draw": "투구에 남은 기스도 깨끗이 복원해 주게.",
-        "attach": "우선 이 모습부터 맡겨보지."
+        "cut": [
+          "전장의 흔적은 지워주게. 위엄까지 지우지는 말고.",
+          "부러진 뿔을 반대쪽과 균형 있게 복원하게. 상단과 옆면의 장식은 그대의 안목을 보겠네.",
+          "단, 투구 안을 들여다볼 생각은 버리게."
+        ],
+        "draw": [
+          "기스가 남아 보이지 않게 덮어주게.",
+          "짙은 바탕은 일곱 할 이상 남기고, 나머지 색과 무늬는 맡기지.",
+          "눈이 보이는 틈은 가리지 말게. 앞을 볼 수는 있어야지."
+        ],
+        "attach": [
+          "작은 장식은 두 개까지 허락하겠네. 안 붙여도 좋고.",
+          "눈이 보이는 틈을 가리거나, 투구보다 장식이 커서는 곤란하네."
+        ]
+      },
+      "demonRequestDetails": {
+        "cut": [
+          "반대쪽 뿔을 보고 높이와 굵기를 맞추게. 발모제로 채우고 망치·정으로 다듬으면 되네.",
+          "얼굴 쪽에 낸 구멍은 작은 동안 메울 수 있네. 선을 넘으면 그 즉시 야차일세.",
+          "상단·옆면 외형은 원래 투구 크기의 삼 할까지 늘려도 좋네."
+        ],
+        "draw": [
+          "기스가 남아 보이지 않게 덮어주게.",
+          "짙은 바탕은 일곱 할 이상 남기고, 나머지 색과 무늬는 맡기지.",
+          "눈이 보이는 틈은 가리지 말게. 앞을 볼 수는 있어야지."
+        ],
+        "attach": [
+          "작은 장식은 두 개까지 허락하겠네. 안 붙여도 좋고.",
+          "눈이 보이는 틈을 가리거나, 투구보다 장식이 커서는 곤란하네."
+        ]
       },
       "beauty": {
         "enabled": true,
@@ -8220,14 +8390,14 @@
         "growth": {
           "enabled": true,
           "material": "horn",
-          "color": "#4853F8",
-          "outline": "#242236",
+          "color": "#242236",
+          "outline": "#18151F",
           "allowFace": true,
           "region": {
-            "x": 0,
-            "y": 0,
-            "w": 320,
-            "h": 350
+            "x": 12,
+            "y": 6,
+            "w": 296,
+            "h": 310
           }
         },
         "drawColors": [
@@ -8239,7 +8409,7 @@
         "cutRegions": [
           {
             "key": "DemonShape",
-            "label": "투구를 깨끗이 복원",
+            "label": "양쪽 뿔의 높이·굵기 균형 복원",
             "x": 0,
             "y": 0,
             "w": 320,
@@ -8253,23 +8423,23 @@
         "drawRegions": [],
         "attachRegions": [],
         "requestBriefNotes": {
-          "cut": "투구를 깨끗이 복원\n절대 얼굴을 보려하지 말 것",
-          "draw": "투구를 깨끗이 복원\n절대 얼굴을 보려하지 말 것",
-          "attach": "투구를 깨끗이 복원\n절대 얼굴을 보려하지 말 것"
+          "cut": "양쪽 뿔의 높이·굵기 균형 복원\n투구 본체 보존 · 얼굴을 뚫지 않기\n상단·옆면 꾸미기는 투구 크기의 30% 안에서",
+          "draw": "기스가 보이지 않게 덮기\n짙은 바탕 70% 이상 · 나머지 색은 자유\n눈 개구부의 인상 보존",
+          "attach": "작은 장식 최대 두 개 · 안 붙여도 좋음\n눈 개구부를 가리지 않기"
         },
         "requestNotes": {
-          "cut": "투구를 깨끗이 복원\n절대 얼굴을 보려하지 말 것",
-          "draw": "투구를 깨끗이 복원\n절대 얼굴을 보려하지 말 것",
-          "attach": "투구를 깨끗이 복원\n절대 얼굴을 보려하지 말 것"
-        },
-        "resultLines": {
-          "satisfied": "……제법이군. 이제 투구를 벗어도 되겠어.",
-          "angry": "……이게 무엇이냐.",
-          "neutral": "……"
-        },
-        "basePay": 0,
-        "tipRate": 0
-      }
+          "cut": "양쪽 뿔의 높이·굵기 균형 복원\n투구 본체 보존 · 얼굴을 뚫지 않기\n상단·옆면 꾸미기는 투구 크기의 30% 안에서",
+          "draw": "기스가 보이지 않게 덮기\n짙은 바탕 70% 이상 · 나머지 색은 자유\n눈 개구부의 인상 보존",
+          "attach": "작은 장식 최대 두 개 · 안 붙여도 좋음\n눈 개구부를 가리지 않기"
+        }
+      },
+      "resultLines": {
+        "satisfied": "……제법이군. 이제 투구를 벗어도 되겠어.",
+        "angry": "……이게 무엇이냐.",
+        "neutral": "……"
+      },
+      "basePay": 0,
+      "tipRate": 0
     }
   ],
   "schedule": [

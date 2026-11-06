@@ -105,3 +105,13 @@
 
 /* Result decorations never intercept the editable portrait. */
 .beautyResultHand{pointer-events:none}
+
+/* The king's long order stays inside the shared parchment. */
+.demonMemo.sculptStatus{top:140px;width:180px;max-height:290px;display:flex;flex-direction:column;padding:12px 11px 9px}
+.demonMemo[hidden]{display:none}
+.demonMemo .requestText{font-size:12px;line-height:1.45;margin:8px 0;overflow-y:auto;min-height:0;scrollbar-width:thin;scrollbar-color:#BC9A70 #F8EACD;padding-right:4px}
+.demonMemo .requestItem{margin:8px 0;gap:5px}
+.demonMemo .requestCaption{font-size:10px;flex-shrink:0}
+#demonAllOrders{margin:6px 0 0;align-self:flex-start;border:1px solid #B99C76;background:#F4E2BA;color:#664B32;border-radius:4px;font-size:10px;padding:4px 6px}
+.demonMemo #repeatBeautyRequest{flex-shrink:0;margin:0;align-self:flex-end}
+.demonGuideLegend{display:block;font-size:8px;line-height:1.5;margin-top:6px;flex-shrink:0;color:#8B6E4C}

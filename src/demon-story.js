@@ -13,6 +13,7 @@ function playDemonLines(lines,done){
  playGroup(p,story.guest,id,done);
 }
 function changeDemonPhase(phase){
+ if(phase!==1&&phase!==2)return;
  const active=story;el('salon').style.transition='opacity .35s';el('salon').style.opacity='0';
  setTimeout(()=>{
   if(story!==active)return;
@@ -29,15 +30,19 @@ function finishDemonBeauty(details,sudden=false){
   return;
  }
  if(phase===1){playDemonLines(['……제법이군. 이제 투구를 벗어도 되겠어.'],()=>changeDemonPhase(2));return;}
- if(phase===2){
-  story.demonSuccessLocked=true;
-  sendSalon('demon-applause');
-  playDemonLines(['……내가 요구한 것은 모두 해냈군.','하지만 그대에게 아직 보여주지 못한 모습이 있다.','그대의 솜씨는 충분히 보았다.','이제는…… 내 진짜 모습을 맡기고 싶군.'],()=>changeDemonPhase(3));return;
- }
- story.demonEnding={ending:'beauty',portrait:story.portrait,headPortrait:story.headPortrait};sendSalon('demon-finish',{portrait:story.portrait});
- playDemonLines(['훗. 이런 차림은 처음이군.',['마왕 부하','그럼 약속대로… 원래 세계로 돌려보내 드리겠습니다.'],['커피 유령','잠깐! 가기 전에 사진 한 장 찍어요!']],()=>{
-  sendSalon('demon-photo');
-  setTimeout(()=>playDemonLines([['마왕 부하','모두, 이쪽을 봐 주십시오.']],()=>{sendSalon('demon-shutter');setTimeout(()=>{modal('<h2>마왕 미용 성공</h2><p>그대의 솜씨, 잊지 않겠네.</p><div class="actions">'+btn('demonFinishHome','메인으로',true)+'</div>');el('demonFinishHome').onclick=homeNow;},800);}),350);
+ if(phase!==2)return;
+ story.demonSuccessLocked=true;
+ const active=story;story.demonEnding={ending:'beauty',form:'handsome',portrait:story.portrait,headPortrait:story.headPortrait};
+ sendSalon('demon-applause');
+ playDemonLines(['……내가 요구한 것은 모두 해냈군.','분노와 관용. 그리고 왕의 품격까지. 훗… 마음에 드는군.',['플레이어','그럼 기념사진 한 장만 같이 찍어주세요.'],'좋다. 백성들에게도 보여주도록 하지.'],()=>{
+  if(story!==active)return;sendSalon('demon-finish',{portrait:story.portrait});
+  playDemonLines([['플레이어','조금만 더 이쪽으로요. 왕관도 나오게!'],'이 거리에선 위엄이 다 담기지 않을 텐데.',['플레이어','그럼 조금 웃어주세요.']],()=>{
+   if(story!==active)return;sendSalon('demon-photo');
+   setTimeout(()=>{if(story!==active)return;playDemonLines(['……이 정도면 되겠나?'],()=>{
+    if(story!==active)return;sendSalon('demon-shutter');
+    setTimeout(()=>{if(story!==active)return;updateStoryHud('미용 성공 · 기념 셀카');el('storyHint').hidden=true;modal('<h2>마왕 미용 성공</h2><p>“그대의 솜씨, 왕의 이름으로 인정하지.”</p><p>완성한 모습 그대로, 마왕과 기념사진을 남겼습니다.</p><div class="actions">'+btn('demonViewPhoto','셀카 보기',true)+btn('demonFinishHome','메인으로')+'</div>');el('demonFinishHome').onclick=homeNow;el('demonViewPhoto').onclick=()=>{closeModal();sendSalon('demon-view-photo');};},1100);
+   });},650);
+  });
  });
 }
 function demonGameOver(){
