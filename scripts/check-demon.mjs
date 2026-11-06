@@ -61,7 +61,7 @@ try{
  if(name==='chromium')screenshots.push(['goblin',await page.locator('#stage').screenshot({type:'jpeg',quality:72})]);
  await page.locator('#finish').click();await page.locator('#portal').waitFor();await page.locator('#portal').click();await page.getByRole('heading',{name:'돌아온 일상에, 새 알림 하나.'}).waitFor();
  // A real mouse stroke across an eye region reaches the threshold and starts phase-one battle.
- await preview(page,1);await page.locator('[data-tool="hammer"]').click();await page.locator('#size').fill('20');
+ await preview(page,1);await page.locator('[data-tool="hammer"]').click();await page.locator('#size').evaluate(e=>{e.value='20';e.dispatchEvent(new Event('input',{bubbles:true}));});
  const box=await page.locator('#portrait').boundingBox();await page.mouse.move(box.x+box.width*.43,box.y+box.height*.56);await page.mouse.down();await page.mouse.move(box.x+box.width*.61,box.y+box.height*.56,{steps:8});await page.mouse.up();
  await page.waitForFunction(()=>window.demonLab.mode==='cutscene');
  await page.evaluate(()=>{let n=0;while(window.demonLab.mode==='cutscene'&&n++<10)window.demonLab.advance();});

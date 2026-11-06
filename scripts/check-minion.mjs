@@ -219,7 +219,7 @@ async function stroke(page, salon, from, to = from) {
   const coords = ([x, y]) => [box.x + x / 320 * box.width, box.y + y / 350 * box.height];
   await page.mouse.move(...coords(from));
   await page.mouse.down();
-  await page.mouse.move(...coords(to));
+  await page.mouse.move(...coords(to), {steps:Math.max(1,Math.ceil(Math.hypot(to[0]-from[0],to[1]-from[1])/6))});
   await page.mouse.up();
 }
 
@@ -257,7 +257,9 @@ async function checkSculpt(page, salon, engine) {
   await stroke(page, salon, [20, 174], point(leftRoot));
   assert.deepEqual((await snapshot(salon)).material, initial.material, 'a stroke starting in air cannot grow, even if dragged onto a horn');
   for (const region of initial.guest.beauty.cutRegions.filter(r => r.mask === 'eyes')) {
-    const eye = eyes.findIndex((v,n) => v && inBeautyRegion(...point(n), region));
+    // Aim inside the eye zone: the live angry-camera motion can move its border by a pixel in WebKit.
+    const eyeZone=eyes.map((v,n)=>Number(v&&inBeautyRegion(...point(n),region)));
+    const eye = nearest(eyeZone,[region.x+region.w/2,region.y+region.h/2]);
     assert(eye >= 0, `${region.key} has an actual source eye mask`);
     const root = nearest(roots, point(eye));
     await salon.locator('[data-tool="grow"]').click();

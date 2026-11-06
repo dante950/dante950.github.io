@@ -14,6 +14,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
+      demon_only: ${{ steps.scope.outputs.demon_only }}
       dialogue_only: ${{ steps.scope.outputs.dialogue_only }}
       walk_only: ${{ steps.scope.outputs.walk_only }}
       font_only: ${{ steps.scope.outputs.font_only }}
@@ -31,6 +32,7 @@ jobs:
           EVENT: ${{ github.event_name }}
           BEFORE: ${{ github.event.before }}
         run: |
+          demon_only=false
           dialogue_only=false
           walk_only=false
           font_only=false
@@ -39,6 +41,7 @@ jobs:
           reaction_only=false
           returning_only=false
           if [ "$EVENT" = push ] && git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            demon_only=true
             dialogue_only=true
             walk_only=true
             font_only=true
@@ -47,6 +50,10 @@ jobs:
             reaction_only=true
             returning_only=true
             while IFS= read -r file; do
+              case "$file" in
+                src/demon/*|public/demon-assets.json|public/media/demon/*|scripts/check-demon.mjs|scripts/check-minion.mjs|tests/demon.test.mjs|docs/demon-day-four.md|.github/workflows/pages.yml) ;;
+                *) demon_only=false ;;
+              esac
               case "$file" in
                 data/project.json|src/salon-beauty.js|scripts/build.mjs|scripts/check-reaction-effects.mjs|tests/coffee-dialogue.test.mjs|docs/returning-zombie-043/coffee-and-reaction-fix/*|.github/workflows/pages.yml) ;;
                 *) reaction_only=false ;;
@@ -77,6 +84,7 @@ jobs:
               esac
             done < <(git diff --name-only "$BEFORE" HEAD)
           fi
+          echo "demon_only=$demon_only" >> "$GITHUB_OUTPUT"
           echo "dialogue_only=$dialogue_only" >> "$GITHUB_OUTPUT"
           echo "walk_only=$walk_only" >> "$GITHUB_OUTPUT"
           echo "font_only=$font_only" >> "$GITHUB_OUTPUT"
@@ -104,7 +112,7 @@ jobs:
           path: dist
   browser-checks:
     needs: build
-    if: needs.build.outputs.dialogue_only != 'true' && needs.build.outputs.walk_only != 'true' && needs.build.outputs.font_only != 'true' && needs.build.outputs.intro_only != 'true' && needs.build.outputs.result_only != 'true' && needs.build.outputs.returning_only != 'true'
+    if: needs.build.outputs.demon_only != 'true' && needs.build.outputs.dialogue_only != 'true' && needs.build.outputs.walk_only != 'true' && needs.build.outputs.font_only != 'true' && needs.build.outputs.intro_only != 'true' && needs.build.outputs.result_only != 'true' && needs.build.outputs.returning_only != 'true'
     name: Check ${{ matrix.suite }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -122,8 +130,6 @@ jobs:
             script: scripts/check-minion.mjs
           - suite: closing
             script: scripts/check-closing.mjs
-          - suite: demon visit
-            script: scripts/check-demon.mjs
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
@@ -195,9 +201,24 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run build
       - run: node scripts/check-ingame-font.mjs
+  demon-browser:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium webkit
+      - run: npm run build
+      - run: node scripts/check-demon.mjs
+      - run: YACHA_MINION_ENGINE=webkit node scripts/check-minion.mjs
+      - run: node scripts/check-browsers.mjs
   deploy:
-    if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.build.result == 'success' && (needs.dialogue-browser.result == 'success' || needs.dialogue-browser.result == 'skipped') && (needs.browser-checks.result == 'success' || needs.browser-checks.result == 'skipped') && (needs.returning-browser.result == 'success' || needs.returning-browser.result == 'skipped') && (needs.font-browser.result == 'success' || needs.font-browser.result == 'skipped') && (needs.walk-browser.result == 'success' || needs.walk-browser.result == 'skipped')
-    needs: [build, browser-checks, dialogue-browser, returning-browser, font-browser, walk-browser]
+    if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.build.result == 'success' && needs.demon-browser.result == 'success' && (needs.dialogue-browser.result == 'success' || needs.dialogue-browser.result == 'skipped') && (needs.browser-checks.result == 'success' || needs.browser-checks.result == 'skipped') && (needs.returning-browser.result == 'success' || needs.returning-browser.result == 'skipped') && (needs.font-browser.result == 'success' || needs.font-browser.result == 'skipped') && (needs.walk-browser.result == 'success' || needs.walk-browser.result == 'skipped')
+    needs: [build, browser-checks, dialogue-browser, returning-browser, font-browser, walk-browser, demon-browser]
     runs-on: ubuntu-latest
     permissions:
       pages: write

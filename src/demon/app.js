@@ -232,6 +232,7 @@ function showMemories(photo,route){
 }
 function goHome(){if(storyToken)hostMessage('home');else location.href='./';}
 function showLobby(){speech=null;visibility('dialogue',false);successLocked=false;setMode('lobby');$('hint').textContent='문을 열면 약속한 손님이 찾아옵니다.';}
+$('homeLink').onclick=e=>{e.preventDefault();goHome();};
 $('open').onclick=startVisit;$('stars').onchange=e=>earnedStars=+e.target.value;$('next').onclick=advance;
 $('skip').onclick=()=>{const ending=afterBeats;afterBeats=null;speech=null;visibility('dialogue',false);visibility('skip',false);ending?.();};
 $('interact').onclick=()=>{if(!$('interact').disabled)beginBeauty(1);};$('size').oninput=e=>radius=+e.target.value;
