@@ -51,7 +51,7 @@ for(const [name,engine]of (process.argv.includes('--chromium')?[['chromium',chro
   await f.locator('#paintOpacity').fill('100');await f.locator('#paintOpacity').dispatchEvent('input');await f.locator('[data-color="#18151F"]').click();
   await report(f,'paint');await snap('royal-paint');assert.equal((await f.evaluate(()=>demonBeautyStatus())).checks[1],true);
   const protestBefore=await f.evaluate(()=>demonLastProtest);
-  await f.locator('[data-color="#A439F4"]').click();await size(f,24);await stroke(f,[140,182]);
+  await f.locator('[data-color="#A439F4"]').click();await size(f,12);await stroke(f,[140,182]);
   const freestyle=await report(f,'free-face-paint');assert(freestyle.metrics.facePaintCore>Math.max(6,Math.floor(freestyle.metrics.visibleFace*.02)),'paint exceeds the retired cleanliness allowance');assert.equal(freestyle.checks[1],true,'cheek decorations are allowed');
   assert.equal(await f.evaluate(()=>demonLastProtest),protestBefore,'free face colour does not trigger a protest');
   await snap('free-face-paint');
