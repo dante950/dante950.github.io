@@ -46,7 +46,7 @@ export function demonJudge(phase,m={}){
  cut:[m.hornRatio>=.78&&m.hornRatio<=1.25&&m.hornHeight<=10&&m.hornWidth<=14,m.bodyLoss<=.04&&m.exposure===0,m.growthRatio<=.30],
  draw:[m.scratches>=.90,m.darkBase>=.70,m.eyePaint<=DEMON_HELMET_EYE_PAINT_LIMIT],attach:[m.decorCount<=2&&m.decorArea<=.18,m.decorEyes<=.05]
  }:{cut:[m.leftEar>=.90,m.rightTip>=.35&&m.rightTip<=.85&&m.rightEar>=.90,m.lengthOver<=6,m.eyes>=.94],
- draw:[m.black>=.97,m.silverLine&&m.silverSpill<=Math.max(6,(m.silverTotal||0)*.25),m.browLeft>=.70&&m.browRight>=.70,m.lips,m.eyelidLeft&&m.eyelidRight],attach:m.adornments||[false,false]};
+ draw:[m.black>=.95,m.silverLine&&m.silverSpill<=Math.max(6,(m.silverTotal||0)*.25),m.browLeft>=.70&&m.browRight>=.70,m.lips,m.eyelidLeft&&m.eyelidRight],attach:m.adornments||[false,false]};
  const checks=['cut','draw','attach'].map(stage=>requirements[stage].every(Boolean));return {success:checks.every(Boolean),sudden:phase===1&&m.exposure>=DEMON_FACE_LIMIT,checks,requirements};
 }
 // Judge the visible skyline, not occupancy of a hidden target polygon.
