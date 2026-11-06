@@ -77,6 +77,37 @@ try{
  await page.waitForFunction(()=>window.demonLab.mode==='cutscene');
  await page.evaluate(()=>{let n=0;while(window.demonLab.mode==='cutscene'&&n++<10)window.demonLab.advance();});
  assert.equal(await page.evaluate(()=>window.demonLab.battle.phase),1);
+
+ // A defeat offers both retries. Beauty retry returns to the visit, not a later phase.
+ const lose=async()=>{await page.evaluate(()=>{const b=window.demonLab.battle;b.hp=18;b.zone=0;b.pointer={x:10,y:480};b.attackAt=performance.now()-1;});await page.locator('#retryBattle').waitFor();};
+ await lose();await page.locator('#retryBattle').click();
+ assert.equal(await page.evaluate(()=>window.demonLab.battle.phase),1);
+ assert.equal(await page.evaluate(()=>window.demonLab.battle.hp),100);
+ await lose();await page.locator('#retryBeauty').click();
+ await page.waitForFunction(()=>window.demonLab.mode==='cutscene');
+ assert.equal(await page.evaluate(()=>window.demonLab.beat.scene),'calendar');
+ await page.locator('#skip').click();await page.waitForFunction(()=>window.demonLab.mode==='room');
+ // Phase-two failure still allows the full trial battle and its distinct ending.
+ await preview(page,2);await page.locator('#finish').click();
+ await page.waitForFunction(()=>window.demonLab.mode==='cutscene');
+ await page.evaluate(()=>{for(let n=0;n<10&&window.demonLab.mode==='cutscene';n++)window.demonLab.advance();});
+ assert.equal(await page.evaluate(()=>window.demonLab.battle.phase),1);
+ const arena=await page.locator('#scene').boundingBox();
+ const point=(x,y)=>({x:arena.x+x/960*arena.width,y:arena.y+y/540*arena.height});
+ for(let phase=1;phase<=3;phase++){
+  // Only extend the attack deadline: charge and scratching use actual pointer input.
+  await page.evaluate(()=>window.demonLab.battle.attackAt=performance.now()+60000);
+  const middle=point(480,280);
+  for(let n=0;n<9;n++){await page.mouse.click(middle.x,middle.y);await page.waitForTimeout(115);}
+  assert.ok(await page.evaluate(()=>window.demonLab.battle.window>0));
+  await page.mouse.move(middle.x,middle.y);await page.mouse.down();
+  for(let n=0;n<18;n++){const p=point(n%2?550:400,280);await page.mouse.move(p.x,p.y);}
+  await page.mouse.up();
+  if(phase<3)assert.equal(await page.evaluate(()=>window.demonLab.battle.phase),phase+1);
+ }
+ await page.getByRole('heading',{name:'이것이 나의 진짜 모습이다.'}).waitFor();
+ await page.locator('#portal').click();
+ await page.getByRole('heading',{name:'돌아온 일상에, 새 알림 하나.'}).waitFor();
  // Full-width and narrow layouts retain all controls in the viewport.
  await page.setViewportSize({width:700,height:900});await preview(page,3);
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);

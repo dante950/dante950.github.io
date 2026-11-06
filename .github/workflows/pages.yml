@@ -32,6 +32,7 @@ jobs:
           EVENT: ${{ github.event_name }}
           BEFORE: ${{ github.event.before }}
         run: |
+          demon_changed=false
           demon_only=false
           dialogue_only=false
           walk_only=false
@@ -50,8 +51,9 @@ jobs:
             reaction_only=true
             returning_only=true
             while IFS= read -r file; do
+              case "$file" in src/demon/*|public/demon-assets.json|public/media/demon/*|scripts/check-demon*.mjs|tests/demon.test.mjs|docs/demon-day-four.md|docs/demon-recovery-2026-11-06/*) demon_changed=true ;; esac
               case "$file" in
-                src/demon/*|public/demon-assets.json|public/media/demon/*|scripts/check-demon.mjs|scripts/check-minion.mjs|tests/demon.test.mjs|docs/demon-day-four.md|.github/workflows/pages.yml) ;;
+                src/app.js|src/demon/*|public/demon-assets.json|public/media/demon/*|scripts/check-demon*.mjs|tests/demon.test.mjs|docs/demon-day-four.md|docs/demon-recovery-2026-11-06/*|.github/workflows/pages.yml) ;;
                 *) demon_only=false ;;
               esac
               case "$file" in
@@ -84,6 +86,7 @@ jobs:
               esac
             done < <(git diff --name-only "$BEFORE" HEAD)
           fi
+          if [ "$demon_changed" != true ]; then demon_only=false; fi
           echo "demon_only=$demon_only" >> "$GITHUB_OUTPUT"
           echo "dialogue_only=$dialogue_only" >> "$GITHUB_OUTPUT"
           echo "walk_only=$walk_only" >> "$GITHUB_OUTPUT"
@@ -105,8 +108,11 @@ jobs:
       - name: Check returning guest and shared beauty flow
         if: steps.scope.outputs.returning_only == 'true'
         run: node --test tests/coffee-dialogue.test.mjs tests/beauty-reaction-dialogue.test.mjs tests/returning-zombie.test.mjs tests/story-start.test.mjs tests/story-progress.test.mjs tests/beauty-shape.test.mjs tests/salon-dialogue.test.mjs tests/workshop-dialogue.test.mjs tests/closing.test.mjs tests/social.test.mjs tests/coffee-beauty.test.mjs
+      - name: Check day-four beauty, star gates and story handoff rules
+        if: steps.scope.outputs.demon_only == 'true'
+        run: node --test tests/demon.test.mjs tests/battle-result.test.mjs tests/story-progress.test.mjs tests/story-start.test.mjs tests/closing.test.mjs
       - run: npm test
-        if: steps.scope.outputs.walk_only != 'true' && steps.scope.outputs.font_only != 'true' && steps.scope.outputs.intro_only != 'true' && steps.scope.outputs.result_only != 'true' && steps.scope.outputs.returning_only != 'true'
+        if: steps.scope.outputs.demon_only != 'true' && steps.scope.outputs.walk_only != 'true' && steps.scope.outputs.font_only != 'true' && steps.scope.outputs.intro_only != 'true' && steps.scope.outputs.result_only != 'true' && steps.scope.outputs.returning_only != 'true'
       - uses: actions/upload-pages-artifact@v4
         with:
           path: dist
@@ -214,8 +220,7 @@ jobs:
       - run: npx playwright install --with-deps chromium webkit
       - run: npm run build
       - run: node scripts/check-demon.mjs
-      - run: YACHA_MINION_ENGINE=webkit node scripts/check-minion.mjs
-      - run: node scripts/check-browsers.mjs
+      - run: node scripts/check-demon-integration.mjs
   deploy:
     if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.build.result == 'success' && needs.demon-browser.result == 'success' && (needs.dialogue-browser.result == 'success' || needs.dialogue-browser.result == 'skipped') && (needs.browser-checks.result == 'success' || needs.browser-checks.result == 'skipped') && (needs.returning-browser.result == 'success' || needs.returning-browser.result == 'skipped') && (needs.font-browser.result == 'success' || needs.font-browser.result == 'skipped') && (needs.walk-browser.result == 'success' || needs.walk-browser.result == 'skipped')
     needs: [build, browser-checks, dialogue-browser, returning-browser, font-browser, walk-browser, demon-browser]

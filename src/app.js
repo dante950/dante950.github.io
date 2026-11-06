@@ -289,13 +289,13 @@ let demonToken='';
 function startDemonVisit(){
  stopChildren();closeModal();talk=null;el('talkLayer').hidden=true;el('phoneButton').hidden=true;story.guest=null;updateStoryHud('마왕 방문');el('storyGuest').textContent='마왕';
  const frame=document.createElement('iframe');frame.id='demonVisit';frame.title='4일차 마왕 방문과 미용';demonToken=token();frame.src='./demon.html?story='+encodeURIComponent(demonToken);
- frame.style.cssText='position:fixed;inset:0;width:100%;height:100%;border:0;z-index:180;background:#100d17';el('storyScreen').append(frame);
+ frame.style.cssText='position:fixed;inset:0;width:100%;height:100%;border:0;z-index:180;background:#100d17;pointer-events:auto';document.body.append(frame);
 }
 addEventListener('message',e=>{
  const f=document.getElementById('demonVisit'),m=e.data;
  if(!story||!f||e.source!==f.contentWindow||e.origin!==location.origin||m?.source!=='yachacha-demon'||m.token!==demonToken)return;
  if(m.type==='ready')f.contentWindow.postMessage({source:'yachacha-story',type:'init',token:demonToken,stars:story.stars||0,records:copy(story.records)},location.origin);
  if(m.type==='home')homeNow();
- if(m.type==='restart'){f.remove();chooseStoryStart(false);}
+ if(m.type==='restart'){homeNow();chooseStoryStart(false);}
  if(m.type==='ending')story.demonEnding={ending:m.ending,portrait:m.portrait||null};
 });
