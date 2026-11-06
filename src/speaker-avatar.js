@@ -4,7 +4,8 @@ export function speakerAvatarSource(speaker,guest={},assets={}){
  if(speaker==='플레이어'||speaker==='야차')return './media/4b01d6d010aabf733b346047.png';
  if(speaker==='마왕 부하')return assets.minion?.portrait||assets.minion?.full||'./media/minion-guide.png';
  if(speaker==='커피 유령')return guest.skin?.portrait||'./media/coffee-ghost/head-base.png';
- if(speaker==='마왕')return './media/intro/intro-1.png';
+ if(speaker==='마왕'||guest.demon&&speaker==='몬스터')return guest.skin?.portrait||'./media/demon/king.png';
+ if(guest.demon)return guest.skin?.portrait||guest.skin?.head||'';
  if(guest.id===10004)return assets.minion?.portrait||guest.skin?.portrait||guest.skin?.full||'./media/minion-guide.png';
  if(guest.id===10003)return assets.sansHeadCropped||guest.skin?.head||assets.sans||'';
  if(guest.id===10002)return assets.drunkFull||guest.skin?.full||'';

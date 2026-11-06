@@ -35,16 +35,17 @@ const schema=await read('data/schema.json'),assets=await read('src/combat/assets
 const zip=await read('vendor/jszip.min.js'),license=await read('vendor/JSZip-LICENSE.txt');
 combat=combat.replace('<link rel="stylesheet" href="style.css">',()=>`<style>${css}</style>`)
  .replace('<script type="module" src="app.js"></script>',()=>`<script id="host-data" type="application/json">__HOST_JSON__</script><script id="embedded-workbook" type="application/octet-stream">${wb}</script><script id="embedded-authoring" type="application/octet-stream">${au}</script><script id="embedded-schema" type="application/json">${safe(schema)}</script><script id="embedded-assets" type="application/json">${safe(assets)}</script><script>${safe(zip)}</script><script type="module">${safe(combatScript)}</script><script type="text/plain">${safe(license)}</script>`);
-const parentBundle=await bundle('src/',['text-effects.js','combat/dialogue.js','combat/engine.js','beauty-reaction-dialogue.js','salon-dialogue.js','tutorial/narrative.js','tutorial/dialogues.js','model.js','returning-zombie.js','star-progress.js','story-progress.js','battle-result.js','workshop-dialogue.js','project-archive.js','publishing.js','owner-access.js','speaker-avatar.js','media.js','audio.js','story-intro.js','tutorial/closing.js','app.js']);
+const parentBundle=await bundle('src/',['text-effects.js','combat/dialogue.js','combat/engine.js','beauty-reaction-dialogue.js','salon-dialogue.js','tutorial/narrative.js','tutorial/dialogues.js','model.js','demon-guest.js','demon-story.js','returning-zombie.js','star-progress.js','story-progress.js','battle-result.js','workshop-dialogue.js','project-archive.js','publishing.js','owner-access.js','speaker-avatar.js','media.js','audio.js','story-intro.js','tutorial/closing.js','app.js']);
 const reactionStyle=await read('src/beauty-reaction.css');
 const styleURL=await emit('style','css',speechStyle+'\n'+reactionStyle+'\n'+await read('src/style.css')+'\n'+await read('src/battle-result.css'));
+const demonBeautyRuntime=await read('src/salon-demon.js'),demonVisitRuntime=await read('src/salon-demon-visit.js');
 const beautyResultRuntime=await read('src/salon-beauty-result.js'),beautyTutorialRuntime=await read('src/salon-tutorial.js');
-const beautyRules=await bundle('src/',['text-effects.js','beauty-rules.js','returning-zombie.js','coffee-beauty.js','beauty-shape.js','beauty-lesson-targets.js','beauty-action-feedback.js']),beautyRuntime=(await read('src/salon-beauty.js')).replace('/*__BEAUTY_RESULT__*/',()=>beautyResultRuntime).replace('/*__BEAUTY_TUTORIAL__*/',()=>beautyTutorialRuntime);
+const beautyRules=await bundle('src/',['text-effects.js','demon-guest.js','beauty-rules.js','returning-zombie.js','coffee-beauty.js','beauty-shape.js','beauty-lesson-targets.js','beauty-action-feedback.js']),beautyRuntime=(await read('src/salon-beauty.js')).replace('/*__DEMON_BEAUTY__*/',()=>demonBeautyRuntime).replace('/*__BEAUTY_RESULT__*/',()=>beautyResultRuntime).replace('/*__BEAUTY_TUTORIAL__*/',()=>beautyTutorialRuntime);
 const salonStyle=await read('src/salon-beauty.css')+'\n'+reactionStyle+'\n'+await read('src/ingame-font.css');
 const inputs={
  'flow-assets':[await emit('assets','json',await read('data/assets.json')),'json'],
  'flow-default':[await emit('project','json',JSON.stringify(project)),'json'],
- 'flow-salon':[await emit('salon','html',(await read('src/salon.html')).replace('</style>',()=>salonStyle+'</style>').replace('/*__BEAUTY_RUNTIME__*/',()=>code(beautyRules)+'\n'+beautyRuntime)),'text'],
+ 'flow-salon':[await emit('salon','html',(await read('src/salon.html')).replace('</style>',()=>salonStyle+'</style>').replace('/*__BEAUTY_RUNTIME__*/',()=>code(beautyRules)+'\n'+beautyRuntime).replace('/*__DEMON_VISIT__*/',()=>demonVisitRuntime)),'text'],
  'flow-combat':[await emit('combat','html',combat),'text']
 };
 const starProgressURL=await emit('star-progress','js',await read('src/star-progress.js'));
@@ -71,11 +72,6 @@ await fs.writeFile(path.join(dist,'tutorial-variants.html'),variantsHTML);
 const resultJS=await emit('battle-result','js',await read('src/battle-result.js'));
 const resultCSS=await emit('battle-result-style','css',speechStyle+'\n'+await read('src/battle-result.css'));
 await fs.writeFile(path.join(dist,'battle-results.html'),(await read('src/battle-results-preview.html')).replace('__RESULT_CSS__',resultCSS).replace('__RESULT_JS__',resultJS));
-// Day-four encounter has independent rendering and retains the main story's rewards.
-const demonModelURL=await emit('demon-model','js',await read('src/demon/model.js'));
-const demonAppURL=await emit('demon','js',(await read('src/demon/app.js')).replace("from './model.js'",`from '${demonModelURL}'`));
-const demonStyleURL=await emit('demon-style','css',await read('src/demon/style.css'));
-await fs.writeFile(path.join(dist,'demon.html'),(await read('src/demon/index.html')).replace('href="demon.css"',`href="${demonStyleURL}"`).replace('src="demon.js"',`src="${demonAppURL}"`));
 const releaseId=hash(JSON.stringify(files));
 const boot=`const inputs=${JSON.stringify(inputs)};
 try {

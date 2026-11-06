@@ -1,6 +1,7 @@
 // Beauty only. The room, guest order, and combat bridge live in salon.html.
 const B=GUEST.beauty,W=160,H=175,PIX=2;
 const coffeeTutorial=GUEST.coffeeTutorial===true;
+const isDemon=GUEST.demon===true;
 const isReturningZombie=GUEST.returningZombie===true;
 function returningStatus(){return returningBeautyStatus(original,current,B,{cut:cutScore,draw:drawScore,attach:attachScore},placements);}
 const coffeeActions={cut:false,grow:false,draw:false,attach:false,guide:false,returned:false};
@@ -79,7 +80,7 @@ const faceFeatures=bone?GUEST.skin.features:null,featureLayers={eyes:{},mouth:{}
 const portraitImages=new Map(),portraitLoads=[];
 if(layered){
  const add=asset=>{if(!asset?.src||portraitImages.has(asset.src))return;const img=new Image();img.src=asset.src;portraitImages.set(asset.src,img);portraitLoads.push(img.decode().then(()=>{if(coffeeTutorial&&asset.whiteKey)portraitImages.set(asset.src,coffeeTransparentHair(img));}));};
- for(const key of ['head','material','target','body',...(coffeeTutorial?['hands']:[])])add(portraitLayers[key]);
+ for(const key of ['head','material','target','body','ears','stones',...(coffeeTutorial?['hands']:[])])add(portraitLayers[key]);
  for(const key of ['eyes','mouth'])for(const asset of Object.values(portraitLayers[key]||{}))add(asset);
 }
 function drawPortraitLayer(context,asset){
@@ -117,7 +118,7 @@ finish.style.display='none';next.disabled=true;
 next.addEventListener('click',()=>{const stages=beautyStageOrder(B),n=stages.indexOf(beautyPhase);if(n===stages.length-1)startBeautyResult();else setBeautyPhase(stages[n+1]);});
 finish.addEventListener('click',startBeautyResult);
 const shapeTools=document.getElementById('shapeTools');
-for(const [key,name] of [[hammer?'hammer':'scissors',hammer?'망치·정':'가위'],['grow',B.growth?.material==='horn'?'발모제 · 뿔 기르기':bone?'발모제 · 뼈 잇기':'발모제 · 머리 늘리기']]){
+for(const [key,name] of (B.shapeTools?B.shapeTools.map(key=>[key,({scissors:'가위',hammer:'망치·정',grow:'발모제 · 머리 늘리기'})[key]]):[[hammer?'hammer':'scissors',hammer?'망치·정':'가위'],['grow',B.growth?.material==='horn'?'발모제 · 뿔 기르기':bone?'발모제 · 뼈 잇기':'발모제 · 머리 늘리기']])){
  if(key==='grow'&&B.growth?.enabled===false)continue;
  const button=document.createElement('button');button.className='sculptTool';button.dataset.tool=key;button.textContent=name;
  button.onclick=()=>{cancelGesture();activeTool=key;refreshTools();coffeeAction('tool',{tool:key});};shapeTools.append(button);
@@ -198,7 +199,8 @@ async function prepareBeauty(){
   }else sculptAnchors.set(masks.hornKeep);
   masks.roots=sculptAnchors;
   for(let n=0;n<W*H;n++)originalBorder[n]=original[n]&&emptyNeighbor(original,n)?1:0;
-  ready=true;next.disabled=briefing;updateBeautyScore();refreshTools();renderPortrait();coffeeAction('progress',{initial:true});return;
+  if(isDemon)prepareDemonBeauty();
+   ready=true;next.disabled=briefing;updateBeautyScore();refreshTools();renderPortrait();coffeeAction('progress',{initial:true});return;
  }
  if(faceFeatures){
   const base=boneBase.getContext('2d');base.imageSmoothingEnabled=false;base.drawImage(faceImage,0,0,29,31);
@@ -241,7 +243,7 @@ async function prepareBeauty(){
  ready=true;next.disabled=briefing;updateBeautyScore();refreshTools();renderPortrait();
 }
 // Paint follows visible hair/bone or the zombie's separate face; empty space stays clipped.
-function canPaintAt(n){return !!(current[n]||!bone&&masks.face[n]||!B.designVersion);}
+function canPaintAt(n){return !!(isDemon&&demonStones[n*4+3]||current[n]||!bone&&masks.face[n]||!B.designVersion);}
 function syncUndo(){const button=document.getElementById('undoBeauty');button.hidden=beautyPhase==='cut';button.disabled=briefing||!history[beautyPhase]?.length;}
 function pushUndo(){
  if(beautyPhase==='cut')return false;
@@ -255,7 +257,7 @@ function undoBeauty(){
 }
 function point(e){const r=portrait.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*320,y:(e.clientY-r.top)/r.height*350};}
 function applyStroke(points,kind){
- const cells=strokeCells(W,H,points,brushRadius);let changed=false;
+ const cells=strokeCells(W,H,points,brushRadius);if(isDemon){applyDemonStroke(cells,kind);return;}let changed=false;
  let connected=null;
  if(kind==='grow'&&B.growth?.connected){
   if(!gesture?.growthAllowed)return;
@@ -295,7 +297,7 @@ portrait.addEventListener('pointerdown',e=>{
   else if(selectedSticker)placeSticker(selectedSticker,p.x,p.y);
   return;
  }
- const undoAdded=pushUndo();gesture={undoAdded,pointerId:e.pointerId,from:p,to:p,last:p,kind:activeTool,snapshot:current.slice(),paint:paint.slice(),touched:{...touched}};
+ const undoAdded=pushUndo();gesture={undoAdded,pointerId:e.pointerId,from:p,to:p,last:p,kind:activeTool,snapshot:current.slice(),paint:paint.slice(),stones:isDemon?demonStones.slice():null,touched:{...touched}};
  if(activeTool==='grow'&&B.growth?.connected){const x=Math.floor(p.x/PIX),y=Math.floor(p.y/PIX);gesture.growthAllowed=x>=0&&x<W&&y>=0&&y<H&&!!rootedBeautyMaterial(current,sculptAnchors,W,H)[y*W+x];}
  portrait.setPointerCapture(e.pointerId);
  if(activeTool!=='scissors'){applyStroke([p],activeTool);updateBeautyScore(true);}
@@ -320,6 +322,7 @@ portrait.addEventListener('pointerup',e=>{
  if(coffeeTutorial){const changed=current.some((v,i)=>v!==g.snapshot[i])||paint.some((v,i)=>v!==g.paint[i]);if(changed){if(['scissors','hammer'].includes(g.kind))coffeeActions.cut=true;if(g.kind==='grow')coffeeActions.grow=true;if(g.kind==='paint')coffeeActions.draw=true;}coffeeAction('stroke',{tool:g.kind,changed});}
 });
 function removeCutFragments(before){
+ if(isDemon)return;
  const rooted=B.growth?.connected?rootedBeautyMaterial(current,sculptAnchors,W,H):null;
  const removed=rooted?Array.from(current,(_,n)=>n).filter(n=>current[n]&&!rooted[n]):detachedByBeautyCut(before,current,W,H,sculptAnchors).filter(n=>!masks.protectedFace[n]);if(!removed.length)return;
  renderPortrait(false);
@@ -333,7 +336,7 @@ function animateFalling(t){
  renderPortrait();fallingFrame=fallingPieces.length?requestAnimationFrame(animateFalling):0;
 }
 function cancelGesture(){
- if(!gesture)return;const g=gesture;gesture=null;current.set(g.snapshot);paint.set(g.paint);touched=g.touched;if(g.undoAdded)history[beautyPhase].pop();
+ if(!gesture)return;const g=gesture;gesture=null;current.set(g.snapshot);paint.set(g.paint);if(isDemon&&g.stones)demonStones.set(g.stones);touched=g.touched;if(g.undoAdded)history[beautyPhase].pop();
  if(portrait.hasPointerCapture(g.pointerId))portrait.releasePointerCapture(g.pointerId);
  syncUndo();updateBeautyScore();renderPortrait();
 }
@@ -343,7 +346,7 @@ addEventListener('keydown',e=>{if(!beautyActive)return;if(e.key==='Escape')cance
 function placeSticker(sticker,x,y){
  if(!ready||finishing||briefing||beautyPhase!=='attach'||placements.length>=10)return;
  resetActionMood();pushUndo();const region=B.attachRegions.find(r=>inBeautyRegion(x,y,r))?.key||'Other';
- placements.push({sticker,region,x,y});touched.attach=true;updateBeautyScore(true);renderPortrait();beautyLessonSticker();
+ placements.push({sticker,region,x,y});if(isDemon)demonProtest('sticker');touched.attach=true;updateBeautyScore(true);renderPortrait();beautyLessonSticker();
  if(isReturningZombie&&B.attachRegions.find(r=>r.key===region)?.stickerIDs.includes(sticker.id))queueReturningReaction((GUEST.returnBranch||'employed')+region);
  if(coffeeTutorial){coffeeActions.attach=true;coffeeAction('sticker',{sticker:sticker.id,x,y,requirement:region});}
 }
@@ -373,6 +376,7 @@ function endStickerDrag(e){
 addEventListener('blur',cancelStickerDrag);
 function updateBeautyScore(action=false){
  if(!ready)return;
+ if(isDemon){updateDemonScore(action);return;}
  const beforeScore=totalSatisfaction,beforeFailure=!!shapeProgress.hardFailure;
  const shape=scoreShape(current,original,B,W,H,masks);shapeProgress=shape;cutScore=shape.score;
  attachScore=beautyAttachScore(placements,B);
@@ -468,9 +472,11 @@ function renderPortrait(includeGuides=true,target=ctx,includeCape=true){
  const facePaint=facePaintCanvas.getContext('2d'),tint=facePaint.createImageData(W,H);
  for(let n=0;n<W*H;n++)if(coffeeTutorial||masks.protectedFace[n]||!bone&&!current[n]&&masks.face[n]){const i=n*4;tint.data.set(paint.subarray(i,i+4),i);}
  facePaint.putImageData(tint,0,0);target.drawImage(facePaintCanvas,0,0);
+ if(isDemon)drawDemonStones(target);
  for(const p of placements){const image=stickerImages.get(p.sticker.id),scale=B.stickerScale??1;if(image?.complete&&image.naturalWidth)target.drawImage(image,p.x/2-p.sticker.w*.375*scale,p.y/2-p.sticker.h*.375*scale,p.sticker.w*.75*scale,p.sticker.h*.75*scale);}
  if(coffeeTutorial)drawPortraitLayer(target,portraitLayers.hands);
- if(includeGuides&&zonesVisible){
+ if(includeGuides&&zonesVisible&&isDemon)drawDemonGuides(target);
+ if(includeGuides&&zonesVisible&&!isDemon){
   target.save();target.lineWidth=.8;target.font='5px Galmuri9';
   const allRegions=beautyPhase==='cut'?B.cutRegions:beautyPhase==='attach'?B.attachRegions:B.drawRegions;
   const regions=allRegions;
@@ -516,8 +522,9 @@ function renderRequestStatus(){
  if(!BEAUTY_STAGES.includes(beautyPhase))return;
  const notes=heardDetails[beautyPhase]?B.requestNotes:B.requestBriefNotes;
  const text=notes?.[beautyPhase]||B.requestNotes?.[beautyPhase]||({cut:bone?'얼굴 테두리 다듬기':'눈이 보이게 · 앞머리 손질',draw:B.weights.draw?'부탁한 색과 무늬로':'색·무늬는 자유롭게',attach:'손님에게 어울리는 장식'}[beautyPhase]);
- const checks=beautyRequirementChecks(B,beautyPhase,shapeProgress,{cut:cutScore,draw:drawScore,attach:attachScore},placements.length);
- const lines=beautyPhase==='cut'&&(!bone||heardDetails.cut)?text.split('\n').filter(Boolean):[text];
+ const demonCheck=isDemon?demonBeautyStatus():null;
+ const checks=demonCheck?(demonPhase===1?[demonCheck.checks[0]&&demonCheck.checks[1],demonCheck.checks[2]]:demonPhase===3?[true]:demonCheck.checks):beautyRequirementChecks(B,beautyPhase,shapeProgress,{cut:cutScore,draw:drawScore,attach:attachScore},placements.length);
+ const lines=(isDemon||beautyPhase==='cut')&&(!bone||heardDetails.cut)?text.split('\n').filter(Boolean):[text];
  const markup=lines.map((label,i)=>{
   const met=checks.length===lines.length?checks[i]:checks.every(Boolean),optional=beautyPhase==='draw'&&!B.weights.draw;
   return '<div class="requestItem'+(optional?' optional':met?' complete':'')+'"><span class="requestCheck" aria-label="'+(optional?'선택 사항':met?'달성':'진행 중')+'">'+(optional?'◇':met?'✓':'○')+'</span><span class="requestLabel">'+safeText(label)+'</span></div>';
@@ -573,6 +580,7 @@ function enterBeauty(){
  requestAnimationFrame(()=>beautyScreen.classList.add('active'));
  setBeautyPhase(beautyStageOrder(B)[0]);
 }
+/*__DEMON_BEAUTY__*/
 /*__BEAUTY_TUTORIAL__*/
 /*__BEAUTY_RESULT__*/
 if(coffeeTutorial){

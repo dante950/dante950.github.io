@@ -16,7 +16,7 @@ async function choice(){for(let n=0;n<60;n++){if(await p.locator('#returningChoi
 async function stroke(f,a,b=a){const r=await f.locator('.sculptCanvas').boundingBox();await p.mouse.move(r.x+a[0]/320*r.width,r.y+a[1]/350*r.height);await p.mouse.down();await p.mouse.move(r.x+b[0]/320*r.width,r.y+b[1]/350*r.height,{steps:8});await p.mouse.up();}
 async function stage(f,name){await f.locator('[data-phase="'+name+'"]').click();await p.waitForTimeout(100);await talks();await f.waitForFunction(()=>!briefing);await p.waitForTimeout(850);}
 try{
- await begin();assert.equal(await p.locator('.startGuest').count(),5);await p.screenshot({path:path.join(out,'start-menu.png')});
+ await begin();assert.equal(await p.locator('.startGuest').count(),6);await p.screenshot({path:path.join(out,'start-menu.png')});
  await p.locator('[data-start-intro]').click();await p.waitForURL(u=>u.pathname.endsWith('/tutorial.html')&&u.searchParams.get('intro')==='3'&&u.searchParams.get('start')==='1');
  for(const id of [10001,10003,10004]){await begin();await p.locator('[data-start-guest="'+id+'"]').click();assert.equal(await p.evaluate(()=>fullflow.story.guest),id);assert(await p.locator('#modal').isHidden());}
  for(const branch of (process.argv.includes('--lottery-failure-only')?['lottery']:['employed','lottery']))for(const success of (process.argv.includes('--lottery-failure-only')?[false]:[true,false])){console.log('case',branch,success);

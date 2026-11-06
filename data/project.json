@@ -4208,6 +4208,54 @@
             "Speaker": "커피 유령",
             "Text": "<wave=2.5>부하님,<wait=0.25> 같이 가요!<wait=0.35> 눈이 셋이라 길도 세 번 잘 보인다니까요!</wave>",
             "Notes": "커피 유령 튜토리얼"
+          },
+          {
+            "DialogueID": 1000036,
+            "GroupID": 90024,
+            "Order": 1,
+            "Speaker": "마왕 부하",
+            "Text": "약속드린 날짜가 되어 마왕님을 모셔왔습니다.",
+            "Notes": "마왕 미용 · 웹 전용"
+          },
+          {
+            "DialogueID": 1000037,
+            "GroupID": 90024,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "호오.. 단기간에 미용 실력을 증명했다던 자가 자네인가?",
+            "Notes": "마왕 미용 · 웹 전용"
+          },
+          {
+            "DialogueID": 1000038,
+            "GroupID": 90024,
+            "Order": 3,
+            "Speaker": "몬스터",
+            "Text": "그럼.. 우선 이 모습부터 맡겨보지",
+            "Notes": "마왕 미용 · 웹 전용"
+          },
+          {
+            "DialogueID": 1000039,
+            "GroupID": 90025,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "뿔과 전투의 흔적을 말끔히 복원해 주게. 다만… 내 얼굴을 보려 하지는 말게.",
+            "Notes": "마왕 미용 · 웹 전용"
+          },
+          {
+            "DialogueID": 1000040,
+            "GroupID": 90026,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "투구에 남은 기스도 깨끗이 복원해 주게.",
+            "Notes": "마왕 미용 · 웹 전용"
+          },
+          {
+            "DialogueID": 1000041,
+            "GroupID": 90027,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "우선 이 모습부터 맡겨보지.",
+            "Notes": "마왕 미용 · 웹 전용"
           }
         ]
       },
@@ -6359,6 +6407,58 @@
             "ActorEffect": "없음",
             "FinishEffect": "없음",
             "Notes": "튜토리얼 전용 · 프로젝트 JSON 보관"
+          },
+          {
+            "GroupID": 90024,
+            "Name": "마왕 · 등장",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "마왕 미용 · 웹 전용",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 90025,
+            "Name": "마왕 · cut",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "마왕 미용 · 웹 전용",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 90026,
+            "Name": "마왕 · draw",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "마왕 미용 · 웹 전용",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 90027,
+            "Name": "마왕 · attach",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "마왕 미용 · 웹 전용",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
           }
         ]
       },
@@ -7113,6 +7213,24 @@
             "Stage": "attach",
             "RequestGroupID": 80108,
             "DetailGroupID": 80109
+          },
+          {
+            "MonsterID": 10007,
+            "Stage": "cut",
+            "RequestGroupID": 90025,
+            "DetailGroupID": 90025
+          },
+          {
+            "MonsterID": 10007,
+            "Stage": "draw",
+            "RequestGroupID": 90026,
+            "DetailGroupID": 90026
+          },
+          {
+            "MonsterID": 10007,
+            "Stage": "attach",
+            "RequestGroupID": 90027,
+            "DetailGroupID": 90027
           }
         ]
       }
@@ -8068,6 +8186,90 @@
         "drawColors": []
       },
       "note": "인트로·튜토리얼 전용 대사. 본편 영업 일정에는 포함하지 않습니다."
+    },
+    {
+      "id": 10007,
+      "name": "마왕",
+      "demon": true,
+      "demonPhase": 1,
+      "workbookExcluded": true,
+      "battle": "none",
+      "bindings": {
+        "arrival": 90024
+      },
+      "note": "기존 본편의 4일차 손님. 야차 미연결. 2페이즈 성공 후 3페이즈 자유 미용.",
+      "demonRequest": {
+        "cut": "뿔과 전투의 흔적을 말끔히 복원해 주게. 다만… 내 얼굴을 보려 하지는 말게.",
+        "draw": "투구에 남은 기스도 깨끗이 복원해 주게.",
+        "attach": "우선 이 모습부터 맡겨보지."
+      },
+      "beauty": {
+        "enabled": true,
+        "designVersion": 2,
+        "steps": {
+          "cut": true,
+          "draw": true,
+          "attach": true
+        },
+        "weights": {
+          "cut": 60,
+          "draw": 30,
+          "attach": 10
+        },
+        "cutTool": "hammer",
+        "growth": {
+          "enabled": true,
+          "material": "horn",
+          "color": "#4853F8",
+          "outline": "#242236",
+          "allowFace": true,
+          "region": {
+            "x": 0,
+            "y": 0,
+            "w": 320,
+            "h": 350
+          }
+        },
+        "drawColors": [
+          "#242236",
+          "#18151F",
+          "#4853F8",
+          "#ECEBF4"
+        ],
+        "cutRegions": [
+          {
+            "key": "DemonShape",
+            "label": "투구를 깨끗이 복원",
+            "x": 0,
+            "y": 0,
+            "w": 320,
+            "h": 350,
+            "kind": "keep",
+            "rule": "free",
+            "points": 60,
+            "tolerance": 0
+          }
+        ],
+        "drawRegions": [],
+        "attachRegions": [],
+        "requestBriefNotes": {
+          "cut": "투구를 깨끗이 복원\n절대 얼굴을 보려하지 말 것",
+          "draw": "투구를 깨끗이 복원\n절대 얼굴을 보려하지 말 것",
+          "attach": "투구를 깨끗이 복원\n절대 얼굴을 보려하지 말 것"
+        },
+        "requestNotes": {
+          "cut": "투구를 깨끗이 복원\n절대 얼굴을 보려하지 말 것",
+          "draw": "투구를 깨끗이 복원\n절대 얼굴을 보려하지 말 것",
+          "attach": "투구를 깨끗이 복원\n절대 얼굴을 보려하지 말 것"
+        },
+        "resultLines": {
+          "satisfied": "……제법이군. 이제 투구를 벗어도 되겠어.",
+          "angry": "……이게 무엇이냐.",
+          "neutral": "……"
+        },
+        "basePay": 0,
+        "tipRate": 0
+      }
     }
   ],
   "schedule": [
@@ -8080,6 +8282,9 @@
     ],
     [
       10006
+    ],
+    [
+      10007
     ]
   ],
   "storyIntro": [

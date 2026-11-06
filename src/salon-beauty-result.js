@@ -38,13 +38,13 @@ function revealBeautyResult(){
 function advanceBeautyResult(){
  if(!beautyResultActive)return;clearTimeout(resultRevealTimer);clearTimeout(resultEndTimer);revealBeautyResult();
  beautyResultActive=false;resultContinue.hidden=true;beautyScreen.classList.add('resultSettled');
- send('beauty-result',{score:totalSatisfaction,mood:resultMood,portrait:captureBeautyCustomer(),headPortrait:captureBeautyHead(),details:isReturningZombie?returningStatus():null});
+ send('beauty-result',{score:totalSatisfaction,mood:resultMood,portrait:captureBeautyCustomer(),headPortrait:captureBeautyHead(),details:isDemon?demonBeautyStatus():isReturningZombie?returningStatus():null});
 }
 function startBeautyResult(){
  if(isReturningZombie)clearReturningReactions();
  if(!ready||finishing||briefing||!beautyLessonDone)return;cancelGesture();updateBeautyScore();finishing=true;beautyPhase='result';beautyResultActive=true;
  clearTimeout(actionMoodTimer);requestAnimationSerial++;
- resultMood=isReturningZombie?returningStatus().mood:beautyResultMood(B,shapeProgress,totalSatisfaction);
+ resultMood=isDemon?(demonBeautyStatus().success?'satisfied':'angry'):isReturningZombie?returningStatus().mood:beautyResultMood(B,shapeProgress,totalSatisfaction);
  eyeReaction.hidden=true;clearTimeout(reactionTimer);clearInterval(reactionTick);reactionOpen=false;
  expression='neutral';talking=false;mouthFrame=false;zonesVisible=false;fallingPieces=[];renderPortrait(false);
  next.disabled=true;finish.disabled=true;state.keys.clear();

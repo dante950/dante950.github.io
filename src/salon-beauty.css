@@ -102,3 +102,6 @@
 .beautyLiveEffects span{position:absolute;font:30px/1 sans-serif;text-shadow:2px 2px #85516b;animation:liveFlowerBurst .65s ease-out var(--delay) both}
 @keyframes liveFlowerBurst{from{opacity:0;transform:translate(-50%,-50%) scale(.25)}25%{opacity:1}to{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--turn)) scale(1.1)}}
 @media(prefers-reduced-motion:reduce){.beautyResultCamera.live-displeased{animation:none}.beautyLiveEffects span{animation-name:liveFlowerFade;translate:var(--dx) var(--dy)}@keyframes liveFlowerFade{from,to{opacity:0}40%{opacity:1}}}
+
+/* Result decorations never intercept the editable portrait. */
+.beautyResultHand{pointer-events:none}

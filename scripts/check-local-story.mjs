@@ -66,7 +66,7 @@ async function closeDay(day,total){
 try{
  await page.goto('http://127.0.0.1:4173/');await page.locator('#siteLoading').waitFor({state:'detached'});
  await page.locator('#soundToggle').click();await page.locator('#play').click();
- assert.deepEqual(await page.locator('[data-start-guest]').evaluateAll(nodes=>nodes.map(n=>+n.dataset.startGuest)),[10001,10003,10004]);
+ assert.deepEqual(await page.locator('[data-start-guest]').evaluateAll(nodes=>nodes.map(n=>+n.dataset.startGuest)),[10001,10003,10004,10006,10007]);
  await page.locator('[data-start-guest="10001"]').click();
  await page.locator('#introSkip').click();
  for(const [id,total] of [[10001,1500],[10003,3000]]){
