@@ -69,3 +69,16 @@ test('published phase-two dialogue matches the current requests and details',()=
   assert.deepEqual(actual,list.map(v=>Array.isArray(v)?v[1]:v));
  }
 });
+
+test('eyebrow masks exclude pale skin and remain separate from lowered eyelid creases',()=>{
+ const base=new Uint8ClampedArray(W*H*4);for(let n=0;n<W*H;n++)base.set([215,215,225,255],n*4);
+ // Original white brow bodies; nearby pale skin must not become a dye target.
+ for(let y=71;y<=73;y++)for(const [a,b]of [[61,77],[90,106]])for(let x=a;x<=b;x++)base.set([240,240,246,255],(y*W+x)*4);
+ const masks=demonMakeupMasks(base,W,H),paint=new Uint8ClampedArray(base.length),hair=new Uint8Array(W*H);
+ for(let n=0;n<W*H;n++){
+  assert(!((masks.brow[n]||masks.browRight[n])&&(masks.eyelidLeft[n]||masks.eyelidRight[n])));
+  if(masks.brow[n]||masks.browRight[n]){assert(Math.min(...base.slice(n*4,n*4+3))>=225);paint.set([24,21,31,255],n*4);}
+  if(masks.eyelidLeft[n]||masks.eyelidRight[n])assert(Math.floor(n/W)*2+1>=151);
+ }
+ const m=demonMakeup(hair,paint,masks,W,H);assert.equal(m.browLeft,1);assert.equal(m.browRight,1);assert.equal(m.eyelidLeft,false);assert.equal(m.eyelidRight,false);
+});

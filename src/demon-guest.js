@@ -15,8 +15,8 @@ export const DEMON_DESIGN={
  forelock:{x:171,y:104,w:12,h:40},silver:{x:174,y:128,w:4,h:16},
  silverZone:{x:50,y:12,w:220,h:142},
  eyes:[{x:112,y:150,w:44,h:18},{x:183,y:150,w:44,h:18}],
- brows:[{x:116,y:136,w:42,h:9},{x:174,y:136,w:42,h:9}],
- eyelids:[[[120,147],[145,147],[155,151]],[[175,151],[185,147],[211,147]]],
+ brows:[{x:118,y:140,w:42,h:10},{x:176,y:140,w:42,h:10}],
+ eyelids:[[[120,151],[145,151],[155,155]],[[175,155],[185,151],[211,151]]],
  lips:{x:151,y:192,w:30,h:8},
  crown:{x:126,y:4,w:80,h:58},earLeft:{x:88,y:157,w:44,h:45},earRight:{x:212,y:157,w:44,h:45}
 };
@@ -87,7 +87,7 @@ export function demonMakeupMasks(base,width,height){
  const result=Object.fromEntries(['brow','browRight','eyelidLeft','eyelidRight','lips'].map(k=>[k,new Uint8Array(width*height)]));
  const distance=(x,y,a,b)=>{const dx=b[0]-a[0],dy=b[1]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy)));return Math.hypot(x-a[0]-dx*t,y-a[1]-dy*t);};
  for(let n=0;n<width*height;n++){const i=n*4,x=(n%width+.5)*2,y=(Math.floor(n/width)+.5)*2;if(base[i+3]<=100)continue;
-  DEMON_DESIGN.brows.forEach((box,k)=>{result[k?'browRight':'brow'][n]=+(demonInside(x,y,box)&&Math.min(base[i],base[i+1],base[i+2])>=205);});
+  DEMON_DESIGN.brows.forEach((box,k)=>{result[k?'browRight':'brow'][n]=+(demonInside(x,y,box)&&Math.min(base[i],base[i+1],base[i+2])>=225);});
   DEMON_DESIGN.eyelids.forEach((line,k)=>{result[k?'eyelidRight':'eyelidLeft'][n]=+(line.slice(1).some((b,j)=>distance(x,y,line[j],b)<=1.8));});
   result.lips[n]=+demonInside(x,y,DEMON_DESIGN.lips);
  }

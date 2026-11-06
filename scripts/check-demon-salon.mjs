@@ -36,8 +36,16 @@ for(const [name,engine]of (process.argv.includes('--chromium')?[['chromium',chro
   await report(f,'shape');await snap('royal-shape');assert.equal((await f.evaluate(()=>demonBeautyStatus())).checks[0],true);
   await stage(f,'draw');await f.locator('[data-color="#18151F"]').click();await mask(f,'current[n]',4);await mask(f,'current[n]&&paint[n*4+3]<242',2);
   await f.locator('[data-color="#ECEBF4"]').click();await size(f,2);await stroke(f,[160,70],[160,100]);
-  await f.locator('[data-color="#18151F"]').click();await mask(f,'demonMasks.brow[n]||demonMasks.browRight[n]',1);
-  await mask(f,'demonMasks.eyelidLeft[n]||demonMasks.eyelidRight[n]',1);
+  await f.locator('[data-color="#18151F"]').click();
+  // Draw the visible original brows, independently of the grading mask.
+  await size(f,3);await stroke(f,[121,145],[157,145]);await stroke(f,[179,145],[215,145]);
+  const brows=await report(f,'original-brows-only');
+  assert(brows.metrics.browLeft>=.70&&brows.metrics.browRight>=.70,'ordinary brow-body dye passes');
+  assert(!brows.metrics.eyelidLeft&&!brows.metrics.eyelidRight,'brow dye does not count as eyelids');
+  assert(await f.evaluate(()=>!demonMasks.brow.some((v,n)=>(v||demonMasks.browRight[n])&&(demonMasks.eyelidLeft[n]||demonMasks.eyelidRight[n]))),'brow and crease masks are separate');
+  await snap('original-brows');
+  await size(f,1);await stroke(f,[121,151],[145,151]);await stroke(f,[145,151],[155,155]);
+  await stroke(f,[175,155],[185,151]);await stroke(f,[185,151],[211,151]);
   await f.locator('[data-color="#FF3024"]').click();await size(f,1);await f.locator('#paintOpacity').fill('20');await f.locator('#paintOpacity').dispatchEvent('input');await stroke(f,[157,195],[177,195]);
   const makeup=await report(f,'makeup');assert(makeup.metrics.lips,'thin 20% red lips');assert(makeup.metrics.eyelidLeft&&makeup.metrics.eyelidRight,'both thin eyelid creases');
   await f.locator('#paintOpacity').fill('100');await f.locator('#paintOpacity').dispatchEvent('input');await f.locator('[data-color="#18151F"]').click();
