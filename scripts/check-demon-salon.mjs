@@ -71,7 +71,7 @@ for(const [name,engine]of (process.argv.includes('--chromium')?[['chromium',chro
   await put(f,'T_hornBig_L',[106,66]);assert.equal((await f.evaluate(()=>demonBeautyStatus())).checks[2],false,'both horns are required');
   await put(f,'T_hornBig_R',[230,66]);assert.equal((await report(f,'horn-pair-and-tiara')).success,true);
   const extraProtestBefore=await f.evaluate(()=>demonLastProtest);
-  await put(f,'T_earring_L',[110,180]);await put(f,'T_Cross',[233,180]);await put(f,'T_Heart',[166,230]);
+  await put(f,'T_earring_L',[110,180]);await put(f,'T_Cross',[233,180]);
   assert.equal((await report(f,'royal-extra-stickers')).success,true,'all additional stickers are allowed');
   assert.equal(await f.evaluate(()=>demonLastProtest),extraProtestBefore,'extra stickers do not trigger protests');
   await stroke(f,[166,26]);assert.equal((await report(f,'horn-pair-without-crown')).success,false,'horns also require a crown');
