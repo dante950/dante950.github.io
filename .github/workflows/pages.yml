@@ -213,15 +213,17 @@ jobs:
       - run: node scripts/check-ingame-font.mjs
   demon-browser:
     needs: build
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      YACHACHA_BROWSER_CHANNEL: chrome
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
       - run: npm ci --ignore-scripts --no-audit --no-fund
-      - run: npx playwright install --with-deps chromium
+      - run: google-chrome --version
       - run: npm run build
       - run: node scripts/check-demon-salon.mjs --chromium
       - run: node scripts/check-demon-salon-regression.mjs --chromium

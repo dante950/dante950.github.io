@@ -13,7 +13,7 @@ await new Promise(r=>server.listen(0,'127.0.0.1',r));const base='http://127.0.0.
 const lineFor=(p,id,event)=>p.combat.sheets.find(s=>s.name==='대사').rows.find(l=>l.GroupID===p.guests.find(g=>g.id===id).bindings[event]).Text;
 async function openWorkshop(page){await page.goto(base);await page.waitForFunction(()=>window.fullflow);await page.locator('#developer').click();if(await page.locator('#updateOK').isVisible())await page.locator('#updateOK').click();await page.locator('#ownerLogin').click();await page.locator('#workshopPassword').fill('archive-fixture');await page.locator('#passwordSubmit').click();await page.locator('#passwordDialog').waitFor({state:'hidden'});}
 try{for(const [name,type] of Object.entries(process.argv.includes('--chromium')?{chromium}:{chromium,webkit})){
- const browser=await type.launch();try{
+ const browser=await type.launch({channel:name==='chromium'?process.env.YACHACHA_BROWSER_CHANNEL:undefined});try{
  const page=await browser.newPage({viewport:{width:1440,height:900},acceptDownloads:true}),errors=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(25000);await openWorkshop(page);
  await page.locator('[data-editor="dialogue"]:visible').first().click();
  for(const [id,event,text] of [[10005,'arrival','<wave=2>커피 유령 수정 보관</wave>'],[10006,'employedArrival','<color=#FFD166>재등장 좀비 수정 보관</color>']]){await page.locator('#dialogueGuest').selectOption(String(id));await page.locator('#dialogueEvent').selectOption(event);await page.locator('[data-line-text]').first().fill(text);}

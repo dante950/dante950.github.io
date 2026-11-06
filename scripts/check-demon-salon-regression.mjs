@@ -5,7 +5,7 @@ const server=http.createServer(async(req,res)=>{try{const f=path.resolve(root,'.
 // Limit regression to the shared room/beauty entry and failed demon branches.
 // cancelPhase invokes the real navigation cleanup during an in-flight fade.
 for(const [name,engine]of (process.argv.includes('--chromium')?[['chromium',chromium]]:process.argv.includes('--webkit')?[['webkit',webkit]]:[['chromium',chromium],['webkit',webkit]])){
- const browser=await engine.launch(),p=await browser.newPage({viewport:{width:1440,height:900}}),errors=[];p.on('pageerror',e=>errors.push(e.message));
+ const browser=await engine.launch({channel:name==='chromium'?process.env.YACHACHA_BROWSER_CHANNEL:undefined}),p=await browser.newPage({viewport:{width:1440,height:900}}),errors=[];p.on('pageerror',e=>errors.push(e.message));
  async function talks(){let idle=0;for(let i=0;i<150;i++){await p.waitForTimeout(100);if(await p.locator('#beautyChoices').isVisible()){idle=0;await p.locator('#beautyAccept').click();await p.locator('#beautyChoices').waitFor({state:'hidden'});}else if(await p.locator('#talkLayer').isVisible()){idle=0;await p.locator('#talkNext').focus();await p.keyboard.press('f');}else if(++idle>=5)return;}throw Error('Dialogue stalled');}
  async function frame(){const f=await p.locator('#salon').elementHandle().then(h=>h.contentFrame());await f.waitForFunction(()=>window.beautyDebug?.ready);return f;}
  async function begin(id){await p.goto(base);await p.waitForFunction(()=>window.fullflow);await p.locator('#play').click();await p.locator('[data-start-guest="'+id+'"]').click();return frame();}
