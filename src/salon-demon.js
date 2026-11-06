@@ -80,7 +80,7 @@ function applyDemonStroke(cells,kind){
  }
  if(!changed)return;touched[beautyPhase]=true;
  if(demonPhase===1&&kind==='hammer'&&faceHit&&demonWarningCount<2&&!gesture?.demonWarned){if(gesture)gesture.demonWarned=true;showBeautyReaction(demonWarningCount++?DEMON_LINES.warningAgain:DEMON_LINES.warning,'angry');}
- if(kind==='paint'){const m=demonBeautyStatus().metrics;if(demonPhase===1&&m.eyePaint>.1)demonProtest('helmetEye');if(demonPhase===2){if(faceHit&&m.facePaintCore>demonFacePaintLimit(m.visibleFace))demonProtest('face');else{const c=rgb(paintColor);if(!((c[0]<=40&&c[1]<=40&&c[2]<=55)||(Math.min(...c)>=195&&Math.max(...c)-Math.min(...c)<=35)))demonProtest('color');}}}
+ if(kind==='paint'){const m=demonBeautyStatus().metrics;if(demonPhase===1&&m.eyePaint>DEMON_HELMET_EYE_PAINT_LIMIT)demonProtest('helmetEye');if(demonPhase===2){if(faceHit&&m.facePaintCore>demonFacePaintLimit(m.visibleFace))demonProtest('face');else{const c=rgb(paintColor);if(!((c[0]<=40&&c[1]<=40&&c[2]<=55)||(Math.min(...c)>=195&&Math.max(...c)-Math.min(...c)<=35)))demonProtest('color');}}}
 }
 function demonStickerReaction(){const r=demonBeautyStatus();if(demonPhase===1&&!r.checks[2])demonProtest('helmetSticker');if(demonPhase===2&&!r.requirements.attach[2])demonProtest('sticker');}
 function updateDemonScore(action){

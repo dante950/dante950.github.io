@@ -1,6 +1,8 @@
 // Demon beauty is a two-phase guest of the shared salon. Battle remains unconnected.
 export const DEMON_GUEST_ID=10007;
 export const DEMON_FACE_LIMIT=.35;
+// Preserve the eye opening while allowing the rim spill of a size-four restoration brush.
+export const DEMON_HELMET_EYE_PAINT_LIMIT=.15;
 export const demonFacePaintLimit=visible=>Math.max(6,Math.floor((visible||0)*.02));
 export function demonHornAllowance(mask,width,height,radius=2){
  const allowed=new Uint8Array(mask.length);
@@ -34,7 +36,7 @@ export function demonJudge(phase,m={}){
  if(phase!==1&&phase!==2)return {success:false,sudden:false,checks:[false,false,false],requirements:{cut:[],draw:[],attach:[]}};
  const requirements=phase===1?{
  cut:[m.hornRatio>=.78&&m.hornRatio<=1.25&&m.hornHeight<=10&&m.hornWidth<=14,m.bodyLoss<=.04&&m.exposure===0,m.growthRatio<=.30],
- draw:[m.scratches>=.90,m.darkBase>=.70,m.eyePaint<=.10],attach:[m.decorCount<=2&&m.decorArea<=.18,m.decorEyes<=.05]
+ draw:[m.scratches>=.90,m.darkBase>=.70,m.eyePaint<=DEMON_HELMET_EYE_PAINT_LIMIT],attach:[m.decorCount<=2&&m.decorArea<=.18,m.decorEyes<=.05]
  }:{cut:[m.leftEar>=.90,m.rightTip>=.35&&m.rightTip<=.85&&m.rightEar>=.90,m.leftSide>=.82&&m.leftOver<=.08,m.rightSide>=.82&&m.rightOver<=.08,m.roof>=.88&&m.roofOver<=.12,m.eyes>=.94&&m.forelock>=.80],
  draw:[m.black>=.97,m.silver>=.85&&m.silverSpill<=Math.max(8,(m.silverTotal||0)*.40),m.brow>=.80,m.rightBrowPaint<=.08&&m.facePaintCore<=demonFacePaintLimit(m.visibleFace)],attach:m.adornments||[false,false,false]};
  const checks=['cut','draw','attach'].map(stage=>requirements[stage].every(Boolean));return {success:checks.every(Boolean),sudden:phase===1&&m.exposure>=DEMON_FACE_LIMIT,checks,requirements};

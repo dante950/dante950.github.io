@@ -237,3 +237,24 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
+  demon-public:
+    needs: [build, deploy]
+    if: needs.build.outputs.demon_only == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Verify the published demon beauty flow
+        run: node scripts/check-demon-public-release.mjs
+      - name: Retain public gameplay captures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: demon-public-${{ github.sha }}
+          path: docs/demon-two-phase-2026-11-06/public-*

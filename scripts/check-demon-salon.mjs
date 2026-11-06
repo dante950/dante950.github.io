@@ -23,6 +23,7 @@ for(const [name,engine]of (process.argv.includes('--chromium')?[['chromium',chro
   let f=await begin();if(process.argv.includes('--phase2')&&!publicRun){await p.evaluate(()=>__demonFixture.phase(2));f=await waitPhase(2);}else{
    await enter(f,!process.argv.includes('--cinema'));await snap('helmet');await f.locator('[data-tool="grow"]').click();await mask(f,'demonMasks.horn[n]&&!current[n]',4);await stage(f,'draw');await f.locator('[data-color="#242236"]').click();await mask(f,'demonMasks.scratch[n]',4);
    assert.equal((await report(f,'helmet')).success,true);await stage(f,'cut');await f.locator('[data-tool="grow"]').click();await size(f,8);const edge=await f.evaluate(()=>{const y=65;let x=0;while(x<W&&!current[y*W+x])x++;return [x*2+1,y*2+1];});await stroke(f,edge,[edge[0]-10,edge[1]]);await stage(f,'draw');await f.locator('[data-color="#4853F8"]').click();await size(f,12);await stroke(f,[160,135]);await stage(f,'attach');await put(f,'T_tara',[160,130]);assert.equal((await report(f,'helmet-customized')).success,true);await snap('helmet-restored');await complete(f);f=await waitPhase(2);
+   if(process.argv.includes('--helmet-only')){assert.deepEqual(errors,[]);console.log(name,'helmet restoration, creative styling and phase transition passed');continue;}
   }
   await snap('royal-orders');assert.equal(await p.evaluate(()=>fullflow.story.successLocked),false);
   assert(await f.evaluate(()=>['earL','earR','tip','sideL','sideR','roof','silver','brow'].every(k=>demonMasks[k].some(Boolean))),'required masks must have actual resource pixels');
