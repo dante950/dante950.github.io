@@ -6,19 +6,21 @@ function prepareDemonBeauty(){
  const readLayer=asset=>{const c=offscreen(),x=c.getContext('2d');x.imageSmoothingEnabled=false;drawPortraitLayer(x,asset);return x.getImageData(0,0,W,H).data;};
  const target=readLayer(portraitLayers.target),base=readLayer(portraitLayers.head),ears=readLayer(portraitLayers.ears);
  demonTarget.set(target);if(portraitLayers.stones)demonStones.set(readLayer(portraitLayers.stones));
- demonMasks={horn:new Uint8Array(W*H),scratch:new Uint8Array(W*H),face:new Uint8Array(W*H),trim:new Uint8Array(W*H)};
+ demonMasks={horn:new Uint8Array(W*H),scratch:new Uint8Array(W*H),face:new Uint8Array(W*H),trim:new Uint8Array(W*H),ears:new Uint8Array(W*H)};
  for(let n=0;n<W*H;n++){
   const i=n*4,x=(n%W+.5)*PIX,y=(Math.floor(n/W)+.5)*PIX,r=sourcePixels[i],g=sourcePixels[i+1],b=sourcePixels[i+2];
   masks.protectedFace[n]=0;
   demonMasks.horn[n]=Number(demonPhase===1&&x>185&&y<117&&target[i+3]>100&&target[i+2]>110&&target[i]<125);
   demonMasks.scratch[n]=Number(demonPhase===1&&original[n]&&r>85&&r<205&&g>85&&b-r<55&&Math.abs(r-g)<40);
   demonMasks.face[n]=Number(base[i+3]>100&&(demonPhase!==1||y>=168&&y<258&&x>85&&x<232));
-  demonMasks.trim[n]=Number(demonPhase===2&&original[n]&&(y>224||ears[i+3]>100));
+  demonMasks.ears[n]=demonPhase===2&&ears[i+3]>100?(x<160?1:2):0;
+  demonMasks.trim[n]=Number(!!demonMasks.ears[n]);
  }
  demonMasks.hornAllowance=demonHornAllowance(demonMasks.horn,W,H);
 }
 function demonBeautyStatus(){
- let horn=0,ht=0,extra=0,scratch=0,st=0,body=0,loss=0,face=0,exposed=0,trim=0,tt=0,keep=0,kt=0,hair=0,black=0,facePaint=0;
+ let horn=0,ht=0,extra=0,scratch=0,st=0,body=0,loss=0,face=0,exposed=0,trim=0,tt=0,keep=0,kt=0,hair=0,black=0,facePaint=0,facePaintCore=0,visibleFace=0;
+ const earTotal=[0,0],earVisible=[0,0],hairFringe=demonPhase===2?demonHornAllowance(current,W,H):null;
  if(!demonMasks)return {success:false,checks:[false,false,false],metrics:{}};
  for(let n=0;n<W*H;n++){
   const i=n*4,exists=!!current[n],orig=!!original[n],p=paint[i+3]>0;
@@ -29,9 +31,11 @@ function demonBeautyStatus(){
   if(demonMasks.face[n]&&orig){face++;if(!exists)exposed++;}
   if(demonMasks.trim[n]){tt++;if(!exists)trim++;}else if(orig){kt++;if(exists)keep++;}
   if(exists){hair++;if(p&&paint[i+3]>=250&&paint[i]<=35&&paint[i+1]<=35&&paint[i+2]<=45)black++;}
-  if(demonMasks.face[n]&&!exists&&p)facePaint++;
+  if(demonMasks.ears[n]){const side=demonMasks.ears[n]-1;earTotal[side]++;if(!exists)earVisible[side]++;}
+  if(demonMasks.face[n]&&!exists){visibleFace++;if(p){facePaint++;if(!hairFringe?.[n])facePaintCore++;}}
  }
- const metrics={horn:ht?horn/ht:1,excess:extra/Math.max(1,ht),scratches:st?scratch/st:1,bodyLoss:loss/Math.max(1,body),exposure:exposed/Math.max(1,face),trim:tt?trim/tt:1,keep:keep/Math.max(1,kt),black:hair?black/hair:0,facePaint,stickers:placements.length};
+ const ears=earTotal.map((total,side)=>total?earVisible[side]/total:0);
+ const metrics={horn:ht?horn/ht:1,excess:extra/Math.max(1,ht),scratches:st?scratch/st:1,bodyLoss:loss/Math.max(1,body),exposure:exposed/Math.max(1,face),trim:demonPhase===2?Math.min(...ears):tt?trim/tt:1,ears,keep:keep/Math.max(1,kt),black:hair?black/hair:0,facePaint,facePaintCore,visibleFace,stickers:placements.length};
  return {...demonJudge(demonPhase,metrics),phase:demonPhase,metrics};
 }
 function demonProtest(kind){
@@ -58,7 +62,7 @@ function applyDemonStroke(cells,kind){
  if(!changed)return;
  touched[beautyPhase]=true;
  if(demonPhase===1&&kind==='hammer'&&faceHit&&demonWarningCount<2&&!gesture?.demonWarned){if(gesture)gesture.demonWarned=true;showBeautyReaction(demonWarningCount++?DEMON_LINES.warningAgain:DEMON_LINES.warning,'angry');}
- if(demonPhase===2&&kind==='paint'){if(faceHit)demonProtest('face');else{const c=rgb(paintColor);if(c[0]>35||c[1]>35||c[2]>45)demonProtest('color');}}
+ if(demonPhase===2&&kind==='paint'){const m=demonBeautyStatus().metrics;if(faceHit&&m.facePaintCore>demonFacePaintLimit(m.visibleFace))demonProtest('face');else{const c=rgb(paintColor);if(c[0]>35||c[1]>35||c[2]>45)demonProtest('color');}}
 }
 function updateDemonScore(action){
  const result=demonBeautyStatus(),m=result.metrics;
@@ -82,7 +86,7 @@ function drawDemonGuides(target){
  for(let n=0;n<W*H;n++){
   const i=n*4;let color=null;
   if(demonPhase===1){if(beautyPhase==='cut')color=demonMasks.face[n]?'#F0505055':current[n]&&!demonTarget[i+3]&&!demonMasks.hornAllowance[n]?'#F0505088':demonMasks.horn[n]?'#5DCD8566':null;else if(beautyPhase==='draw'&&demonMasks.scratch[n])color='#5DCD8588';}
-  if(demonPhase===2){if(beautyPhase==='cut'&&demonMasks.trim[n])color='#5DCD8577';if(beautyPhase==='draw')color=current[n]?'#5DCD8555':demonMasks.face[n]?'#F0505055':null;}
+  if(demonPhase===2){if(beautyPhase==='cut'&&demonMasks.trim[n]&&current[n])color='#5DCD8577';if(beautyPhase==='draw')color=current[n]?'#5DCD8555':demonMasks.face[n]?'#F0505055':null;}
   if(demonPhase===3&&beautyPhase==='cut')color=demonStones[i+3]?'#FFD87388':null;
   if(color){target.fillStyle=color;target.fillRect(n%W,Math.floor(n/W),1,1);}
  }

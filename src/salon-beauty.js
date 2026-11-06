@@ -450,7 +450,7 @@ function renderPortrait(includeGuides=true,target=ctx,includeCape=true){
  if(!ready)return;
  if(finishing)includeGuides=false;
  target.imageSmoothingEnabled=false;target.clearRect(0,0,W,H);
- if(includeCape&&!coffeeTutorial)target.drawImage(capeImage,24,79.5,112,112*capeImage.naturalHeight/capeImage.naturalWidth);
+ if(includeCape&&!coffeeTutorial)target.drawImage(capeImage,isDemon&&demonPhase===2?28:24,isDemon&&demonPhase===2?115:79.5,112,112*capeImage.naturalHeight/capeImage.naturalWidth);
  paintFace();
  if(!bone)target.drawImage(faceCanvas,0,0);
  const coffeeEdge=coffeeTutorial?coffeeMaterialBoundary(current,W,H):null;

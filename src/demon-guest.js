@@ -1,6 +1,8 @@
 // The fourth-day guest uses the existing salon, dialogue and beauty runtime.
 export const DEMON_GUEST_ID=10007;
 export const DEMON_FACE_LIMIT=.15;
+// Small brush spills are recoverable handling error, not an automatic failure.
+export const demonFacePaintLimit=visible=>Math.max(6,Math.floor((visible||0)*.02));
 // The sculpt grid is 160×175. Permit a two-cell contour fringe so a size-4
 // brush can restore the horn without having to trace single cells exactly.
 export function demonHornAllowance(mask,width,height){
@@ -29,7 +31,7 @@ export function demonGate(stars){
 export function demonJudge(phase,m={}){
  if(phase===3)return {success:true,locked:true,sudden:false,checks:[true,true,true]};
  if(phase===1){const checks=[m.horn>=.92&&m.excess<=.06,m.scratches>=.96&&m.bodyLoss<=.02,m.exposure===0];return {success:checks.every(Boolean),sudden:m.exposure>=DEMON_FACE_LIMIT,checks};}
- const checks=[m.trim>=.97&&m.keep>=.55,m.black>=.995&&m.facePaint===0,m.stickers===0];
+ const checks=[m.trim>=.90&&m.keep>=.55,m.black>=.97&&(m.facePaintCore??m.facePaint)<=demonFacePaintLimit(m.visibleFace),m.stickers===0];
  return {success:checks.every(Boolean),sudden:false,checks};
 }
 export function demonGuest(phase=1){
@@ -65,9 +67,10 @@ export async function prepareDemonSkins(){
  const descriptor=c=>({src:c.toDataURL(),x:0,y:0,w:320,h:350});
  const skins={};
  for(const phase of [1,2,3]){
-  const head=layer(phase===3?'goblin':'face',phase===3?[0,0,320,320]:[-17,-7,371,371]),ears=layer('ears',[-17,-7,371,371]);
+  const faceY=phase===2?-37:-7;
+  const head=layer(phase===3?'goblin':'face',phase===3?[0,0,320,320]:[-17,faceY,371,371]),ears=layer('ears',[-17,faceY,371,371]);
   if(phase===2)head.getContext('2d').drawImage(ears,0,0);
-  const material=layer(phase===1?'helmet':phase===2?'hair':'goblinHair',phase===1?[-12,-10,344,305]:phase===2?[-57,-82,456,456]:[-6,-18,327,327]);
+  const material=layer(phase===1?'helmet':phase===2?'hair':'goblinHair',phase===1?[-12,-10,344,305]:phase===2?[-57,-112,456,456]:[-6,-18,327,327]);
   const target=document.createElement('canvas');target.width=320;target.height=350;const tx=target.getContext('2d');tx.drawImage(material,0,0);
   if(phase===1){const src=tx.getImageData(0,0,320,350).data,out=tx.getImageData(0,0,320,350);for(let y=0;y<117;y++)for(let x=185;x<292;x++){const s=(y*320+318-x)*4,i=(y*320+x)*4;if(src[s+3]&&src[s+2]>110&&src[s]<125&&src[s+1]<145)out.data.set(src.subarray(s,s+4),i);}tx.putImageData(out,0,0);}
   const stones=phase===3?layer('stones',[10,-6,300,300]):null;
