@@ -50,23 +50,24 @@ for(const [name,engine]of (process.argv.includes('--chromium')?[['chromium',chro
   const makeup=await report(f,'makeup');assert(makeup.metrics.lips,'thin 20% red lips');assert(makeup.metrics.eyelidLeft&&makeup.metrics.eyelidRight,'both thin eyelid creases');
   await f.locator('#paintOpacity').fill('100');await f.locator('#paintOpacity').dispatchEvent('input');await f.locator('[data-color="#18151F"]').click();
   await report(f,'paint');await snap('royal-paint');assert.equal((await f.evaluate(()=>demonBeautyStatus())).checks[1],true);
-  const xy=[140,182];await size(f,1);await stroke(f,xy);assert.equal((await f.evaluate(()=>demonBeautyStatus())).checks[1],true,'small spill');await size(f,24);await stroke(f,xy);assert.equal((await f.evaluate(()=>demonBeautyStatus())).checks[1],false,'broad face paint');await f.locator('#erasePaint').click();await stroke(f,xy);assert.equal((await f.evaluate(()=>demonBeautyStatus())).checks[1],true,'erase restores');
+  const protestBefore=await f.evaluate(()=>demonLastProtest);
+  await f.locator('[data-color="#A439F4"]').click();await size(f,24);await stroke(f,[140,182]);
+  const freestyle=await report(f,'free-face-paint');assert(freestyle.metrics.facePaintCore>Math.max(6,Math.floor(freestyle.metrics.visibleFace*.02)),'paint exceeds the retired cleanliness allowance');assert.equal(freestyle.checks[1],true,'cheek decorations are allowed');
+  assert.equal(await f.evaluate(()=>demonLastProtest),protestBefore,'free face colour does not trigger a protest');
+  await snap('free-face-paint');
   await stage(f,'attach');
-  await put(f,'T_tara',[166,26]);
-  for(const pair of [['T_earring_L','T_earring_R'],['T_Cross','T_Cross'],['T_earring_L','T_Cross']]){
-   await put(f,pair[0],[110,180]);await put(f,pair[1],[233,180]);assert.equal((await report(f,'paired-'+pair.join('+'))).success,true);
-   await stroke(f,[110,180]);await stroke(f,[233,180]);
-  }
-  await stroke(f,[166,26]);
-  for(const crown of ['T_tara','T_blackCrown']){await put(f,crown,[166,26]);for(const [ear,xy]of [['T_earring_L',[110,180]],['T_earring_R',[233,180]],['T_Cross',[233,180]]]){await put(f,ear,xy);assert.equal((await report(f,crown+'+'+ear)).success,true);await stroke(f,xy);}await stroke(f,[166,26]);}
-  await put(f,'T_blackCrown',[166,26]);await put(f,'T_Cross',[233,180]);await snap('royal-complete');assert.equal(await f.locator('.requestItem:not(.complete)').count(),0);
+  await put(f,'T_tara',[166,26]);assert.equal((await report(f,'tiara-only')).success,true);
+  await put(f,'T_earring_L',[110,180]);assert.equal((await f.evaluate(()=>demonBeautyStatus())).checks[2],false,'earrings are no longer an accepted accessory');await stroke(f,[110,180]);
+  await stroke(f,[166,26]);await put(f,'T_hornBig_L',[106,66]);assert.equal((await f.evaluate(()=>demonBeautyStatus())).checks[2],false,'both horns are required');
+  await put(f,'T_hornBig_R',[230,66]);assert.equal((await report(f,'large-horn-pair')).success,true);
+  await snap('royal-complete');assert.equal(await f.locator('.requestItem:not(.complete)').count(),0);
   await complete(f);for(let n=0;n<12&&!await p.locator('#demonFinishHome').isVisible();n++){await p.waitForTimeout(300);await talks();}await p.waitForSelector('#demonFinishHome');assert.equal(await p.evaluate(()=>fullflow.story.demonPhase),2);assert.equal(await p.evaluate(()=>fullflow.story.successLocked),true);assert(!(await p.locator('#storyBattle').getAttribute('srcdoc')));await p.locator('#demonViewPhoto').click();await f.locator('#demonSelfie.captured').waitFor();await snap('handsome-selfie');
   if(!publicRun){
    f=await begin();await enter(f);await f.locator('[data-tool="hammer"]').click();await size(f,18);outer:for(let y=177;y<253;y+=12)for(let x=105;x<230;x+=12){if(await p.locator('#talkLayer').isVisible())break outer;await stroke(f,[x,y]);const r=await f.evaluate(()=>demonBeautyStatus());if(r.metrics.exposure>=.15&&r.metrics.exposure<.35)assert.equal(r.sudden,false);if(r.sudden)break outer;}await talks();await p.waitForSelector('#demonRetryBeauty');assert((await f.evaluate(()=>demonBeautyStatus())).metrics.exposure>=.35);assert.equal(await p.evaluate(()=>fullflow.story.demonPhase),1);await snap('warning-35');await p.locator('#demonRetryBeauty').click();await waitPhase(1);
    for(const stars of [0,1,2]){f=await begin();await p.evaluate(n=>__demonFixture.stars(n),stars);f=await frame();await f.locator('#openShopBtn').click();await f.locator('.demonCinema button').click();await p.waitForSelector('#demonRestart');await p.locator('#demonRestart').click();await p.locator('#cancelStoryStart').click();}
    await p.evaluate(()=>__demonFixture.closing());const closing=await p.locator('#storyClosing').elementHandle().then(h=>h.contentFrame());await closing.waitForLoadState('domcontentloaded');await closing.evaluate(()=>parent.postMessage({source:'yachacha-closing',type:'next-day',token:new URLSearchParams(location.search).get('story'),stars:3},location.origin));await frame();await p.waitForFunction(()=>fullflow.story?.guest===10007);assert.equal(await p.evaluate(()=>fullflow.story.followers),6100);
   }
-  assert.deepEqual(errors,[]);console.log(name,'two beauty phases, six royal accessory pairs, selfie, face tolerance and gates passed');
+  assert.deepEqual(errors,[]);console.log(name,'two beauty phases, horns or tiara, free face painting, selfie and gates passed');
  }catch(e){await snap('failure-debug');console.error(errors);throw e;}finally{await browser.close();}
 }
 server.close();
