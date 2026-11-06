@@ -14,7 +14,7 @@ for(const [name,engine]of (process.argv.includes('--chromium')?[['chromium',chro
  async function stroke(f,a,b=a){const r=await f.locator('.sculptCanvas').boundingBox();await p.mouse.move(r.x+a[0]/320*r.width,r.y+a[1]/350*r.height);await p.mouse.down();await p.mouse.move(r.x+b[0]/320*r.width,r.y+b[1]/350*r.height,{steps:1});await p.mouse.up();}
  async function size(f,n){await f.locator('#sculptSize').fill(String(n));await f.locator('#sculptSize').dispatchEvent('input');}
  async function mask(f,key){
-  await size(f,1);
+  await size(f,key==='horn'?4:1);
   const runs=await f.evaluate(key=>{const selected=n=>key==='horn'?demonMasks.horn[n]&&!current[n]:key==='scratch'?demonMasks.scratch[n]:key==='trim'?demonMasks.trim[n]&&current[n]:current[n]&&!(paint[n*4+3]>=250&&paint[n*4]<=35&&paint[n*4+1]<=35&&paint[n*4+2]<=45);const runs=[];for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(!selected(y*W+x))continue;let end=x;while(end+1<W&&selected(y*W+end+1))end++;runs.push([[x*2+1,y*2+1],[end*2+1,y*2+1]]);x=end;}return runs;},key);
   for(const [a,b]of runs)await stroke(f,a,b);console.log(name,key,runs.length);
  }

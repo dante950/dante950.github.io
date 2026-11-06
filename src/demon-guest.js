@@ -1,6 +1,18 @@
 // The fourth-day guest uses the existing salon, dialogue and beauty runtime.
 export const DEMON_GUEST_ID=10007;
 export const DEMON_FACE_LIMIT=.15;
+// The sculpt grid is 160×175. Permit a two-cell contour fringe so a size-4
+// brush can restore the horn without having to trace single cells exactly.
+export function demonHornAllowance(mask,width,height){
+ const allowed=new Uint8Array(mask.length),radius=2;
+ for(let n=0;n<mask.length;n++)if(mask[n]){
+  const x=n%width,y=Math.floor(n/width);
+  for(let dy=-radius;dy<=radius;dy++)for(let dx=-radius;dx<=radius;dx++){
+   const xx=x+dx,yy=y+dy;if(dx*dx+dy*dy<=radius*radius&&xx>=0&&xx<width&&yy>=0&&yy<height)allowed[yy*width+xx]=1;
+  }
+ }
+ return allowed;
+}
 export const DEMON_LINES={
  arrival:[['마왕 부하','약속드린 날짜가 되어 마왕님을 모셔왔습니다.'],['몬스터','호오.. 단기간에 미용 실력을 증명했다던 자가 자네인가?'],['몬스터','그럼.. 우선 이 모습부터 맡겨보지']],
  warning:'그곳은 복원할 곳이 아니다. 손을 멈추게.',

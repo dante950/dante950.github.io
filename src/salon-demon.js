@@ -15,6 +15,7 @@ function prepareDemonBeauty(){
   demonMasks.face[n]=Number(base[i+3]>100&&(demonPhase!==1||y>=168&&y<258&&x>85&&x<232));
   demonMasks.trim[n]=Number(demonPhase===2&&original[n]&&(y>224||ears[i+3]>100));
  }
+ demonMasks.hornAllowance=demonHornAllowance(demonMasks.horn,W,H);
 }
 function demonBeautyStatus(){
  let horn=0,ht=0,extra=0,scratch=0,st=0,body=0,loss=0,face=0,exposed=0,trim=0,tt=0,keep=0,kt=0,hair=0,black=0,facePaint=0;
@@ -22,7 +23,7 @@ function demonBeautyStatus(){
  for(let n=0;n<W*H;n++){
   const i=n*4,exists=!!current[n],orig=!!original[n],p=paint[i+3]>0;
   if(demonMasks.horn[n]){ht++;if(exists)horn++;}
-  if(demonPhase===1&&exists&&!demonTarget[i+3])extra++;
+  if(demonPhase===1&&exists&&!demonTarget[i+3]&&!demonMasks.hornAllowance[n])extra++;
   if(demonMasks.scratch[n]){st++;if(exists&&p&&paint[i+3]>=245&&paint[i]<65&&paint[i+1]<65&&paint[i+2]<90)scratch++;}
   if(demonPhase===1&&orig&&!demonMasks.horn[n]){body++;if(!exists)loss++;}
   if(demonMasks.face[n]&&orig){face++;if(!exists)exposed++;}
@@ -80,7 +81,7 @@ function drawDemonGuides(target){
  target.save();
  for(let n=0;n<W*H;n++){
   const i=n*4;let color=null;
-  if(demonPhase===1){if(beautyPhase==='cut')color=demonMasks.face[n]?'#F0505055':demonMasks.horn[n]?'#5DCD8566':null;else if(beautyPhase==='draw'&&demonMasks.scratch[n])color='#5DCD8588';}
+  if(demonPhase===1){if(beautyPhase==='cut')color=demonMasks.face[n]?'#F0505055':current[n]&&!demonTarget[i+3]&&!demonMasks.hornAllowance[n]?'#F0505088':demonMasks.horn[n]?'#5DCD8566':null;else if(beautyPhase==='draw'&&demonMasks.scratch[n])color='#5DCD8588';}
   if(demonPhase===2){if(beautyPhase==='cut'&&demonMasks.trim[n])color='#5DCD8577';if(beautyPhase==='draw')color=current[n]?'#5DCD8555':demonMasks.face[n]?'#F0505055':null;}
   if(demonPhase===3&&beautyPhase==='cut')color=demonStones[i+3]?'#FFD87388':null;
   if(color){target.fillStyle=color;target.fillRect(n%W,Math.floor(n/W),1,1);}

@@ -1,0 +1,31 @@
+import {chromium,webkit} from 'playwright';
+import assert from 'node:assert/strict';import fs from 'node:fs/promises';import http from 'node:http';import path from 'node:path';
+const publicUrl=process.argv.find(a=>a.startsWith('--url='))?.slice(6);
+const root=path.resolve('dist'),out=path.resolve('docs/demon-helmet-2026-11-06',publicUrl?'public':'.');await fs.mkdir(out,{recursive:true});
+const server=http.createServer(async(req,res)=>{try{const f=path.resolve(root,'.'+new URL(req.url,'http://localhost').pathname.replace(/\/$/,'/index.html'));if(!f.startsWith(root+path.sep))throw Error();let bytes=await fs.readFile(f);res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.woff2':'font/woff2','.png':'image/png'})[path.extname(f)]||'application/octet-stream');res.end(bytes);}catch{res.writeHead(404).end();}});await new Promise(r=>server.listen(0,'127.0.0.1',r));const base=publicUrl||'http://127.0.0.1:'+server.address().port;
+for(const [name,engine]of (process.argv.includes('--chromium')?[['chromium',chromium]]:process.argv.includes('--webkit')?[['webkit',webkit]]:[['chromium',chromium],['webkit',webkit]])){
+ const browser=await engine.launch(),p=await browser.newPage({viewport:{width:1440,height:900},reducedMotion:'reduce'}),errors=[];p.on('pageerror',e=>errors.push(e.message));
+ const snap=label=>p.screenshot({path:path.join(out,name+'-'+label+'.png')});
+ async function talks(){let idle=0;for(let i=0;i<150;i++){await p.waitForTimeout(100);if(await p.locator('#beautyChoices').isVisible()){idle=0;await p.locator('#beautyAccept').click();await p.locator('#beautyChoices').waitFor({state:'hidden'});}else if(await p.locator('#talkLayer').isVisible()){idle=0;await p.locator('#talkNext').focus();await p.keyboard.press('f');}else if(++idle>=5)return;}throw Error('Dialogue stalled');}
+ async function frame(){const f=await p.locator('#salon').elementHandle().then(h=>h.contentFrame());await f.waitForFunction(()=>window.beautyDebug?.ready);return f;}
+ async function begin(){await p.goto(base);await p.waitForFunction(()=>window.fullflow);await p.locator('#play').click();assert.equal(await p.locator('.startGuest').count(),6);await p.locator('[data-start-guest="10007"]').click();return frame();}
+ async function enter(f,skip=true){await f.locator('#openShopBtn').click();if(skip)await f.locator('.demonCinema button').click();else{for(let i=0;i<400;i++){await talks();if(await f.locator('#demonStanding').isVisible()||await f.evaluate(()=>salonLab.customerPhase==='seated'))break;await p.waitForTimeout(100);}}await p.waitForTimeout(150);await talks();await f.waitForFunction(()=>salonLab.customerPhase==='seated');await snap('room');await f.locator('.childExit').click();await p.waitForTimeout(100);await talks();await f.waitForFunction(()=>beautyActive&&!briefing);}
+ async function stage(f,key){await f.locator('[data-phase="'+key+'"]').click();await p.waitForTimeout(100);await talks();await f.waitForFunction(()=>!briefing);}
+ async function stroke(f,a,b=a){const r=await f.locator('.sculptCanvas').boundingBox();await p.mouse.move(r.x+a[0]/320*r.width,r.y+a[1]/350*r.height);await p.mouse.down();await p.mouse.move(r.x+b[0]/320*r.width,r.y+b[1]/350*r.height,{steps:1});await p.mouse.up();}
+ async function size(f,n){await f.locator('#sculptSize').fill(String(n));await f.locator('#sculptSize').dispatchEvent('input');}
+ async function mask(f,key){
+  await size(f,4);
+  const runs=await f.evaluate(key=>{const selected=n=>key==='horn'?demonMasks.horn[n]&&!current[n]:key==='scratch'?demonMasks.scratch[n]:key==='trim'?demonMasks.trim[n]&&current[n]:current[n]&&!(paint[n*4+3]>=250&&paint[n*4]<=35&&paint[n*4+1]<=35&&paint[n*4+2]<=45);const runs=[];for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(!selected(y*W+x))continue;let end=x;while(end+1<W&&selected(y*W+end+1))end++;runs.push([[x*2+1,y*2+1],[end*2+1,y*2+1]]);x=end;}return runs;},key);
+  for(const [a,b]of runs)await stroke(f,a,b);console.log(name,key,runs.length);
+ }
+ async function complete(f){await stage(f,'attach');await f.locator('.beautyNext').click();await f.locator('#beautyResultContinue').click();await p.waitForTimeout(100);await talks();}
+ async function waitPhase(n){await p.waitForFunction(n=>fullflow.story?.demonPhase===n&&document.querySelector('#salon').style.opacity==='1',n);let f=await frame();await f.waitForFunction(()=>beautyActive);await p.waitForTimeout(150);await talks();await f.waitForFunction(()=>!briefing);return f;}
+ try{
+  const f=await begin();await enter(f);const initial=await f.evaluate(()=>demonBeautyStatus());assert.equal(initial.success,false);
+  await f.locator('[data-tool="grow"]').click();await mask(f,'horn');const grown=await f.evaluate(()=>demonBeautyStatus());assert.equal(grown.checks[0],true);assert.equal(grown.success,false,'unpainted scratches still block completion');
+  await stage(f,'draw');await f.locator('[data-color="#242236"]').click();await mask(f,'scratch');const restored=await f.evaluate(()=>demonBeautyStatus());assert.equal(restored.success,true,JSON.stringify(restored));assert.equal(await f.locator('.requestItem.complete').count(),2);await snap('restored-size4');
+  await stage(f,'cut');await f.locator('[data-tool="grow"]').click();await size(f,10);await stroke(f,[285,40]);const excess=await f.evaluate(()=>demonBeautyStatus());assert.equal(excess.checks[0],false,'obviously excessive growth still fails');await f.getByRole('button',{name:'손질 가이드',exact:true}).click();await snap('excess-guide');await f.locator('[data-tool="hammer"]').click();await stroke(f,[285,40]);assert.equal(await f.evaluate(()=>demonBeautyStatus().success),true,'trimming excess restores the requirement');
+  await complete(f);await waitPhase(2);assert.equal(await p.evaluate(()=>fullflow.story.demonPhase),2);assert.deepEqual(errors,[]);await fs.writeFile(path.join(out,name+'-verification.json'),JSON.stringify({initial,grown,restored,excess,errors,time:new Date().toISOString()},null,2));console.log(name,'size-four restoration, excessive growth, correction and phase-two transition passed',JSON.stringify({grown:grown.metrics,restored:restored.metrics,excess:excess.metrics}));
+ }catch(e){await snap('failure-debug');throw e;}finally{await browser.close();}
+}
+server.close();

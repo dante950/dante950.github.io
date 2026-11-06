@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs/promises';
-import {demonGuest,demonJudge,demonGate,DEMON_FACE_LIMIT} from '../src/demon-guest.js';
+import {demonGuest,demonJudge,demonGate,demonHornAllowance,DEMON_FACE_LIMIT} from '../src/demon-guest.js';
 import {projectProblems,storyStartOptions} from '../src/model.js';
 const project=JSON.parse(await fs.readFile(new URL('../data/project.json',import.meta.url),'utf8'));
 test('demon is the fourth-day guest in the shared story and has no battle route',()=>{assert.deepEqual(projectProblems(project),[]);const start=storyStartOptions(project).find(x=>x.guest.id===10007);assert.equal(start.day,4);assert.equal(start.guest.battle,'none');assert.equal(start.guest.workbookExcluded,true);});
@@ -8,3 +8,6 @@ test('helmet restoration and the fifteen percent face interruption are independe
 test('phase two succeeds only with trimmed black hair, a clean face and no decorations',()=>{const m={trim:1,keep:1,black:1,facePaint:0,stickers:0};assert.equal(demonJudge(2,m).success,true);for(const change of [{trim:.2},{black:.5},{facePaint:1},{stickers:1}])assert.equal(demonJudge(2,{...m,...change}).success,false);assert.equal(demonJudge(2,m).success,true);});
 test('goblin is already a success, with independent scissors and stone tools',()=>{assert.deepEqual(demonGuest(3).beauty.shapeTools,['scissors','hammer','grow']);for(const m of [{},{keep:0,black:0,facePaint:10000,stickers:10,exposure:1}]){const r=demonJudge(3,m);assert.equal(r.success,true);assert.equal(r.locked,true);assert.equal(r.sudden,false);}});
 test('retired standalone game and its combat implementation are absent',async()=>{for(const p of ['../src/demon/app.js','../src/demon/model.js','../src/demon/index.html'])await assert.rejects(fs.access(new URL(p,import.meta.url)));const app=await fs.readFile(new URL('../src/app.js',import.meta.url),'utf8');assert(!app.includes("frame.id='demonVisit'"));const index=await fs.readFile(new URL('../src/index.html',import.meta.url),'utf8');assert(!index.includes('마왕 방문 · 미용 시험'));});
+
+test('horn contour permits a size-four brush fringe but still rejects distant growth',()=>{const mask=new Uint8Array(49);mask[24]=1;const a=demonHornAllowance(mask,7,7);assert.equal(a[24],1);assert.equal(a[26],1);assert.equal(a[10],1);assert.equal(a[27],0);assert.equal(a[8],0);assert.equal(demonJudge(1,{horn:1,excess:.2,scratches:1,bodyLoss:0,exposure:0}).success,false);});
+test('horn contour allowance stays inside grid edges without wrapping rows',()=>{const mask=new Uint8Array(25);mask[0]=1;const a=demonHornAllowance(mask,5,5);assert.equal(a[2],1);assert.equal(a[10],1);assert.equal(a[4],0);assert.equal(a[24],0);});
