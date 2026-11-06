@@ -71,6 +71,11 @@ await fs.writeFile(path.join(dist,'tutorial-variants.html'),variantsHTML);
 const resultJS=await emit('battle-result','js',await read('src/battle-result.js'));
 const resultCSS=await emit('battle-result-style','css',speechStyle+'\n'+await read('src/battle-result.css'));
 await fs.writeFile(path.join(dist,'battle-results.html'),(await read('src/battle-results-preview.html')).replace('__RESULT_CSS__',resultCSS).replace('__RESULT_JS__',resultJS));
+// Day-four encounter has independent rendering and retains the main story's rewards.
+const demonModelURL=await emit('demon-model','js',await read('src/demon/model.js'));
+const demonAppURL=await emit('demon','js',(await read('src/demon/app.js')).replace("from './model.js'",`from '${demonModelURL}'`));
+const demonStyleURL=await emit('demon-style','css',await read('src/demon/style.css'));
+await fs.writeFile(path.join(dist,'demon.html'),(await read('src/demon/index.html')).replace('href="demon.css"',`href="${demonStyleURL}"`).replace('src="demon.js"',`src="${demonAppURL}"`));
 const releaseId=hash(JSON.stringify(files));
 const boot=`const inputs=${JSON.stringify(inputs)};
 try {

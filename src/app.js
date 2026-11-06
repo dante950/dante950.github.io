@@ -73,8 +73,8 @@ const BEAUTY_TUTORIAL_ENABLED=false;
 function loadSalon(g,mode='story',afterReady=null){salonToken=token();pendingSalon=afterReady;mount(el('salon'),SALON_TEMPLATE,'__GUEST_JSON__',{...copy(g),beauty:beautyWithDialogue(story?.project||draft,g),skin:skin(g),stickers:ASSETS.stickers,returnBranch:story?.returnBranch||'employed',returningReactions:g.returningZombie?Object.fromEntries(Object.keys(g.bindings).map(key=>[key,beautyReactionLines(story?.project||draft,g,key).map(l=>l.Text)])):null,mode,token:salonToken,tutorialBeauty:BEAUTY_TUTORIAL_ENABLED&&mode==='story'&&!story?.guidesSeen?.beauty,day:story?.day||1,money:story?.money||0,followers:story?.followers||0});}
 function sendSalon(type,extra={}){el('salon').contentWindow?.postMessage({type,token:salonToken,...extra},'*');}
 function background(){loadSalon(published.guests[0],'backdrop');}
-function stopChildren(){hideReturningChoice();document.getElementById('storyClosing')?.remove();closingToken='';for(const f of [el('combatEditor'),el('storyBattle')]){f.srcdoc='';f.removeAttribute('src');}combatFrame=null;combatToken='';el('battleHost').hidden=true;}
-function homeNow(){gameAudio.music('salon');document.body.classList.remove('inBattle');stopChildren();talk=null;el('talkLayer').hidden=true;closeModal();story=null;el('phoneButton').hidden=true;showPage('home');background();}
+function stopChildren(){document.getElementById('demonVisit')?.remove();hideReturningChoice();document.getElementById('storyClosing')?.remove();closingToken='';for(const f of [el('combatEditor'),el('storyBattle')]){f.srcdoc='';f.removeAttribute('src');}combatFrame=null;combatToken='';el('battleHost').hidden=true;}
+function homeNow(){document.getElementById('demonVisit')?.remove();gameAudio.music('salon');document.body.classList.remove('inBattle');stopChildren();talk=null;el('talkLayer').hidden=true;closeModal();story=null;el('phoneButton').hidden=true;showPage('home');background();}
 function askExit(){if(page!=='story'){goHome();return;}modal(`<h2>이번 영업을 마칠까요?</h2><p>진행 중인 본편은 처음부터 다시 시작합니다. 개발실에 저장한 설정은 유지됩니다.</p><div class="actions">${btn('keepPlaying','계속 플레이')}${btn('leavePlay','메인 화면',true)}</div>`);el('keepPlaying').onclick=closeModal;el('leavePlay').onclick=homeNow;}
 async function goHome(){if(editorMode==='combat'&&page==='editor')await captureCombat();homeNow();}
 function beep(freq=420,duration=.06){if(!soundOn)return;try{audioContext??=new (window.AudioContext||window.webkitAudioContext)();audioContext.resume();const o=audioContext.createOscillator(),g=audioContext.createGain();o.type='sine';o.frequency.value=freq;g.gain.setValueAtTime(.055,audioContext.currentTime);g.gain.exponentialRampToValueAtTime(.0001,audioContext.currentTime+duration);o.connect(g).connect(audioContext.destination);o.start();o.stop(audioContext.currentTime+duration);}catch{}}
@@ -234,7 +234,7 @@ function chooseReturningBranch(workshop){
 }
 function startStory(workshop,guestID,skipIntro=false,tutorialReward=null,returnBranch=null){
  const next=coffeeApplyHandoff(createStoryState(projectForPlay(BASE,published,workshop),guestID),tutorialReward);
- next.returnBranch=returnBranch;gameAudio.unlock().then(()=>gameAudio.music('salon'));stopChildren();closeModal();story=next;showPage('story');if(story.day===1&&story.index===0&&!skipIntro)showStoryIntro(startCustomer);else startCustomer();
+ next.returnBranch=returnBranch;next.starSettings={...next.starSettings,starThresholds:next.starSettings?.starThresholds?.length===3?next.starSettings.starThresholds:[5000,5500,6100]};gameAudio.unlock().then(()=>gameAudio.music('salon'));stopChildren();closeModal();story=next;showPage('story');if(story.day===1&&story.index===0&&!skipIntro)showStoryIntro(startCustomer);else startCustomer();
 }
 function showStoryIntro(done){
  const cards=story.project.storyIntro||BASE.storyIntro,activeStory=story;
@@ -267,8 +267,8 @@ function settlement(){
 addEventListener('message',e=>{
  const frame=document.getElementById('storyClosing'),m=e.data;
  if(!story||!frame||e.source!==frame.contentWindow||e.origin!==location.origin||m?.source!=='yachacha-closing'||m.token!==closingToken)return;
- if(m.type==='ready')frame.contentWindow.postMessage({source:'yachacha-story',type:'init',token:closingToken,day:story.day,lastDay:story.project.schedule.length,records:copy(story.records),stars:story.stars||0,followerFloor:story.followerFloor||0,settings:story.starSettings,weather:weatherForDay(),socialChoices:story.socialChoices||{}},location.origin);
- if(m.type==='next-day'){story.socialChoices=m.socialChoices||{};story.stars=Math.max(story.stars||0,m.stars||0);story.followerFloor=Math.max(story.followerFloor||0,m.followerFloor||0);story.starSettings=m.settings||story.starSettings;frame.remove();closingToken='';story.day++;story.index=0;startCustomer();}
+ if(m.type==='ready')frame.contentWindow.postMessage({source:'yachacha-story',type:'init',token:closingToken,day:story.day,lastDay:Math.max(4,story.project.schedule.length),records:copy(story.records),stars:story.stars||0,followerFloor:story.followerFloor||0,settings:story.starSettings,weather:weatherForDay(),socialChoices:story.socialChoices||{}},location.origin);
+ if(m.type==='next-day'){story.socialChoices=m.socialChoices||{};story.stars=Math.max(story.stars||0,m.stars||0);story.followerFloor=Math.max(story.followerFloor||0,m.followerFloor||0);story.starSettings=m.settings||story.starSettings;frame.remove();closingToken='';story.day++;story.index=0;if(story.day===4)startDemonVisit();else startCustomer();}
  if(m.type==='build-complete'){frame.remove();closingToken='';demoEnd();}if(m.type==='home')homeNow();
 });
 function openPhone(){if(!story)return;toast('몬스타그램은 하루 마감 때 확인할 수 있어요.');}
@@ -284,3 +284,18 @@ await prepareSkins();background();el('projectVersion').textContent='내 브라�
 // Explicit handoff from the isolated tutorial, never personal workshop data.
 const tutorialHandoff=new URLSearchParams(location.search).get('fromTutorial');
 if(tutorialHandoff==='skip'||tutorialHandoff==='complete'){history.replaceState(null,'',location.pathname);startStory(false,BASE.schedule[0][0],true,coffeeReadHandoff(tutorialHandoff));}
+
+let demonToken='';
+function startDemonVisit(){
+ stopChildren();closeModal();talk=null;el('talkLayer').hidden=true;el('phoneButton').hidden=true;story.guest=null;updateStoryHud('마왕 방문');el('storyGuest').textContent='마왕';
+ const frame=document.createElement('iframe');frame.id='demonVisit';frame.title='4일차 마왕 방문과 미용';demonToken=token();frame.src='./demon.html?story='+encodeURIComponent(demonToken);
+ frame.style.cssText='position:fixed;inset:0;width:100%;height:100%;border:0;z-index:180;background:#100d17';el('storyScreen').append(frame);
+}
+addEventListener('message',e=>{
+ const f=document.getElementById('demonVisit'),m=e.data;
+ if(!story||!f||e.source!==f.contentWindow||e.origin!==location.origin||m?.source!=='yachacha-demon'||m.token!==demonToken)return;
+ if(m.type==='ready')f.contentWindow.postMessage({source:'yachacha-story',type:'init',token:demonToken,stars:story.stars||0,records:copy(story.records)},location.origin);
+ if(m.type==='home')homeNow();
+ if(m.type==='restart'){f.remove();chooseStoryStart(false);}
+ if(m.type==='ending')story.demonEnding={ending:m.ending,portrait:m.portrait||null};
+});

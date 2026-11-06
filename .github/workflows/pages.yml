@@ -122,6 +122,8 @@ jobs:
             script: scripts/check-minion.mjs
           - suite: closing
             script: scripts/check-closing.mjs
+          - suite: demon visit
+            script: scripts/check-demon.mjs
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
