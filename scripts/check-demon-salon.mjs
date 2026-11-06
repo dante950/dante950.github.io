@@ -22,7 +22,18 @@ for(const [name,engine]of (process.argv.includes('--chromium')?[['chromium',chro
  try{
   let f=await begin();if(process.argv.includes('--phase2')&&!publicRun){await p.evaluate(()=>__demonFixture.phase(2));f=await waitPhase(2);}else{
    await enter(f,!process.argv.includes('--cinema'));await snap('helmet');await f.locator('[data-tool="grow"]').click();await mask(f,'demonMasks.horn[n]&&!current[n]',4);await stage(f,'draw');await f.locator('[data-color="#242236"]').click();await mask(f,'demonMasks.scratch[n]',4);
-   assert.equal((await report(f,'helmet')).success,true);await stage(f,'cut');await f.locator('[data-tool="grow"]').click();await size(f,8);const edge=await f.evaluate(()=>{const y=65;let x=0;while(x<W&&!current[y*W+x])x++;return [x*2+1,y*2+1];});await stroke(f,edge,[edge[0]-10,edge[1]]);assert(await f.evaluate(()=>{prepareDemonGeometry();let edge=0,inside=0;for(let n=0;n<current.length;n++)if(current[n]===2){const c=demonMaterialColor(n);if(demonEdge[n]){if(c.join(',')!==outlineColor.join(','))return false;edge++;}else inside++;}return edge>0&&inside>0;}),'grown helmet has outline and coloured interior');await stage(f,'draw');await f.locator('[data-color="#4853F8"]').click();await size(f,12);await stroke(f,[160,135]);await stage(f,'attach');await put(f,'T_tara',[160,130]);assert.equal((await report(f,'helmet-customized')).success,true);await snap('helmet-restored');await complete(f);f=await waitPhase(2);
+   assert.equal((await report(f,'helmet')).success,true);await stage(f,'cut');await f.locator('[data-tool="grow"]').click();await size(f,8);const edge=await f.evaluate(()=>{const y=65;let x=0;while(x<W&&!current[y*W+x])x++;return [x*2+1,y*2+1];});await stroke(f,edge,[edge[0]-10,edge[1]]);assert(await f.evaluate(()=>{prepareDemonGeometry();let edge=0,inside=0;for(let n=0;n<current.length;n++)if(current[n]===2){const c=demonMaterialColor(n);if(demonEdge[n]){if(c.join(',')!==outlineColor.join(','))return false;edge++;}else inside++;}return edge>0&&inside>0;}),'grown helmet has outline and coloured interior');await stage(f,'draw');await f.locator('[data-color="#4853F8"]').click();
+   const eyeProtestBefore=await f.evaluate(()=>demonLastProtest);
+   await mask(f,'demonMasks.eyeOpening[n]',1);
+   assert((await f.evaluate(()=>demonBeautyStatus())).metrics.eyePaint>.15,'eye paint exceeds the retired limit');
+   assert.equal(await f.evaluate(()=>demonLastProtest),eyeProtestBefore,'helmet eye colour is free');
+   await size(f,12);await stroke(f,[160,135]);await stage(f,'attach');
+   const guideBefore=await f.evaluate(()=>zonesVisible);if(!guideBefore)await f.locator('#showBeautyZones').click();await snap('helmet-full-face-sticker-guide');if(!guideBefore)await f.locator('#showBeautyZones').click();
+   const stickerProtestBefore=await f.evaluate(()=>demonLastProtest);
+   await put(f,'T_tara',[145,205]);
+   assert((await f.evaluate(()=>demonBeautyStatus())).metrics.decorEyes>.05,'sticker can cover the eye opening');
+   assert.equal(await f.evaluate(()=>demonLastProtest),stickerProtestBefore,'helmet sticker location is free');
+   assert.equal((await report(f,'helmet-customized')).success,true);await snap('helmet-restored');await complete(f);f=await waitPhase(2);
    if(process.argv.includes('--helmet-only')){assert.deepEqual(errors,[]);console.log(name,'helmet restoration, creative styling and phase transition passed');continue;}
   }
   assert(await f.evaluate(()=>{const a=demonBeautyStatus();return a===demonBeautyStatus();}),'unchanged grading reuses its result');
@@ -59,7 +70,10 @@ for(const [name,engine]of (process.argv.includes('--chromium')?[['chromium',chro
   await put(f,'T_tara',[166,26]);assert.equal((await report(f,'tiara-only')).success,false,'crown alone is incomplete');
   await put(f,'T_hornBig_L',[106,66]);assert.equal((await f.evaluate(()=>demonBeautyStatus())).checks[2],false,'both horns are required');
   await put(f,'T_hornBig_R',[230,66]);assert.equal((await report(f,'horn-pair-and-tiara')).success,true);
-  await put(f,'T_earring_L',[110,180]);assert.equal((await f.evaluate(()=>demonBeautyStatus())).checks[2],false,'earrings are not an accepted accessory');await stroke(f,[110,180]);
+  const extraProtestBefore=await f.evaluate(()=>demonLastProtest);
+  await put(f,'T_earring_L',[110,180]);await put(f,'T_Cross',[233,180]);await put(f,'T_Heart',[166,230]);
+  assert.equal((await report(f,'royal-extra-stickers')).success,true,'all additional stickers are allowed');
+  assert.equal(await f.evaluate(()=>demonLastProtest),extraProtestBefore,'extra stickers do not trigger protests');
   await stroke(f,[166,26]);assert.equal((await report(f,'horn-pair-without-crown')).success,false,'horns also require a crown');
   await put(f,'T_blackCrown',[166,26]);assert.equal((await report(f,'horn-pair-and-black-crown')).success,true);
   await snap('royal-complete');assert.equal(await f.locator('.requestItem:not(.complete)').count(),0);

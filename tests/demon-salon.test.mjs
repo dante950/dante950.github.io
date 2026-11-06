@@ -5,18 +5,21 @@ const project=JSON.parse(await fs.readFile(new URL('../data/project.json',import
 test('demon is the fourth-day guest in the shared story and has no battle route',()=>{assert.deepEqual(projectProblems(project),[]);const start=storyStartOptions(project).find(x=>x.guest.id===10007);assert.equal(start.day,4);assert.equal(start.guest.battle,'none');assert.equal(start.guest.workbookExcluded,false);});
 test('only three stars admit the visit',()=>{for(const n of [0,1,2])assert.equal(demonGate(n).admitted,false);assert.equal(demonGate(3).admitted,true);});
 const helmet={hornRatio:1,hornHeight:0,hornWidth:0,bodyLoss:0,exposure:0,growthRatio:0,scratches:1,darkBase:1,eyePaint:0,decorCount:0,decorArea:0,decorEyes:0};
-const royal={leftEar:1,rightEar:1,rightTip:.5,lengthOver:0,roofPeaks:3,centerHighest:true,eyes:1,forelock:1,black:1,silverLine:true,silverTotal:16,silverSpill:0,browLeft:1,browRight:1,lips:true,eyelidLeft:true,eyelidRight:true,facePaintCore:0,visibleFace:2000,adornments:[true,true,true]};
-test('helmet permits creative silhouette, accents and two small stickers, while protecting eye openings',()=>{assert.equal(demonJudge(1,helmet).success,true);assert.equal(demonJudge(1,{...helmet,growthRatio:.3,darkBase:.7,eyePaint:.15,decorCount:2,decorArea:.18}).success,true);for(const m of [{hornRatio:.7},{hornHeight:12},{growthRatio:.31},{scratches:.89},{darkBase:.69},{eyePaint:.16},{decorCount:3},{decorEyes:.06}])assert.equal(demonJudge(1,{...helmet,...m}).success,false,JSON.stringify(m));});
+const royal={leftEar:1,rightEar:1,rightTip:.5,lengthOver:0,roofPeaks:3,centerHighest:true,eyes:1,forelock:1,black:1,silverLine:true,silverTotal:16,silverSpill:0,browLeft:1,browRight:1,lips:true,eyelidLeft:true,eyelidRight:true,facePaintCore:0,visibleFace:2000,adornments:[true,true]};
+test('helmet permits creative silhouette, accents and two small stickers, including over the eye openings',()=>{assert.equal(demonJudge(1,helmet).success,true);assert.equal(demonJudge(1,{...helmet,growthRatio:.3,darkBase:.7,eyePaint:1,decorCount:2,decorArea:.18,decorEyes:1}).success,true);for(const m of [{hornRatio:.7},{hornHeight:12},{growthRatio:.31},{scratches:.89},{darkBase:.69},{decorCount:3},{decorArea:.181}])assert.equal(demonJudge(1,{...helmet,...m}).success,false,JSON.stringify(m));});
 test('face warnings do not interrupt until thirty-five percent',()=>{assert.equal(DEMON_FACE_LIMIT,.35);for(const exposure of [.15,.20,.349])assert.equal(demonJudge(1,{...helmet,exposure}).sudden,false);assert.equal(demonJudge(1,{...helmet,exposure:.35}).sudden,true);});
-test('every royal order is independently graded, with small dye spills still tolerated',()=>{assert.equal(demonJudge(2,royal).success,true);for(const change of [{leftEar:.89},{rightTip:0},{rightTip:1},{lengthOver:7},{eyes:.8},{black:.9499},{silverLine:false},{browLeft:.69},{browRight:.69},{lips:false},{eyelidLeft:false},{eyelidRight:false},{adornments:[true,false,true]}])assert.equal(demonJudge(2,{...royal,...change}).success,false,JSON.stringify(change));assert.equal(demonJudge(2,{...royal,black:.95,facePaintCore:40}).success,true);assert.equal(demonJudge(2,{...royal,black:.96}).success,true);assert.equal(demonFacePaintLimit(10),6);});
-test('royal accessories require both large horns AND either tiara or black crown',()=>{
+test('every royal order is independently graded, with small dye spills still tolerated',()=>{assert.equal(demonJudge(2,royal).success,true);for(const change of [{leftEar:.89},{rightTip:0},{rightTip:1},{lengthOver:7},{eyes:.8},{black:.9499},{silverLine:false},{browLeft:.69},{browRight:.69},{lips:false},{eyelidLeft:false},{eyelidRight:false},{adornments:[true,false]}])assert.equal(demonJudge(2,{...royal,...change}).success,false,JSON.stringify(change));assert.equal(demonJudge(2,{...royal,black:.95,facePaintCore:40}).success,true);assert.equal(demonJudge(2,{...royal,black:.96}).success,true);assert.equal(demonFacePaintLimit(10),6);});
+test('royal accessories require the horn pair and crown, allowing any additional stickers',()=>{
  const p=(name,x,y)=>({sticker:{resourceFile:name+'.png'},x,y}),left=p('T_hornBig_L',106,66),right=p('T_hornBig_R',230,66),tiara=p('T_tara',166,26),crown=p('T_blackCrown',166,26);
  for(const head of [tiara,crown]){
-  assert.deepEqual(demonRoyalStickers([left,right,head]),[true,true,true]);
-  for(const items of [[head],[left,head],[right,head],[left,left,head],[p('T_hornBig_R',106,66),p('T_hornBig_L',230,66),head],[left,right,head,p('T_earring_L',110,180)],[left,right,head,p('T_Cross',233,180)]])assert(!demonRoyalStickers(items).every(Boolean),JSON.stringify(items));
+  assert.deepEqual(demonRoyalStickers([left,right,head]),[true,true]);
+  for(const extra of [p('T_earring_L',110,180),p('T_Cross',233,180),p('T_Heart',160,200),left,right,tiara,crown,p('T_hornBig_R',110,180)]){
+   assert.deepEqual(demonRoyalStickers([left,right,head,extra]),[true,true]);
+  }
+  for(const items of [[head],[left,head],[right,head],[left,left,head],[p('T_hornBig_R',106,66),p('T_hornBig_L',230,66),head]])assert(!demonRoyalStickers(items).every(Boolean),JSON.stringify(items));
  }
- assert.deepEqual(demonRoyalStickers([left,right]),[true,false,true]);
- for(const items of [[],[left],[right],[left,right,tiara,crown],[left,right,p('T_tara',166,220)]])assert(!demonRoyalStickers(items).every(Boolean),JSON.stringify(items));
+ assert.deepEqual(demonRoyalStickers([left,right]),[true,false]);
+ for(const items of [[],[left],[right],[left,right,p('T_tara',166,220)]])assert(!demonRoyalStickers(items).every(Boolean),JSON.stringify(items));
 });
 test('beauty ends at handsome phase two; goblin is never a beauty phase',async()=>{assert.throws(()=>demonGuest(3));assert.equal(demonJudge(3,royal).success,false);const story=await fs.readFile(new URL('../src/demon-story.js',import.meta.url),'utf8');assert(!story.includes('changeDemonPhase(3)'));assert(story.includes("form:'handsome'"));});
 test('retired standalone game and its combat implementation are absent',async()=>{for(const p of ['../src/demon/app.js','../src/demon/model.js','../src/demon/index.html'])await assert.rejects(fs.access(new URL(p,import.meta.url)));const app=await fs.readFile(new URL('../src/app.js',import.meta.url),'utf8');assert(!app.includes("frame.id='demonVisit'"));const index=await fs.readFile(new URL('../src/index.html',import.meta.url),'utf8');assert(!index.includes('마왕 방문 · 미용 시험'));});
@@ -70,12 +73,14 @@ test('both painted eyebrows and both thin upper-eye creases are required',()=>{
  fill('brow');let m=demonMakeup(hair,paint,masks,W,H);assert.equal(m.browLeft,1);assert.equal(m.browRight,0);assert.equal(m.eyelidLeft,false);
  fill('browRight');fill('eyelidLeft');fill('eyelidRight');m=demonMakeup(hair,paint,masks,W,H);assert.equal(m.browRight,1);assert(m.eyelidLeft);assert(m.eyelidRight);
 });
-test('published phase-two dialogue matches the current requests and details',()=>{
- const g=project.guests.find(g=>g.id===10007),lines=project.combat.sheets.find(s=>s.name==='대사').rows,guest=demonGuest(2);
+test('both published phases match their current requests and details',()=>{
+ const g=project.guests.find(g=>g.id===10007),lines=project.combat.sheets.find(s=>s.name==='대사').rows;
+ for(const phase of [1,2]){const guest=demonGuest(phase);
  for(const stage of ['cut','draw','attach'])for(const [key,list]of [['RequestGroupID',guest.demonRequest[stage]],['DetailGroupID',guest.demonRequestDetails[stage]]]){
-  const actual=lines.filter(r=>r.GroupID===g.demonPhaseDialogue[2][stage][key]).sort((a,b)=>a.Order-b.Order).map(r=>r.Text);
+  const actual=lines.filter(r=>r.GroupID===g.demonPhaseDialogue[phase][stage][key]).sort((a,b)=>a.Order-b.Order).map(r=>r.Text);
   assert.deepEqual(actual,list.map(v=>Array.isArray(v)?v[1]:v));
- }
+ }}
+ assert.deepEqual(g.beauty.requestBriefNotes,demonGuest(1).beauty.requestBriefNotes);
 });
 
 test('eyebrow masks exclude pale skin and remain separate from lowered eyelid creases',()=>{
