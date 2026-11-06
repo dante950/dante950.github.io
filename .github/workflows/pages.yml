@@ -14,6 +14,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
+      release_only: ${{ steps.scope.outputs.release_only }}
       demon_only: ${{ steps.scope.outputs.demon_only }}
       archive_changed: ${{ steps.scope.outputs.archive_changed }}
       dialogue_only: ${{ steps.scope.outputs.dialogue_only }}
@@ -33,6 +34,7 @@ jobs:
           EVENT: ${{ github.event_name }}
           BEFORE: ${{ github.event.before }}
         run: |
+          release_only=false
           archive_changed=false
           demon_changed=false
           demon_only=false
@@ -44,6 +46,7 @@ jobs:
           reaction_only=false
           returning_only=false
           if [ "$EVENT" = push ] && git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            release_only=true
             demon_only=true
             dialogue_only=true
             walk_only=true
@@ -53,6 +56,7 @@ jobs:
             reaction_only=true
             returning_only=true
             while IFS= read -r file; do
+              case "$file" in scripts/check-demon-public-release.mjs|.github/workflows/pages.yml) ;; *) release_only=false ;; esac
               case "$file" in data/schema.json|src/combat/versions.js|src/project-archive.js|src/workshop-dialogue.js|scripts/check-project-archive.mjs|tests/project-archive.test.mjs) archive_changed=true ;; esac
               case "$file" in src/demon/*|src/demon-guest.js|src/demon-story.js|src/salon-demon*.js|public/demon.html|public/demon-assets.json|public/media/demon/*|scripts/check-demon*.mjs|tests/demon*.test.mjs|docs/demon-day-four.md|docs/demon-recovery-2026-11-06/*) demon_changed=true ;; esac
               case "$file" in
@@ -90,6 +94,7 @@ jobs:
             done < <(git diff --name-only "$BEFORE" HEAD)
           fi
           if [ "$demon_changed" != true ]; then demon_only=false; fi
+          echo "release_only=$release_only" >> "$GITHUB_OUTPUT"
           echo "archive_changed=$archive_changed" >> "$GITHUB_OUTPUT"
           echo "demon_only=$demon_only" >> "$GITHUB_OUTPUT"
           echo "dialogue_only=$dialogue_only" >> "$GITHUB_OUTPUT"
@@ -118,11 +123,12 @@ jobs:
       - run: npm test
         if: steps.scope.outputs.demon_only != 'true' && steps.scope.outputs.walk_only != 'true' && steps.scope.outputs.font_only != 'true' && steps.scope.outputs.intro_only != 'true' && steps.scope.outputs.result_only != 'true' && steps.scope.outputs.returning_only != 'true'
       - uses: actions/upload-pages-artifact@v4
+        if: steps.scope.outputs.release_only != 'true'
         with:
           path: dist
   browser-checks:
     needs: build
-    if: needs.build.outputs.demon_only != 'true' && needs.build.outputs.dialogue_only != 'true' && needs.build.outputs.walk_only != 'true' && needs.build.outputs.font_only != 'true' && needs.build.outputs.intro_only != 'true' && needs.build.outputs.result_only != 'true' && needs.build.outputs.returning_only != 'true'
+    if: needs.build.outputs.release_only != 'true' && needs.build.outputs.demon_only != 'true' && needs.build.outputs.dialogue_only != 'true' && needs.build.outputs.walk_only != 'true' && needs.build.outputs.font_only != 'true' && needs.build.outputs.intro_only != 'true' && needs.build.outputs.result_only != 'true' && needs.build.outputs.returning_only != 'true'
     name: Check ${{ matrix.suite }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -151,7 +157,7 @@ jobs:
       - run: node ${{ matrix.script }}
   dialogue-browser:
     needs: build
-    if: needs.build.outputs.dialogue_only == 'true'
+    if: needs.build.outputs.release_only != 'true' && needs.build.outputs.dialogue_only == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -166,7 +172,7 @@ jobs:
       - run: node scripts/check-project-archive.mjs
   returning-browser:
     needs: build
-    if: needs.build.outputs.returning_only == 'true'
+    if: needs.build.outputs.release_only != 'true' && needs.build.outputs.returning_only == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -185,7 +191,7 @@ jobs:
         if: needs.build.outputs.reaction_only != 'true'
   walk-browser:
     needs: build
-    if: needs.build.outputs.walk_only == 'true'
+    if: needs.build.outputs.release_only != 'true' && needs.build.outputs.walk_only == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -199,7 +205,7 @@ jobs:
       - run: node scripts/check-sans-walk.mjs
   font-browser:
     needs: build
-    if: needs.build.outputs.font_only == 'true'
+    if: needs.build.outputs.release_only != 'true' && needs.build.outputs.font_only == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -213,6 +219,7 @@ jobs:
       - run: node scripts/check-ingame-font.mjs
   demon-browser:
     needs: build
+    if: needs.build.outputs.release_only != 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:
@@ -240,7 +247,7 @@ jobs:
             docs/demon-native-2026-11-06/*.png
             docs/project-archive-fix/*.png
   deploy:
-    if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.build.result == 'success' && needs.demon-browser.result == 'success' && (needs.dialogue-browser.result == 'success' || needs.dialogue-browser.result == 'skipped') && (needs.browser-checks.result == 'success' || needs.browser-checks.result == 'skipped') && (needs.returning-browser.result == 'success' || needs.returning-browser.result == 'skipped') && (needs.font-browser.result == 'success' || needs.font-browser.result == 'skipped') && (needs.walk-browser.result == 'success' || needs.walk-browser.result == 'skipped')
+    if: always() && needs.build.outputs.release_only != 'true' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.build.result == 'success' && needs.demon-browser.result == 'success' && (needs.dialogue-browser.result == 'success' || needs.dialogue-browser.result == 'skipped') && (needs.browser-checks.result == 'success' || needs.browser-checks.result == 'skipped') && (needs.returning-browser.result == 'success' || needs.returning-browser.result == 'skipped') && (needs.font-browser.result == 'success' || needs.font-browser.result == 'skipped') && (needs.walk-browser.result == 'success' || needs.walk-browser.result == 'skipped')
     needs: [build, browser-checks, dialogue-browser, returning-browser, font-browser, walk-browser, demon-browser]
     runs-on: ubuntu-latest
     permissions:
@@ -257,7 +264,7 @@ jobs:
 
   demon-public:
     needs: [build, deploy]
-    if: always() && needs.deploy.result == 'success' && needs.build.outputs.demon_only == 'true'
+    if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.build.result == 'success' && (needs.deploy.result == 'success' && needs.build.outputs.demon_only == 'true' || needs.build.outputs.release_only == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 7
     steps:
@@ -265,7 +272,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - run: npm run build
       - name: Verify published version and entry assets
+        env:
+          RELEASE_AUTOMATION_ONLY: ${{ needs.build.outputs.release_only }}
         run: node scripts/check-demon-public-release.mjs
       - name: Retain public release verification
         if: always()
