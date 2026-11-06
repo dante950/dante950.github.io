@@ -5,8 +5,8 @@ assert.match(expected||'',/^[a-f0-9]{40}$/);
 const base='https://dante950.github.io/';
 let version;
 for(let attempt=0;attempt<60;attempt++){
- const response=await fetch(base+'version.json?v='+expected+'&attempt='+attempt,{cache:'no-store'});
- if(response.ok){version=await response.json();if(version.commit===expected)break;}
+ const response=await fetch(base+'version.json?v='+expected+'&attempt='+attempt,{cache:'no-store'}).catch(()=>null);
+ if(response?.ok){version=await response.json();if(version.commit===expected)break;}
  await new Promise(resolve=>setTimeout(resolve,5000));
 }
 assert.equal(version?.commit,expected,'Published release must match the checked commit');

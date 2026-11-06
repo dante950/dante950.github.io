@@ -239,7 +239,7 @@ jobs:
 
   demon-public:
     needs: [build, deploy]
-    if: needs.build.outputs.demon_only == 'true'
+    if: always() && needs.deploy.result == 'success' && needs.build.outputs.demon_only == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
