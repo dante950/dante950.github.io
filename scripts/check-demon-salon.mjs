@@ -27,18 +27,30 @@ for(const [name,engine]of (process.argv.includes('--chromium')?[['chromium',chro
   }
   assert(await f.evaluate(()=>{const a=demonBeautyStatus();return a===demonBeautyStatus();}),'unchanged grading reuses its result');
   await snap('royal-orders');assert.equal(await p.evaluate(()=>fullflow.story.successLocked),false);
-  assert(await f.evaluate(()=>['earL','earR','tip','longHair','roof','silver','brow'].every(k=>demonMasks[k].some(Boolean))),'required masks must have actual resource pixels');
-  const trim='current[n]&&(demonMasks.earL[n]||demonMasks.earR[n]||demonMasks.eyes[n]||demonMasks.longHair[n]||demonMasks.roofZone[n]&&!demonMasks.roofAllowance[n]||demonMasks.tip[n]&&!demonMasks.tipKeep[n])';
+  assert(await f.evaluate(()=>['earL','earR','tip','longHair','brow','browRight','eyelidLeft','eyelidRight','lips'].every(k=>demonMasks[k].some(Boolean))),'required masks must have actual resource pixels');
+  const trim='current[n]&&(demonMasks.earL[n]||demonMasks.earR[n]||demonMasks.eyes[n]||demonMasks.longHair[n]||demonMasks.tip[n]&&!demonMasks.tipKeep[n])';
   // A horizontal cut through the long hair must release detached chunks.
   await size(f,1);await stroke(f,[50,204],[275,204]);
   assert(await f.evaluate(()=>fallingPieces.length>0),'cut hair falls with the shared effect');
-  await mask(f,trim,1);await f.locator('[data-tool="grow"]').click();await mask(f,'(demonMasks.roof[n]||demonMasks.tipKeep[n])&&!current[n]',1,true);await mask(f,'(demonMasks.roof[n]||demonMasks.tipKeep[n])&&!current[n]',1,true);
+  await mask(f,trim,1);await f.locator('[data-tool="grow"]').click();await mask(f,'demonMasks.tipKeep[n]&&!current[n]',1,true);await mask(f,'demonMasks.tipKeep[n]&&!current[n]',1,true);
   await report(f,'shape');await snap('royal-shape');assert.equal((await f.evaluate(()=>demonBeautyStatus())).checks[0],true);
   await stage(f,'draw');await f.locator('[data-color="#18151F"]').click();await mask(f,'current[n]',4);await mask(f,'current[n]&&paint[n*4+3]<242',2);
-  await f.locator('[data-color="#ECEBF4"]').click();await size(f,3);await stroke(f,[178,126],[178,144]);await f.locator('[data-color="#18151F"]').click();await mask(f,'demonMasks.brow[n]',1);
+  await f.locator('[data-color="#ECEBF4"]').click();await size(f,2);await stroke(f,[160,70],[160,100]);
+  await f.locator('[data-color="#18151F"]').click();await mask(f,'demonMasks.brow[n]||demonMasks.browRight[n]',1);
+  await mask(f,'demonMasks.eyelidLeft[n]||demonMasks.eyelidRight[n]',1);
+  await f.locator('[data-color="#FF3024"]').click();await size(f,1);await f.locator('#paintOpacity').fill('20');await f.locator('#paintOpacity').dispatchEvent('input');await stroke(f,[157,195],[177,195]);
+  const makeup=await report(f,'makeup');assert(makeup.metrics.lips,'thin 20% red lips');assert(makeup.metrics.eyelidLeft&&makeup.metrics.eyelidRight,'both thin eyelid creases');
+  await f.locator('#paintOpacity').fill('100');await f.locator('#paintOpacity').dispatchEvent('input');await f.locator('[data-color="#18151F"]').click();
   await report(f,'paint');await snap('royal-paint');assert.equal((await f.evaluate(()=>demonBeautyStatus())).checks[1],true);
-  const xy=[162,204];await size(f,1);await stroke(f,xy);assert.equal((await f.evaluate(()=>demonBeautyStatus())).checks[1],true,'small spill');await size(f,24);await stroke(f,xy);assert.equal((await f.evaluate(()=>demonBeautyStatus())).checks[1],false,'broad face paint');await f.locator('#erasePaint').click();await stroke(f,xy);assert.equal((await f.evaluate(()=>demonBeautyStatus())).checks[1],true,'erase restores');
-  await stage(f,'attach');for(const crown of ['T_tara','T_blackCrown']){await put(f,crown,[166,26]);for(const [ear,xy]of [['T_earring_L',[110,180]],['T_earring_R',[233,180]],['T_Cross',[233,180]]]){await put(f,ear,xy);assert.equal((await report(f,crown+'+'+ear)).success,true);await stroke(f,xy);}await stroke(f,[166,26]);}
+  const xy=[140,182];await size(f,1);await stroke(f,xy);assert.equal((await f.evaluate(()=>demonBeautyStatus())).checks[1],true,'small spill');await size(f,24);await stroke(f,xy);assert.equal((await f.evaluate(()=>demonBeautyStatus())).checks[1],false,'broad face paint');await f.locator('#erasePaint').click();await stroke(f,xy);assert.equal((await f.evaluate(()=>demonBeautyStatus())).checks[1],true,'erase restores');
+  await stage(f,'attach');
+  await put(f,'T_tara',[166,26]);
+  for(const pair of [['T_earring_L','T_earring_R'],['T_Cross','T_Cross'],['T_earring_L','T_Cross']]){
+   await put(f,pair[0],[110,180]);await put(f,pair[1],[233,180]);assert.equal((await report(f,'paired-'+pair.join('+'))).success,true);
+   await stroke(f,[110,180]);await stroke(f,[233,180]);
+  }
+  await stroke(f,[166,26]);
+  for(const crown of ['T_tara','T_blackCrown']){await put(f,crown,[166,26]);for(const [ear,xy]of [['T_earring_L',[110,180]],['T_earring_R',[233,180]],['T_Cross',[233,180]]]){await put(f,ear,xy);assert.equal((await report(f,crown+'+'+ear)).success,true);await stroke(f,xy);}await stroke(f,[166,26]);}
   await put(f,'T_blackCrown',[166,26]);await put(f,'T_Cross',[233,180]);await snap('royal-complete');assert.equal(await f.locator('.requestItem:not(.complete)').count(),0);
   await complete(f);for(let n=0;n<12&&!await p.locator('#demonFinishHome').isVisible();n++){await p.waitForTimeout(300);await talks();}await p.waitForSelector('#demonFinishHome');assert.equal(await p.evaluate(()=>fullflow.story.demonPhase),2);assert.equal(await p.evaluate(()=>fullflow.story.successLocked),true);assert(!(await p.locator('#storyBattle').getAttribute('srcdoc')));await p.locator('#demonViewPhoto').click();await f.locator('#demonSelfie.captured').waitFor();await snap('handsome-selfie');
   if(!publicRun){

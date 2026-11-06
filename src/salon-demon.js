@@ -7,6 +7,7 @@ function prepareDemonBeauty(){
  const readLayer=asset=>{const c=offscreen(),x=c.getContext('2d');x.imageSmoothingEnabled=false;drawPortraitLayer(x,asset);return x.getImageData(0,0,W,H).data;};
  const base=readLayer(portraitLayers.head),ears=readLayer(portraitLayers.ears);demonTarget.set(readLayer(portraitLayers.target));
  demonMasks=Object.fromEntries(['horn','scratch','face','earL','earR','tip','tipKeep','eyeOpening','roof','roofZone','forelock','silver','brow','browRight','eyes','longHair'].map(k=>[k,new Uint8Array(W*H)]));
+ if(demonPhase===2)Object.assign(demonMasks,demonMakeupMasks(base,W,H));
  const D=DEMON_DESIGN,segmentDistance=(x,y,a,b)=>{const dx=b[0]-a[0],dy=b[1]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy)));return Math.hypot(x-a[0]-dx*t,y-a[1]-dy*t);};
  for(let n=0;n<W*H;n++){
   const i=n*4,x=(n%W+.5)*PIX,y=(Math.floor(n/W)+.5)*PIX,r=sourcePixels[i],g=sourcePixels[i+1],b=sourcePixels[i+2],originalHere=!!original[n];masks.protectedFace[n]=0;
@@ -21,8 +22,8 @@ function prepareDemonBeauty(){
   demonMasks.earL[n]=Number(isEar&&!isRight);demonMasks.earR[n]=Number(isRight&&!isTip);demonMasks.tip[n]=Number(isTip);demonMasks.tipKeep[n]=Number(isTip&&x>=252);
   demonMasks.roofZone[n]=Number(demonInside(x,y,D.roofBox));demonMasks.roof[n]=Number(demonPolygon(x,y,D.roof));
   demonMasks.forelock[n]=Number(originalHere&&demonInside(x,y,D.forelock));demonMasks.silver[n]=Number(originalHere&&demonInside(x,y,D.silver));
-  demonMasks.brow[n]=Number(base[i+3]>100&&segmentDistance(x,y,...D.browLeft)<=2.1);demonMasks.browRight[n]=Number(base[i+3]>100&&demonInside(x,y,D.browRight));
-  demonMasks.eyes[n]=Number(D.eyes.some(box=>demonInside(x,y,box))||segmentDistance(x,y,...D.browLeft)<=4);
+  
+  demonMasks.eyes[n]=Number(D.eyes.some(box=>demonInside(x,y,box))||demonMasks.brow[n]||demonMasks.browRight[n]||demonMasks.eyelidLeft[n]||demonMasks.eyelidRight[n]);
 
  }
  const earBottom=Math.max(0,...Array.from(ears.keys()).filter(i=>i%4===3&&ears[i]>100).map(i=>(Math.floor(i/4/W)+.5)*PIX));
@@ -63,15 +64,15 @@ function demonBeautyStatus(){
    if(exists&&!stripe.allowance[n]&&isSilver(i))silverSpill++;
    if(demonMasks.brow[n]){browTotal++;if(!exists&&isBlack(i))brow++;}
    if(demonMasks.browRight[n]&&!exists&&!fringe[n]){rbt++;if(p)rb++;}
-   if(demonMasks.face[n]&&!exists){visibleFace++;if(p){facePaint++;if(!fringe[n]&&!demonMasks.browAllowance[n])facePaintCore++;}}
+   if(demonMasks.face[n]&&!exists){visibleFace++;if(p){facePaint++;if(!fringe[n]&&!demonMasks.makeupAllowance[n])facePaintCore++;}}
   }
  }
  if(demonPhase===1){
   const horn=right=>{let area=0,x0=320,x1=0,y0=350,y1=0;for(let n=0;n<W*H;n++){const x=(n%W+.5)*PIX,y=(Math.floor(n/W)+.5)*PIX;if(current[n]&&y>=8&&y<110&&(right?x>=212&&x<280:x>40&&x<=108)){area++;x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y);}}return {area,w:x1-x0,h:y1-y0};},left=horn(false),right=horn(true);
   Object.assign(metrics,{hornRatio:right.area/Math.max(1,left.area),hornHeight:Math.abs(right.h-left.h),hornWidth:Math.abs(right.w-left.w),bodyLoss:loss/Math.max(1,body),exposure:exposed/Math.max(1,face),growthRatio:extra/Math.max(1,body),scratches:scratch/Math.max(1,st),darkBase:dark/Math.max(1,baseTotal),eyePaint:ep/Math.max(1,et)},demonDecorationMetrics());
  }else{
-  const coverage=k=>count(k).ratio,roof=demonRoofProfile(current,W,H);
-  Object.assign(metrics,{leftEar:1-coverage('earL'),rightEar:1-coverage('earR'),rightTip:coverage('tip'),lengthOver:count('longHair').kept,...roof,eyes:1-coverage('eyes'),forelock:coverage('forelock'),black:black/Math.max(1,hair),silverLine:stripe.valid,silverTotal:stripe.total,silverSpill,brow:brow/Math.max(1,browTotal),rightBrowPaint:rb/Math.max(1,rbt),facePaint,facePaintCore,visibleFace,adornments:demonRoyalStickers(placements),exposure:0});
+  const coverage=k=>count(k).ratio,makeup=demonMakeup(current,paint,demonMasks,W,H);
+  Object.assign(metrics,{leftEar:1-coverage('earL'),rightEar:1-coverage('earR'),rightTip:coverage('tip'),lengthOver:count('longHair').kept,eyes:1-coverage('eyes'),forelock:coverage('forelock'),black:black/Math.max(1,hair),silverLine:stripe.valid,silverTotal:stripe.total,silverSpill,brow:brow/Math.max(1,browTotal),...makeup,facePaint,facePaintCore,visibleFace,adornments:demonRoyalStickers(placements),exposure:0});
  }
  return demonScoreCache={...demonJudge(demonPhase,metrics),phase:demonPhase,metrics};
 }
@@ -100,7 +101,7 @@ function updateDemonScore(action){
  if(action&&!finishing){expression=stage.every(Boolean)?'satisfied':'angry';beautyCustomer.dataset.expression=expression;}renderRequestStatus();
  if(demonPendingStroke){const {kind,faceHit}=demonPendingStroke,m=result.metrics;demonPendingStroke=null;
   if(kind==='sticker'){if(demonPhase===1&&!result.checks[2])demonProtest('helmetSticker');if(demonPhase===2&&!result.requirements.attach[2])demonProtest('sticker');}
-  if(kind==='paint'){if(demonPhase===1&&m.eyePaint>DEMON_HELMET_EYE_PAINT_LIMIT)demonProtest('helmetEye');if(demonPhase===2){if(faceHit&&m.facePaintCore>demonFacePaintLimit(m.visibleFace))demonProtest('face');else{const c=rgb(paintColor);if(Math.max(...c)>55&&!(Math.min(...c)>=190&&Math.max(...c)-Math.min(...c)<=40))demonProtest('color');}}}
+  if(kind==='paint'){if(demonPhase===1&&m.eyePaint>DEMON_HELMET_EYE_PAINT_LIMIT)demonProtest('helmetEye');if(demonPhase===2){if(faceHit&&m.facePaintCore>demonFacePaintLimit(m.visibleFace))demonProtest('face');else{const c=rgb(paintColor);if(Math.max(...c)>65&&!(Math.min(...c)>=190&&Math.max(...c)-Math.min(...c)<=40)&&!(c[0]>=180&&c[1]<=90&&c[2]<=100&&paintOpacity>=.15&&paintOpacity<=.30))demonProtest('color');}}}
  }
  if(result.sudden&&!demonSudden&&!finishing){demonSudden=true;setTimeout(()=>{if(finishing)return;const g=gesture;gesture=null;if(g&&portrait.hasPointerCapture(g.pointerId))portrait.releasePointerCapture(g.pointerId);finishing=true;beautyPhase='result';panel.inert=true;nav.inert=true;actions.inert=true;next.disabled=true;clearReturningReactions();renderPortrait(false);send('demon-sudden',{details:result,portrait:captureBeautyCustomer(),headPortrait:captureBeautyHead()});},0);}
 }
@@ -121,12 +122,11 @@ function drawDemonGuides(target){
   if(demonPhase===1){if(beautyPhase==='cut')color=demonMasks.face[n]?'#E9484855':demonMasks.horn[n]?'#FFD87366':null;if(beautyPhase==='draw')color=demonMasks.eyeOpening[n]?'#E9484877':demonMasks.scratch[n]?'#5DCD8588':null;}
   else if(beautyPhase==='cut'){
    const remove=demonMasks.earL[n]||demonMasks.earR[n]||demonMasks.eyes[n]||demonMasks.longHair[n]||demonMasks.tip[n]&&!demonMasks.tipKeep[n];
-   const keep=demonMasks.forelock[n]||demonMasks.tipKeep[n];
+   const keep=demonMasks.tipKeep[n];
    color=remove&&current[n]?'#5DCD8588':keep?'#FFD87366':null;
-  }else if(beautyPhase==='draw')color=current[n]&&demonInside((n%W+.5)*PIX,(Math.floor(n/W)+.5)*PIX,DEMON_DESIGN.silverZone)?'#CFE8FF88':demonMasks.brow[n]?'#FFD873DD':current[n]?'#5DCD8544':demonMasks.face[n]&&!demonMasks.browAllowance[n]?'#E9484833':null;
+  }else if(beautyPhase==='draw')color=current[n]&&demonInside((n%W+.5)*PIX,(Math.floor(n/W)+.5)*PIX,DEMON_DESIGN.silverZone)?'#CFE8FF88':(demonMasks.brow[n]||demonMasks.browRight[n])?'#FFD873DD':(demonMasks.eyelidLeft[n]||demonMasks.eyelidRight[n])?'#83CDEACC':demonMasks.lips[n]?'#EF929277':current[n]?'#5DCD8544':demonMasks.face[n]&&!demonMasks.makeupAllowance[n]?'#E9484833':null;
   if(color){target.fillStyle=color;target.fillRect(n%W,Math.floor(n/W),1,1);}
  }
- if(demonPhase===2&&beautyPhase==='cut'){target.strokeStyle='#92713F';target.lineWidth=.7;target.setLineDash([2,2]);target.beginPath();DEMON_DESIGN.roof.forEach(([x,y],i)=>i?target.lineTo(x/2,y/2):target.moveTo(x/2,y/2));target.stroke();target.setLineDash([]);target.font='5px Galmuri9';target.fillStyle='#675538';target.fillText('세 봉우리 예시 · 모양은 자유',38,7);}
  if(beautyPhase==='attach'){target.lineWidth=1;target.strokeStyle='#D7A331';target.setLineDash([3,2]);const boxes=demonPhase===2?[DEMON_DESIGN.crown,DEMON_DESIGN.earLeft,DEMON_DESIGN.earRight]:[{x:74,y:112,w:172,h:42}];for(const box of boxes)target.strokeRect(box.x/2,box.y/2,box.w/2,box.h/2);}
  target.restore();
 }
