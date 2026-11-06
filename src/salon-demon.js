@@ -100,7 +100,7 @@ function updateDemonScore(action){
  totalSatisfaction=result.success?100:Math.min(39,cutScore+drawScore+attachScore);liveSatisfaction=100*stage.filter(Boolean).length/Math.max(1,stage.length);shapeProgress={score:cutScore,hardFailure:!result.success,details:[],demon:result};
  if(action&&!finishing){expression=stage.every(Boolean)?'satisfied':'angry';beautyCustomer.dataset.expression=expression;}renderRequestStatus();
  if(demonPendingStroke){const {kind,hairHit}=demonPendingStroke,m=result.metrics;demonPendingStroke=null;
-  if(kind==='sticker'){if(demonPhase===1&&!result.checks[2])demonProtest('helmetSticker');if(demonPhase===2&&!result.requirements.attach[1])demonProtest('sticker');}
+  if(kind==='sticker'){if(demonPhase===1&&!result.checks[2])demonProtest('helmetSticker');if(demonPhase===2&&!result.requirements.attach[2])demonProtest('sticker');}
   if(kind==='paint'){if(demonPhase===1&&m.eyePaint>DEMON_HELMET_EYE_PAINT_LIMIT)demonProtest('helmetEye');if(demonPhase===2&&hairHit){const c=rgb(paintColor);if(Math.max(...c)>65&&!(Math.min(...c)>=190&&Math.max(...c)-Math.min(...c)<=40))demonProtest('color');}}
  }
  if(result.sudden&&!demonSudden&&!finishing){demonSudden=true;setTimeout(()=>{if(finishing)return;const g=gesture;gesture=null;if(g&&portrait.hasPointerCapture(g.pointerId))portrait.releasePointerCapture(g.pointerId);finishing=true;beautyPhase='result';panel.inert=true;nav.inert=true;actions.inert=true;next.disabled=true;clearReturningReactions();renderPortrait(false);send('demon-sudden',{details:result,portrait:captureBeautyCustomer(),headPortrait:captureBeautyHead()});},0);}
