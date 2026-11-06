@@ -29,6 +29,11 @@ export function demonProtest(phase,kind){
  if(phase!==2)return '';
  return ({face:DEMON_LINES.face,color:DEMON_LINES.color,sticker:DEMON_LINES.sticker})[kind]||'';
 }
+// Uploaded PNGs can contain faint alpha residue outside the visible pixel art.
+// Use the same occupancy boundary for rendering, tools and satisfaction masks.
+export function normalizeDemonPixels(data){
+ const out=data.slice();for(let i=0;i<out.length;i+=4){if(out[i+3]<=100)out.fill(0,i,i+4);else out[i+3]=255;}return out;
+}
 export class DemonPixels {
  constructor(phase,layers,width=320,height=350){
   this.phase=phase;this.w=width;this.h=height;this.count=width*height;this.base=layers.base;

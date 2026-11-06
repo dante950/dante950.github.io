@@ -1,4 +1,4 @@
-import {DemonPixels,DEMON_LINES,demonGate,demonProtest,DEMON_STAR_THRESHOLDS} from './model.js';
+import {DemonPixels,normalizeDemonPixels,DEMON_LINES,demonGate,demonProtest,DEMON_STAR_THRESHOLDS} from './model.js';
 const $=id=>document.getElementById(id),scene=$('scene'),ctx=scene.getContext('2d'),portrait=$('portrait'),pc=portrait.getContext('2d');
 const query=new URLSearchParams(location.search),storyToken=query.get('story');
 let config={},images={},ready=false,mode='loading',since=performance.now(),last=since,beat=0,beats=[],speech=null,model=null,phase=1,successLocked=false,tool='hammer',color=[36,34,54],radius=7,drag=null,selectedSticker=null,sound=true,clock=0,busy=false,raf=0;
@@ -110,7 +110,7 @@ function drawRoom(dt){
  hero(player.x,player.y,165,player.frame,player.direction);
  const near=Math.hypot(player.x-505,player.y-400)<170&&p===1;$('interact').disabled=!near;$('interact').textContent=near?'마왕에게 말 걸기 · F':'마왕에게 가까이 가세요';
 }
-function makeLayer(name,box){const c=transparent(),x=c.getContext('2d');x.imageSmoothingEnabled=false;const im=imageOf(name);if(im)x.drawImage(im,...box);return c;}
+function makeLayer(name,box){const c=transparent(),x=c.getContext('2d');x.imageSmoothingEnabled=false;const im=imageOf(name);if(im)x.drawImage(im,...box);const data=x.getImageData(0,0,320,350);data.data.set(normalizeDemonPixels(data.data));x.putImageData(data,0,0);return c;}
 function pixels(c){return c.getContext('2d').getImageData(0,0,320,350).data;}
 const layerCache={};
 function makeLayers(p){

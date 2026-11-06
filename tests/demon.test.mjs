@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {demonGate,demonJudge,demonProtest,DemonPixels} from '../src/demon/model.js';
+import {demonGate,demonJudge,demonProtest,DemonPixels,normalizeDemonPixels} from '../src/demon/model.js';
 test('only three earned stars admit the king; each failed level has its own line',()=>{
  for(const stars of [0,1,2])assert.equal(demonGate(stars).admitted,false);
  assert.equal(demonGate(3).admitted,true);assert.equal(demonGate(8).stars,3);
@@ -34,4 +34,11 @@ test('scissors and hammer affect separate phase-three layers; undo restores both
  m.stroke(1,1,.1,'hammer');assert.equal(m.stones[23],0);m.undo();assert.equal(m.material[23],255);assert.equal(m.stones[23],255);
  m.stroke(1,1,.1,'paint',[18,18,18]);assert.equal(m.paint[23],255);
  m.stroke(1,1,.1,'erase');assert.equal(m.paint[23],0);
+});
+
+test('faint PNG alpha residue is not editable hair or a hidden face-paint target',()=>{
+ const source=new Uint8ClampedArray([240,240,250,1,240,240,250,100,240,240,250,180,240,240,250,255]);
+ const result=normalizeDemonPixels(source);
+ assert.deepEqual([...result],[0,0,0,0,0,0,0,0,240,240,250,255,240,240,250,255]);
+ assert.equal(source[3],1);
 });
