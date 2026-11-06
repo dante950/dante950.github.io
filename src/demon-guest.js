@@ -13,14 +13,14 @@ export const DEMON_DESIGN={
  roof:[[110,100],[122,56],[145,86],[166,28],[187,86],[207,56],[220,100]],
  roofBox:{x:52,y:8,w:220,h:92},
  forelock:{x:171,y:104,w:12,h:40},silver:{x:174,y:128,w:4,h:16},
- leftSide:{x:70,y:176,w:70,h:130,end:194},rightSide:{x:208,y:176,w:60,h:130,end:214},
+ silverZone:{x:146,y:100,w:56,h:50},
  eyes:[{x:112,y:150,w:44,h:18},{x:183,y:150,w:44,h:18}],
  browLeft:[[122,144],[116,138]],browRight:{x:182,y:137,w:34,h:13},
  crown:{x:126,y:4,w:80,h:58},earLeft:{x:88,y:157,w:44,h:45},earRight:{x:212,y:157,w:44,h:45}
 };
 export const DEMON_REQUIREMENTS={
  1:{cut:['양쪽 뿔의 높이·굵기 균형 복원','투구 본체 보존 · 얼굴을 뚫지 않기','상단·옆면 꾸미기는 투구 크기의 30% 안에서'],draw:['기스가 보이지 않게 덮기','짙은 바탕 70% 이상 · 나머지 색은 자유','눈 개구부의 인상 보존'],attach:['작은 장식 최대 두 개 · 안 붙여도 좋음','눈 개구부를 가리지 않기']},
- 2:{cut:['화면 왼쪽 귀는 끝까지 드러내기','오른쪽 귀는 끝만 살짝 가리기','왼쪽 구레나룻은 귓불 높이까지','오른쪽 구레나룻은 한 단계 길게','정수리 세 갈래 · 가운데가 가장 높게','두 눈·왼쪽 눈썹 노출 · 가운데 앞머리는 남기기'],draw:['머리는 검정 · 가운데 은빛 부분 제외','가운데 앞머리 끝에 가는 은색 한 줄','왼쪽 눈썹 꼬리를 검정으로 세 칸 올리기','오른쪽 눈썹은 원래대로 · 얼굴은 깨끗이'],attach:['머리 위에 티아라 또는 검은 왕관 하나','귓불에 하트 귀걸이 또는 십자가 하나','그 밖의 장식은 제외']}
+ 2:{cut:['화면 왼쪽 귀는 끝까지 드러내기','오른쪽 귀는 끝만 살짝 가리기','머리 전체 길이는 귓불 아래로 내려오지 않게','정수리에 세 봉우리 · 가운데를 양옆보다 높게','두 눈·왼쪽 눈썹 노출 · 가운데 앞머리는 남기기'],draw:['은색 한 줄을 제외한 머리 전체를 검정으로','이마 가운데 앞머리 끝에 은색 세로 한 줄','왼쪽 눈썹 꼬리를 검정으로 세 칸 올리기','오른쪽 눈썹은 원래대로 · 얼굴은 깨끗이'],attach:['머리 위에 티아라 또는 검은 왕관 하나','귓불에 하트 귀걸이 또는 십자가 하나','그 밖의 장식은 제외']}
 };
 export const DEMON_LINES={arrival:[['마왕 부하','약속드린 날짜가 되어 마왕님을 모셔왔습니다.'],['몬스터','호오.. 단기간에 미용 실력을 증명했다던 자가 자네인가?'],['몬스터','그럼.. 우선 이 모습부터 맡겨보지']],warning:'그곳은 복원할 곳이 아니다. 손을 멈추게.',warningAgain:'얼굴에는 손대지 말라고 했을 텐데.',face:'그곳까지 칠해 달라고 하지는 않았네. 닦아주게.',color:'검은 머리와 은빛 한 줄. 내 주문을 다시 살펴보게.',sticker:'위치와 수를 다시 보게. 장식에도 격식이 있지.',helmetEye:'눈이 보이는 틈은 남겨두게. 앞을 볼 수는 있어야지.',helmetSticker:'투구보다 장식이 먼저 입장할 기세로군. 조금 줄여주게.'};
 export function demonGate(stars){const n=Math.max(0,Math.min(3,Math.floor(Number(stars)||0)));return {stars:n,admitted:n===3,line:n===3?'흠.. 3스타 미용실.. 일단 합격이군.':['별 하나 없는 곳에 내 머리를 맡기라는 것이냐?','흥… 별이 하나뿐인가. 형편없는 미용실이군.','별이 둘이라… 내 머리를 맡기엔 부족하군.'][n]};}
@@ -37,20 +37,82 @@ export function demonJudge(phase,m={}){
  const requirements=phase===1?{
  cut:[m.hornRatio>=.78&&m.hornRatio<=1.25&&m.hornHeight<=10&&m.hornWidth<=14,m.bodyLoss<=.04&&m.exposure===0,m.growthRatio<=.30],
  draw:[m.scratches>=.90,m.darkBase>=.70,m.eyePaint<=DEMON_HELMET_EYE_PAINT_LIMIT],attach:[m.decorCount<=2&&m.decorArea<=.18,m.decorEyes<=.05]
- }:{cut:[m.leftEar>=.90,m.rightTip>=.35&&m.rightTip<=.85&&m.rightEar>=.90,m.leftSide>=.82&&m.leftOver<=.08,m.rightSide>=.82&&m.rightOver<=.08,m.roof>=.88&&m.roofOver<=.12,m.eyes>=.94&&m.forelock>=.80],
- draw:[m.black>=.97,m.silver>=.85&&m.silverSpill<=Math.max(8,(m.silverTotal||0)*.40),m.brow>=.80,m.rightBrowPaint<=.08&&m.facePaintCore<=demonFacePaintLimit(m.visibleFace)],attach:m.adornments||[false,false,false]};
+ }:{cut:[m.leftEar>=.90,m.rightTip>=.35&&m.rightTip<=.85&&m.rightEar>=.90,m.lengthOver<=6,m.roofPeaks===3&&m.centerHighest,m.eyes>=.94&&m.forelock>=.80],
+ draw:[m.black>=.97,m.silverLine&&m.silverSpill<=Math.max(6,(m.silverTotal||0)*.25),m.brow>=.80,m.rightBrowPaint<=.08&&m.facePaintCore<=demonFacePaintLimit(m.visibleFace)],attach:m.adornments||[false,false,false]};
  const checks=['cut','draw','attach'].map(stage=>requirements[stage].every(Boolean));return {success:checks.every(Boolean),sudden:phase===1&&m.exposure>=DEMON_FACE_LIMIT,checks,requirements};
+}
+// Judge the visible skyline, not occupancy of a hidden target polygon.
+export function demonRoofProfile(material,width,height){
+ const left=Math.ceil(52/2),right=Math.floor(272/2),bottom=Math.min(height,60),top=[];
+ for(let x=left;x<=right;x++){let y=bottom;for(let q=0;q<bottom;q++)if(material[q*width+x]){y=q;break;}top.push(y);}
+ const smooth=top.map((y,i)=>[top[Math.max(0,i-1)],y,top[Math.min(top.length-1,i+1)]].sort((a,b)=>a-b)[1]);
+ const peaks=[];
+ for(let i=0;i<smooth.length;){let end=i;while(end+1<smooth.length&&smooth[end+1]===smooth[i])end++;
+  const y=smooth[i],before=i?smooth[i-1]:bottom,after=end+1<smooth.length?smooth[end+1]:bottom;
+  if(y<bottom-4&&y<before&&y<after){
+   let l=i-1,r=end+1,lv=y,rv=y;
+   while(l>=0&&smooth[l]>=y){lv=Math.max(lv,smooth[l--]);if(lv-y>=4)break;}
+   while(r<smooth.length&&smooth[r]>=y){rv=Math.max(rv,smooth[r++]);if(rv-y>=4)break;}
+   if(Math.min(lv,rv)-y>=4)peaks.push({x:(left+(i+end)/2)*2,y:y*2});
+  }i=end+1;
+ }
+ return {peaks,roofPeaks:peaks.length,centerHighest:peaks.length===3&&peaks[1].y+6<=Math.min(peaks[0].y,peaks[2].y)};
+}
+export function demonSilverStripe(material,paint,width,height){
+ const selected=new Uint8Array(material.length),seen=new Uint8Array(material.length),components=[];let tip=0,total=0;
+ const zone=DEMON_DESIGN.silverZone;
+ for(let n=0;n<material.length;n++)if(material[n]&&demonInside((n%width+.5)*2,(Math.floor(n/width)+.5)*2,zone)){
+  tip=Math.max(tip,Math.floor(n/width));const i=n*4;
+  if(paint[i+3]>=230&&Math.min(paint[i],paint[i+1],paint[i+2])>=190&&Math.max(paint[i],paint[i+1],paint[i+2])-Math.min(paint[i],paint[i+1],paint[i+2])<=40){selected[n]=1;total++;}
+ }
+ for(let n=0;n<selected.length;n++)if(selected[n]&&!seen[n]){
+  const cells=[n];seen[n]=1;let x0=width,x1=0,y0=height,y1=0;
+  for(let q=0;q<cells.length;q++){const k=cells[q],x=k%width,y=Math.floor(k/width);x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y);
+   for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const xx=x+dx,yy=y+dy,i=yy*width+xx;if(xx>=0&&xx<width&&yy>=0&&yy<height&&selected[i]&&!seen[i]){seen[i]=1;cells.push(i);}}
+  }components.push({cells,x0,x1,y0,y1});
+ }
+ components.sort((a,b)=>b.cells.length-a.cells.length);const line=components[0],mask=new Uint8Array(material.length);
+ if(line)for(const n of line.cells)mask[n]=1;
+ const w=line?line.x1-line.x0+1:0,h=line?line.y1-line.y0+1:0;
+ const valid=!!line&&h>=4&&w<=8&&h>=w*1.25&&line.y1>=tip-4&&line.cells.length>=w*h*.5&&total-line.cells.length<=6;
+ return {valid,total:line?.cells.length||0,mask,allowance:demonHornAllowance(mask,width,height,2)};
+}
+// Extend the source palette into new material, keeping the original PNG unchanged.
+export function demonGrowthPalette(pixels,width,height){
+ const filled=new Uint8Array(width*height),colors=new Uint8ClampedArray(pixels.length),queue=[];
+ const occupied=Uint8Array.from({length:width*height},(_,n)=>pixels[n*4+3]>100?1:0);
+ for(let n=0;n<occupied.length;n++){const x=n%width,y=Math.floor(n/width),i=n*4;
+  if(occupied[n]&&Math.max(pixels[i],pixels[i+1],pixels[i+2])>35&&x>0&&x<width-1&&y>0&&y<height-1&&occupied[n-1]&&occupied[n+1]&&occupied[n-width]&&occupied[n+width]){filled[n]=1;colors.set(pixels.subarray(i,i+4),i);queue.push(n);}
+ }
+ for(let q=0;q<queue.length;q++){const n=queue[q],x=n%width,y=Math.floor(n/width);for(const [xx,yy]of [[x-1,y],[x+1,y],[x,y-1],[x,y+1]]){if(xx<0||xx>=width||yy<0||yy>=height)continue;const k=yy*width+xx;if(!filled[k]){filled[k]=1;colors.set(colors.subarray(n*4,n*4+4),k*4);queue.push(k);}}}
+ return colors;
 }
 export function demonGuest(phase=1){
  if(phase!==1&&phase!==2)throw Error('마왕 미용은 두 페이즈입니다.');
  const notes=DEMON_REQUIREMENTS[phase];
- const request=phase===1?{cut:['전장의 흔적은 지워주게. 위엄까지 지우지는 말고.','부러진 뿔을 반대쪽과 균형 있게 복원하게. 상단과 옆면의 장식은 그대의 안목을 보겠네.','단, 투구 안을 들여다볼 생각은 버리게.'],draw:['기스가 남아 보이지 않게 덮어주게.','짙은 바탕은 일곱 할 이상 남기고, 나머지 색과 무늬는 맡기지.','눈이 보이는 틈은 가리지 말게. 앞을 볼 수는 있어야지.'],attach:['작은 장식은 두 개까지 허락하겠네. 안 붙여도 좋고.','눈이 보이는 틈을 가리거나, 투구보다 장식이 커서는 곤란하네.']}:{cut:['내 주문은 간단하네.','왼쪽 귀는 전부 드러내게. 오른쪽은 끝만 살짝 가리고. 모든 말을 들을 생각은 없으니.','왼쪽 구레나룻은 귓불까지. 오른쪽은 그보다 한 단계 길게 남기게.','정수리는 세 갈래. 가운데가 가장 높아야 하네.','두 눈과 왼쪽 눈썹은 드러내되, 가운데 앞머리 한 가닥은 남기게.','머리는 검게. 가운데 앞머리 끝에만 가느다란 은빛 한 줄을 남겨두게.','왼쪽 눈썹 끝은 세 칸 올리고, 오른쪽은 그대로. 분노와 관용이 동시에 보여야 하니.','머리 위에는 티아라나 검은 왕관 하나. 왕관이 없다고 누가 왕인지 헷갈려서는 곤란하지.','……이상일세.',['플레이어','방금 미용 주문하신 거 맞죠? 국가 운영 방침 아니고?'],['마왕 부하','오늘은 상당히 간소하게 말씀하신 편입니다.'],'아. 귓불의 하트 귀걸이나 십자가 하나를 빠뜨렸군. 좌우는 거울에 보이는 쪽을 기준으로 하게.'],draw:['머리는 검게. 가운데 앞머리 끝에만 은빛 한 줄일세.','왼쪽 눈썹 꼬리는 검정으로 세 칸 올리고, 오른쪽 눈썹은 그대로 두게.','눈썹 밖 얼굴에 남은 색은 닦아주게.'],attach:['티아라나 검은 왕관을 머리 위에 하나 올려주게. 왕관이 없다고 누가 왕인지 헷갈려서는 곤란하지.','귀에는 좌우에 맞는 하트 귀걸이, 또는 십자가 하나. 그 밖의 장식은 제외하게.']};
- const details=phase===1?{cut:['반대쪽 뿔을 보고 높이와 굵기를 맞추게. 발모제로 채우고 망치·정으로 다듬으면 되네.','얼굴 쪽에 낸 구멍은 작은 동안 메울 수 있네. 선을 넘으면 그 즉시 야차일세.','상단·옆면 외형은 원래 투구 크기의 삼 할까지 늘려도 좋네.'],draw:request.draw,attach:request.attach}:{cut:['좌우는 화면 기준일세. 왼쪽 귀 전체, 오른쪽 귀는 아래가 드러나고 끝만 머리에 가리면 되네.','구레나룻은 가이드의 길이 범위에 맞추게. 정수리의 가운데 갈래는 양옆보다 높게.','손질 가이드는 초록 부분을 덜고, 금빛 안쪽을 남기거나 채우는 표시일세.'],draw:['은빛 줄과 왼쪽 눈썹 꼬리는 손질 가이드에 표시해두었네. 작은 손떨림까지 따지지는 않겠네.','머리의 검정 염색, 은빛 줄, 눈썹 꼬리의 모양을 함께 살피게.'],attach:request.attach};
- return {id:DEMON_GUEST_ID,name:'마왕',demon:true,demonPhase:phase,workbookExcluded:true,battle:'none',bindings:{},note:'4일차 마왕. 투구 복원과 미형 미용의 두 페이즈. 미용 성공은 미형 셀카, 고블린은 야차에서만 공개. 야차 전투 미연결.',demonRequest:request,demonRequestDetails:details,
- beauty:{enabled:true,designVersion:2,steps:{cut:true,draw:true,attach:true},weights:{cut:60,draw:30,attach:10},cutTool:phase===1?'hammer':'scissors',growth:{enabled:true,material:phase===1?'horn':'hair',color:phase===1?'#242236':'#ECEBF4',outline:phase===1?'#18151F':'#9695AB',allowFace:true,region:{x:12,y:6,w:296,h:310}},drawColors:['#242236','#18151F','#4853F8','#ECEBF4'],cutRegions:[{key:'DemonShape',label:notes.cut[0],x:0,y:0,w:320,h:350,kind:'keep',rule:'free',points:60,tolerance:0}],drawRegions:[],attachRegions:[],requestBriefNotes:Object.fromEntries(Object.entries(notes).map(([k,v])=>[k,v.join('\n')])),requestNotes:Object.fromEntries(Object.entries(notes).map(([k,v])=>[k,v.join('\n')]))},
+ const request=phase===1?{cut:['전장의 흔적은 지워주게. 위엄까지 지우지는 말고.','부러진 뿔을 반대쪽과 균형 있게 복원하게. 상단과 옆면의 장식은 그대의 안목을 보겠네.','단, 투구 안을 들여다볼 생각은 버리게.'],draw:['기스가 남아 보이지 않게 덮어주게.','짙은 바탕은 일곱 할 이상 남기고, 나머지 색과 무늬는 맡기지.','눈이 보이는 틈은 가리지 말게. 앞을 볼 수는 있어야지.'],attach:['작은 장식은 두 개까지 허락하겠네. 안 붙여도 좋고.','눈이 보이는 틈을 가리거나, 투구보다 장식이 커서는 곤란하네.']}:{cut:['내 주문은 간단하네.','왼쪽 귀는 전부 드러내게. 오른쪽은 끝만 살짝 가리고. 모든 말을 들을 생각은 없으니.','머리 전체를 귓불 아래로 내려오지 않게 다듬게. 전투 중 목에 닿으면 거슬리니.','정수리에 뾰족한 봉우리 셋을 만들게. 가운데 봉우리가 양옆보다 높아야 하네.','두 눈과 왼쪽 눈썹은 드러내되, 가운데 앞머리 한 가닥은 남기게.','머리 전체는 검게. 단, 이마 가운데로 내려오는 앞머리 끝에는 은색 세로 한 줄을 칠해주게.','왼쪽 눈썹 끝은 세 칸 올리고, 오른쪽은 그대로. 분노와 관용이 동시에 보여야 하니.','머리 위에는 티아라나 검은 왕관 하나. 왕관이 없다고 누가 왕인지 헷갈려서는 곤란하지.','……이상일세.',['플레이어','방금 미용 주문하신 거 맞죠? 국가 운영 방침 아니고?'],['마왕 부하','오늘은 상당히 간소하게 말씀하신 편입니다.'],'아. 귓불의 하트 귀걸이나 십자가 하나를 빠뜨렸군. 좌우는 거울에 보이는 쪽을 기준으로 하게.'],draw:['머리는 검게. 이마 가운데 앞머리 끝에 은색 세로 한 줄만 칠하게. 그 줄을 빼고 나머지는 검정일세.','왼쪽 눈썹 꼬리는 검정으로 세 칸 올리고, 오른쪽 눈썹은 그대로 두게.','눈썹 밖 얼굴에 남은 색은 닦아주게.'],attach:['티아라나 검은 왕관을 머리 위에 하나 올려주게. 왕관이 없다고 누가 왕인지 헷갈려서는 곤란하지.','귀에는 좌우에 맞는 하트 귀걸이, 또는 십자가 하나. 그 밖의 장식은 제외하게.']};
+ const details=phase===1?{cut:['반대쪽 뿔을 보고 높이와 굵기를 맞추게. 발모제로 채우고 망치·정으로 다듬으면 되네.','얼굴 쪽에 낸 구멍은 작은 동안 메울 수 있네. 선을 넘으면 그 즉시 야차일세.','상단·옆면 외형은 원래 투구 크기의 삼 할까지 늘려도 좋네.'],draw:request.draw,attach:request.attach}:{cut:['좌우는 화면 기준일세. 왼쪽 귀 전체, 오른쪽 귀는 아래가 드러나고 끝만 머리에 가리면 되네.','귓불 아래의 초록색 머리는 덜어내게. 정수리 점선은 세 봉우리의 예시일 뿐, 똑같이 따라 그릴 필요는 없네.','손질 가이드는 초록 부분을 덜고, 금빛 안쪽을 남기거나 채우는 표시일세.'],draw:['은색은 이마 가운데 앞머리 끝에 세로로 한 줄일세. 하늘색 표시 안에서 위치나 굵기가 조금 달라도 좋네. 왼쪽 눈썹 꼬리는 금빛 표시를 보게.','머리의 검정 염색, 은빛 줄, 눈썹 꼬리의 모양을 함께 살피게.'],attach:request.attach};
+ return {id:DEMON_GUEST_ID,name:'마왕',demon:true,demonPhase:phase,workbookExcluded:false,battle:'none',bindings:{},note:'4일차 마왕. 투구 복원과 미형 미용의 두 페이즈. 미용 성공은 미형 셀카, 고블린은 야차에서만 공개. 야차 전투 미연결.',demonRequest:request,demonRequestDetails:details,
+ beauty:{enabled:true,designVersion:2,steps:{cut:true,draw:true,attach:true},weights:{cut:60,draw:30,attach:10},cutTool:phase===1?'hammer':'scissors',growth:{enabled:true,material:phase===1?'horn':'hair',color:phase===1?'#242236':'#ECEBF4',outline:phase===1?'#18151F':'#242236',allowFace:true,region:{x:12,y:6,w:296,h:310}},drawColors:['#242236','#18151F','#4853F8','#ECEBF4'],cutRegions:[{key:'DemonShape',label:notes.cut[0],x:0,y:0,w:320,h:350,kind:'keep',rule:'free',points:60,tolerance:0}],drawRegions:[],attachRegions:[],requestBriefNotes:Object.fromEntries(Object.entries(notes).map(([k,v])=>[k,v.join('\n')])),requestNotes:Object.fromEntries(Object.entries(notes).map(([k,v])=>[k,v.join('\n')]))},
  resultLines:{satisfied:phase===1?'……제법이군. 이제 투구를 벗어도 되겠어.':'훗… 정말 만족스럽군!',angry:'……이게 무엇이냐.',neutral:'……'},basePay:0,tipRate:0};
 }
+// Existing workbook sheets keep the prose; phase selection stays in project JSON.
+export function ensureDemonDialogueCatalogue(project){
+ const g=project?.guests?.find(g=>g.id===DEMON_GUEST_ID);if(!g||!project.combat?.sheets)return project;
+ g.workbookExcluded=false;
+ const rows=name=>project.combat.sheets.find(s=>s.name===name)?.rows||[],groups=rows('대화 그룹'),lines=rows('대사'),links=rows('미용 대사 연결');
+ g.demonPhaseDialogue||={};g.demonPhaseDialogue[1]||=Object.fromEntries(links.filter(r=>r.MonsterID===g.id).map(r=>[r.Stage,{RequestGroupID:r.RequestGroupID,DetailGroupID:r.DetailGroupID}]));
+ const second=g.demonPhaseDialogue[2]||={},guest=demonGuest(2);
+ for(const stage of ['cut','draw','attach']){second[stage]||={};for(const [key,texts]of [['RequestGroupID',guest.demonRequest[stage]],['DetailGroupID',guest.demonRequestDetails[stage]]]){
+  if(groups.some(r=>r.GroupID===second[stage][key]))continue;
+  const id=Math.max(80000,...groups.map(r=>r.GroupID))+1;second[stage][key]=id;
+  groups.push({GroupID:id,Name:'마왕 · 미형 · '+stage+(key==='DetailGroupID'?' 상세':''),PlaybackMode:'순서대로',PauseCombat:true,AdvanceMode:'입력',CPS:30,HoldMs:1400,GapMs:100,Notes:'마왕 2페이즈 미용 · 페이즈 연결은 프로젝트 JSON',ActorEffect:'없음',FinishEffect:'없음'});
+  for(const [i,line]of texts.entries())lines.push({DialogueID:Math.max(900000,...lines.map(r=>r.DialogueID))+1,GroupID:id,Order:i+1,Speaker:Array.isArray(line)?line[0]:'몬스터',Text:Array.isArray(line)?line[1]:line,Notes:'마왕 2페이즈 미용'});
+ }}return project;
+}
 export function installDemonDialogue(project,g){
+ ensureDemonDialogueCatalogue(project);const source=project.guests.find(x=>x.id===g.id),configured=source?.demonPhaseDialogue?.[g.demonPhase];
+ if(configured&&['cut','draw','attach'].every(k=>configured[k])){g.bindings={...source.bindings};const links=project.combat.sheets.find(s=>s.name==='미용 대사 연결').rows;for(const stage of ['cut','draw','attach']){const row={MonsterID:g.id,Stage:stage,...configured[stage]},old=links.find(r=>r.MonsterID===g.id&&r.Stage===stage);if(old)Object.assign(old,row);else links.push(row);}return g;}
  const rows=n=>project.combat.sheets.find(s=>s.name===n).rows,groups=rows('대화 그룹'),lines=rows('대사'),links=rows('미용 대사 연결');
  const add=(name,texts)=>{const id=Math.max(80000,...groups.map(r=>r.GroupID))+1;groups.push({GroupID:id,Name:'마왕 · '+name,PlaybackMode:'순서대로',PauseCombat:true,AdvanceMode:'입력',CPS:30,HoldMs:1400,GapMs:100,Notes:'마왕 미용 · 웹 전용',ActorEffect:'없음',FinishEffect:'없음'});for(const [i,line]of texts.entries())lines.push({DialogueID:Math.max(900000,...lines.map(r=>r.DialogueID))+1,GroupID:id,Order:i+1,Speaker:Array.isArray(line)?line[0]:'몬스터',Text:Array.isArray(line)?line[1]:line,Notes:'마왕 미용 · 웹 전용'});return id;};
  g.bindings.arrival=add('등장',DEMON_LINES.arrival);

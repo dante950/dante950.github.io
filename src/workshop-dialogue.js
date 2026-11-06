@@ -3,7 +3,7 @@
 const workshopRows=(data,name)=>data.sheets.find(s=>s.name===name)?.rows||[];
 // These released guests used to be marked JSON-only. Keep old projects compatible
 // while exporting their existing dialogue rows, without inventing combat phases.
-const releasedDialogueGuest=g=>[10005,10006].includes(g.id)&&!g.previewOnly;
+const releasedDialogueGuest=g=>[10005,10006,10007].includes(g.id)&&!g.previewOnly;
 const workshopIDs=project=>new Set(project.guests.filter(g=>g.previewOnly===true||(g.workbookExcluded===true&&!releasedDialogueGuest(g))).map(g=>g.id));
 const workshopLinkKey=row=>row.MonsterID+'/'+row.Stage;
 const workshopGroupIDs=links=>new Set(links.flatMap(r=>[r.RequestGroupID,r.DetailGroupID]).filter(Number.isInteger));

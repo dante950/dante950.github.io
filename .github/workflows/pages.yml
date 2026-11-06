@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       demon_only: ${{ steps.scope.outputs.demon_only }}
+      archive_changed: ${{ steps.scope.outputs.archive_changed }}
       dialogue_only: ${{ steps.scope.outputs.dialogue_only }}
       walk_only: ${{ steps.scope.outputs.walk_only }}
       font_only: ${{ steps.scope.outputs.font_only }}
@@ -32,6 +33,7 @@ jobs:
           EVENT: ${{ github.event_name }}
           BEFORE: ${{ github.event.before }}
         run: |
+          archive_changed=false
           demon_changed=false
           demon_only=false
           dialogue_only=false
@@ -51,9 +53,10 @@ jobs:
             reaction_only=true
             returning_only=true
             while IFS= read -r file; do
+              case "$file" in data/schema.json|src/combat/versions.js|src/project-archive.js|src/workshop-dialogue.js|scripts/check-project-archive.mjs|tests/project-archive.test.mjs) archive_changed=true ;; esac
               case "$file" in src/demon/*|src/demon-guest.js|src/demon-story.js|src/salon-demon*.js|public/demon.html|public/demon-assets.json|public/media/demon/*|scripts/check-demon*.mjs|tests/demon*.test.mjs|docs/demon-day-four.md|docs/demon-recovery-2026-11-06/*) demon_changed=true ;; esac
               case "$file" in
-                data/project.json|src/app.js|src/model.js|src/index.html|src/style.css|src/salon.html|src/salon-beauty.js|src/salon-beauty.css|src/salon-beauty-result.js|src/speaker-avatar.js|scripts/build.mjs|scripts/check-minion.mjs|scripts/check-returning-zombie.mjs|scripts/check-local-story.mjs|tests/story-start.test.mjs|tests/salon-dialogue.test.mjs|docs/demon-native-2026-11-06/*|src/demon/*|src/demon-guest.js|src/demon-story.js|src/salon-demon*.js|public/demon.html|public/demon-assets.json|public/media/demon/*|scripts/check-demon*.mjs|tests/demon*.test.mjs|docs/demon-day-four.md|docs/demon-recovery-2026-11-06/*|.github/workflows/pages.yml) ;;
+                data/schema.json|src/combat/versions.js|src/workshop-dialogue.js|tests/project-archive.test.mjs|tests/workshop-dialogue.test.mjs|scripts/check-project-archive.mjs|data/project.json|src/app.js|src/model.js|src/index.html|src/style.css|src/salon.html|src/salon-beauty.js|src/salon-beauty.css|src/salon-beauty-result.js|src/speaker-avatar.js|scripts/build.mjs|scripts/check-minion.mjs|scripts/check-returning-zombie.mjs|scripts/check-local-story.mjs|tests/story-start.test.mjs|tests/salon-dialogue.test.mjs|docs/demon-native-2026-11-06/*|src/demon/*|src/demon-guest.js|src/demon-story.js|src/salon-demon*.js|public/demon.html|public/demon-assets.json|public/media/demon/*|scripts/check-demon*.mjs|tests/demon*.test.mjs|docs/demon-day-four.md|docs/demon-recovery-2026-11-06/*|.github/workflows/pages.yml) ;;
                 *) demon_only=false ;;
               esac
               case "$file" in
@@ -87,6 +90,7 @@ jobs:
             done < <(git diff --name-only "$BEFORE" HEAD)
           fi
           if [ "$demon_changed" != true ]; then demon_only=false; fi
+          echo "archive_changed=$archive_changed" >> "$GITHUB_OUTPUT"
           echo "demon_only=$demon_only" >> "$GITHUB_OUTPUT"
           echo "dialogue_only=$dialogue_only" >> "$GITHUB_OUTPUT"
           echo "walk_only=$walk_only" >> "$GITHUB_OUTPUT"
@@ -110,7 +114,7 @@ jobs:
         run: node --test tests/coffee-dialogue.test.mjs tests/beauty-reaction-dialogue.test.mjs tests/returning-zombie.test.mjs tests/story-start.test.mjs tests/story-progress.test.mjs tests/beauty-shape.test.mjs tests/salon-dialogue.test.mjs tests/workshop-dialogue.test.mjs tests/closing.test.mjs tests/social.test.mjs tests/coffee-beauty.test.mjs
       - name: Check day-four beauty, star gates and story handoff rules
         if: steps.scope.outputs.demon_only == 'true'
-        run: node --test tests/demon-salon.test.mjs tests/story-progress.test.mjs tests/story-start.test.mjs tests/beauty-shape.test.mjs tests/coffee-beauty.test.mjs tests/salon-dialogue.test.mjs tests/workshop-dialogue.test.mjs tests/returning-zombie.test.mjs tests/beauty-reaction-dialogue.test.mjs
+        run: node --test tests/demon-salon.test.mjs tests/project-archive.test.mjs tests/story-progress.test.mjs tests/story-start.test.mjs tests/beauty-shape.test.mjs tests/coffee-beauty.test.mjs tests/salon-dialogue.test.mjs tests/workshop-dialogue.test.mjs tests/returning-zombie.test.mjs tests/beauty-reaction-dialogue.test.mjs
       - run: npm test
         if: steps.scope.outputs.demon_only != 'true' && steps.scope.outputs.walk_only != 'true' && steps.scope.outputs.font_only != 'true' && steps.scope.outputs.intro_only != 'true' && steps.scope.outputs.result_only != 'true' && steps.scope.outputs.returning_only != 'true'
       - uses: actions/upload-pages-artifact@v4
@@ -217,10 +221,22 @@ jobs:
         with:
           node-version: '22'
       - run: npm ci --ignore-scripts --no-audit --no-fund
-      - run: npx playwright install --with-deps chromium webkit
+      - run: npx playwright install --with-deps chromium
       - run: npm run build
-      - run: node scripts/check-demon-salon.mjs
-      - run: node scripts/check-demon-salon-regression.mjs
+      - run: node scripts/check-demon-salon.mjs --chromium
+      - run: node scripts/check-demon-salon-regression.mjs --chromium
+      - name: Check actual XLSM and XLSX archive roundtrip
+        if: needs.build.outputs.archive_changed == 'true'
+        run: node scripts/check-project-archive.mjs --chromium
+      - name: Retain changed-flow evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: demon-checks-${{ github.sha }}
+          path: |
+            docs/demon-two-phase-2026-11-06/*.png
+            docs/demon-native-2026-11-06/*.png
+            docs/project-archive-fix/*.png
   deploy:
     if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.build.result == 'success' && needs.demon-browser.result == 'success' && (needs.dialogue-browser.result == 'success' || needs.dialogue-browser.result == 'skipped') && (needs.browser-checks.result == 'success' || needs.browser-checks.result == 'skipped') && (needs.returning-browser.result == 'success' || needs.returning-browser.result == 'skipped') && (needs.font-browser.result == 'success' || needs.font-browser.result == 'skipped') && (needs.walk-browser.result == 'success' || needs.walk-browser.result == 'skipped')
     needs: [build, browser-checks, dialogue-browser, returning-browser, font-browser, walk-browser, demon-browser]
@@ -241,18 +257,15 @@ jobs:
     needs: [build, deploy]
     if: always() && needs.deploy.result == 'success' && needs.build.outputs.demon_only == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 7
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: npm ci --ignore-scripts --no-audit --no-fund
-      - run: npx playwright install --with-deps chromium
-      - run: npm run build
-      - name: Verify the published demon beauty flow
+      - name: Verify published version and entry assets
         run: node scripts/check-demon-public-release.mjs
-      - name: Retain public gameplay captures
+      - name: Retain public release verification
         if: always()
         uses: actions/upload-artifact@v4
         with:

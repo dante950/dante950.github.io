@@ -255,6 +255,9 @@ function undoBeauty(){
  else {placements=old.placements;touched.attach=old.touched;}
  syncUndo();updateBeautyScore();renderPortrait();coffeeAction('undo');
 }
+let beautyPaintFrame=0;
+function cancelBeautyPaintFrame(){if(beautyPaintFrame){cancelAnimationFrame(beautyPaintFrame);beautyPaintFrame=0;}}
+function queueBeautyPaint(){if(beautyPaintFrame)return;beautyPaintFrame=requestAnimationFrame(()=>{beautyPaintFrame=0;if(gesture?.kind!=='scissors')updateBeautyScore(true);renderPortrait();});}
 function point(e){const r=portrait.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*320,y:(e.clientY-r.top)/r.height*350};}
 function applyStroke(points,kind){
  const cells=strokeCells(W,H,points,brushRadius);if(isDemon){applyDemonStroke(cells,kind);return;}let changed=false;
@@ -305,12 +308,12 @@ portrait.addEventListener('pointerdown',e=>{
 });
 portrait.addEventListener('pointermove',e=>{
  if(!gesture||e.pointerId!==gesture.pointerId)return;e.preventDefault();const p=point(e);gesture.to=p;
- if(gesture.kind!=='scissors'){applyStroke([gesture.last,p],gesture.kind);updateBeautyScore(true);}
- gesture.last=p;renderPortrait();
+ if(gesture.kind!=='scissors')applyStroke([gesture.last,p],gesture.kind);
+ gesture.last=p;queueBeautyPaint();
 });
 portrait.addEventListener('pointerup',e=>{
  if(!gesture||e.pointerId!==gesture.pointerId)return;
- const g=gesture;g.to=point(e);
+ cancelBeautyPaintFrame();const g=gesture;g.to=point(e);
  if(g.kind==='scissors'){applyStroke([g.from,g.to],'scissors');}
  gesture=null;
  if(portrait.hasPointerCapture(e.pointerId))portrait.releasePointerCapture(e.pointerId);
@@ -322,12 +325,13 @@ portrait.addEventListener('pointerup',e=>{
  if(coffeeTutorial){const changed=current.some((v,i)=>v!==g.snapshot[i])||paint.some((v,i)=>v!==g.paint[i]);if(changed){if(['scissors','hammer'].includes(g.kind))coffeeActions.cut=true;if(g.kind==='grow')coffeeActions.grow=true;if(g.kind==='paint')coffeeActions.draw=true;}coffeeAction('stroke',{tool:g.kind,changed});}
 });
 function removeCutFragments(before){
- if(isDemon)return;
+ if(isDemon&&demonPhase===1)return;
  const rooted=B.growth?.connected?rootedBeautyMaterial(current,sculptAnchors,W,H):null;
  const removed=rooted?Array.from(current,(_,n)=>n).filter(n=>current[n]&&!rooted[n]):detachedByBeautyCut(before,current,W,H,sculptAnchors).filter(n=>!masks.protectedFace[n]);if(!removed.length)return;
  renderPortrait(false);
  const data=materialCanvas.getContext('2d').getImageData(0,0,W,H),piece=offscreen(),pc=piece.getContext('2d'),pixels=pc.createImageData(W,H);
  for(const n of removed){const i=n*4;pixels.data.set(data.data.subarray(i,i+4),i);current[n]=0;clearMaterialPaint(n);}
+ if(isDemon){demonGeometryDirty=true;demonScoreCache=null;}
  pc.putImageData(pixels,0,0);fallingPieces.push({canvas:piece,start:performance.now()});
  if(!fallingFrame)fallingFrame=requestAnimationFrame(animateFalling);
 }
@@ -336,7 +340,7 @@ function animateFalling(t){
  renderPortrait();fallingFrame=fallingPieces.length?requestAnimationFrame(animateFalling):0;
 }
 function cancelGesture(){
- if(!gesture)return;const g=gesture;gesture=null;current.set(g.snapshot);paint.set(g.paint);if(isDemon&&g.stones)demonStones.set(g.stones);touched=g.touched;if(g.undoAdded)history[beautyPhase].pop();
+ cancelBeautyPaintFrame();if(!gesture)return;if(isDemon)demonGeometryDirty=true;const g=gesture;gesture=null;current.set(g.snapshot);paint.set(g.paint);if(isDemon&&g.stones)demonStones.set(g.stones);touched=g.touched;if(g.undoAdded)history[beautyPhase].pop();
  if(portrait.hasPointerCapture(g.pointerId))portrait.releasePointerCapture(g.pointerId);
  syncUndo();updateBeautyScore();renderPortrait();
 }
@@ -453,15 +457,16 @@ function renderPortrait(includeGuides=true,target=ctx,includeCape=true){
  if(includeCape&&!coffeeTutorial)target.drawImage(capeImage,isDemon&&demonPhase===2?28:24,isDemon&&demonPhase===2?115:79.5,112,112*capeImage.naturalHeight/capeImage.naturalWidth);
  paintFace();
  if(!bone)target.drawImage(faceCanvas,0,0);
+ if(isDemon)prepareDemonGeometry();
  const coffeeEdge=coffeeTutorial?coffeeMaterialBoundary(current,W,H):null;
- const materialCtx=materialCanvas.getContext('2d'),data=materialCtx.createImageData(W,H),face=faceCanvas.getContext('2d').getImageData(0,0,W,H).data;
+ const materialCtx=materialCanvas.getContext('2d'),data=materialCtx.createImageData(W,H),face=bone?faceCanvas.getContext('2d').getImageData(0,0,W,H).data:null;
  for(let n=0;n<W*H;n++){
   if(!current[n])continue;const i=n*4;
-  const edge=emptyNeighbor(current,n),joining=originalBorder[n]&&!edge;
-  const sourceDark=!bone&&sourcePixels[i+1]<140;
-  const nearGrowth=!bone&&sourceDark&&[-2*W,-W,-2,-1,1,2,W,2*W].some(d=>current[n+d]===2);
-  const color=coffeeTutorial?coffeeHairPixelColor(current[n],coffeeEdge[n],masks.coffeeOldEdge?.[n],masks.coffeeRestore?.[n],materialColor,outlineColor):layered?(current[n]===2?(edge?outlineColor:materialColor):null):edge?outlineColor:current[n]===2||joining||nearGrowth?materialColor:null;
-  if(color)data.data.set([...color,255],i);else data.data.set((bone?face:sourcePixels).subarray(i,i+4),i);
+  const legacy=!isDemon&&!coffeeTutorial,edge=legacy?emptyNeighbor(current,n):false,joining=legacy&&originalBorder[n]&&!edge;
+  const sourceDark=legacy&&!layered&&!bone&&sourcePixels[i+1]<140;
+  const nearGrowth=sourceDark&&[-2*W,-W,-2,-1,1,2,W,2*W].some(d=>current[n+d]===2);
+  const color=isDemon?demonMaterialColor(n):coffeeTutorial?coffeeHairPixelColor(current[n],coffeeEdge[n],masks.coffeeOldEdge?.[n],masks.coffeeRestore?.[n],materialColor,outlineColor):layered?(current[n]===2?(edge?outlineColor:materialColor):null):edge?outlineColor:current[n]===2||joining||nearGrowth?materialColor:null;
+  if(color){data.data[i]=color[0];data.data[i+1]=color[1];data.data[i+2]=color[2];data.data[i+3]=255;}else data.data.set((bone?face:sourcePixels).subarray(i,i+4),i);
   if(!coffeeTutorial&&paint[i+3]&&!masks.protectedFace[n])data.data.set(blendBeautyRGBA(data.data.subarray(i,i+4),paint.subarray(i,i+3),paint[i+3]/255),i);
  }
  if(!B.designVersion)for(let n=0;n<W*H;n++){const i=n*4;if(paint[i+3]&&!current[n]&&(bone||!masks.face[n]))data.data.set(paint.subarray(i,i+4),i);}

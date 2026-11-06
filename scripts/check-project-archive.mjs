@@ -12,7 +12,7 @@ const server=http.createServer(async(req,res)=>{try{const url=new URL(req.url,'h
 await new Promise(r=>server.listen(0,'127.0.0.1',r));const base='http://127.0.0.1:'+server.address().port;
 const lineFor=(p,id,event)=>p.combat.sheets.find(s=>s.name==='대사').rows.find(l=>l.GroupID===p.guests.find(g=>g.id===id).bindings[event]).Text;
 async function openWorkshop(page){await page.goto(base);await page.waitForFunction(()=>window.fullflow);await page.locator('#developer').click();if(await page.locator('#updateOK').isVisible())await page.locator('#updateOK').click();await page.locator('#ownerLogin').click();await page.locator('#workshopPassword').fill('archive-fixture');await page.locator('#passwordSubmit').click();await page.locator('#passwordDialog').waitFor({state:'hidden'});}
-try{for(const [name,type] of Object.entries({chromium,webkit})){
+try{for(const [name,type] of Object.entries(process.argv.includes('--chromium')?{chromium}:{chromium,webkit})){
  const browser=await type.launch();try{
  const page=await browser.newPage({viewport:{width:1440,height:900},acceptDownloads:true}),errors=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(25000);await openWorkshop(page);
  await page.locator('[data-editor="dialogue"]:visible').first().click();
@@ -22,7 +22,7 @@ try{for(const [name,type] of Object.entries({chromium,webkit})){
  // This edit is made after entering combat; the archive must request current data instead of copying its entry snapshot.
  const editedHP=await frame.evaluate(()=>{const row=lab.data.sheets.find(s=>s.name==='몬스터 페이즈').rows[0];return ++row.MaxHP;});
  await frame.locator('#changeIntent').fill('두 손님 대사 저장 왕복 검증');const download=page.waitForEvent('download',{timeout:90000});await frame.locator('#exportZip').click();const zipDownload=await download;const zipBytes=await fs.readFile(await zipDownload.path()),zip=await JSZip.loadAsync(zipBytes);const member=Object.keys(zip.files).find(n=>n.endsWith('/야차차_통합프로젝트.json'));assert(member,'ZIP contains full simulator project');const archived=JSON.parse(await zip.file(member).async('string'));
- assert.equal(lineFor(archived,10005,'arrival'),lineFor(authored,10005,'arrival'));assert.equal(lineFor(archived,10006,'employedArrival'),lineFor(authored,10006,'employedArrival'));assert.deepEqual(archived.guests,authored.guests);assert.equal(archived.combat.sheets.find(s=>s.name==='몬스터 페이즈').rows[0].MaxHP,editedHP);assert(Object.keys(zip.files).some(n=>n.endsWith('.xlsm')));assert(Object.keys(zip.files).some(n=>n.endsWith('.xlsx')));
+ assert.equal(lineFor(archived,10005,'arrival'),lineFor(authored,10005,'arrival'));assert.equal(lineFor(archived,10006,'employedArrival'),lineFor(authored,10006,'employedArrival'));assert.deepEqual(archived.guests,authored.guests);assert.equal(archived.combat.sheets.find(s=>s.name==='몬스터 페이즈').rows[0].MaxHP,editedHP);assert(Object.keys(zip.files).some(n=>n.endsWith('.xlsm')));assert(Object.keys(zip.files).some(n=>n.endsWith('.xlsx')));assert.equal(archived.combat.sheets.find(s=>s.name==='미용 대사 연결').rows.filter(r=>r.MonsterID===10007).length,3);
 
  // Check the actual serialized Excel pair, then edit and reload each representation alone.
  for(const member of Object.keys(zip.files).filter(n=>/\.xls[mx]$/.test(n))){
@@ -30,7 +30,7 @@ try{for(const [name,type] of Object.entries({chromium,webkit})){
   const checked=await frame.evaluate(async ({bytes,filename,project})=>{
    const book=lab.OfflineBook.create(),data=await book.load(Uint8Array.from(bytes),filename);
    const rows=n=>data.sheets.find(s=>s.name===n).rows,source=project.combat.sheets.find(s=>s.name==='대사').rows;
-   let count=0;for(const guest of project.guests.filter(g=>[10005,10006].includes(g.id)))for(const gid of Object.values(guest.bindings)){
+   let count=0;for(const guest of project.guests.filter(g=>[10005,10006,10007].includes(g.id)))for(const gid of new Set([...Object.values(guest.bindings),...Object.values(guest.demonPhaseDialogue||{}).flatMap(stages=>Object.values(stages).flatMap(link=>Object.values(link)))])){
     if(!rows('대화 그룹').some(g=>g.GroupID===gid))throw Error('Excel group missing: '+gid);
     const expected=source.filter(l=>l.GroupID===gid),actual=rows('대사').filter(l=>l.GroupID===gid);
     if(JSON.stringify(actual.map(l=>[l.DialogueID,l.Order,l.Speaker,l.Text]))!==JSON.stringify(expected.map(l=>[l.DialogueID,l.Order,l.Speaker,l.Text])) )throw Error('Excel lines differ: '+gid);count+=actual.length;

@@ -1,3 +1,4 @@
+import {ensureDemonDialogueCatalogue} from '../demon-guest.js';
 import {projectArchiveFiles,PROJECT_ARCHIVE_FILE} from '../project-archive.js';
 import {parseWorkbookXml} from './workbook-xml.js';
 import {salonDialogueProblems} from '../salon-dialogue.js';
@@ -85,6 +86,7 @@ const TableVersions=(()=>{
   return '\uFEFF'+text.filter(x=>x!==undefined).join('\r\n')+'\r\n';
  }
  async function prepare(input,intent,version=stamp(),project=null){
+  if(project)project=ensureDemonDialogueCatalogue(structuredClone(project));
   const projectFiles=project?projectArchiveFiles(project,version):[];
   if(!intent?.trim())throw Error('변경 의도를 적어 주세요. 예: 취객이 술에서 깨는 느낌을 주려고 후반 공격을 빠르게 조정.');
   const a=authorFrom(project?.combat||input),{u,drafts}=unityFrom(a);assertKeys(a);assertKeys(u);const check=validate(u);

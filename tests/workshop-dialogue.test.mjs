@@ -12,7 +12,7 @@ test('workbook roundtrip excludes only workshop dialogue and restores its edited
  const p=structuredClone(base);salonDialogueGroup(p,10004,'cut').lines[0].Text='사용자가 수정한 마왕 부하 부탁';
  const before=structuredClone(p),workbook=combatForWorkbook(p);
  assert(!rows(workbook,'미용 대사 연결').some(r=>r.MonsterID===10004));
- const workbookGuestIDs=[...new Set(rows(workbook,'몬스터 페이즈').map(r=>r.MonsterID)),10006];
+ const workbookGuestIDs=[...new Set(rows(workbook,'몬스터 페이즈').map(r=>r.MonsterID)),10006,10007];
  assert.deepEqual(salonDialogueProblems({combat:workbook,guests:workbookGuestIDs.map(id=>({id}))}),[]);
  const merged=mergeWorkshopDialogues(p,workbook);
  for(const sheet of p.combat.sheets)assert.deepEqual(rows(merged,sheet.name).map(r=>JSON.stringify(r)).sort(),sheet.rows.map(r=>JSON.stringify(r)).sort());assert.deepEqual(p,before);

@@ -4360,6 +4360,198 @@
             "Speaker": "몬스터",
             "Text": "눈이 보이는 틈을 가리거나, 투구보다 장식이 커서는 곤란하네.",
             "Notes": "마왕 미용 · 웹 전용"
+          },
+          {
+            "DialogueID": 1000055,
+            "GroupID": 90031,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "내 주문은 간단하네.",
+            "Notes": "마왕 2페이즈 미용"
+          },
+          {
+            "DialogueID": 1000056,
+            "GroupID": 90031,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "왼쪽 귀는 전부 드러내게. 오른쪽은 끝만 살짝 가리고. 모든 말을 들을 생각은 없으니.",
+            "Notes": "마왕 2페이즈 미용"
+          },
+          {
+            "DialogueID": 1000057,
+            "GroupID": 90031,
+            "Order": 3,
+            "Speaker": "몬스터",
+            "Text": "머리 전체를 귓불 아래로 내려오지 않게 다듬게. 전투 중 목에 닿으면 거슬리니.",
+            "Notes": "마왕 2페이즈 미용"
+          },
+          {
+            "DialogueID": 1000058,
+            "GroupID": 90031,
+            "Order": 4,
+            "Speaker": "몬스터",
+            "Text": "정수리에 뾰족한 봉우리 셋을 만들게. 가운데 봉우리가 양옆보다 높아야 하네.",
+            "Notes": "마왕 2페이즈 미용"
+          },
+          {
+            "DialogueID": 1000059,
+            "GroupID": 90031,
+            "Order": 5,
+            "Speaker": "몬스터",
+            "Text": "두 눈과 왼쪽 눈썹은 드러내되, 가운데 앞머리 한 가닥은 남기게.",
+            "Notes": "마왕 2페이즈 미용"
+          },
+          {
+            "DialogueID": 1000060,
+            "GroupID": 90031,
+            "Order": 6,
+            "Speaker": "몬스터",
+            "Text": "머리 전체는 검게. 단, 이마 가운데로 내려오는 앞머리 끝에는 은색 세로 한 줄을 칠해주게.",
+            "Notes": "마왕 2페이즈 미용"
+          },
+          {
+            "DialogueID": 1000061,
+            "GroupID": 90031,
+            "Order": 7,
+            "Speaker": "몬스터",
+            "Text": "왼쪽 눈썹 끝은 세 칸 올리고, 오른쪽은 그대로. 분노와 관용이 동시에 보여야 하니.",
+            "Notes": "마왕 2페이즈 미용"
+          },
+          {
+            "DialogueID": 1000062,
+            "GroupID": 90031,
+            "Order": 8,
+            "Speaker": "몬스터",
+            "Text": "머리 위에는 티아라나 검은 왕관 하나. 왕관이 없다고 누가 왕인지 헷갈려서는 곤란하지.",
+            "Notes": "마왕 2페이즈 미용"
+          },
+          {
+            "DialogueID": 1000063,
+            "GroupID": 90031,
+            "Order": 9,
+            "Speaker": "몬스터",
+            "Text": "……이상일세.",
+            "Notes": "마왕 2페이즈 미용"
+          },
+          {
+            "DialogueID": 1000064,
+            "GroupID": 90031,
+            "Order": 10,
+            "Speaker": "플레이어",
+            "Text": "방금 미용 주문하신 거 맞죠? 국가 운영 방침 아니고?",
+            "Notes": "마왕 2페이즈 미용"
+          },
+          {
+            "DialogueID": 1000065,
+            "GroupID": 90031,
+            "Order": 11,
+            "Speaker": "마왕 부하",
+            "Text": "오늘은 상당히 간소하게 말씀하신 편입니다.",
+            "Notes": "마왕 2페이즈 미용"
+          },
+          {
+            "DialogueID": 1000066,
+            "GroupID": 90031,
+            "Order": 12,
+            "Speaker": "몬스터",
+            "Text": "아. 귓불의 하트 귀걸이나 십자가 하나를 빠뜨렸군. 좌우는 거울에 보이는 쪽을 기준으로 하게.",
+            "Notes": "마왕 2페이즈 미용"
+          },
+          {
+            "DialogueID": 1000067,
+            "GroupID": 90032,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "좌우는 화면 기준일세. 왼쪽 귀 전체, 오른쪽 귀는 아래가 드러나고 끝만 머리에 가리면 되네.",
+            "Notes": "마왕 2페이즈 미용"
+          },
+          {
+            "DialogueID": 1000068,
+            "GroupID": 90032,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "귓불 아래의 초록색 머리는 덜어내게. 정수리 점선은 세 봉우리의 예시일 뿐, 똑같이 따라 그릴 필요는 없네.",
+            "Notes": "마왕 2페이즈 미용"
+          },
+          {
+            "DialogueID": 1000069,
+            "GroupID": 90032,
+            "Order": 3,
+            "Speaker": "몬스터",
+            "Text": "손질 가이드는 초록 부분을 덜고, 금빛 안쪽을 남기거나 채우는 표시일세.",
+            "Notes": "마왕 2페이즈 미용"
+          },
+          {
+            "DialogueID": 1000070,
+            "GroupID": 90033,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "머리는 검게. 이마 가운데 앞머리 끝에 은색 세로 한 줄만 칠하게. 그 줄을 빼고 나머지는 검정일세.",
+            "Notes": "마왕 2페이즈 미용"
+          },
+          {
+            "DialogueID": 1000071,
+            "GroupID": 90033,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "왼쪽 눈썹 꼬리는 검정으로 세 칸 올리고, 오른쪽 눈썹은 그대로 두게.",
+            "Notes": "마왕 2페이즈 미용"
+          },
+          {
+            "DialogueID": 1000072,
+            "GroupID": 90033,
+            "Order": 3,
+            "Speaker": "몬스터",
+            "Text": "눈썹 밖 얼굴에 남은 색은 닦아주게.",
+            "Notes": "마왕 2페이즈 미용"
+          },
+          {
+            "DialogueID": 1000073,
+            "GroupID": 90034,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "은색은 이마 가운데 앞머리 끝에 세로로 한 줄일세. 하늘색 표시 안에서 위치나 굵기가 조금 달라도 좋네. 왼쪽 눈썹 꼬리는 금빛 표시를 보게.",
+            "Notes": "마왕 2페이즈 미용"
+          },
+          {
+            "DialogueID": 1000074,
+            "GroupID": 90034,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "머리의 검정 염색, 은빛 줄, 눈썹 꼬리의 모양을 함께 살피게.",
+            "Notes": "마왕 2페이즈 미용"
+          },
+          {
+            "DialogueID": 1000075,
+            "GroupID": 90035,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "티아라나 검은 왕관을 머리 위에 하나 올려주게. 왕관이 없다고 누가 왕인지 헷갈려서는 곤란하지.",
+            "Notes": "마왕 2페이즈 미용"
+          },
+          {
+            "DialogueID": 1000076,
+            "GroupID": 90035,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "귀에는 좌우에 맞는 하트 귀걸이, 또는 십자가 하나. 그 밖의 장식은 제외하게.",
+            "Notes": "마왕 2페이즈 미용"
+          },
+          {
+            "DialogueID": 1000077,
+            "GroupID": 90036,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "티아라나 검은 왕관을 머리 위에 하나 올려주게. 왕관이 없다고 누가 왕인지 헷갈려서는 곤란하지.",
+            "Notes": "마왕 2페이즈 미용"
+          },
+          {
+            "DialogueID": 1000078,
+            "GroupID": 90036,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "귀에는 좌우에 맞는 하트 귀걸이, 또는 십자가 하나. 그 밖의 장식은 제외하게.",
+            "Notes": "마왕 2페이즈 미용"
           }
         ]
       },
@@ -6602,6 +6794,84 @@
             "Notes": "마왕 미용 · 웹 전용",
             "ActorEffect": "없음",
             "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 90031,
+            "Name": "마왕 · 미형 · cut",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "마왕 2페이즈 미용 · 페이즈 연결은 프로젝트 JSON",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 90032,
+            "Name": "마왕 · 미형 · cut 상세",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "마왕 2페이즈 미용 · 페이즈 연결은 프로젝트 JSON",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 90033,
+            "Name": "마왕 · 미형 · draw",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "마왕 2페이즈 미용 · 페이즈 연결은 프로젝트 JSON",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 90034,
+            "Name": "마왕 · 미형 · draw 상세",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "마왕 2페이즈 미용 · 페이즈 연결은 프로젝트 JSON",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 90035,
+            "Name": "마왕 · 미형 · attach",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "마왕 2페이즈 미용 · 페이즈 연결은 프로젝트 JSON",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 90036,
+            "Name": "마왕 · 미형 · attach 상세",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "마왕 2페이즈 미용 · 페이즈 연결은 프로젝트 JSON",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
           }
         ]
       },
@@ -8335,7 +8605,7 @@
       "name": "마왕",
       "demon": true,
       "demonPhase": 1,
-      "workbookExcluded": true,
+      "workbookExcluded": false,
       "battle": "none",
       "bindings": {
         "arrival": 90024
@@ -8439,7 +8709,37 @@
         "neutral": "……"
       },
       "basePay": 0,
-      "tipRate": 0
+      "tipRate": 0,
+      "demonPhaseDialogue": {
+        "1": {
+          "cut": {
+            "RequestGroupID": 90025,
+            "DetailGroupID": 90026
+          },
+          "draw": {
+            "RequestGroupID": 90027,
+            "DetailGroupID": 90028
+          },
+          "attach": {
+            "RequestGroupID": 90029,
+            "DetailGroupID": 90030
+          }
+        },
+        "2": {
+          "cut": {
+            "RequestGroupID": 90031,
+            "DetailGroupID": 90032
+          },
+          "draw": {
+            "RequestGroupID": 90033,
+            "DetailGroupID": 90034
+          },
+          "attach": {
+            "RequestGroupID": 90035,
+            "DetailGroupID": 90036
+          }
+        }
+      }
     }
   ],
   "schedule": [

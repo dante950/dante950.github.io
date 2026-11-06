@@ -2,7 +2,8 @@
   "version": 1,
   "salonOnlyMonsterIDs": [
     10004,
-    10006
+    10006,
+    10007
   ],
   "source": "https://app.notion.com/p/3ef648bf677880ac939bde40fc57a243",
   "ignoredSheets": [

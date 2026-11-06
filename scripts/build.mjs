@@ -3,12 +3,13 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
 import {projectProblems} from '../src/model.js';
+import {ensureDemonDialogueCatalogue} from '../src/demon-guest.js';
 import {ensureCoffeeDialogues} from '../src/tutorial/dialogues.js';
 import {validate} from '../src/combat/engine.js';
 
 const root=path.resolve(fileURLToPath(new URL('../',import.meta.url)));
 const read=f=>fs.readFile(path.join(root,f),'utf8');
-const project=ensureCoffeeDialogues(JSON.parse(await read('data/project.json')));
+const project=ensureDemonDialogueCatalogue(ensureCoffeeDialogues(JSON.parse(await read('data/project.json'))));
 const errors=projectProblems(project);
 for(const guest of (project.guests||[]).filter(g=>!g.previewOnly&&g.battle!=='none')) errors.push(...validate(project.combat,{monsterID:guest.id}).errors);
 if(errors.length)throw Error('배포 데이터 확인 필요:\n'+errors.join('\n'));
@@ -28,7 +29,7 @@ async function bundle(prefix,names){return (await Promise.all(names.map(f=>read(
 let combat=await read('src/combat/index.html');
 const speechStyle=(await read('src/ingame-font.css'))+'\n'+await read('src/guest-speech.css');
 const css=speechStyle+'\n'+(await Promise.all(['style.css','story.css','story-stage.css'].map(f=>read('src/combat/'+f)))).join('\n');
-const combatScript=await bundle('src/combat/',['../media.js','text-effects.js','dialogue.js','engine.js','cursor-engine.js','../beauty-reaction-dialogue.js','../salon-dialogue.js','workbook-xml.js','workbook.js','../project-archive.js','versions.js','scene.js','story-scene.js','cursor-scene.js','cursor-ui.js','app.js','tutorial.js','bridge.js']);
+const combatScript=await bundle('src/combat/',['../media.js','text-effects.js','dialogue.js','engine.js','cursor-engine.js','../beauty-reaction-dialogue.js','../salon-dialogue.js','workbook-xml.js','workbook.js','../project-archive.js','../demon-guest.js','versions.js','scene.js','story-scene.js','cursor-scene.js','cursor-ui.js','app.js','tutorial.js','bridge.js']);
 const wb=(await fs.readFile(path.join(root,'data/source.xlsx'))).toString('base64');
 const au=(await fs.readFile(path.join(root,'data/source-authoring.xlsm'))).toString('base64');
 const schema=await read('data/schema.json'),assets=await read('src/combat/assets.json');
