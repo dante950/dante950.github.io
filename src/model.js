@@ -389,7 +389,7 @@ export function addWorkshopGuests(project,defaults){
   for(const old of ids){const src=modelRows(defaults,'대화 그룹').find(r=>r.GroupID===old);if(!src)continue;const id=Math.max(80000,...groups.map(r=>r.GroupID))+1;map.set(old,id);groups.push({...structuredClone(src),GroupID:id});for(const line of modelRows(defaults,'대사').filter(r=>r.GroupID===old))lines.push({...structuredClone(line),DialogueID:Math.max(900000,...lines.map(r=>r.DialogueID))+1,GroupID:id});}
   for(const event of Object.keys(guest.bindings))guest.bindings[event]=map.get(guest.bindings[event]);
   for(const link of sourceLinks)links.push({...link,RequestGroupID:map.get(link.RequestGroupID),DetailGroupID:map.get(link.DetailGroupID)});
-  delete guest.demonPhaseDialogue;project.guests.push(guest);
+  delete guest.demonPhaseDialogue;delete guest.demonResultDialogue;project.guests.push(guest);
  }
  return ensureDemonDialogueCatalogue(project);
 }

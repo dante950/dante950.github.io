@@ -54,7 +54,7 @@ test('both phases stay in workbook dialogue sheets, without overwriting authored
  const p=structuredClone(project),g=p.guests.find(g=>g.id===10007),rows=n=>p.combat.sheets.find(s=>s.name===n).rows;
  assert.equal(Object.keys(g.demonPhaseDialogue[2]).length,3);
  const id=g.demonPhaseDialogue[2].draw.RequestGroupID,line=rows('대사').find(l=>l.GroupID===id);line.Text='수정한 미형 요청';
- const before=structuredClone(p);ensureDemonDialogueCatalogue(p);assert.deepEqual(p,before);assert.equal(line.Text,'수정한 미형 요청');
+ ensureDemonDialogueCatalogue(p);const before=structuredClone(p);ensureDemonDialogueCatalogue(p);assert.deepEqual(p,before);assert.equal(line.Text,'수정한 미형 요청');
 });
 
 test('free face decoration is not a cleanliness failure while requested makeup still matters',()=>{
@@ -210,4 +210,20 @@ test('workshop phase settings survive switches and JSON without changing the sto
  assert.deepEqual(projectProblems(p),[]);
  source.demonPhaseBeauty[2].growth.color='invalid';
  assert(projectProblems(p).some(m=>m.includes('마왕 2페이즈 발모제 색상')));
+});
+
+test('demon result dialogue is editable per phase and preserved through migration and save/load',()=>{
+ const p=structuredClone(project);ensureDemonDialogueCatalogue(p);
+ const g=p.guests.find(g=>g.id===10007),lines=p.combat.sheets.find(s=>s.name==='대사').rows;
+ for(const phase of [1,2]){
+  const links=g.demonResultDialogue[phase];
+  for(const [event,expected]of [['normal',phase===1?DEMON_LINES.phase1Success:DEMON_LINES.success],['fail',DEMON_LINES.failure],...(phase===1?[['sudden',DEMON_LINES.sudden]]:[])]){
+   const group=lines.filter(l=>l.GroupID===links[event]).sort((a,b)=>a.Order-b.Order);
+   assert.deepEqual(group.map(l=>l.Text),expected.map(l=>Array.isArray(l)?l[1]:l));
+   group[0].Text='편집한 '+phase+' '+event;
+  }
+ }
+ assert.notEqual(g.demonResultDialogue[1].normal,g.demonResultDialogue[2].normal);
+ const saved=JSON.parse(JSON.stringify(p));ensureDemonDialogueCatalogue(saved);assert.deepEqual(saved,p);
+ assert.deepEqual(projectProblems(saved),[]);
 });

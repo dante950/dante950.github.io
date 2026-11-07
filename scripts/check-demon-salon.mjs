@@ -3,7 +3,7 @@ import {chromium,webkit} from 'playwright';
 import assert from 'node:assert/strict';import fs from 'node:fs/promises';import http from 'node:http';import path from 'node:path';
 const root=path.resolve('dist'),out=path.resolve('docs/demon-two-phase-2026-11-06');await fs.mkdir(out,{recursive:true});
 // Fixtures are injected by this test server only; the published bundle has no setters.
-const server=http.createServer(async(req,res)=>{try{const f=path.resolve(root,'.'+new URL(req.url,'http://localhost').pathname.replace(/\/$/,'/index.html'));if(!f.startsWith(root+path.sep))throw Error();let bytes=await fs.readFile(f);if(/^app\..*\.js$/.test(path.basename(f)))bytes=Buffer.concat([bytes,Buffer.from("\nwindow.__demonFixture={exterior(){modelRows(story.project,'대사').find(r=>r.GroupID===story.guest.bindings.exterior).Text='마왕님,<wait=0.1> 외부 등장 연결 확인입니다.';},phase(n){changeDemonPhase(n);},stars(n){story.stars=n;loadSalon(story.guest);},closing(){story=createStoryState(copy(BASE),10006);story.stars=3;story.followers=6100;story.records=[{day:3,id:10006,name:'취업 성공 좀비',gain:1100,before:5000,after:6100,beautySuccess:true}];showPage('story');settlement();}};\n")]);res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.woff2':'font/woff2','.png':'image/png'})[path.extname(f)]||'application/octet-stream');res.end(bytes);}catch{res.writeHead(404).end();}});await new Promise(r=>server.listen(0,'127.0.0.1',r));const base=process.argv.includes('--url')?process.argv[process.argv.indexOf('--url')+1]:'http://127.0.0.1:'+server.address().port;const publicRun=process.argv.includes('--url');
+const server=http.createServer(async(req,res)=>{try{const f=path.resolve(root,'.'+new URL(req.url,'http://localhost').pathname.replace(/\/$/,'/index.html'));if(!f.startsWith(root+path.sep))throw Error();let bytes=await fs.readFile(f);if(/^app\..*\.js$/.test(path.basename(f)))bytes=Buffer.concat([bytes,Buffer.from("\nwindow.__demonFixture={result(phase,event){const g=story.project.guests.find(g=>g.id===10007);modelRows(story.project,'대사').find(l=>l.GroupID===g.demonResultDialogue[phase][event]).Text='결과 연결 확인 '+phase+' '+event;},exterior(){modelRows(story.project,'대사').find(r=>r.GroupID===story.guest.bindings.exterior).Text='마왕님,<wait=0.1> 외부 등장 연결 확인입니다.';},phase(n){changeDemonPhase(n);},stars(n){story.stars=n;loadSalon(story.guest);},closing(){story=createStoryState(copy(BASE),10006);story.stars=3;story.followers=6100;story.records=[{day:3,id:10006,name:'취업 성공 좀비',gain:1100,before:5000,after:6100,beautySuccess:true}];showPage('story');settlement();}};\n")]);res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.woff2':'font/woff2','.png':'image/png'})[path.extname(f)]||'application/octet-stream');res.end(bytes);}catch{res.writeHead(404).end();}});await new Promise(r=>server.listen(0,'127.0.0.1',r));const base=process.argv.includes('--url')?process.argv[process.argv.indexOf('--url')+1]:'http://127.0.0.1:'+server.address().port;const publicRun=process.argv.includes('--url');
 
 for(const [name,engine]of (process.argv.includes('--chromium')?[['chromium',chromium]]:process.argv.includes('--webkit')?[['webkit',webkit]]:[['chromium',chromium],['webkit',webkit]])){
  const browser=await engine.launch({channel:name==='chromium'?process.env.YACHACHA_BROWSER_CHANNEL:undefined}),p=await browser.newPage({viewport:{width:1440,height:900},reducedMotion:'reduce'}),errors=[];p.on('pageerror',e=>errors.push(e.message));
@@ -25,6 +25,8 @@ for(const [name,engine]of (process.argv.includes('--chromium')?[['chromium',chro
  async function complete(f){
   await stage(f,'attach');
   const preview=await p.evaluate(()=>!!fullflow.story?.preview);
+  const phase=await f.evaluate(()=>demonPhase);const resultEvent=await f.evaluate(()=>demonBeautyStatus().success?'normal':'fail');
+  if(!preview&&!publicRun)await p.evaluate(({phase,resultEvent})=>__demonFixture.result(phase,resultEvent),{phase,resultEvent});
   await p.evaluate(()=>{window.__beautyResults=0;window.__resultListener&&removeEventListener('message',window.__resultListener);window.__resultListener=e=>{if(e.source===document.querySelector('#salon').contentWindow&&e.data?.type==='beauty-result')window.__beautyResults++;};addEventListener('message',window.__resultListener);});
   await f.locator('.beautyNext').click();
   await p.waitForFunction(()=>window.__beautyResults===1);
@@ -32,6 +34,7 @@ for(const [name,engine]of (process.argv.includes('--chromium')?[['chromium',chro
   assert(await f.locator('#beautyResultContinue').isHidden());
   assert.equal(await f.locator('.beautyResultCaption').textContent(),'');
   if(!preview){await p.locator('#talkLayer').waitFor({state:'visible'});assert.doesNotMatch(await p.locator('#talkText').textContent(),/반차 결재|수정 요청/);}
+  if(!preview&&!publicRun)await p.waitForFunction(marker=>document.querySelector('#talkText').textContent.includes(marker),'결과 연결 확인 '+phase+' '+resultEvent);
   await talks();
   assert.equal(await p.evaluate(()=>window.__beautyResults),1,'one completion message without a common result screen');
  }
@@ -65,6 +68,16 @@ for(const [name,engine]of (process.argv.includes('--chromium')?[['chromium',chro
    await p.locator('#dialogueDemonPhase').selectOption('1');
    assert.equal(await p.locator('#beautyRequestText').inputValue(),helmetRequest);
    await p.locator('#dialogueDemonPhase').selectOption('2');
+   await p.locator('#dialogueEvent').selectOption('normal');
+   assert(await p.locator('[data-line-text]').count()>0);
+   await p.locator('[data-line-text]').first().fill('작업실 성공 대사 수정 확인');
+   await p.locator('#dialogueDemonPhase').selectOption('1');
+   assert.notEqual(await p.locator('[data-line-text]').first().inputValue(),'작업실 성공 대사 수정 확인');
+   await p.locator('#dialogueDemonPhase').selectOption('2');
+   assert.equal(await p.locator('[data-line-text]').first().inputValue(),'작업실 성공 대사 수정 확인');
+   await p.locator('#previewGroup').click();
+   await p.waitForFunction(()=>document.querySelector('#talkText').textContent.includes('작업실 성공 대사 수정 확인'));await talks();
+   await p.locator('#dialogueEvent').selectOption('fail');assert(await p.locator('[data-line-text]').count()>0);
    await p.locator('[data-editor="beauty"]:visible').first().click();await p.locator('#beautyTry').click();await p.locator('#previewStart').click();
    f=await frame();await p.waitForFunction(()=>document.querySelector('#talkText').textContent.includes('작업실 미형 대사 확인입니다.'));
    await talks();await f.waitForFunction(()=>beautyActive&&!briefing);
@@ -199,6 +212,7 @@ await stage(f,'draw');await f.locator('[data-color="#4853F8"]').click();
   assert(await f.locator('#demonStanding').isVisible());assert(!(await f.locator('#beautyScreen').isVisible()));
   await p.locator('#salon').focus();const before=await f.evaluate(()=>state.x);await p.keyboard.down('d');await p.waitForTimeout(180);await p.keyboard.up('d');assert((await f.evaluate(()=>state.x))>before,'movement resumes in the salon');
   await f.evaluate(()=>send('demon-room-ready'));await p.waitForTimeout(100);assert.equal(await p.evaluate(()=>window.__endingEvents.length),1);
+  assert(await p.locator('#storyHint').isVisible());assert.match(await p.locator('#storyHint').textContent(),/엔딩 컷씬은 아직 연결되지/);
   await snap('handsome-room-return');
   if(!publicRun){
    f=await begin();await enter(f);await f.locator('[data-tool="hammer"]').click();await size(f,18);outer:for(let y=177;y<253;y+=12)for(let x=105;x<230;x+=12){if(await p.locator('#talkLayer').isVisible())break outer;await stroke(f,[x,y]);const r=await f.evaluate(()=>demonBeautyStatus());if(r.metrics.exposure>=.15&&r.metrics.exposure<.35)assert.equal(r.sudden,false);if(r.sudden)break outer;}await talks();await p.waitForSelector('#demonRetryBeauty');assert((await f.evaluate(()=>demonBeautyStatus())).metrics.exposure>=.35);assert.equal(await p.evaluate(()=>fullflow.story.demonPhase),1);await snap('warning-35');await p.locator('#demonRetryBeauty').click();await waitPhase(1);

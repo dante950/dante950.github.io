@@ -165,7 +165,18 @@ export function ensureDemonDialogueCatalogue(project){
   const id=Math.max(80000,...groups.map(r=>r.GroupID))+1;second[stage][key]=id;
   groups.push({GroupID:id,Name:'마왕 · 미형 · '+stage+(key==='DetailGroupID'?' 상세':''),PlaybackMode:'순서대로',PauseCombat:true,AdvanceMode:'입력',CPS:30,HoldMs:1400,GapMs:100,Notes:'마왕 2페이즈 미용 · 페이즈 연결은 프로젝트 JSON',ActorEffect:'없음',FinishEffect:'없음'});
   for(const [i,line]of texts.entries())lines.push({DialogueID:Math.max(900000,...lines.map(r=>r.DialogueID))+1,GroupID:id,Order:i+1,Speaker:Array.isArray(line)?line[0]:'몬스터',Text:Array.isArray(line)?line[1]:line,Notes:'마왕 2페이즈 미용'});
- }}return project;
+ }}
+ g.demonResultDialogue||={};
+ for(const phase of [1,2]){
+  const result=g.demonResultDialogue[phase]||={};
+  for(const [event,title,texts]of [['normal','미용 만족 · 성공',phase===1?DEMON_LINES.phase1Success:DEMON_LINES.success],['fail','미용 불만족 · 실패',DEMON_LINES.failure],...(phase===1?[['sudden','얼굴 훼손 · 돌발 야차',DEMON_LINES.sudden]]:[])]){
+   if(groups.some(r=>r.GroupID===result[event]))continue;
+   const id=Math.max(80000,...groups.map(r=>r.GroupID))+1;result[event]=id;
+   groups.push({GroupID:id,Name:'마왕 · '+phase+'페이즈 · '+title,PlaybackMode:'순서대로',PauseCombat:true,AdvanceMode:'입력',CPS:30,HoldMs:1400,GapMs:100,Notes:'마왕 결과 대사 · 프로젝트의 페이즈별 연결',ActorEffect:'없음',FinishEffect:'없음'});
+   for(const [i,line]of texts.entries())lines.push({DialogueID:Math.max(900000,...lines.map(r=>r.DialogueID))+1,GroupID:id,Order:i+1,Speaker:Array.isArray(line)?line[0]:'몬스터',Text:Array.isArray(line)?line[1]:line,Notes:'마왕 '+phase+'페이즈 결과'});
+  }
+ }
+ return project;
 }
 // Phase selection never changes the canonical story guest's starting phase.
 export function demonWorkshopGuest(source,phase=1){
