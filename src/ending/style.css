@@ -11,3 +11,7 @@
 #memoryTrack .social-photo.coffee-beauty img.photo-base{height:100%;width:100%;object-fit:contain}
 
 #memoryTrack .ending-news .ending-group{height:240px;background:radial-gradient(ellipse,#e4d5ea,#b8b9d5)}#memoryTrack .ending-news .ending-group img{object-fit:contain;padding:18px}
+
+/* One complete article: the clock scrolls the whole card before comments appear. */
+#memoryTrack .ending-news .post-card{height:560px;overflow:hidden;scroll-behavior:auto;overflow-anchor:none}
+#memoryTrack .ending-news .ending-copy{font-size:15px;line-height:1.8;max-height:none;overflow:visible;padding:0 18px 12px}

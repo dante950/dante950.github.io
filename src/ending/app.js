@@ -1,8 +1,8 @@
-import {ENDING_CREDITS,ENDING_POST,ENDING_COMMENTS,BATTLE_ENDING_NEWS,BATTLE_ENDING_COMMENTS,endingReviews,endingSchedule} from './model.js';
+import {ENDING_CREDITS,ENDING_POST,ENDING_COMMENTS,BATTLE_ENDING_NEWS,BATTLE_ENDING_COMMENTS,endingReviews,endingSchedule,battleNewsSchedule} from './model.js';
 import {runFromStory} from '../closing/model.js';
 import {createSocialPhone,photoMarkup} from '../closing/social-ui.js';
 const endingToken=new URLSearchParams(location.search).get('story'),E=id=>document.getElementById(id);
-let endingData=null,endingTime=0,endingLast=0,endingPaused=false,endingMuted=false,endingRaf=0,endingPhone=null,endingPosts=[],endingPlan=null,endingPhotoIndex=0,endingCreditIndex=-1,endingSounds=new Set();
+let endingData=null,endingTime=0,endingLast=0,endingPaused=false,endingMuted=false,endingRaf=0,endingPhone=null,endingPosts=[],endingPlan=null,endingPhotoIndex=0,endingCreditIndex=-1,endingSounds=new Set(),endingNewsPlan=null,endingNewsOverflow=0;
 const clamp=x=>Math.max(0,Math.min(1,x)),smooth=x=>{x=clamp(x);return x*x*(3-2*x);};
 function endingMessage(type,extra={}){parent.postMessage({source:'yachacha-ending',type,token:endingToken,...extra},location.origin);}
 function resizeEnding(){document.documentElement.style.setProperty('--ending-scale',Math.min(innerWidth/1200,innerHeight/675));}
@@ -29,6 +29,12 @@ async function initEnding(data){
  E('memoryTrack').innerHTML=endingPosts.map(p=>endingCard(p)).join('')+(data.ending==='battle'?BATTLE_ENDING_NEWS.map(p=>endingCard(p,true)).join(''):'')+endingCard({id:'ending-group',user:'money_slave',place:'몬스터 헤어살롱 · 마지막 영업',text:data.ending==='battle'?'마지막 영업, 그리고 작별의 기념사진.':ENDING_POST},true);
  await Promise.all([...document.images].map(im=>im.decode().catch(()=>{})));
  E('endingComments').querySelector('div:last-child').innerHTML=(data.ending==='battle'?BATTLE_ENDING_COMMENTS:ENDING_COMMENTS).map(c=>'<p><b>'+esc(c.user)+'</b>'+esc(c.text)+'</p>').join('');
+ if(data.ending==='battle'){
+  await document.fonts.ready;
+  const article=E('memoryTrack').querySelector('.ending-news .post-card');
+  endingNewsOverflow=Math.max(0,article.scrollHeight-article.clientHeight);
+  endingNewsPlan=battleNewsSchedule(endingNewsOverflow,BATTLE_ENDING_NEWS[0].text.length);
+ }
  E('endingLoading').remove();endingLast=performance.now();endingRaf=requestAnimationFrame(tickEnding);endingMessage('started');
 }
 function setEndingPause(value){endingPaused=value;E('endingPause').textContent=value?'계속 보기':'일시정지';endingMessage('pause',{paused:value});}
@@ -57,7 +63,11 @@ function renderEnding(){
  const prev=Math.max(0,idx-1),start=idx===endingPosts.length?total:idx*endingPlan.reviewMs;
  let pos=idx===0?0:prev+smooth((memoryT-start)/800);
  const battleEnding=endingData.ending==='battle',aftermathT=memoryT-total;
- if(battleEnding&&aftermathT>=0){const page=Math.min(2,Math.floor(aftermathT/12000));pos=endingPosts.length-1+page+smooth((aftermathT-page*12000)/800);}
+ if(battleEnding){
+  const article=E('memoryTrack').querySelector('.ending-news .post-card');
+  article.scrollTop=endingNewsOverflow*clamp((aftermathT-endingNewsPlan.lead)/endingNewsPlan.scroll);
+  if(aftermathT>=0){const page=aftermathT>=endingNewsPlan.total?1:0;pos=endingPosts.length-1+page+smooth((aftermathT-page*endingNewsPlan.total)/800);}
+ }
  track.style.transform='translateY('+(-pos*590)+'px)';
  if(!endingPosts.length&&memoryT<total)view.style.opacity=0;
  if(memoryT>=0&&memoryT<total){
@@ -65,8 +75,8 @@ function renderEnding(){
   if(ci!==endingCreditIndex){endingCreditIndex=ci;const [team,role,name]=ENDING_CREDITS[ci];credit.querySelector('small').textContent=team;credit.querySelector('p').textContent=role||' ';credit.querySelector('h1').textContent=name;}
   credit.style.opacity=Math.min(clamp(ct/450),clamp((endingPlan.creditMs-ct)/450));
  }else credit.style.opacity=0;
- const finalT=memoryT-total-(battleEnding?24000:0);view.style.left=memoryT>=total?'415px':'110px';
- const commentT=battleEnding?aftermathT-12000:finalT,comments=E('endingComments');comments.style.opacity=(battleEnding&&aftermathT>=24000)?0:clamp((commentT-5000)/500);comments.style.transform='translateY('+(500*(1-smooth((commentT-5000)/700)))+'px)';
+ const finalT=memoryT-total-(battleEnding?endingNewsPlan.total:0);view.style.left=memoryT>=total?'415px':'110px';
+ const commentT=battleEnding?aftermathT-endingNewsPlan.commentsAt+5000:finalT,comments=E('endingComments');comments.style.opacity=(battleEnding&&aftermathT>=endingNewsPlan.total)?0:clamp((commentT-5000)/500);comments.style.transform='translateY('+(500*(1-smooth((commentT-5000)/700)))+'px)';
  comments.querySelectorAll('p').forEach((p,i)=>p.style.opacity=clamp((commentT-5700-i*1700)/450));
  if(commentT>=5700)endingSound('ending-comment-1');if(commentT>=7400)endingSound('ending-comment-2');
  if(finalT>=11500){fade.style.opacity=clamp((finalT-11500)/2400);if(finalT>=12000)endingSound('ending-music-fade');}

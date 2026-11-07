@@ -32,5 +32,5 @@ function renderDemonBattleScene(scene,b){const g=scene.ctx,t=b.time,vt=b.visualT
  if(['basicHit','openingHit'].includes(c.kind)&&age<700){g.textAlign='center';g.font='bold 27px Galmuri9';g.fillStyle='#fff0b7';g.fillText(String(c.value),ex+((c.hit%5)-2)*30,ey-height-30-age*.1);}
  if(c.kind==='hit'&&age<200){g.fillStyle='#ff355422';g.fillRect(0,0,1280,650);}}
  scene.trails=scene.trails.filter(c=>t-c.time<190);g.strokeStyle='#a9ffef';g.lineWidth=4;for(const s of scene.trails){g.beginPath();g.moveTo(s.from.x,s.from.y);g.lineTo(s.to.x,s.to.y);g.stroke();}scene.breakEffects(b);
- if(b.transition){const u=(vt-b.transition.started)/(b.transition.end-b.transition.started);g.fillStyle='rgba(3,6,17,'+Math.sin(Math.PI*u)*.85+')';g.fillRect(0,0,1280,650);g.textAlign='center';g.fillStyle='#e1ecff';g.font='bold 34px Galmuri9';g.fillText(b.transition.label,640,290);}
+ if(b.transition){const u=(vt-b.transition.started)/(b.transition.end-b.transition.started);g.fillStyle='rgba(3,6,17,'+Math.sin(Math.PI*u)*.85+')';g.fillRect(0,0,1280,650);}
  g.restore();}
