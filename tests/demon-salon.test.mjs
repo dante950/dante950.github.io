@@ -119,10 +119,10 @@ test('phase-two success hands off exactly once after an authenticated room retur
  const runtime=await fs.readFile(new URL('../src/demon-story.js',import.meta.url),'utf8');
  const frame={},nodes={salon:{contentWindow:frame,focus(){}},storyHint:{}},messages=[],events=[],listeners=[];
  let done,spoken;
- const ctx={DEMON_LINES,story:{guest:{demon:true,demonPhase:2},portrait:'edited-portrait',headPortrait:'edited-head'},salonToken:'current-token',
+ const ctx={DEMON_LINES,DEMON_GUEST_ID:10007,ensureDemonDialogueCatalogue,page:'story',playGroup:(project,g,gid,callback)=>{spoken=project.combat.sheets.find(s=>s.name==='대사').rows.filter(l=>l.GroupID===gid).map(l=>l.Text);done=callback;},story:{project:structuredClone(project),guest:{demon:true,demonPhase:2},portrait:'edited-portrait',headPortrait:'edited-head'},salonToken:'current-token',
   el:id=>nodes[id],copy:structuredClone,updateStoryHud(){},sendSalon:(type,data)=>messages.push({type,data}),
   addEventListener:(type,fn)=>listeners.push(fn),window:{dispatchEvent:e=>events.push(e)},CustomEvent:class{constructor(type,options){this.type=type;this.detail=options.detail;}}};
- vm.createContext(ctx);vm.runInContext(runtime,ctx);ctx.playDemonLines=(lines,callback)=>{spoken=lines;done=callback;};
+ vm.createContext(ctx);vm.runInContext(runtime,ctx);
  ctx.finishDemonBeauty({success:true});
  assert.equal(spoken.length,2);assert(!spoken.join('').match(/사진|셀카/));assert.equal(ctx.story.demonEnding.status,'returning');
  assert.equal(events.length,0);done();assert.equal(messages.at(-1).type,'demon-finish');
@@ -163,7 +163,7 @@ test('outside scene binding is editable and older projects acquire it only once'
  const p=structuredClone(project),g=p.guests.find(g=>g.id===10007),rows=n=>p.combat.sheets.find(s=>s.name===n).rows;
  const group=rows('대화 그룹').find(r=>r.GroupID===g.bindings.exterior);assert.equal(group.Name,'마왕 · 미용실 외부 등장 씬');
  const exterior=rows('대사').find(r=>r.GroupID===group.GroupID);assert.equal(exterior.Speaker,'마왕 부하');assert.match(exterior.Text,/^마왕님,/);
- exterior.Text='직접 수정한 외관 대사';const before=structuredClone(p);ensureDemonDialogueCatalogue(p);assert.deepEqual(p,before);
+ exterior.Text='직접 수정한 외관 대사';ensureDemonDialogueCatalogue(p);const before=structuredClone(p);ensureDemonDialogueCatalogue(p);assert.deepEqual(p,before);
  const legacy=structuredClone(project),lg=legacy.guests.find(g=>g.id===10007);delete lg.bindings.exterior;ensureDemonDialogueCatalogue(legacy);
  const once=structuredClone(legacy);ensureDemonDialogueCatalogue(legacy);assert.deepEqual(legacy,once);assert(lg.bindings.exterior);
 });
