@@ -13,9 +13,9 @@ class CursorScene extends GameScene {
  constructor(canvas,assets){super(canvas,assets);this.box=monsterHitbox('zombie',{x:962,y:534});this.scratchBox=openingHitbox(this.box);this.pointer=null;this.trails=[];}
  get attackBox(){return this.battle?.state==='opening'?this.scratchBox:this.box;}
  async loadBackdrop(room){const canvas=document.createElement('canvas'),r=new RoomRenderer(canvas,this.assets);await r.loadRoom(room);r.roomBackdrop();this.backdrop=canvas;}
- point(tile){const c=(tile-1)%3,r=Math.floor((tile-1)/3);return this.floor((c+.5)/3,(r+.5)/3);}
+ point(tile){if(this.battle?.isDemon)return demonPoint(this.battle,tile);const c=(tile-1)%3,r=Math.floor((tile-1)/3);return this.floor((c+.5)/3,(r+.5)/3);}
  floor(u,v){return {x:164-73*v+(351+151*v)*u,y:355+219*v};}
- tilePath(tile){const c=(tile-1)%3,r=Math.floor((tile-1)/3),g=this.ctx;g.beginPath();[[c,r],[c+1,r],[c+1,r+1],[c,r+1]].forEach(([u,v],i)=>{const p=this.floor(u/3,v/3);i?g.lineTo(p.x,p.y):g.moveTo(p.x,p.y);});g.closePath();}
+ tilePath(tile){if(this.battle?.isDemon){const c=(tile-1)%5,r=Math.floor((tile-1)/5),g=this.ctx;g.beginPath();[[c,r],[c+1,r],[c+1,r+1],[c,r+1]].forEach(([u,v],i)=>{const p=demonFloor(this.battle,u/5,v/5);i?g.lineTo(p.x,p.y):g.moveTo(p.x,p.y);});g.closePath();return;}const c=(tile-1)%3,r=Math.floor((tile-1)/3),g=this.ctx;g.beginPath();[[c,r],[c+1,r],[c+1,r+1],[c,r+1]].forEach(([u,v],i)=>{const p=this.floor(u/3,v/3);i?g.lineTo(p.x,p.y):g.moveTo(p.x,p.y);});g.closePath();}
  shadow(x,y,w){const g=this.ctx;g.fillStyle='#1a111788';g.beginPath();g.ellipse(x,y,w,14,0,0,Math.PI*2);g.fill();}
  actor(key,frame,x,feet,height,flip=false,alpha=1){const g=this.ctx;g.save();g.translate(x,0);if(flip)g.scale(-1,1);this.sprite(key,frame,0,feet,height,alpha);g.restore();}
  coffeeActor(asset,frame,x,feet,height,alpha=1){
@@ -93,6 +93,7 @@ class CursorScene extends GameScene {
  render(b,character,now=0){
   if(this.battle!==b){this.stop();this.battle=b;this.seen=0;this.cues=[];this.trails=[];this.breakFX=null;this.enemy=null;}
   if(b){for(const c of b.cues){if(c.id<=this.seen)continue;this.seen=c.id;this.cues.push(c);if(c.kind==='staggerBurst')this.breakFX={time:c.visualTime,source:c.source,from:this.enemy?{x:this.enemy.x,y:this.enemy.y}:b.footwork.position(b.time)};if(!b.paused)this.play(c.kind,b,c);}this.cues=this.cues.filter(c=>b.visualTime-c.visualTime<1600);}
+  if(b?.isDemon){renderDemonBattleScene(this,b);return;}
   const g=this.ctx,t=b?.time??now,vt=b?.visualTime??now,home=b?.footwork.position(t)??{x:962,y:534};g.clearRect(0,0,1280,650);
   g.save();const crash=this.cues.filter(c=>c.kind==='stoneCrash').at(-1),crashAge=crash?vt-crash.visualTime:Infinity;const breakAge=this.breakFX?vt-this.breakFX.time:Infinity;if(Math.min(breakAge,crashAge)<300){const age=Math.min(breakAge,crashAge),strength=9*(1-age/300);g.translate(Math.sin(age*.19)*strength,Math.cos(age*.23)*strength*.5);}
   g.save();g.filter='blur(3px) brightness(.55) saturate(.65)';if(this.backdrop)g.drawImage(this.backdrop,-8,-12,1296,665);else{g.fillStyle='#473a39';g.fillRect(0,0,1280,650);}g.restore();

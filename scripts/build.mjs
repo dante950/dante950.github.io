@@ -29,7 +29,7 @@ async function bundle(prefix,names){return (await Promise.all(names.map(f=>read(
 let combat=await read('src/combat/index.html');
 const speechStyle=(await read('src/ingame-font.css'))+'\n'+await read('src/guest-speech.css');
 const css=speechStyle+'\n'+(await Promise.all(['style.css','story.css','story-stage.css'].map(f=>read('src/combat/'+f)))).join('\n');
-const combatScript=await bundle('src/combat/',['../media.js','text-effects.js','dialogue.js','engine.js','cursor-engine.js','../beauty-reaction-dialogue.js','../salon-dialogue.js','workbook-xml.js','workbook.js','../project-archive.js','../demon-guest.js','versions.js','scene.js','story-scene.js','cursor-scene.js','cursor-ui.js','app.js','tutorial.js','bridge.js']);
+const combatScript=await bundle('src/combat/',['../media.js','text-effects.js','dialogue.js','engine.js','cursor-engine.js','demon-engine.js','../beauty-reaction-dialogue.js','../salon-dialogue.js','workbook-xml.js','workbook.js','../project-archive.js','../demon-guest.js','versions.js','scene.js','story-scene.js','cursor-scene.js','demon-scene.js','cursor-ui.js','app.js','tutorial.js','bridge.js']);
 const wb=(await fs.readFile(path.join(root,'data/source.xlsx'))).toString('base64');
 const au=(await fs.readFile(path.join(root,'data/source-authoring.xlsm'))).toString('base64');
 const schema=await read('data/schema.json'),assets=await read('src/combat/assets.json');

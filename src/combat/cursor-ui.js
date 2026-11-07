@@ -3,7 +3,7 @@ class IntegratedCursorScene extends CursorScene{
  constructor(canvas,assets){super(canvas,assets);canvas.width=1280;canvas.height=650;this.healthView=new RaidHealthAnimator();}
  async loadRoom(spec){if(spec)await this.loadBackdrop(spec);}
  render(b,character,now=0){
-  super.render(b,character,now);const g=this.ctx;
+  super.render(b,character,now);if(b?.isDemon&&b.state==='victory')return;const g=this.ctx;
   g.save();
   const bar=(x,y,w,h,value,max,color)=>{g.fillStyle='#433842';g.fillRect(x,y,w,h);g.fillStyle=color;g.fillRect(x,y,w*Math.max(0,Math.min(1,value/Math.max(1,max))),h);};
   // UI arrangement from the user's actual 2026-10-16 Unity build screenshot.
@@ -24,7 +24,7 @@ class IntegratedCursorScene extends CursorScene{
   g.fillStyle='#fff';g.textAlign='right';g.font='bold 16px Galmuri9';g.fillText('무력화',417,gaugeY+14);
   g.textAlign='left';g.font='bold 13px Galmuri9';g.fillText(`${Math.ceil(b?.staggerRemaining??100)} / ${b?.settings.staggerMax??100}`,832,gaugeY+14);
   // The supplied player sheet includes transparent headroom above the figure.
-  const player=this.playerPosition??this.point(b?.pos??5),py=player.y-170;
+  const player=this.playerPosition??this.point(b?.pos??5),py=player.y-(b?.isDemon?120:170);
   bar(player.x-100,py,200,18,b?.hp??100,b?.player?.MaxHP??100,'#36d39a');
   g.fillStyle='#fff';g.font='bold 12px Galmuri9';g.fillText(`${Math.ceil(b?.hp??100)} / ${b?.player?.MaxHP??100}`,player.x+106,py+14);
   g.fillStyle='#38212ca6';g.fillRect(970,520,290,40);g.fillRect(895,570,365,31);g.fillStyle='#fff';g.font='bold 16px Galmuri9';g.fillText('라이브 채팅',994,546);g.font='13px Galmuri9';g.fillText('몬스타팬: 가위 소리, 은근히 중독성이 ...',910,590);
@@ -33,6 +33,8 @@ class IntegratedCursorScene extends CursorScene{
   if(b?.state==='opening')message=`${b.opportunities<=b.monster.PlayerDodgeMissCount?'이번 기회는 MISS · ':''}가위로 좌우로 긁기 · ${Math.max(0,(b.groggyEnd-b.time)/1000).toFixed(1)}초 · ${b.openingResult.attempts}타`;
   if(b?.state==='staggerBreak')message='무력화 붕괴! 잠시 뒤 가위로 긁어 주세요.';
   if(b?.rush)message=b.rush.stage==='aim'?`비석 왼쪽 ${b.rush.stone-1}번 칸으로 유도!`:'조준 고정 · 다른 줄로 피할 수 있어요';
+  if(b?.isDemon&&b.planInfo?.kind==='reflect')message='빛이 도착하기 전에 테두리가 빛나는 마지막 거울을 클릭하세요';
+  if(b?.isDemon&&b.planInfo?.kind==='iaido')message='시선을 따라 조준 · 눈이 반짝이면 다른 줄로 이동!';
   if(b?.dialogueBlocking)message='대화 중 · Enter로 다음 대사';
   g.fillText(message,30,636);
   if(b&&!['opening','staggerBreak'].includes(b.state)){bar(1010,621,235,7,b.attackProgress,1,'#d5c5ff');g.font='12px Galmuri9';g.textAlign='right';g.fillText(b.attackReady?'클릭 준비 완료':'공격 준비 중',1244,644);}
@@ -59,7 +61,7 @@ function installCursorInput(){
    }else return;
   }
   if(!cursorCanInteract())return;cursorPointerID=e.pointerId;canvas.setPointerCapture(e.pointerId);cursorScratch.begin(scene.pointer);
-  if(battle.state!=='opening')battle.basicAttack(insideBox(scene.pointer,scene.box));
+  if(battle.state!=='opening'){const mirror=battle.isDemon&&scene.mirrorBoxes?.find(m=>m.last&&insideBox(scene.pointer,m));if(mirror)battle.rotateMirror(mirror.tile);else battle.basicAttack(insideBox(scene.pointer,scene.box));}
  });
  canvas.addEventListener('pointermove',e=>{
   const p=cursorPoint(e),previous=scene.pointer;scene.pointer=p;

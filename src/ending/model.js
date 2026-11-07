@@ -40,3 +40,10 @@ export const ENDING_COMMENTS=[
  {user:'커피유령',text:'다음에는 손님으로 와! 커피는 내가 살게!'},
  {user:'마왕',text:'다음 예약은 어디서 하는 것이냐?'}
 ];
+
+// Victory branch from the cutscene specification; separate from beauty success.
+export const BATTLE_ENDING_NEWS=[
+ {id:'royal-reveal',user:'마계일보',place:'왕실 소식',photo:'./media/demon-battle/demon_idle3.png',text:'마왕의 정체는 고블린… 왕실, 사실 인정\n\n미용실에서 공개된 기념사진을 계기로 마왕의 정체를 둘러싼 논란이 커지고 있다.\n왕실은 “사진 속 인물은 폐하가 맞다”고 밝혔다.'},
+ {id:'royal-change',user:'마계일보',place:'왕실 소식',photo:'./media/demon-battle/demon_idle3.png',text:'정체 공개 이후 국정 운영 개선… 마왕 지지율 상승\n\n밀린 결재와 민원 처리가 빨라지면서 긍정적인 반응이 늘고 있다.\n왕실 관계자는 “최근 폐하께서 거울보다 서류를 오래 보신다”고 전했다.'}
+];
+export const BATTLE_ENDING_COMMENTS=[{user:'마계 주민',text:'그래서 지금까지 거울을 그렇게 많이 들고 다니셨구나.'},{user:'마계 주민',text:'고블린이면 어때. 내 민원은 드디어 처리됐는데.'}];

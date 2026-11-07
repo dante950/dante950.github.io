@@ -1,8 +1,8 @@
 // Included inside the demon visitor closure. Uses the current salon and completed portrait.
 let endingRoom=null;
-async function prepareDemonEndingRoom(head){
+async function prepareDemonEndingRoom(head,form='handsome'){
  const images={};
- await Promise.all(Object.entries({body:'./media/ending/king-body-source.png',head,
+ await Promise.all(Object.entries({body:form==='goblin'?'./media/demon-battle/demon_idle3.png':'./media/ending/king-body-source.png',head:head||'./media/demon/goblin.png',
  hero:SPRITES.front,minion:GUEST.companion,coffee:'./media/coffee-ghost/appeared-sheet.png',
  magic:'./media/intro/pt/summoning.png'}).map(async([key,src])=>{
   const im=new Image();im.src=src;await im.decode();images[key]=im;
@@ -13,7 +13,7 @@ async function prepareDemonEndingRoom(head){
  for(const n of [player,shadow,standing,companion,customer,customerShadow,seatedCustomer,mimic])n.style.visibility='hidden';
  for(const n of gameWorld.querySelectorAll('.phone,.hudTop,.help,.resourceNote,#interactPrompt'))n.style.visibility='hidden';
  dialogueState.active=true;customerState.phase='cutscene';state.keys.clear();
- endingRoom={layer,cx:layer.getContext('2d'),images,scene:'room',elapsed:0,group:0,coffee:0,last:performance.now(),ack:false};
+ endingRoom={form,layer,cx:layer.getContext('2d'),images,scene:'room',elapsed:0,group:0,coffee:0,last:performance.now(),ack:false};
  endingRoom.scenery={};
  await Promise.all(['.wall','.floor'].map(async selector=>{const url=getComputedStyle(gameWorld.querySelector(selector)).backgroundImage.match(/url\(["']?(.*?)["']?\)/)?.[1];if(url){const im=new Image();im.src=url;await im.decode();endingRoom.scenery[url]=im;}}));
  renderDemonEndingRoom();
@@ -23,7 +23,7 @@ async function prepareDemonEndingRoom(head){
 function endingSprite(cx,im,x,feet,h){cx.drawImage(im,x-h*im.width/im.height/2,feet-h,h*im.width/im.height,h);}
 function drawEndingActors(cx,{group=0,coffee=0,sink=0,portal=0,time=0}={}){
  const im=endingRoom.images,lerp=(a,b)=>a+(b-a)*group;
- const hx=lerp(330,300),kx=lerp(580,470),mx=lerp(745,640),cy=420;
+ const hx=lerp(330,endingRoom.form==='goblin'?520:300),kx=lerp(580,endingRoom.form==='goblin'?325:470),mx=lerp(745,640),cy=420;
  cx.imageSmoothingEnabled=false;
  if(portal>0){
   cx.save();cx.globalAlpha=portal;cx.shadowColor='#44ffac';cx.shadowBlur=16;
@@ -31,15 +31,18 @@ function drawEndingActors(cx,{group=0,coffee=0,sink=0,portal=0,time=0}={}){
   cx.drawImage(im.magic,150,680,1250,260,hx-115,cy-20,230,49);
   cx.restore();
  }
+ if(endingRoom.form==='goblin'){endingSprite(cx,im.body,kx,cy,155);}else{
  // Retain the team's body, excluding the original head region at runtime.
  const scale=1.32,bx=kx-76*scale,by=cy-181*scale;
  cx.save();cx.translate(bx,by);cx.scale(scale,scale);
  cx.beginPath();cx.rect(0,61,152,120);cx.rect(0,0,50,61);cx.rect(105,0,47,61);cx.clip();cx.drawImage(im.body,0,0,152,181);cx.restore();
  const hh=92,hw=hh*im.head.width/im.head.height;
  cx.drawImage(im.head,kx-hw/2,by-4,hw,hh);
+ }
  endingSprite(cx,im.minion,mx,cy,170);
  cx.save();cx.beginPath();cx.rect(0,0,950,cy+2);cx.clip();cx.globalAlpha=1-sink*.85;
  const heroH=214,heroW=heroH*219/162;
+ if(endingRoom.scene==='refuse'){cx.translate(hx,cy-heroH/2);cx.rotate(Math.sin(time/70)*.075);cx.translate(-hx,-cy+heroH/2);}
  cx.drawImage(im.hero,0,0,219,162,hx-heroW/2,cy-heroH+sink*220,heroW,heroH);
  cx.restore();
  if(coffee>0){
@@ -78,7 +81,7 @@ function demonEndingRoomTick(now){
  const dt=Math.min(80,now-r.last);r.last=now;if(!paused)r.elapsed+=dt;
  if(r.paused!==paused){r.paused=paused;send('demon-ending-paused',{paused});}
  renderDemonEndingRoom();
- const durations={coffee:700,group:900,photo:800,return:3500};
+ const durations={refuse:1100,coffee:700,group:900,photo:800,return:3500};
  if(!r.ack&&r.elapsed>=(durations[r.scene]||Infinity)){
   r.ack=true;
   if(r.scene==='photo'){
@@ -90,6 +93,6 @@ function demonEndingRoomTick(now){
  requestAnimationFrame(demonEndingRoomTick);
 }
 function setDemonEndingScene(scene){
- if(!endingRoom||!['coffee','group','photo','return'].includes(scene))return;
+ if(!endingRoom||!['refuse','coffee','group','photo','return'].includes(scene))return;
  endingRoom.scene=scene;endingRoom.layer.dataset.scene=scene;endingRoom.elapsed=0;endingRoom.ack=false;
 }

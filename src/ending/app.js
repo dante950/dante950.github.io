@@ -1,4 +1,4 @@
-import {ENDING_CREDITS,ENDING_POST,ENDING_COMMENTS,endingReviews,endingSchedule} from './model.js';
+import {ENDING_CREDITS,ENDING_POST,ENDING_COMMENTS,BATTLE_ENDING_NEWS,BATTLE_ENDING_COMMENTS,endingReviews,endingSchedule} from './model.js';
 import {runFromStory} from '../closing/model.js';
 import {createSocialPhone,photoMarkup} from '../closing/social-ui.js';
 const endingToken=new URLSearchParams(location.search).get('story'),E=id=>document.getElementById(id);
@@ -9,8 +9,8 @@ function resizeEnding(){document.documentElement.style.setProperty('--ending-sca
 addEventListener('resize',resizeEnding);resizeEnding();
 function endingSound(key){if(endingSounds.has(key))return;endingSounds.add(key);endingMessage('sound',{key});}
 function endingCard(p,group=false){
- return '<article class="ending-post" data-review="'+esc(p.id)+'"><div class="post-card"><header><b>'+esc(p.user)+'</b><small>'+esc(p.place||'몬스터 헤어살롱')+'</small></header>'+
- (group?'<div class="ending-group"><img src="'+esc(endingData.photo)+'" alt="플레이어가 꾸민 마왕과 주인공, 마왕 부하, 커피유령의 단체사진"></div>':photoMarkup(p))+
+ return '<article class="ending-post '+(p.photo&&group?'ending-news':'')+'" data-review="'+esc(p.id)+'"><div class="post-card"><header><b>'+esc(p.user)+'</b><small>'+esc(p.place||'몬스터 헤어살롱')+'</small></header>'+
+ (group?'<div class="ending-group"><img src="'+esc(p.photo||endingData.photo)+'" alt="'+(p.photo?'고블린 모습의 마왕':endingData.ending==='battle'?'고블린 마왕과 주인공, 마왕 부하, 커피유령의 단체사진':'플레이어가 꾸민 마왕과 주인공, 마왕 부하, 커피유령의 단체사진')+'"></div>':photoMarkup(p))+
  '<div class="ending-actions">♡ ▢ ⌑</div><p class="ending-copy">'+esc(p.text)+'</p></div></article>';
 }
 async function endingCoffeeSample(){
@@ -26,9 +26,9 @@ async function initEnding(data){
  const sky=E('returnSky');await sky.decode();endingPosts=endingReviews(data.records);for(const post of endingPosts)if(post.samplePortrait==='coffee')post.photo=await endingCoffeeSample();endingPlan=endingSchedule(endingPosts.length);endingPhotoIndex=endingPosts.length;
  const run=runFromStory(data.records,4,{settings:data.settings});endingPhone=createSocialPhone(E('endingPhoneHost'),{getRun:()=>run,onManagement(){},onExit(){}});
  endingPhone.restore(data.socialChoices||{});endingPhone.show(true);
- E('memoryTrack').innerHTML=endingPosts.map(p=>endingCard(p)).join('')+endingCard({id:'ending-group',user:'money_slave',place:'몬스터 헤어살롱 · 마지막 영업',text:ENDING_POST},true);
+ E('memoryTrack').innerHTML=endingPosts.map(p=>endingCard(p)).join('')+(data.ending==='battle'?BATTLE_ENDING_NEWS.map(p=>endingCard(p,true)).join(''):'')+endingCard({id:'ending-group',user:'money_slave',place:'몬스터 헤어살롱 · 마지막 영업',text:data.ending==='battle'?'마지막 영업, 그리고 작별의 기념사진.':ENDING_POST},true);
  await Promise.all([...document.images].map(im=>im.decode().catch(()=>{})));
- E('endingComments').querySelector('div:last-child').innerHTML=ENDING_COMMENTS.map(c=>'<p><b>'+esc(c.user)+'</b>'+esc(c.text)+'</p>').join('');
+ E('endingComments').querySelector('div:last-child').innerHTML=(data.ending==='battle'?BATTLE_ENDING_COMMENTS:ENDING_COMMENTS).map(c=>'<p><b>'+esc(c.user)+'</b>'+esc(c.text)+'</p>').join('');
  E('endingLoading').remove();endingLast=performance.now();endingRaf=requestAnimationFrame(tickEnding);endingMessage('started');
 }
 function setEndingPause(value){endingPaused=value;E('endingPause').textContent=value?'계속 보기':'일시정지';endingMessage('pause',{paused:value});}
@@ -55,7 +55,9 @@ function renderEnding(){
  view.style.opacity=clamp(memoryT/600);
  const idx=endingPosts.length?Math.min(endingPosts.length,Math.floor(Math.max(0,memoryT)/endingPlan.reviewMs)):0;
  const prev=Math.max(0,idx-1),start=idx===endingPosts.length?total:idx*endingPlan.reviewMs;
- const pos=idx===0?0:prev+smooth((memoryT-start)/800);
+ let pos=idx===0?0:prev+smooth((memoryT-start)/800);
+ const battleEnding=endingData.ending==='battle',aftermathT=memoryT-total;
+ if(battleEnding&&aftermathT>=0){const page=Math.min(2,Math.floor(aftermathT/12000));pos=endingPosts.length-1+page+smooth((aftermathT-page*12000)/800);}
  track.style.transform='translateY('+(-pos*590)+'px)';
  if(!endingPosts.length&&memoryT<total)view.style.opacity=0;
  if(memoryT>=0&&memoryT<total){
@@ -63,10 +65,10 @@ function renderEnding(){
   if(ci!==endingCreditIndex){endingCreditIndex=ci;const [team,role,name]=ENDING_CREDITS[ci];credit.querySelector('small').textContent=team;credit.querySelector('p').textContent=role||' ';credit.querySelector('h1').textContent=name;}
   credit.style.opacity=Math.min(clamp(ct/450),clamp((endingPlan.creditMs-ct)/450));
  }else credit.style.opacity=0;
- const finalT=memoryT-total;view.style.left=finalT>=0?'415px':'110px';
- const comments=E('endingComments');comments.style.opacity=clamp((finalT-5000)/500);comments.style.transform='translateY('+(500*(1-smooth((finalT-5000)/700)))+'px)';
- comments.querySelectorAll('p').forEach((p,i)=>p.style.opacity=clamp((finalT-5700-i*1700)/450));
- if(finalT>=5700)endingSound('ending-comment-1');if(finalT>=7400)endingSound('ending-comment-2');
+ const finalT=memoryT-total-(battleEnding?24000:0);view.style.left=memoryT>=total?'415px':'110px';
+ const commentT=battleEnding?aftermathT-12000:finalT,comments=E('endingComments');comments.style.opacity=(battleEnding&&aftermathT>=24000)?0:clamp((commentT-5000)/500);comments.style.transform='translateY('+(500*(1-smooth((commentT-5000)/700)))+'px)';
+ comments.querySelectorAll('p').forEach((p,i)=>p.style.opacity=clamp((commentT-5700-i*1700)/450));
+ if(commentT>=5700)endingSound('ending-comment-1');if(commentT>=7400)endingSound('ending-comment-2');
  if(finalT>=11500){fade.style.opacity=clamp((finalT-11500)/2400);if(finalT>=12000)endingSound('ending-music-fade');}
  E('endingThanks').style.opacity=finalT<14200?0:Math.min(clamp((finalT-14200)/2000),clamp((22200-finalT)/2000));
  if(finalT>=22500){E('endingDone').hidden=false;E('endingStage').dataset.phase='done';if(!endingSounds.has('done')){endingSounds.add('done');endingMessage('complete');}}

@@ -65,15 +65,15 @@ if(GUEST.demon&&GUEST.mode!=='backdrop'){
    standing.style.display='none';dialogueState.active=false;customerState.phase='door';customerState.wait=.2;customerState.x=670;customerState.y=430;customerState.target=2;doorSignal.classList.add('open');send('cutscene-end');
   }
   if(e.data.type==='demon-applause'){companion.classList.add('demonApplause');player.classList.add('demonApplause');send('sound',{key:'beauty-pleased'});}
-  if(e.data.type==='demon-finish'){
-   if(customerState.phase==='closed'&&!beautyActive)return;
+  if(e.data.type==='demon-finish'||e.data.type==='demon-battle-return'){
+   if(e.data.type==='demon-finish'&&customerState.phase==='closed'&&!beautyActive)return;
    beautyActive=false;beautyResultActive=false;dialogueState.active=false;customerState.phase='closed';state.keys.clear();
    clearTimeout(resultRevealTimer);clearTimeout(resultEndTimer);clearReturningReactions();
    beautyScreen.style.display='none';seatedCustomer.style.display='none';interact.style.display='none';interactPrompt.style.display='none';openShopBtn.style.display='none';
    standing.src=e.data.portrait||GUEST.skin.portrait;standing.style.cssText='position:absolute;left:48%;bottom:21%;width:180px;height:197px;object-fit:contain;image-rendering:pixelated;z-index:49;pointer-events:none';
    companion.style.display='block';companion.classList.remove('demonApplause');player.classList.remove('demonApplause');
    state.x=380;state.y=420;state.direction='right';render(false);updateInteraction();
-   prepareDemonEndingRoom(e.data.headPortrait||e.data.portrait||GUEST.skin.portrait).catch(error=>send('demon-ending-error',{message:error.message}));
+   prepareDemonEndingRoom(e.data.headPortrait||e.data.portrait||GUEST.skin.portrait,e.data.type==='demon-battle-return'?'goblin':'handsome').catch(error=>send('demon-ending-error',{message:error.message}));
   }
 
  });

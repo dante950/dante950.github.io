@@ -9,3 +9,5 @@
 #memoryTrack .social-photo{height:250px;max-height:250px}#memoryTrack .ending-copy{font-size:12.5px;line-height:1.5;max-height:200px}
 
 #memoryTrack .social-photo.coffee-beauty img.photo-base{height:100%;width:100%;object-fit:contain}
+
+#memoryTrack .ending-news .ending-group{height:240px;background:radial-gradient(ellipse,#e4d5ea,#b8b9d5)}#memoryTrack .ending-news .ending-group img{object-fit:contain;padding:18px}

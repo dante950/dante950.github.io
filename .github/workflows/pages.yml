@@ -16,6 +16,7 @@ jobs:
     outputs:
       release_only: ${{ steps.scope.outputs.release_only }}
       ending_only: ${{ steps.scope.outputs.ending_only }}
+      demon_battle_only: ${{ steps.scope.outputs.demon_battle_only }}
       demon_only: ${{ steps.scope.outputs.demon_only }}
       archive_changed: ${{ steps.scope.outputs.archive_changed }}
       dialogue_only: ${{ steps.scope.outputs.dialogue_only }}
@@ -39,6 +40,8 @@ jobs:
           archive_changed=false
           ending_only=false
           ending_changed=false
+          demon_battle_only=false
+          demon_battle_changed=false
           demon_changed=false
           demon_only=false
           dialogue_only=false
@@ -51,6 +54,7 @@ jobs:
           if [ "$EVENT" = push ] && git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
             release_only=true
             ending_only=true
+            demon_battle_only=true
             demon_only=true
             dialogue_only=true
             walk_only=true
@@ -60,6 +64,11 @@ jobs:
             reaction_only=true
             returning_only=true
             while IFS= read -r file; do
+              case "$file" in src/combat/demon-*.js) demon_battle_changed=true ;; esac
+              case "$file" in
+                src/combat/demon-*.js|src/combat/app.js|src/combat/assets.json|src/combat/bridge.js|src/combat/cursor-scene.js|src/combat/cursor-ui.js|src/ending/*|src/demon-story.js|src/demon-guest.js|src/salon-demon-visit.js|src/app.js|src/battle-result.js|scripts/build.mjs|scripts/import-demon-battle-assets.cjs|scripts/check-demon-battle.mjs|scripts/serve-demon-battle-review.mjs|scripts/check-demon-salon.mjs|tests/demon-battle.test.mjs|tests/demon-salon.test.mjs|tests/ending.test.mjs|public/media/demon-battle/*|docs/demon-battle-2026-11-08/*|.github/workflows/pages.yml) ;;
+                *) demon_battle_only=false ;;
+              esac
               case "$file" in src/ending/*) ending_changed=true ;; esac
               case "$file" in
                 src/ending/*|public/media/ending/*|src/demon-story.js|src/salon-demon-visit.js|src/app.js|src/style.css|scripts/build.mjs|tests/ending.test.mjs|tests/demon-salon.test.mjs|scripts/check-ending.mjs|scripts/serve-ending-review.mjs|scripts/check-demon-salon.mjs|docs/beauty-ending-2026-11-07/*|.github/workflows/pages.yml) ;;
@@ -102,6 +111,8 @@ jobs:
               esac
             done < <(git diff --name-only "$BEFORE" HEAD)
           fi
+          if [ "$demon_battle_changed" != true ]; then demon_battle_only=false; fi
+          echo "demon_battle_only=$demon_battle_only" >> "$GITHUB_OUTPUT"
           if [ "$ending_changed" != true ]; then ending_only=false; fi
           echo "ending_only=$ending_only" >> "$GITHUB_OUTPUT"
           if [ "$demon_changed" != true ]; then demon_only=false; fi
@@ -134,15 +145,18 @@ jobs:
       - name: Check beauty-success ending and retained review records
         if: steps.scope.outputs.ending_only == 'true'
         run: node --test tests/ending.test.mjs tests/demon-salon.test.mjs tests/story-progress.test.mjs tests/social.test.mjs
+      - name: Check demon battle, shared combat and both endings
+        if: steps.scope.outputs.demon_battle_only == 'true'
+        run: node --test tests/demon-battle.test.mjs tests/demon-salon.test.mjs tests/ending.test.mjs tests/cursor-combat.test.mjs tests/battle-result.test.mjs
       - run: npm test
-        if: steps.scope.outputs.ending_only != 'true' && steps.scope.outputs.demon_only != 'true' && steps.scope.outputs.walk_only != 'true' && steps.scope.outputs.font_only != 'true' && steps.scope.outputs.intro_only != 'true' && steps.scope.outputs.result_only != 'true' && steps.scope.outputs.returning_only != 'true'
+        if: steps.scope.outputs.demon_battle_only != 'true' && steps.scope.outputs.ending_only != 'true' && steps.scope.outputs.demon_only != 'true' && steps.scope.outputs.walk_only != 'true' && steps.scope.outputs.font_only != 'true' && steps.scope.outputs.intro_only != 'true' && steps.scope.outputs.result_only != 'true' && steps.scope.outputs.returning_only != 'true'
       - uses: actions/upload-pages-artifact@v4
         if: steps.scope.outputs.release_only != 'true'
         with:
           path: dist
   browser-checks:
     needs: build
-    if: needs.build.outputs.ending_only != 'true' && needs.build.outputs.release_only != 'true' && needs.build.outputs.demon_only != 'true' && needs.build.outputs.dialogue_only != 'true' && needs.build.outputs.walk_only != 'true' && needs.build.outputs.font_only != 'true' && needs.build.outputs.intro_only != 'true' && needs.build.outputs.result_only != 'true' && needs.build.outputs.returning_only != 'true'
+    if: needs.build.outputs.demon_battle_only != 'true' && needs.build.outputs.ending_only != 'true' && needs.build.outputs.release_only != 'true' && needs.build.outputs.demon_only != 'true' && needs.build.outputs.dialogue_only != 'true' && needs.build.outputs.walk_only != 'true' && needs.build.outputs.font_only != 'true' && needs.build.outputs.intro_only != 'true' && needs.build.outputs.result_only != 'true' && needs.build.outputs.returning_only != 'true'
     name: Check ${{ matrix.suite }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -233,7 +247,7 @@ jobs:
       - run: node scripts/check-ingame-font.mjs
   demon-browser:
     needs: build
-    if: needs.build.outputs.ending_only != 'true' && needs.build.outputs.release_only != 'true'
+    if: needs.build.outputs.demon_battle_only != 'true' && needs.build.outputs.ending_only != 'true' && needs.build.outputs.release_only != 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:
@@ -282,9 +296,34 @@ jobs:
         with:
           name: ending-checks-${{ github.sha }}
           path: docs/beauty-ending-2026-11-07/
+  demon-battle-browser:
+    needs: build
+    if: needs.build.outputs.demon_battle_only == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium webkit
+      - run: npm run build
+      - name: Check main-game battle and both endings
+        run: |
+          node scripts/serve-demon-battle-review.mjs &
+          node scripts/serve-ending-review.mjs &
+          node scripts/check-demon-battle.mjs
+          node scripts/check-demon-battle.mjs --webkit
+          node scripts/check-ending.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: demon-battle-checks-${{ github.sha }}
+          path: docs/demon-battle-2026-11-08/
   deploy:
-    if: always() && needs.build.outputs.release_only != 'true' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.build.result == 'success' && (needs.demon-browser.result == 'success' || (needs.build.outputs.ending_only == 'true' && needs.ending-browser.result == 'success')) && (needs.dialogue-browser.result == 'success' || needs.dialogue-browser.result == 'skipped') && (needs.browser-checks.result == 'success' || needs.browser-checks.result == 'skipped') && (needs.returning-browser.result == 'success' || needs.returning-browser.result == 'skipped') && (needs.font-browser.result == 'success' || needs.font-browser.result == 'skipped') && (needs.walk-browser.result == 'success' || needs.walk-browser.result == 'skipped')
-    needs: [build, browser-checks, dialogue-browser, returning-browser, font-browser, walk-browser, demon-browser, ending-browser]
+    if: always() && needs.build.outputs.release_only != 'true' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.build.result == 'success' && ((needs.build.outputs.demon_battle_only == 'true' && needs.demon-battle-browser.result == 'success') || needs.demon-browser.result == 'success' || (needs.build.outputs.ending_only == 'true' && needs.ending-browser.result == 'success')) && (needs.dialogue-browser.result == 'success' || needs.dialogue-browser.result == 'skipped') && (needs.browser-checks.result == 'success' || needs.browser-checks.result == 'skipped') && (needs.returning-browser.result == 'success' || needs.returning-browser.result == 'skipped') && (needs.font-browser.result == 'success' || needs.font-browser.result == 'skipped') && (needs.walk-browser.result == 'success' || needs.walk-browser.result == 'skipped')
+    needs: [build, browser-checks, dialogue-browser, returning-browser, font-browser, walk-browser, demon-browser, ending-browser, demon-battle-browser]
     runs-on: ubuntu-latest
     permissions:
       pages: write

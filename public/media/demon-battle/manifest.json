@@ -1,0 +1,162 @@
+{
+  "demon_idle1": {
+    "src": "./media/demon-battle/demon_idle1.png",
+    "fw": 208,
+    "fh": 231,
+    "count": 1,
+    "cols": 1,
+    "file": "demon_idle1.png"
+  },
+  "demon_idle2": {
+    "src": "./media/demon-battle/demon_idle2.png",
+    "fw": 151,
+    "fh": 182,
+    "count": 1,
+    "cols": 1,
+    "file": "demon_idle2.png"
+  },
+  "demon_idle3": {
+    "src": "./media/demon-battle/demon_idle3.png",
+    "fw": 175,
+    "fh": 97,
+    "count": 1,
+    "cols": 1,
+    "file": "demon_idle3.png"
+  },
+  "demon_cross": {
+    "src": "./media/demon-battle/demon_cross.png",
+    "fw": 509,
+    "fh": 316,
+    "count": 6,
+    "cols": 3,
+    "file": "demon_cross.png"
+  },
+  "demon_down": {
+    "src": "./media/demon-battle/demon_down.png",
+    "fw": 509,
+    "fh": 316,
+    "count": 6,
+    "cols": 3,
+    "file": "demon_down.png"
+  },
+  "demon_up": {
+    "src": "./media/demon-battle/demon_up.png",
+    "fw": 509,
+    "fh": 316,
+    "count": 9,
+    "cols": 3,
+    "file": "demon_up.png"
+  },
+  "demon_explosion_return": {
+    "src": "./media/demon-battle/demon_explosion_return.png",
+    "fw": 509,
+    "fh": 316,
+    "count": 9,
+    "cols": 3,
+    "file": "demon_explosion_return.png"
+  },
+  "demon_slash": {
+    "src": "./media/demon-battle/demon_slash.png",
+    "fw": 509,
+    "fh": 316,
+    "count": 9,
+    "cols": 3,
+    "file": "demon_slash.png"
+  },
+  "demon_charge": {
+    "src": "./media/demon-battle/demon_charge.png",
+    "fw": 509,
+    "fh": 316,
+    "count": 6,
+    "cols": 3,
+    "file": "demon_charge.png"
+  },
+  "demon_slash_return": {
+    "src": "./media/demon-battle/demon_slash_return.png",
+    "fw": 509,
+    "fh": 316,
+    "count": 6,
+    "cols": 3,
+    "file": "demon_slash_return.png"
+  },
+  "demon_beam": {
+    "src": "./media/demon-battle/demon_beam.png",
+    "fw": 244,
+    "fh": 199,
+    "count": 19,
+    "cols": 5,
+    "file": "demon_beam.png"
+  },
+  "demon_mirror_center": {
+    "src": "./media/demon-battle/demon_mirror_center.png",
+    "fw": 102,
+    "fh": 174,
+    "count": 17,
+    "cols": 5,
+    "file": "demon_mirror_center.png"
+  },
+  "demon_mirror_side": {
+    "src": "./media/demon-battle/demon_mirror_side.png",
+    "fw": 55,
+    "fh": 87,
+    "count": 13,
+    "cols": 4,
+    "file": "demon_mirror_side.png"
+  },
+  "demon_hit": {
+    "src": "./media/demon-battle/demon_hit.png",
+    "fw": 264,
+    "fh": 231,
+    "count": 1,
+    "cols": 1,
+    "file": "demon_hit.png"
+  },
+  "demon_hit3": {
+    "src": "./media/demon-battle/demon_hit3.png",
+    "fw": 935,
+    "fh": 755,
+    "count": 1,
+    "cols": 1,
+    "file": "demon_hit3.png"
+  },
+  "demon_double1": {
+    "src": "./media/demon-battle/demon_double1.png",
+    "fw": 252,
+    "fh": 240,
+    "count": 1,
+    "cols": 1,
+    "file": "demon_double1.png"
+  },
+  "demon_double2": {
+    "src": "./media/demon-battle/demon_double2.png",
+    "fw": 252,
+    "fh": 240,
+    "count": 1,
+    "cols": 1,
+    "file": "demon_double2.png"
+  },
+  "demon_iaido": {
+    "src": "./media/demon-battle/demon_iaido.png",
+    "fw": 1246,
+    "fh": 240,
+    "count": 10,
+    "cols": 10,
+    "file": "demon_iaido.png"
+  },
+  "demon_tile_mirror": {
+    "src": "./media/demon-battle/demon_tile_mirror.png",
+    "fw": 256,
+    "fh": 280,
+    "count": 1,
+    "cols": 1,
+    "file": "demon_tile_mirror.png"
+  },
+  "demon_tile_mirror_turned": {
+    "src": "./media/demon-battle/demon_tile_mirror_turned.png",
+    "fw": 256,
+    "fh": 280,
+    "count": 1,
+    "cols": 1,
+    "file": "demon_tile_mirror_turned.png"
+  }
+}

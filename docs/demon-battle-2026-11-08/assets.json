@@ -1,0 +1,129 @@
+{
+  "sourceDirectories": [
+    "시뮬레이터/애니메이션/전투/마왕",
+    "시뮬레이터/캐릭터/몬스터/마왕"
+  ],
+  "note": "Provided artwork. Original files unchanged. GIF extraction and mesh projection documented in README.",
+  "assets": [
+    {
+      "key": "demon_idle1",
+      "file": "./media/demon-battle/demon_idle1.png",
+      "sha256": "afafe65c3157fef5e58610a3a2075a2cf64e07dc04ef50bb56fef6262b65481a",
+      "frames": 1
+    },
+    {
+      "key": "demon_idle2",
+      "file": "./media/demon-battle/demon_idle2.png",
+      "sha256": "ca7f5687cd35a72ea9e6a34315a953a3195461e96cf8ccca455b5eb67a5b2981",
+      "frames": 1
+    },
+    {
+      "key": "demon_idle3",
+      "file": "./media/demon-battle/demon_idle3.png",
+      "sha256": "6cfb87cddbc688f666c284c8a5d225243ce510a37167cc1a52fb4b5da9bbeb06",
+      "frames": 1
+    },
+    {
+      "key": "demon_cross",
+      "file": "./media/demon-battle/demon_cross.png",
+      "sha256": "19b01c5835e508416012385ec83d5b7ded9db4835786045db5295ff063ba265c",
+      "frames": 6
+    },
+    {
+      "key": "demon_down",
+      "file": "./media/demon-battle/demon_down.png",
+      "sha256": "a495cf4c8cfb673ec6a9b979ffda62f67f95688f22bbe8678b04025f388ae790",
+      "frames": 6
+    },
+    {
+      "key": "demon_up",
+      "file": "./media/demon-battle/demon_up.png",
+      "sha256": "df5531b3194974c28fac68664e36b92d02c36e0e1169e479e50d09ae9db99c58",
+      "frames": 9
+    },
+    {
+      "key": "demon_explosion_return",
+      "file": "./media/demon-battle/demon_explosion_return.png",
+      "sha256": "766d0bfe09c6fb99eb945e8dd988bd9d33f4ff361d7fc848e711ee1db54a5063",
+      "frames": 9
+    },
+    {
+      "key": "demon_slash",
+      "file": "./media/demon-battle/demon_slash.png",
+      "sha256": "12db3ec48b607865713286a8e5cc0bcc959d49bf22cea80286bc1cf6fd198540",
+      "frames": 9
+    },
+    {
+      "key": "demon_charge",
+      "file": "./media/demon-battle/demon_charge.png",
+      "sha256": "98ffd7c1b35e7c1d86ff6763de32601258d41b7561d43ec6f97914a94efd887b",
+      "frames": 6
+    },
+    {
+      "key": "demon_slash_return",
+      "file": "./media/demon-battle/demon_slash_return.png",
+      "sha256": "cd3321134886b9793e0704e902ff283f8ee5cf2623e2bf42f3cfdd404e27681f",
+      "frames": 6
+    },
+    {
+      "key": "demon_beam",
+      "file": "./media/demon-battle/demon_beam.png",
+      "sha256": "6979d37ba9f51f6b3d9c6aec5e4757cc1e62a339f203eadcf947c117decda4a6",
+      "frames": 19
+    },
+    {
+      "key": "demon_mirror_center",
+      "file": "./media/demon-battle/demon_mirror_center.png",
+      "sha256": "6fc50bbac55b196f905af4a052d6b3f2e8abbb1e82a3cc5dc540f92d9f5db7d6",
+      "frames": 17
+    },
+    {
+      "key": "demon_mirror_side",
+      "file": "./media/demon-battle/demon_mirror_side.png",
+      "sha256": "bb44f67c73ce5b7c6861ff4bc08336566a136d51d82cd5d5b26efc09eea4f4b9",
+      "frames": 13
+    },
+    {
+      "key": "demon_hit",
+      "file": "./media/demon-battle/demon_hit.png",
+      "sha256": "5f066a7d19506be4f68f10e17e997e59b2def387e775b2f05429adcb29ed3d3b",
+      "frames": 1
+    },
+    {
+      "key": "demon_hit3",
+      "file": "./media/demon-battle/demon_hit3.png",
+      "sha256": "6aa949983ef85c9dc73a0c59da6515d63393b77111e378f7121927ac35f0958e",
+      "frames": 1
+    },
+    {
+      "key": "demon_double1",
+      "file": "./media/demon-battle/demon_double1.png",
+      "sha256": "7e3cb9f18ed19ae5139a7d46c1b4c56faa269b8141d0380e946ebcc2fc99b9a5",
+      "frames": 1
+    },
+    {
+      "key": "demon_double2",
+      "file": "./media/demon-battle/demon_double2.png",
+      "sha256": "8c86caa8c0872c94514800607f07925101555d15678a3a98d2896174dd2edae7",
+      "frames": 1
+    },
+    {
+      "key": "demon_iaido",
+      "file": "./media/demon-battle/demon_iaido.png",
+      "sha256": "6681284ce3b9f041e891708b91711140635e6438327d1e6b4630991378493b04",
+      "frames": 10
+    },
+    {
+      "key": "demon_tile_mirror",
+      "file": "./media/demon-battle/demon_tile_mirror.png",
+      "sha256": "84c3c871e47d2fdf23eea2bde575c3ab9be28e9826cca60f62d6e947b5306b00",
+      "frames": 1
+    },
+    {
+      "key": "demon_tile_mirror_turned",
+      "file": "./media/demon-battle/demon_tile_mirror_turned.png",
+      "sha256": "9aa2631d2caa43ad43dd6f44c3f9399d2f557dcfb24cf3938c6aba4e82dc0700",
+      "frames": 1
+    }
+  ]
+}
