@@ -167,8 +167,17 @@ export function ensureDemonDialogueCatalogue(project){
   for(const [i,line]of texts.entries())lines.push({DialogueID:Math.max(900000,...lines.map(r=>r.DialogueID))+1,GroupID:id,Order:i+1,Speaker:Array.isArray(line)?line[0]:'몬스터',Text:Array.isArray(line)?line[1]:line,Notes:'마왕 2페이즈 미용'});
  }}return project;
 }
+// Phase selection never changes the canonical story guest's starting phase.
+export function demonWorkshopGuest(source,phase=1){
+ if(!source?.demon||phase===1)return source;
+ if(phase!==2)throw Error('마왕 미용은 두 페이즈입니다.');
+ source.demonPhaseBeauty||={};
+ source.demonPhaseBeauty[2]||=demonGuest(2).beauty;
+ return {...source,...demonGuest(2),bindings:source.bindings,beauty:source.demonPhaseBeauty[2]};
+}
 export function installDemonDialogue(project,g){
  ensureDemonDialogueCatalogue(project);const source=project.guests.find(x=>x.id===g.id),configured=source?.demonPhaseDialogue?.[g.demonPhase];
+ g.beauty=structuredClone(source?.demonPhaseBeauty?.[g.demonPhase]||(g.demonPhase===1?source?.beauty:null)||g.beauty);
  if(configured&&['cut','draw','attach'].every(k=>configured[k])){g.bindings={...source.bindings};const links=project.combat.sheets.find(s=>s.name==='미용 대사 연결').rows;for(const stage of ['cut','draw','attach']){const row={MonsterID:g.id,Stage:stage,...configured[stage]},old=links.find(r=>r.MonsterID===g.id&&r.Stage===stage);if(old)Object.assign(old,row);else links.push(row);}return g;}
  const rows=n=>project.combat.sheets.find(s=>s.name===n).rows,groups=rows('대화 그룹'),lines=rows('대사'),links=rows('미용 대사 연결');
  const add=(name,texts)=>{const id=Math.max(80000,...groups.map(r=>r.GroupID))+1;groups.push({GroupID:id,Name:'마왕 · '+name,PlaybackMode:'순서대로',PauseCombat:true,AdvanceMode:'입력',CPS:30,HoldMs:1400,GapMs:100,Notes:'마왕 미용 · 웹 전용',ActorEffect:'없음',FinishEffect:'없음'});for(const [i,line]of texts.entries())lines.push({DialogueID:Math.max(900000,...lines.map(r=>r.DialogueID))+1,GroupID:id,Order:i+1,Speaker:Array.isArray(line)?line[0]:'몬스터',Text:Array.isArray(line)?line[1]:line,Notes:'마왕 미용 · 웹 전용'});return id;};

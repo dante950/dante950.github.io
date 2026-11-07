@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs/promises';
-import {DEMON_LINES,demonGrowthCells,demonGuest,demonJudge,demonGate,demonHornAllowance,demonFacePaintLimit,DEMON_FACE_LIMIT,demonRoyalStickers,demonRoofProfile,demonPolygon,DEMON_DESIGN,demonSilverStripe,demonGrowthPalette,demonMakeupMasks,demonMakeup,demonLipPaint,ensureDemonDialogueCatalogue} from '../src/demon-guest.js';
+import {demonWorkshopGuest,installDemonDialogue,DEMON_LINES,demonGrowthCells,demonGuest,demonJudge,demonGate,demonHornAllowance,demonFacePaintLimit,DEMON_FACE_LIMIT,demonRoyalStickers,demonRoofProfile,demonPolygon,DEMON_DESIGN,demonSilverStripe,demonGrowthPalette,demonMakeupMasks,demonMakeup,demonLipPaint,ensureDemonDialogueCatalogue} from '../src/demon-guest.js';
 import {projectProblems,storyStartOptions} from '../src/model.js';
 const project=JSON.parse(await fs.readFile(new URL('../data/project.json',import.meta.url),'utf8'));
 test('demon is the fourth-day guest in the shared story and has no battle route',()=>{assert.deepEqual(projectProblems(project),[]);const start=storyStartOptions(project).find(x=>x.guest.id===10007);assert.equal(start.day,4);assert.equal(start.guest.battle,'none');assert.equal(start.guest.workbookExcluded,false);});
@@ -186,4 +186,23 @@ test('helmet extension does not stretch highlight bands or opaque scratch pixels
  for(let n=0;n<w*h;n++){assert.equal(colors[n*4+3],255);used.add([...colors.slice(n*4,n*4+3)].join(','));}
  assert.deepEqual([...used].sort(),['36,34,54','72,83,248']);
  assert.deepEqual(p,before,'authored source and scratches remain intact');
+});
+
+test('workshop phase settings survive switches and JSON without changing the story starting phase',()=>{
+ const p=structuredClone(project),source=p.guests.find(g=>g.id===10007),original=structuredClone(source.beauty);
+ const second=demonWorkshopGuest(source,2);second.beauty.growth.color='#d8d0e0';second.beauty.requestNotes.draw='2페이즈 작업 메모';
+ assert.equal(source.demonPhase,1);assert.deepEqual(source.beauty,original);
+ assert.equal(demonWorkshopGuest(source,1),source);
+ assert.equal(demonWorkshopGuest(source,2).beauty.growth.color,'#d8d0e0');
+ const restored=JSON.parse(JSON.stringify(p)),saved=restored.guests.find(g=>g.id===10007);
+ assert.equal(demonWorkshopGuest(saved,2).beauty.requestNotes.draw,'2페이즈 작업 메모');
+ const played=installDemonDialogue(restored,demonGuest(2));
+ assert.equal(played.beauty.growth.color,'#d8d0e0');
+ for(const stage of ['cut','draw','attach']){
+  const link=restored.combat.sheets.find(s=>s.name==='미용 대사 연결').rows.find(r=>r.MonsterID===10007&&r.Stage===stage);
+  assert.equal(link.RequestGroupID,saved.demonPhaseDialogue[2][stage].RequestGroupID);
+ }
+ assert.deepEqual(projectProblems(p),[]);
+ source.demonPhaseBeauty[2].growth.color='invalid';
+ assert(projectProblems(p).some(m=>m.includes('마왕 2페이즈 발모제 색상')));
 });

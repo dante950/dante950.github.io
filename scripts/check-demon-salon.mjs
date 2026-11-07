@@ -149,6 +149,50 @@ await stage(f,'draw');await f.locator('[data-color="#4853F8"]').click();
    await p.goto(base);await p.waitForFunction(()=>window.fullflow);await p.locator('#developer').click();if(await p.locator('#updateOK').isVisible())await p.locator('#updateOK').click();
    await p.locator('[data-editor="dialogue"]').first().click();await p.locator('#dialogueGuest').selectOption('10007');await p.locator('#dialogueEvent').selectOption('exterior');
    assert.equal(await p.locator('#dialogueEvent option:checked').textContent(),'미용실 외부 등장 씬');assert.match(await p.locator('[data-line-text]').first().inputValue(),/^마왕님,/);await snap('exterior-dialogue-editor');
+   await p.locator('[data-editor="beauty"]').first().click();await p.locator('#beautyGuest').selectOption('10007');
+   assert.equal(await p.locator('#workshopDemonPhase').inputValue(),'1');
+   const helmetImage=await p.locator('#regionStage .layeredPortrait').getAttribute('src');
+   const helmetRequest=await p.locator('[data-field="request"]').inputValue();
+   await p.locator('#workshopDemonPhase').selectOption('2');
+   assert.equal(await p.locator('#toolSelect').inputValue(),'scissors');
+   assert.notEqual(await p.locator('#regionStage .layeredPortrait').getAttribute('src'),helmetImage);
+   assert.match(await p.locator('[data-field="request"]').inputValue(),/내 얼굴/);
+   await p.locator('[data-field="growth.color"]').fill('#d8d0e0');await p.locator('[data-field="growth.color"]').dispatchEvent('change');
+   await p.locator('[data-field="request"]').fill('작업실 미형 대사 확인입니다.');await p.locator('[data-field="request"]').dispatchEvent('change');
+   await p.locator('#workshopDemonPhase').selectOption('1');
+   assert.equal(await p.locator('#toolSelect').inputValue(),'hammer');
+   assert.equal(await p.locator('[data-field="growth.color"]').inputValue(),'#242236');
+   assert.equal(await p.locator('[data-field="request"]').inputValue(),helmetRequest);
+   await p.locator('#workshopDemonPhase').selectOption('2');
+   assert.equal(await p.locator('[data-field="growth.color"]').inputValue(),'#d8d0e0');
+   await snap('workshop-phase-two');
+   await p.locator('[data-editor="dialogue"]').first().click();await p.locator('#dialogueEvent').selectOption('cut');
+   assert.equal(await p.locator('#workshopDemonPhase').inputValue(),'2');
+   assert.equal(await p.locator('#beautyRequestText').inputValue(),'작업실 미형 대사 확인입니다.');
+   await p.locator('#workshopDemonPhase').selectOption('1');assert.equal(await p.locator('#beautyRequestText').inputValue(),helmetRequest);
+   await p.locator('#workshopDemonPhase').selectOption('2');
+   await p.locator('[data-editor="beauty"]').first().click();await p.locator('#beautyTry').click();await p.locator('#previewStart').click();
+   f=await frame();await p.waitForFunction(()=>document.querySelector('#talkText').textContent.includes('작업실 미형 대사 확인입니다.'));
+   await talks();await f.waitForFunction(()=>beautyActive&&!briefing);
+   assert.equal(await f.evaluate(()=>demonPhase),2);assert.equal(await f.evaluate(()=>B.growth.color),'#d8d0e0');
+   assert.equal(await p.evaluate(()=>fullflow.story.preview),true);
+   assert.equal(await f.locator('.demonCinema').count(),0);
+   await snap('workshop-phase-two-trial');
+   await complete(f);await p.locator('#returnBeauty').click();
+   assert.equal(await p.locator('#workshopDemonPhase').inputValue(),'2');
+   assert.equal(await p.locator('[data-field="growth.color"]').inputValue(),'#d8d0e0');
+   await p.locator('#workshopDemonPhase').selectOption('1');await p.locator('#beautyTry').click();await p.locator('#previewStart').click();
+   f=await frame();await talks();await f.waitForFunction(()=>beautyActive&&!briefing);
+   assert.equal(await f.evaluate(()=>demonPhase),1);
+   await f.locator('[data-tool="hammer"]').click();await size(f,22);
+   previewDamage:for(let y=177;y<253;y+=12)for(let x=105;x<230;x+=12){
+    if(await p.locator('#returnBeauty').isVisible())break previewDamage;await stroke(f,[x,y]);if(await f.evaluate(()=>demonSudden))break previewDamage;
+   }
+   await p.locator('#returnBeauty').waitFor();assert.equal(await p.locator('#demonRetryBeauty').count(),0);
+   await p.locator('#returnBeauty').click();assert.equal(await p.locator('#workshopDemonPhase').inputValue(),'1');
+   await p.locator('#beautyGuest').selectOption('10001');assert.equal(await p.locator('#workshopDemonPhase').count(),0);
+   console.log('workshop: phase-specific edit, dialogue, direct trials, return, and sudden-failure isolation passed');
+
   }
   assert.deepEqual(errors,[]);console.log(name,'two beauty phases, horn pair AND either crown, free face painting, dialogue effects, room handoff and gates passed');
  }catch(e){await snap('failure-debug');console.error(errors);throw e;}finally{await browser.close();}
