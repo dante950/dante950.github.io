@@ -36,10 +36,11 @@ const schema=await read('data/schema.json'),assets=await read('src/combat/assets
 const zip=await read('vendor/jszip.min.js'),license=await read('vendor/JSZip-LICENSE.txt');
 combat=combat.replace('<link rel="stylesheet" href="style.css">',()=>`<style>${css}</style>`)
  .replace('<script type="module" src="app.js"></script>',()=>`<script id="host-data" type="application/json">__HOST_JSON__</script><script id="embedded-workbook" type="application/octet-stream">${wb}</script><script id="embedded-authoring" type="application/octet-stream">${au}</script><script id="embedded-schema" type="application/json">${safe(schema)}</script><script id="embedded-assets" type="application/json">${safe(assets)}</script><script>${safe(zip)}</script><script type="module">${safe(combatScript)}</script><script type="text/plain">${safe(license)}</script>`);
-const parentBundle=await bundle('src/',['text-effects.js','combat/dialogue.js','combat/engine.js','beauty-reaction-dialogue.js','salon-dialogue.js','tutorial/narrative.js','tutorial/dialogues.js','model.js','demon-guest.js','demon-story.js','returning-zombie.js','star-progress.js','story-progress.js','battle-result.js','workshop-dialogue.js','project-archive.js','publishing.js','owner-access.js','speaker-avatar.js','media.js','audio.js','story-intro.js','tutorial/closing.js','app.js']);
+const parentBundle=await bundle('src/',['text-effects.js','combat/dialogue.js','combat/engine.js','beauty-reaction-dialogue.js','salon-dialogue.js','tutorial/narrative.js','tutorial/dialogues.js','model.js','demon-guest.js','demon-story.js','ending/story.js','returning-zombie.js','star-progress.js','story-progress.js','battle-result.js','workshop-dialogue.js','project-archive.js','publishing.js','owner-access.js','speaker-avatar.js','media.js','audio.js','story-intro.js','tutorial/closing.js','app.js']);
 const reactionStyle=await read('src/beauty-reaction.css');
 const styleURL=await emit('style','css',speechStyle+'\n'+reactionStyle+'\n'+await read('src/style.css')+'\n'+await read('src/battle-result.css'));
-const demonBeautyRuntime=await read('src/salon-demon.js'),demonVisitRuntime=await read('src/salon-demon-visit.js');
+const endingRoomRuntime=await read('src/ending/salon-room.js');
+const demonBeautyRuntime=await read('src/salon-demon.js'),demonVisitRuntime=(await read('src/salon-demon-visit.js')).replace('/*__DEMON_ENDING_ROOM__*/',()=>endingRoomRuntime);
 const beautyResultRuntime=await read('src/salon-beauty-result.js'),beautyTutorialRuntime=await read('src/salon-tutorial.js');
 const beautyRules=await bundle('src/',['text-effects.js','demon-guest.js','beauty-rules.js','returning-zombie.js','coffee-beauty.js','beauty-shape.js','beauty-lesson-targets.js','beauty-action-feedback.js']),beautyRuntime=(await read('src/salon-beauty.js')).replace('/*__DEMON_BEAUTY__*/',()=>demonBeautyRuntime).replace('/*__BEAUTY_RESULT__*/',()=>beautyResultRuntime).replace('/*__BEAUTY_TUTORIAL__*/',()=>beautyTutorialRuntime);
 const salonStyle=await read('src/salon-beauty.css')+'\n'+reactionStyle+'\n'+await read('src/ingame-font.css');
@@ -73,6 +74,9 @@ await fs.writeFile(path.join(dist,'tutorial-variants.html'),variantsHTML);
 const resultJS=await emit('battle-result','js',await read('src/battle-result.js'));
 const resultCSS=await emit('battle-result-style','css',speechStyle+'\n'+await read('src/battle-result.css'));
 await fs.writeFile(path.join(dist,'battle-results.html'),(await read('src/battle-results-preview.html')).replace('__RESULT_CSS__',resultCSS).replace('__RESULT_JS__',resultJS));
+const endingJS=await emit('ending-app','js',await bundle('src/',['star-progress.js','closing/model.js','closing/social-model.js','closing/social-ui.js','ending/model.js','ending/app.js']));
+const endingCSS=await emit('ending-style','css',await read('src/ingame-font.css')+'\n'+await read('src/closing/social.css')+'\n'+await read('src/closing/social-refinements.css')+'\n'+await read('src/ending/style.css'));
+await fs.writeFile(path.join(dist,'ending.html'),(await read('src/ending/index.html')).replace('__ENDING_JS__',endingJS).replace('__ENDING_CSS__',endingCSS));
 const releaseId=hash(JSON.stringify(files));
 const boot=`const inputs=${JSON.stringify(inputs)};
 try {

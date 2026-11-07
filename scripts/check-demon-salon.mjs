@@ -212,7 +212,7 @@ await stage(f,'draw');await f.locator('[data-color="#4853F8"]').click();
   assert(await f.locator('#demonStanding').isVisible());assert(!(await f.locator('#beautyScreen').isVisible()));
   await p.locator('#salon').focus();const before=await f.evaluate(()=>state.x);await p.keyboard.down('d');await p.waitForTimeout(180);await p.keyboard.up('d');assert((await f.evaluate(()=>state.x))>before,'movement resumes in the salon');
   await f.evaluate(()=>send('demon-room-ready'));await p.waitForTimeout(100);assert.equal(await p.evaluate(()=>window.__endingEvents.length),1);
-  assert(await p.locator('#storyHint').isVisible());assert.match(await p.locator('#storyHint').textContent(),/엔딩 컷씬은 아직 연결되지/);
+  assert.equal(await p.locator('#storyHint').isVisible(),false);assert(await f.locator('#demonEndingRoom').isVisible());
   await snap('handsome-room-return');
   if(!publicRun){
    f=await begin();await enter(f);await f.locator('[data-tool="hammer"]').click();await size(f,18);outer:for(let y=177;y<253;y+=12)for(let x=105;x<230;x+=12){if(await p.locator('#talkLayer').isVisible())break outer;await stroke(f,[x,y]);const r=await f.evaluate(()=>demonBeautyStatus());if(r.metrics.exposure>=.15&&r.metrics.exposure<.35)assert.equal(r.sudden,false);if(r.sudden)break outer;}await talks();await p.waitForSelector('#demonRetryBeauty');assert((await f.evaluate(()=>demonBeautyStatus())).metrics.exposure>=.35);assert.equal(await p.evaluate(()=>fullflow.story.demonPhase),1);await snap('warning-35');await p.locator('#demonRetryBeauty').click();await waitPhase(1);

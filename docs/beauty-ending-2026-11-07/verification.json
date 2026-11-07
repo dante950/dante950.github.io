@@ -1,0 +1,6 @@
+{
+  "errors": [],
+  "reviewCount": 3,
+  "coverage": "Injected completed visit records and completed portrait; actual salon-to-ending dialogue and automatic room transitions; timeline checkpoints; replay/home",
+  "passed": true
+}

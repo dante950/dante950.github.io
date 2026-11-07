@@ -41,7 +41,7 @@ function finishDemonBeauty(details,sudden=false){
  sendSalon('demon-applause');
  playDemonResult('normal',()=>{
   if(story!==active)return;
-  sendSalon('demon-finish',{portrait:story.portrait});
+  sendSalon('demon-finish',{portrait:story.portrait,headPortrait:story.headPortrait});
  });
 }
 // Hand the completed beauty branch to the ending flow only after the room is ready.
@@ -50,7 +50,7 @@ addEventListener('message',e=>{
  if(!story?.demonSuccessLocked||story.demonEnding?.status!=='returning')return;
  story.demonEnding.status='ready';updateStoryHud('미용 성공');el('storyHint').hidden=true;el('salon').focus();
  window.dispatchEvent(new CustomEvent('yachacha-ending-ready',{detail:copy(story.demonEnding)}));
- if(story?.demonEnding?.status==='ready'&&page==='story'){el('storyHint').textContent='마왕 미용 성공 · 이후 엔딩 컷씬은 아직 연결되지 않았습니다. ESC로 설정 메뉴를 열 수 있습니다.';el('storyHint').hidden=false;}
+ startBeautyEnding();
 });
 function demonGameOver(){
  modal('<h2>GAME OVER</h2><p>마왕이 미용실을 지나쳤습니다.</p><div class="actions">'+btn('demonRestart','다시 시작',true)+btn('demonHome','메인으로')+'</div>');

@@ -56,9 +56,11 @@ if(GUEST.demon&&GUEST.mode!=='backdrop'){
  else companion.style.display='block';
  const roomUpdate=updateInteraction;updateInteraction=()=>{roomUpdate();interact.style.display=interactionAvailable?'block':'none';};
  const sharedUpdateCustomer=updateCustomer;updateCustomer=dt=>{if(GUEST.demon&&customerState.phase==='cutscene')return;sharedUpdateCustomer(dt);};
+ /*__DEMON_ENDING_ROOM__*/
  addEventListener('message',e=>{
   if(e.source!==parent||e.data?.token!==GUEST.token)return;
   if(e.data.type==='demon-visit-next')advanceVisit();
+  if(e.data.type==='demon-ending-scene')setDemonEndingScene(e.data.scene);
   if(e.data.type==='demon-seat'){
    standing.style.display='none';dialogueState.active=false;customerState.phase='door';customerState.wait=.2;customerState.x=670;customerState.y=430;customerState.target=2;doorSignal.classList.add('open');send('cutscene-end');
   }
@@ -70,7 +72,8 @@ if(GUEST.demon&&GUEST.mode!=='backdrop'){
    beautyScreen.style.display='none';seatedCustomer.style.display='none';interact.style.display='none';interactPrompt.style.display='none';openShopBtn.style.display='none';
    standing.src=e.data.portrait||GUEST.skin.portrait;standing.style.cssText='position:absolute;left:48%;bottom:21%;width:180px;height:197px;object-fit:contain;image-rendering:pixelated;z-index:49;pointer-events:none';
    companion.style.display='block';companion.classList.remove('demonApplause');player.classList.remove('demonApplause');
-   state.x=380;state.y=420;state.direction='right';render(false);updateInteraction();send('demon-room-ready');
+   state.x=380;state.y=420;state.direction='right';render(false);updateInteraction();
+   prepareDemonEndingRoom(e.data.headPortrait||e.data.portrait||GUEST.skin.portrait).catch(error=>send('demon-ending-error',{message:error.message}));
   }
 
  });

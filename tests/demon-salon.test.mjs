@@ -118,9 +118,9 @@ test('phase-two success hands off exactly once after an authenticated room retur
  const {default:vm}=await import('node:vm');
  const runtime=await fs.readFile(new URL('../src/demon-story.js',import.meta.url),'utf8');
  const frame={},nodes={salon:{contentWindow:frame,focus(){}},storyHint:{}},messages=[],events=[],listeners=[];
- let done,spoken;
+ let done,spoken,endingStarts=0;
  const ctx={DEMON_LINES,DEMON_GUEST_ID:10007,ensureDemonDialogueCatalogue,page:'story',playGroup:(project,g,gid,callback)=>{spoken=project.combat.sheets.find(s=>s.name==='대사').rows.filter(l=>l.GroupID===gid).map(l=>l.Text);done=callback;},story:{project:structuredClone(project),guest:{demon:true,demonPhase:2},portrait:'edited-portrait',headPortrait:'edited-head'},salonToken:'current-token',
-  el:id=>nodes[id],copy:structuredClone,updateStoryHud(){},sendSalon:(type,data)=>messages.push({type,data}),
+  startBeautyEnding(){endingStarts++;ctx.story.demonEnding.status='playing';},el:id=>nodes[id],copy:structuredClone,updateStoryHud(){},sendSalon:(type,data)=>messages.push({type,data}),
   addEventListener:(type,fn)=>listeners.push(fn),window:{dispatchEvent:e=>events.push(e)},CustomEvent:class{constructor(type,options){this.type=type;this.detail=options.detail;}}};
  vm.createContext(ctx);vm.runInContext(runtime,ctx);
  ctx.finishDemonBeauty({success:true});
@@ -130,7 +130,7 @@ test('phase-two success hands off exactly once after an authenticated room retur
  listeners[0]({...ready,source:{}});listeners[0]({...ready,data:{...ready.data,token:'old-token'}});assert.equal(events.length,0);
  listeners[0](ready);listeners[0](ready);ctx.finishDemonBeauty({success:true});
  assert.equal(events.length,1);assert.equal(events[0].type,'yachacha-ending-ready');assert.equal(events[0].detail.form,'handsome');assert.equal(events[0].detail.portrait,'edited-portrait');assert.equal(ctx.story.outcome,'beauty');
- assert.equal(messages.filter(x=>x.type==='demon-finish').length,1);
+ assert.equal(messages.filter(x=>x.type==='demon-finish').length,1);assert.equal(endingStarts,1);assert.equal(messages.at(-1).data.headPortrait,'edited-head');
 });
 
 test('connected growth fills the same brush footprint in either cell order without row wrapping',()=>{

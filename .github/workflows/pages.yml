@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       release_only: ${{ steps.scope.outputs.release_only }}
+      ending_only: ${{ steps.scope.outputs.ending_only }}
       demon_only: ${{ steps.scope.outputs.demon_only }}
       archive_changed: ${{ steps.scope.outputs.archive_changed }}
       dialogue_only: ${{ steps.scope.outputs.dialogue_only }}
@@ -36,6 +37,8 @@ jobs:
         run: |
           release_only=false
           archive_changed=false
+          ending_only=false
+          ending_changed=false
           demon_changed=false
           demon_only=false
           dialogue_only=false
@@ -47,6 +50,7 @@ jobs:
           returning_only=false
           if [ "$EVENT" = push ] && git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
             release_only=true
+            ending_only=true
             demon_only=true
             dialogue_only=true
             walk_only=true
@@ -56,6 +60,11 @@ jobs:
             reaction_only=true
             returning_only=true
             while IFS= read -r file; do
+              case "$file" in src/ending/*) ending_changed=true ;; esac
+              case "$file" in
+                src/ending/*|public/media/ending/*|src/demon-story.js|src/salon-demon-visit.js|src/app.js|src/style.css|scripts/build.mjs|tests/ending.test.mjs|tests/demon-salon.test.mjs|scripts/check-ending.mjs|scripts/serve-ending-review.mjs|scripts/check-demon-salon.mjs|docs/beauty-ending-2026-11-07/*|.github/workflows/pages.yml) ;;
+                *) ending_only=false ;;
+              esac
               case "$file" in scripts/check-demon-public-release.mjs|.github/workflows/pages.yml) ;; *) release_only=false ;; esac
               case "$file" in data/schema.json|src/combat/versions.js|src/project-archive.js|src/workshop-dialogue.js|scripts/check-project-archive.mjs|tests/project-archive.test.mjs) archive_changed=true ;; esac
               case "$file" in src/demon/*|src/demon-guest.js|src/demon-story.js|src/salon-demon*.js|public/demon.html|public/demon-assets.json|public/media/demon/*|scripts/check-demon*.mjs|tests/demon*.test.mjs|docs/demon-day-four.md|docs/demon-recovery-2026-11-06/*) demon_changed=true ;; esac
@@ -93,6 +102,8 @@ jobs:
               esac
             done < <(git diff --name-only "$BEFORE" HEAD)
           fi
+          if [ "$ending_changed" != true ]; then ending_only=false; fi
+          echo "ending_only=$ending_only" >> "$GITHUB_OUTPUT"
           if [ "$demon_changed" != true ]; then demon_only=false; fi
           echo "release_only=$release_only" >> "$GITHUB_OUTPUT"
           echo "archive_changed=$archive_changed" >> "$GITHUB_OUTPUT"
@@ -120,15 +131,18 @@ jobs:
       - name: Check day-four beauty, star gates and story handoff rules
         if: steps.scope.outputs.demon_only == 'true'
         run: node --test tests/demon-salon.test.mjs tests/project-archive.test.mjs tests/story-progress.test.mjs tests/story-start.test.mjs tests/beauty-shape.test.mjs tests/coffee-beauty.test.mjs tests/salon-dialogue.test.mjs tests/workshop-dialogue.test.mjs tests/returning-zombie.test.mjs tests/beauty-reaction-dialogue.test.mjs
+      - name: Check beauty-success ending and retained review records
+        if: steps.scope.outputs.ending_only == 'true'
+        run: node --test tests/ending.test.mjs tests/demon-salon.test.mjs tests/story-progress.test.mjs tests/social.test.mjs
       - run: npm test
-        if: steps.scope.outputs.demon_only != 'true' && steps.scope.outputs.walk_only != 'true' && steps.scope.outputs.font_only != 'true' && steps.scope.outputs.intro_only != 'true' && steps.scope.outputs.result_only != 'true' && steps.scope.outputs.returning_only != 'true'
+        if: steps.scope.outputs.ending_only != 'true' && steps.scope.outputs.demon_only != 'true' && steps.scope.outputs.walk_only != 'true' && steps.scope.outputs.font_only != 'true' && steps.scope.outputs.intro_only != 'true' && steps.scope.outputs.result_only != 'true' && steps.scope.outputs.returning_only != 'true'
       - uses: actions/upload-pages-artifact@v4
         if: steps.scope.outputs.release_only != 'true'
         with:
           path: dist
   browser-checks:
     needs: build
-    if: needs.build.outputs.release_only != 'true' && needs.build.outputs.demon_only != 'true' && needs.build.outputs.dialogue_only != 'true' && needs.build.outputs.walk_only != 'true' && needs.build.outputs.font_only != 'true' && needs.build.outputs.intro_only != 'true' && needs.build.outputs.result_only != 'true' && needs.build.outputs.returning_only != 'true'
+    if: needs.build.outputs.ending_only != 'true' && needs.build.outputs.release_only != 'true' && needs.build.outputs.demon_only != 'true' && needs.build.outputs.dialogue_only != 'true' && needs.build.outputs.walk_only != 'true' && needs.build.outputs.font_only != 'true' && needs.build.outputs.intro_only != 'true' && needs.build.outputs.result_only != 'true' && needs.build.outputs.returning_only != 'true'
     name: Check ${{ matrix.suite }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -219,7 +233,7 @@ jobs:
       - run: node scripts/check-ingame-font.mjs
   demon-browser:
     needs: build
-    if: needs.build.outputs.release_only != 'true'
+    if: needs.build.outputs.ending_only != 'true' && needs.build.outputs.release_only != 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:
@@ -246,9 +260,31 @@ jobs:
             docs/demon-two-phase-2026-11-06/*.png
             docs/demon-native-2026-11-06/*.png
             docs/project-archive-fix/*.png
+  ending-browser:
+    needs: build
+    if: needs.build.outputs.ending_only == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Check salon handoff, ending timeline and navigation
+        run: |
+          node scripts/serve-ending-review.mjs &
+          node scripts/check-ending.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ending-checks-${{ github.sha }}
+          path: docs/beauty-ending-2026-11-07/
   deploy:
-    if: always() && needs.build.outputs.release_only != 'true' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.build.result == 'success' && needs.demon-browser.result == 'success' && (needs.dialogue-browser.result == 'success' || needs.dialogue-browser.result == 'skipped') && (needs.browser-checks.result == 'success' || needs.browser-checks.result == 'skipped') && (needs.returning-browser.result == 'success' || needs.returning-browser.result == 'skipped') && (needs.font-browser.result == 'success' || needs.font-browser.result == 'skipped') && (needs.walk-browser.result == 'success' || needs.walk-browser.result == 'skipped')
-    needs: [build, browser-checks, dialogue-browser, returning-browser, font-browser, walk-browser, demon-browser]
+    if: always() && needs.build.outputs.release_only != 'true' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.build.result == 'success' && (needs.demon-browser.result == 'success' || (needs.build.outputs.ending_only == 'true' && needs.ending-browser.result == 'success')) && (needs.dialogue-browser.result == 'success' || needs.dialogue-browser.result == 'skipped') && (needs.browser-checks.result == 'success' || needs.browser-checks.result == 'skipped') && (needs.returning-browser.result == 'success' || needs.returning-browser.result == 'skipped') && (needs.font-browser.result == 'success' || needs.font-browser.result == 'skipped') && (needs.walk-browser.result == 'success' || needs.walk-browser.result == 'skipped')
+    needs: [build, browser-checks, dialogue-browser, returning-browser, font-browser, walk-browser, demon-browser, ending-browser]
     runs-on: ubuntu-latest
     permissions:
       pages: write

@@ -1,0 +1,95 @@
+// Included inside the demon visitor closure. Uses the current salon and completed portrait.
+let endingRoom=null;
+async function prepareDemonEndingRoom(head){
+ const images={};
+ await Promise.all(Object.entries({body:'./media/ending/king-body-source.png',head,
+ hero:SPRITES.front,minion:GUEST.companion,coffee:'./media/coffee-ghost/appeared-sheet.png',
+ magic:'./media/intro/pt/summoning.png'}).map(async([key,src])=>{
+  const im=new Image();im.src=src;await im.decode();images[key]=im;
+ }));
+ const layer=document.createElement('canvas');layer.id='demonEndingRoom';layer.width=950;layer.height=531;
+ layer.style.cssText='position:absolute;inset:0;width:100%;height:100%;z-index:80;pointer-events:none;image-rendering:pixelated';
+ gameWorld.append(layer);
+ for(const n of [player,shadow,standing,companion,customer,customerShadow,seatedCustomer,mimic])n.style.visibility='hidden';
+ for(const n of gameWorld.querySelectorAll('.phone,.hudTop,.help,.resourceNote,#interactPrompt'))n.style.visibility='hidden';
+ dialogueState.active=true;customerState.phase='cutscene';state.keys.clear();
+ endingRoom={layer,cx:layer.getContext('2d'),images,scene:'room',elapsed:0,group:0,coffee:0,last:performance.now(),ack:false};
+ endingRoom.scenery={};
+ await Promise.all(['.wall','.floor'].map(async selector=>{const url=getComputedStyle(gameWorld.querySelector(selector)).backgroundImage.match(/url\(["']?(.*?)["']?\)/)?.[1];if(url){const im=new Image();im.src=url;await im.decode();endingRoom.scenery[url]=im;}}));
+ renderDemonEndingRoom();
+ requestAnimationFrame(demonEndingRoomTick);
+ send('demon-room-ready');
+}
+function endingSprite(cx,im,x,feet,h){cx.drawImage(im,x-h*im.width/im.height/2,feet-h,h*im.width/im.height,h);}
+function drawEndingActors(cx,{group=0,coffee=0,sink=0,portal=0,time=0}={}){
+ const im=endingRoom.images,lerp=(a,b)=>a+(b-a)*group;
+ const hx=lerp(330,300),kx=lerp(580,470),mx=lerp(745,640),cy=420;
+ cx.imageSmoothingEnabled=false;
+ if(portal>0){
+  cx.save();cx.globalAlpha=portal;cx.shadowColor='#44ffac';cx.shadowBlur=16;
+  // Only the floor circle in the supplied summon art; no character is copied.
+  cx.drawImage(im.magic,150,680,1250,260,hx-115,cy-20,230,49);
+  cx.restore();
+ }
+ // Retain the team's body, excluding the original head region at runtime.
+ const scale=1.32,bx=kx-76*scale,by=cy-181*scale;
+ cx.save();cx.translate(bx,by);cx.scale(scale,scale);
+ cx.beginPath();cx.rect(0,61,152,120);cx.rect(0,0,50,61);cx.rect(105,0,47,61);cx.clip();cx.drawImage(im.body,0,0,152,181);cx.restore();
+ const hh=92,hw=hh*im.head.width/im.head.height;
+ cx.drawImage(im.head,kx-hw/2,by-4,hw,hh);
+ endingSprite(cx,im.minion,mx,cy,170);
+ cx.save();cx.beginPath();cx.rect(0,0,950,cy+2);cx.clip();cx.globalAlpha=1-sink*.85;
+ const heroH=214,heroW=heroH*219/162;
+ cx.drawImage(im.hero,0,0,219,162,hx-heroW/2,cy-heroH+sink*220,heroW,heroH);
+ cx.restore();
+ if(coffee>0){
+  const x=lerp(880,790),h=132;cx.globalAlpha=coffee;
+  // Read the first authored walk sprite cell.
+  const fw=89,fh=97;
+  cx.drawImage(im.coffee,0,291,fw,fh,x-h/2,cy-h+Math.sin(time/360)*3,h,h);cx.globalAlpha=1;
+ }
+}
+function drawDemonEndingBackdrop(cx){
+ // Compose the live salon's scenery only: character layers are deliberately separate.
+ const bounds=gameWorld.getBoundingClientRect(),sx=950/bounds.width,sy=531/bounds.height;
+ cx.save();cx.scale(1,650/531);cx.fillStyle='#504340';cx.fillRect(0,0,950,531);
+ for(const selector of ['.wall','.floor']){
+  const el=gameWorld.querySelector(selector),style=getComputedStyle(el),url=style.backgroundImage.match(/url\(["']?(.*?)["']?\)/)?.[1];
+  const im=endingRoom.scenery?.[url];if(!im)continue;
+  const b=el.getBoundingClientRect();cx.drawImage(im,(b.left-bounds.left)*sx,(b.top-bounds.top)*sy,b.width*sx,b.height*sy);
+ }
+ const props=[...gameWorld.querySelectorAll('img.prop')].sort((a,b)=>(parseInt(getComputedStyle(a).zIndex)||0)-(parseInt(getComputedStyle(b).zIndex)||0));
+ for(const im of props){if(!im.complete||!im.naturalWidth)continue;const style=getComputedStyle(im);if(style.display==='none'||style.visibility==='hidden')continue;const b=im.getBoundingClientRect(),w=b.width*sx,h=b.height*sy,k=Math.min(w/im.naturalWidth,h/im.naturalHeight);cx.drawImage(im,(b.left-bounds.left)*sx+(w-im.naturalWidth*k)/2,(b.top-bounds.top)*sy+(h-im.naturalHeight*k)/2,im.naturalWidth*k,im.naturalHeight*k);}
+ cx.restore();
+}
+function renderDemonEndingRoom(){
+ const r=endingRoom;if(!r)return;const t=r.elapsed,cx=r.cx;cx.clearRect(0,0,950,531);
+ let sink=0,portal=0;
+ if(r.scene==='coffee')r.coffee=Math.min(1,t/650);
+ if(r.scene==='group')r.group=Math.min(1,t/850);
+ if(r.scene==='return'){r.group=Math.max(0,1-t/650);portal=Math.min(1,Math.max(0,(t-650)/1000));sink=Math.min(1,Math.max(0,(t-1650)/1200));}
+ drawEndingActors(cx,{group:r.group,coffee:r.coffee,sink,portal,time:t});
+ if(r.scene==='photo'&&t<160){cx.fillStyle='#fff';cx.globalAlpha=1-t/160;cx.fillRect(0,0,950,531);cx.globalAlpha=1;}
+ if(r.scene==='return'&&t>2850){cx.fillStyle='rgba(0,0,0,'+Math.min(1,(t-2850)/650)+')';cx.fillRect(0,0,950,531);}
+}
+function demonEndingRoomTick(now){
+ const r=endingRoom;if(!r||!r.layer.isConnected)return;
+ const paused=settingsOpen()||document.hidden;
+ const dt=Math.min(80,now-r.last);r.last=now;if(!paused)r.elapsed+=dt;
+ if(r.paused!==paused){r.paused=paused;send('demon-ending-paused',{paused});}
+ renderDemonEndingRoom();
+ const durations={coffee:700,group:900,photo:800,return:3500};
+ if(!r.ack&&r.elapsed>=(durations[r.scene]||Infinity)){
+  r.ack=true;
+  if(r.scene==='photo'){
+   const c=document.createElement('canvas');c.width=950;c.height=650;const x=c.getContext('2d');x.imageSmoothingEnabled=false;
+   drawDemonEndingBackdrop(x);x.save();x.translate(0,80);drawEndingActors(x,{group:1,coffee:1});x.restore();
+   send('demon-ending-room-done',{scene:r.scene,photo:c.toDataURL('image/png')});
+  }else send('demon-ending-room-done',{scene:r.scene});
+ }
+ requestAnimationFrame(demonEndingRoomTick);
+}
+function setDemonEndingScene(scene){
+ if(!endingRoom||!['coffee','group','photo','return'].includes(scene))return;
+ endingRoom.scene=scene;endingRoom.layer.dataset.scene=scene;endingRoom.elapsed=0;endingRoom.ack=false;
+}
