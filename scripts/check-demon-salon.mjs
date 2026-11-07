@@ -1,3 +1,4 @@
+import {checkPortraitRendering} from './check-salon-performance.mjs';
 import {chromium,webkit} from 'playwright';
 import assert from 'node:assert/strict';import fs from 'node:fs/promises';import http from 'node:http';import path from 'node:path';
 const root=path.resolve('dist'),out=path.resolve('docs/demon-two-phase-2026-11-06');await fs.mkdir(out,{recursive:true});
@@ -21,7 +22,7 @@ for(const [name,engine]of (process.argv.includes('--chromium')?[['chromium',chro
  async function put(f,id,xy){await f.locator('[data-sticker="ST-RESOURCE-'+id+'"]').click();await stroke(f,xy);}
  try{
   let f=await begin();if(process.argv.includes('--phase2')&&!publicRun){await p.evaluate(()=>__demonFixture.phase(2));f=await waitPhase(2);}else{
-   await enter(f,!process.argv.includes('--cinema'));await snap('helmet');await f.locator('[data-tool="grow"]').click();await mask(f,'demonMasks.horn[n]&&!current[n]',4);await stage(f,'draw');await f.locator('[data-color="#242236"]').click();await mask(f,'demonMasks.scratch[n]',4);
+   await enter(f,!process.argv.includes('--cinema'));await snap('helmet');await checkPortraitRendering(f,'demon-helmet');await f.locator('[data-tool="grow"]').click();await mask(f,'demonMasks.horn[n]&&!current[n]',4);await stage(f,'draw');await f.locator('[data-color="#242236"]').click();await mask(f,'demonMasks.scratch[n]',4);
    assert.equal((await report(f,'helmet')).success,true);await stage(f,'cut');await f.locator('[data-tool="grow"]').click();await size(f,8);const edge=await f.evaluate(()=>{const y=65;let x=0;while(x<W&&!current[y*W+x])x++;return [x*2+1,y*2+1];});await stroke(f,edge,[edge[0]-10,edge[1]]);assert(await f.evaluate(()=>{prepareDemonGeometry();let edge=0,inside=0;for(let n=0;n<current.length;n++)if(current[n]===2){const c=demonMaterialColor(n);if(demonEdge[n]){if(c.join(',')!==outlineColor.join(','))return false;edge++;}else inside++;}return edge>0&&inside>0;}),'grown helmet has outline and coloured interior');await stage(f,'draw');await f.locator('[data-color="#4853F8"]').click();
    const eyeProtestBefore=await f.evaluate(()=>demonLastProtest);
    await mask(f,'demonMasks.eyeOpening[n]',1);
@@ -76,7 +77,7 @@ for(const [name,engine]of (process.argv.includes('--chromium')?[['chromium',chro
   assert.equal(await f.evaluate(()=>demonLastProtest),extraProtestBefore,'extra stickers do not trigger protests');
   await stroke(f,[166,26]);assert.equal((await report(f,'horn-pair-without-crown')).success,false,'horns also require a crown');
   await put(f,'T_blackCrown',[166,26]);assert.equal((await report(f,'horn-pair-and-black-crown')).success,true);
-  await snap('royal-complete');assert.equal(await f.locator('.requestItem:not(.complete)').count(),0);
+  await snap('royal-complete');await checkPortraitRendering(f,'demon-royal');assert.equal(await f.locator('.requestItem:not(.complete)').count(),0);
   await complete(f);for(let n=0;n<12&&!await p.locator('#demonFinishHome').isVisible();n++){await p.waitForTimeout(300);await talks();}await p.waitForSelector('#demonFinishHome');assert.equal(await p.evaluate(()=>fullflow.story.demonPhase),2);assert.equal(await p.evaluate(()=>fullflow.story.successLocked),true);assert(!(await p.locator('#storyBattle').getAttribute('srcdoc')));await p.locator('#demonViewPhoto').click();await f.locator('#demonSelfie.captured').waitFor();await snap('handsome-selfie');
   if(!publicRun){
    f=await begin();await enter(f);await f.locator('[data-tool="hammer"]').click();await size(f,18);outer:for(let y=177;y<253;y+=12)for(let x=105;x<230;x+=12){if(await p.locator('#talkLayer').isVisible())break outer;await stroke(f,[x,y]);const r=await f.evaluate(()=>demonBeautyStatus());if(r.metrics.exposure>=.15&&r.metrics.exposure<.35)assert.equal(r.sudden,false);if(r.sudden)break outer;}await talks();await p.waitForSelector('#demonRetryBeauty');assert((await f.evaluate(()=>demonBeautyStatus())).metrics.exposure>=.35);assert.equal(await p.evaluate(()=>fullflow.story.demonPhase),1);await snap('warning-35');await p.locator('#demonRetryBeauty').click();await waitPhase(1);

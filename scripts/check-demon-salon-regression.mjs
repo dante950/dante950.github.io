@@ -1,3 +1,4 @@
+import {checkPortraitRendering,checkIdlePlayer} from './check-salon-performance.mjs';
 import {chromium,webkit} from 'playwright';
 import assert from 'node:assert/strict';import fs from 'node:fs/promises';import http from 'node:http';import path from 'node:path';
 const root=path.resolve('dist'),out=path.resolve('docs/demon-native-2026-11-06');await fs.mkdir(out,{recursive:true});
@@ -6,13 +7,14 @@ const server=http.createServer(async(req,res)=>{try{const f=path.resolve(root,'.
 // cancelPhase invokes the real navigation cleanup during an in-flight fade.
 for(const [name,engine]of (process.argv.includes('--chromium')?[['chromium',chromium]]:process.argv.includes('--webkit')?[['webkit',webkit]]:[['chromium',chromium],['webkit',webkit]])){
  const browser=await engine.launch({channel:name==='chromium'?process.env.YACHACHA_BROWSER_CHANNEL:undefined}),p=await browser.newPage({viewport:{width:1440,height:900}}),errors=[];p.on('pageerror',e=>errors.push(e.message));
- async function talks(){let idle=0;for(let i=0;i<150;i++){await p.waitForTimeout(100);if(await p.locator('#beautyChoices').isVisible()){idle=0;await p.locator('#beautyAccept').click();await p.locator('#beautyChoices').waitFor({state:'hidden'});}else if(await p.locator('#talkLayer').isVisible()){idle=0;await p.locator('#talkNext').focus();await p.keyboard.press('f');}else if(++idle>=5)return;}throw Error('Dialogue stalled');}
+ async function talks(){let idle=0;for(let i=0;i<150;i++){await p.waitForTimeout(100);if(await p.locator('#returningChoices').isVisible()){idle=0;await p.locator('[data-return-choice]').first().click();}else if(await p.locator('#beautyChoices').isVisible()){idle=0;await p.locator('#beautyAccept').click();await p.locator('#beautyChoices').waitFor({state:'hidden'});}else if(await p.locator('#talkLayer').isVisible()){idle=0;await p.locator('#talkNext').focus();await p.keyboard.press('f');}else if(++idle>=5)return;}throw Error('Dialogue stalled');}
  async function frame(){const f=await p.locator('#salon').elementHandle().then(h=>h.contentFrame());await f.waitForFunction(()=>window.beautyDebug?.ready);return f;}
- async function begin(id){await p.goto(base);await p.waitForFunction(()=>window.fullflow);await p.locator('#play').click();await p.locator('[data-start-guest="'+id+'"]').click();return frame();}
+ async function begin(id){await p.goto(base);await p.waitForFunction(()=>window.fullflow);await p.locator('#play').click();await p.locator('[data-start-guest="'+id+'"]').click();if(id===10006)await p.locator('#returnEmployed').click();return frame();}
  try{
-  for(const id of [10001,10003,10004]){
+  for(const id of [10001,10003,10004,10006]){
    const f=await begin(id);await f.locator('#openShopBtn').click();await f.waitForFunction(()=>salonLab.customerPhase==='seated');await f.locator('.childExit').click();await p.waitForTimeout(150);await talks();await f.waitForFunction(()=>beautyActive&&!briefing);
-   assert.equal(await f.evaluate(()=>isDemon),false);assert.equal(await f.locator('#demonCompanion').count(),0);assert(await f.locator('.beautyMirror').isVisible());assert.equal(await f.locator('[data-tool="'+(id===10001?'scissors':'hammer')+'"]').count(),1);assert.equal(await f.locator('.demonCinema').count(),0);await p.screenshot({path:path.join(out,name+'-existing-'+id+'.png')});
+   assert.equal(await f.evaluate(()=>isDemon),false);assert.equal(await f.locator('#demonCompanion').count(),0);assert(await f.locator('.beautyMirror').isVisible());assert.equal(await f.locator('[data-tool="'+([10001,10006].includes(id)?'scissors':'hammer')+'"]').count(),1);assert.equal(await f.locator('.demonCinema').count(),0);await p.screenshot({path:path.join(out,name+'-existing-'+id+'.png')});
+   await checkPortraitRendering(f,String(id),{exercise:true});await checkIdlePlayer(f);
    console.log(name,'existing guest',id,'room, dialogue and beauty passed');
   }
   await begin(10007);await p.evaluate(()=>__demonFixture.phase(2));await p.waitForFunction(()=>fullflow.story?.demonPhase===2&&document.querySelector('#salon').style.opacity==='1');let f=await frame();await f.waitForFunction(()=>beautyActive);await p.waitForTimeout(150);await talks();await f.waitForFunction(()=>!briefing);

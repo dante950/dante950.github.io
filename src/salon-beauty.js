@@ -76,6 +76,17 @@ faceImage.src=GUEST.skin.head;hairImage.src=GUEST.skin.hair;
 capeImage.src=beautyCustomer.querySelector('.cape').src;
 const offscreen=()=>{const c=document.createElement('canvas');c.width=W;c.height=H;return c;};
 const portrait=offscreen(),materialCanvas=offscreen(),faceCanvas=offscreen(),featureOverlay=offscreen(),facePaintCanvas=offscreen();
+// Shape/paint changes invalidate pixel layers; expressions, stickers and falling
+// fragments are composited separately and can reuse the same material.
+let beautyPixelRevision=0,materialRevision=-1,facePaintRevision=-1,materialFaceKey='';
+const materialCtx=materialCanvas.getContext('2d'),materialPixels=materialCtx.createImageData(W,H);
+const facePaintCtx=facePaintCanvas.getContext('2d'),facePaintPixels=facePaintCtx.createImageData(W,H);
+const beautyRenderStats={materialBuilds:0,facePaintBuilds:0};
+let drawGuideRegions=null;
+function getDrawGuideRegions(){
+ if(!drawGuideRegions)drawGuideRegions=Array.from({length:W*H},(_,n)=>B.drawRegions.find(r=>inBeautyRegion((n%W+.5)*PIX,(Math.floor(n/W)+.5)*PIX,r)));
+ return drawGuideRegions;
+}
 const faceFeatures=bone?GUEST.skin.features:null,featureLayers={eyes:{},mouth:{}};
 const portraitImages=new Map(),portraitLoads=[];
 if(layered){
@@ -251,7 +262,7 @@ function pushUndo(){
 }
 function undoBeauty(){
  if(beautyPhase==='cut'||briefing||finishing)return;cancelGesture();const old=history[beautyPhase]?.pop();if(!old)return;
- if(beautyPhase==='draw'){paint.set(old.paint);for(let n=0;n<current.length;n++)if(!coffeeTutorial&&!canPaintAt(n))paint.fill(0,n*4,n*4+4);touched.draw=old.touched;}
+ if(beautyPhase==='draw'){beautyPixelRevision++;paint.set(old.paint);for(let n=0;n<current.length;n++)if(!coffeeTutorial&&!canPaintAt(n))paint.fill(0,n*4,n*4+4);touched.draw=old.touched;}
  else {placements=old.placements;touched.attach=old.touched;}
  syncUndo();updateBeautyScore();renderPortrait();coffeeAction('undo');
 }
@@ -260,6 +271,7 @@ function cancelBeautyPaintFrame(){if(beautyPaintFrame){cancelAnimationFrame(beau
 function queueBeautyPaint(){if(beautyPaintFrame)return;beautyPaintFrame=requestAnimationFrame(()=>{beautyPaintFrame=0;if(gesture?.kind!=='scissors')updateBeautyScore(true);renderPortrait();});}
 function point(e){const r=portrait.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*320,y:(e.clientY-r.top)/r.height*350};}
 function applyStroke(points,kind){
+ beautyPixelRevision++;
  const cells=strokeCells(W,H,points,brushRadius);if(isDemon){applyDemonStroke(cells,kind);return;}let changed=false;
  let connected=null;
  if(kind==='grow'&&B.growth?.connected){
@@ -330,6 +342,7 @@ function removeCutFragments(before){
  const removed=rooted?Array.from(current,(_,n)=>n).filter(n=>current[n]&&!rooted[n]):detachedByBeautyCut(before,current,W,H,sculptAnchors).filter(n=>!masks.protectedFace[n]);if(!removed.length)return;
  renderPortrait(false);
  const data=materialCanvas.getContext('2d').getImageData(0,0,W,H),piece=offscreen(),pc=piece.getContext('2d'),pixels=pc.createImageData(W,H);
+ beautyPixelRevision++;
  for(const n of removed){const i=n*4;pixels.data.set(data.data.subarray(i,i+4),i);current[n]=0;clearMaterialPaint(n);}
  if(isDemon){demonGeometryDirty=true;demonScoreCache=null;}
  pc.putImageData(pixels,0,0);fallingPieces.push({canvas:piece,start:performance.now()});
@@ -340,7 +353,7 @@ function animateFalling(t){
  renderPortrait();fallingFrame=fallingPieces.length?requestAnimationFrame(animateFalling):0;
 }
 function cancelGesture(){
- cancelBeautyPaintFrame();if(!gesture)return;if(isDemon)demonGeometryDirty=true;const g=gesture;gesture=null;current.set(g.snapshot);paint.set(g.paint);if(isDemon&&g.stones)demonStones.set(g.stones);touched=g.touched;if(g.undoAdded)history[beautyPhase].pop();
+ cancelBeautyPaintFrame();if(!gesture)return;if(isDemon)demonGeometryDirty=true;const g=gesture;gesture=null;beautyPixelRevision++;current.set(g.snapshot);paint.set(g.paint);if(isDemon&&g.stones)demonStones.set(g.stones);touched=g.touched;if(g.undoAdded)history[beautyPhase].pop();
  if(portrait.hasPointerCapture(g.pointerId))portrait.releasePointerCapture(g.pointerId);
  syncUndo();updateBeautyScore();renderPortrait();
 }
@@ -457,9 +470,12 @@ function renderPortrait(includeGuides=true,target=ctx,includeCape=true){
  if(includeCape&&!coffeeTutorial)target.drawImage(capeImage,isDemon&&demonPhase===2?28:24,isDemon&&demonPhase===2?115:79.5,112,112*capeImage.naturalHeight/capeImage.naturalWidth);
  paintFace();
  if(!bone)target.drawImage(faceCanvas,0,0);
+ const faceKey=bone?[expression,talking,mouthFrame,finishing].join(':'):'';
+ if(materialRevision!==beautyPixelRevision||materialFaceKey!==faceKey){
+ materialPixels.data.fill(0);
  if(isDemon)prepareDemonGeometry();
  const coffeeEdge=coffeeTutorial?coffeeMaterialBoundary(current,W,H):null;
- const materialCtx=materialCanvas.getContext('2d'),data=materialCtx.createImageData(W,H),face=bone?faceCanvas.getContext('2d').getImageData(0,0,W,H).data:null;
+ const data=materialPixels,face=bone?faceCanvas.getContext('2d').getImageData(0,0,W,H).data:null;
  for(let n=0;n<W*H;n++){
   if(!current[n])continue;const i=n*4;
   const legacy=!isDemon&&!coffeeTutorial,edge=legacy?emptyNeighbor(current,n):false,joining=legacy&&originalBorder[n]&&!edge;
@@ -470,13 +486,19 @@ function renderPortrait(includeGuides=true,target=ctx,includeCape=true){
   if(!coffeeTutorial&&paint[i+3]&&!masks.protectedFace[n])data.data.set(blendBeautyRGBA(data.data.subarray(i,i+4),paint.subarray(i,i+3),paint[i+3]/255),i);
  }
  if(!B.designVersion)for(let n=0;n<W*H;n++){const i=n*4;if(paint[i+3]&&!current[n]&&(bone||!masks.face[n]))data.data.set(paint.subarray(i,i+4),i);}
- materialCtx.putImageData(data,0,0);target.drawImage(materialCanvas,0,0);
+ materialCtx.putImageData(data,0,0);
+ materialRevision=beautyPixelRevision;materialFaceKey=faceKey;beautyRenderStats.materialBuilds++;
+ }
+ target.drawImage(materialCanvas,0,0);
  if(includeGuides)for(const p of fallingPieces){const age=Math.max(0,(performance.now()-p.start)/320);target.save();target.globalAlpha=Math.max(0,1-age);target.drawImage(p.canvas,0,4+40*age*age);target.restore();}
  if(faceFeatures)target.drawImage(featureOverlay,0,0);
  // Face color sits over the animated artwork without modifying its source or cut mask.
- const facePaint=facePaintCanvas.getContext('2d'),tint=facePaint.createImageData(W,H);
+ if(facePaintRevision!==beautyPixelRevision){
+ const tint=facePaintPixels;tint.data.fill(0);
  for(let n=0;n<W*H;n++)if(coffeeTutorial||masks.protectedFace[n]||!bone&&!current[n]&&masks.face[n]){const i=n*4;tint.data.set(paint.subarray(i,i+4),i);}
- facePaint.putImageData(tint,0,0);target.drawImage(facePaintCanvas,0,0);
+ facePaintCtx.putImageData(tint,0,0);facePaintRevision=beautyPixelRevision;beautyRenderStats.facePaintBuilds++;
+ }
+ target.drawImage(facePaintCanvas,0,0);
  if(isDemon)drawDemonStones(target);
  for(const p of placements){const image=stickerImages.get(p.sticker.id),scale=B.stickerScale??1;if(image?.complete&&image.naturalWidth)target.drawImage(image,p.x/2-p.sticker.w*.375*scale,p.y/2-p.sticker.h*.375*scale,p.sticker.w*.75*scale,p.sticker.h*.75*scale);}
  if(coffeeTutorial)drawPortraitLayer(target,portraitLayers.hands);
@@ -498,7 +520,7 @@ function renderPortrait(includeGuides=true,target=ctx,includeCape=true){
    if(beautyPhase==='draw'){
     // Match scoring's first-region priority, so the face penalty cannot cover the targets.
     target.fillStyle=r.kind==='good'?'#46B97B80':'#E9566538';
-    for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(allRegions.find(q=>inBeautyRegion((x+.5)*PIX,(y+.5)*PIX,q))===r)target.fillRect(x,y,1,1);
+    for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(getDrawGuideRegions()[y*W+x]===r)target.fillRect(x,y,1,1);
     continue;
    }
    const warm=r.rule==='cover'||layered&&r.rule==='preserve',color=warm?'#FCBB52':'#E95665';target.strokeStyle=color;target.fillStyle=color+(layered?'70':'25');

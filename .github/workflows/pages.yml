@@ -264,7 +264,7 @@ jobs:
 
   demon-public:
     needs: [build, deploy]
-    if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.build.result == 'success' && (needs.deploy.result == 'success' && needs.build.outputs.demon_only == 'true' || needs.build.outputs.release_only == 'true')
+    if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.build.result == 'success' && (needs.deploy.result == 'success' || needs.build.outputs.release_only == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 7
     steps:
