@@ -25,17 +25,17 @@ function finishDemonBeauty(details,sudden=false){
  if(!story?.guest?.demon||story.demonSuccessLocked)return;
  const phase=story.guest.demonPhase;updateStoryHud('미용 결과');
  if(!details?.success){
-  const lines=sudden?['얼굴에는<wait=0.35> <cps=22><size=20>손대지 말라고</size> 했을 텐데.</cps>','이 모욕은<wait=0.25> <size=22><shake=1.2 dur=0.6>야차로 갚게 하겠다!</shake></size>']:['…<wait=0.4>…<wait=0.45><cps=22>이게 <size=20>무엇이냐.</size></cps>','나를…<wait=0.55> <cps=24><size=20>웃음거리</size>로 만들 셈이냐?</cps>',['마왕 부하','폐하,<wait=0.2> 잠시 진정하시고—'],'<size=22><shake=1.5 dur=0.6>입 다물어라!</shake></size><wait=0.4> 이 모욕은<wait=0.25> <size=22><shake=1.2 dur=0.6>야차로 갚게 하겠다!</shake></size>'];
+  const lines=sudden?DEMON_LINES.sudden:DEMON_LINES.failure;
   playDemonLines(lines,()=>{modal('<h2>마왕이 야차를 신청했습니다.</h2><p>마왕 야차는 아직 연결하지 않았습니다.<br>팔로워와 스타를 유지한 채 미용을 다시 진행할 수 있습니다.</p><div class="actions">'+btn('demonRetryBeauty','미용 다시 하기',true)+btn('demonExit','메인으로')+'</div>');el('demonRetryBeauty').onclick=()=>{closeModal();changeDemonPhase(1);};el('demonExit').onclick=homeNow;});
   return;
  }
- if(phase===1){playDemonLines(['…<wait=0.3>…<wait=0.3>제법이군.<wait=0.45> 이제 <size=20>투구를 벗어도</size> 되겠어.'],()=>changeDemonPhase(2));return;}
+ if(phase===1){playDemonLines(DEMON_LINES.phase1Success,()=>changeDemonPhase(2));return;}
  if(phase!==2)return;
  story.demonSuccessLocked=true;
  const active=story;story.outcome='beauty';
  story.demonEnding={ending:'beauty',form:'handsome',status:'returning',portrait:story.portrait,headPortrait:story.headPortrait};
  sendSalon('demon-applause');
- playDemonLines(["…<wait=0.3>…<wait=0.3>내가 요구한 것은<wait=0.25> <size=20>모두 해냈군.</size>","분노와 관용.<wait=0.35> 그리고 <size=20>왕의 품격</size>까지.<wait=0.45> 훗…<wait=0.3> 마음에 드는군."],()=>{
+ playDemonLines(DEMON_LINES.success,()=>{
   if(story!==active)return;
   sendSalon('demon-finish',{portrait:story.portrait});
  });

@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs/promises';
-import {demonGuest,demonJudge,demonGate,demonHornAllowance,demonFacePaintLimit,DEMON_FACE_LIMIT,demonRoyalStickers,demonRoofProfile,demonPolygon,DEMON_DESIGN,demonSilverStripe,demonGrowthPalette,demonMakeupMasks,demonMakeup,demonLipPaint,ensureDemonDialogueCatalogue} from '../src/demon-guest.js';
+import {DEMON_LINES,demonGrowthCells,demonGuest,demonJudge,demonGate,demonHornAllowance,demonFacePaintLimit,DEMON_FACE_LIMIT,demonRoyalStickers,demonRoofProfile,demonPolygon,DEMON_DESIGN,demonSilverStripe,demonGrowthPalette,demonMakeupMasks,demonMakeup,demonLipPaint,ensureDemonDialogueCatalogue} from '../src/demon-guest.js';
 import {projectProblems,storyStartOptions} from '../src/model.js';
 const project=JSON.parse(await fs.readFile(new URL('../data/project.json',import.meta.url),'utf8'));
 test('demon is the fourth-day guest in the shared story and has no battle route',()=>{assert.deepEqual(projectProblems(project),[]);const start=storyStartOptions(project).find(x=>x.guest.id===10007);assert.equal(start.day,4);assert.equal(start.guest.battle,'none');assert.equal(start.guest.workbookExcluded,false);});
@@ -114,7 +114,7 @@ test('phase-two success hands off exactly once after an authenticated room retur
  const runtime=await fs.readFile(new URL('../src/demon-story.js',import.meta.url),'utf8');
  const frame={},nodes={salon:{contentWindow:frame,focus(){}},storyHint:{}},messages=[],events=[],listeners=[];
  let done,spoken;
- const ctx={story:{guest:{demon:true,demonPhase:2},portrait:'edited-portrait',headPortrait:'edited-head'},salonToken:'current-token',
+ const ctx={DEMON_LINES,story:{guest:{demon:true,demonPhase:2},portrait:'edited-portrait',headPortrait:'edited-head'},salonToken:'current-token',
   el:id=>nodes[id],copy:structuredClone,updateStoryHud(){},sendSalon:(type,data)=>messages.push({type,data}),
   addEventListener:(type,fn)=>listeners.push(fn),window:{dispatchEvent:e=>events.push(e)},CustomEvent:class{constructor(type,options){this.type=type;this.detail=options.detail;}}};
  vm.createContext(ctx);vm.runInContext(runtime,ctx);ctx.playDemonLines=(lines,callback)=>{spoken=lines;done=callback;};
@@ -126,4 +126,49 @@ test('phase-two success hands off exactly once after an authenticated room retur
  listeners[0](ready);listeners[0](ready);ctx.finishDemonBeauty({success:true});
  assert.equal(events.length,1);assert.equal(events[0].type,'yachacha-ending-ready');assert.equal(events[0].detail.form,'handsome');assert.equal(events[0].detail.portrait,'edited-portrait');assert.equal(ctx.story.outcome,'beauty');
  assert.equal(messages.filter(x=>x.type==='demon-finish').length,1);
+});
+
+test('connected growth fills the same brush footprint in either cell order without row wrapping',()=>{
+ const w=11,h=9,current=new Uint8Array(w*h),restore=new Uint8Array(w*h);current[4*w+5]=1;
+ const cells=[];for(let y=2;y<=6;y++)for(let x=3;x<=7;x++)cells.push(y*w+x);
+ const forward=demonGrowthCells(current,restore,cells,w,h,()=>true),backward=demonGrowthCells(current,restore,[...cells].reverse(),w,h,()=>true);
+ assert.deepEqual(forward,backward);assert.equal(forward.reduce((a,b)=>a+b,0),25);
+ assert.equal(current.reduce((a,b)=>a+b,0),1,'selection must not mutate the source');
+ const border=new Uint8Array(12);border[3]=1;
+ assert.equal(demonGrowthCells(border,new Uint8Array(12),[4],4,3,()=>true)[4],0,'right edge does not wrap to next row');
+ const isolated=demonGrowthCells(current,restore,[0,1],w,h,()=>true);assert.equal(isolated.reduce((a,b)=>a+b,0),0);
+ restore[0]=1;assert.equal(demonGrowthCells(current,restore,[0,1],w,h,n=>n===0)[0],1,'source holes can be restored');
+ assert.equal(demonGrowthCells(current,restore,[0,1],w,h,n=>n===0)[1],0,'restricted cells remain empty');
+});
+
+test('helmet growth extends blue horn and dark metal colours without copying scratches',()=>{
+ const w=19,h=9,p=new Uint8ClampedArray(w*h*4);
+ for(let y=1;y<8;y++)for(let x=1;x<18;x++){
+  const edge=x===1||x===17||y===1||y===7;
+  p.set(edge?[24,21,31,255]:x<9?[72,83,248,255]:[36,34,54,255],(y*w+x)*4);
+ }
+ p.set([140,140,155,255],(4*w+15)*4);
+ const colors=demonGrowthPalette(p,w,h,true);
+ assert.deepEqual([...colors.slice((4*w)*4,(4*w)*4+3)],[72,83,248]);
+ assert.deepEqual([...colors.slice((4*w+18)*4,(4*w+18)*4+3)],[36,34,54]);
+ for(let n=0;n<w*h;n++)assert.notDeepEqual([...colors.slice(n*4,n*4+3)],[140,140,155]);
+});
+
+test('outside scene binding is editable and older projects acquire it only once',()=>{
+ const p=structuredClone(project),g=p.guests.find(g=>g.id===10007),rows=n=>p.combat.sheets.find(s=>s.name===n).rows;
+ const group=rows('대화 그룹').find(r=>r.GroupID===g.bindings.exterior);assert.equal(group.Name,'마왕 · 미용실 외부 등장 씬');
+ const exterior=rows('대사').find(r=>r.GroupID===group.GroupID);assert.equal(exterior.Speaker,'마왕 부하');assert.match(exterior.Text,/^마왕님,/);
+ exterior.Text='직접 수정한 외관 대사';const before=structuredClone(p);ensureDemonDialogueCatalogue(p);assert.deepEqual(p,before);
+ const legacy=structuredClone(project),lg=legacy.guests.find(g=>g.id===10007);delete lg.bindings.exterior;ensureDemonDialogueCatalogue(legacy);
+ const once=structuredClone(legacy);ensureDemonDialogueCatalogue(legacy);assert.deepEqual(legacy,once);assert(lg.bindings.exterior);
+});
+
+test('demon dialogue emphasis uses only the agreed dark palette and valid tags',async()=>{
+ const {parseDialogueText}=await import('../src/text-effects.js');
+ const allowed=new Set(['#653D7C','#285780','#24634D','#A13636','#242236','#43536B']);
+ const strings=[];const walk=v=>{if(typeof v==='string')strings.push(v);else if(v&&typeof v==='object')Object.values(v).forEach(walk);};
+ walk(DEMON_LINES);for(const phase of [1,2]){const g=demonGuest(phase);walk(g.demonRequest);walk(g.demonRequestDetails);}
+ let colors=0;for(const text of strings){assert.deepEqual(parseDialogueText(text).warnings,[]);for(const m of text.matchAll(/<color=([^>]+)>/g)){assert(allowed.has(m[1]),m[1]);colors++;}}
+ assert(colors>40);assert.equal(DEMON_LINES.arrival.length,8);assert.equal(DEMON_LINES.phase1Success.length,3);assert.equal(demonGuest(2).demonRequest.cut.length,15);
+ assert(!JSON.stringify(DEMON_LINES).includes('투구 뒤에 숨'));
 });

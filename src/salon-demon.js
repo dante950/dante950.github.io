@@ -2,7 +2,7 @@
 const demonPhase=Number(GUEST.demonPhase)||0;
 const demonStones=new Uint8ClampedArray(W*H*4),demonTarget=new Uint8ClampedArray(W*H*4);
 let demonScoreCache=null,demonFringe=null,demonGrowthColors=null,demonOldEdge=null,demonJoined=null,demonEdge=null,demonMaskIndices={},demonGeometryDirty=true,demonPendingStroke=null,demonDecorCache=null;
-let demonMasks=null,demonWarningCount=0,demonLastProtest=-Infinity,demonSudden=false,demonMemoAll=demonPhase===2;
+let demonRestore=null,demonMasks=null,demonWarningCount=0,demonLastProtest=-Infinity,demonSudden=false,demonMemoAll=demonPhase===2;
 function prepareDemonBeauty(){
  const readLayer=asset=>{const c=offscreen(),x=c.getContext('2d');x.imageSmoothingEnabled=false;drawPortraitLayer(x,asset);return x.getImageData(0,0,W,H).data;};
  const base=readLayer(portraitLayers.head),ears=readLayer(portraitLayers.ears);demonTarget.set(readLayer(portraitLayers.target));
@@ -29,7 +29,10 @@ function prepareDemonBeauty(){
  const earBottom=Math.max(0,...Array.from(ears.keys()).filter(i=>i%4===3&&ears[i]>100).map(i=>(Math.floor(i/4/W)+.5)*PIX));
  for(let n=0;n<W*H;n++)demonMasks.longHair[n]=Number((Math.floor(n/W)+.5)*PIX>earBottom+4);
  if(demonPhase===2){sculptAnchors.fill(0);for(let n=0;n<W*H;n++)if(original[n]&&demonMasks.face[n]&&(Math.floor(n/W)+.5)*PIX<155)sculptAnchors[n]=1;}
- demonGrowthColors=demonGrowthPalette(demonTarget,W,H);demonOldEdge=coffeeMaterialBoundary(Uint8Array.from({length:W*H},(_,n)=>demonTarget[n*4+3]>100?1:0),W,H,2);
+ demonRestore=Uint8Array.from({length:W*H},(_,n)=>demonPhase===1?+(demonTarget[n*4+3]>100):original[n]);
+ demonGrowthColors=demonGrowthPalette(demonTarget,W,H,demonPhase===1);
+ const targetEdge=coffeeMaterialBoundary(demonRestore,W,H,2),initialEdge=coffeeMaterialBoundary(original,W,H,2);
+ demonOldEdge=Uint8Array.from(targetEdge,(v,n)=>v||initialEdge[n]);
  demonMasks.hornAllowance=demonHornAllowance(demonMasks.horn,W,H,4);demonMasks.roofAllowance=demonHornAllowance(demonMasks.roof,W,H,2);demonMasks.silverAllowance=demonHornAllowance(demonMasks.silver,W,H,2);demonMasks.browAllowance=demonHornAllowance(demonMasks.brow,W,H,2);
  for(const [k,mask]of Object.entries(demonMasks))demonMaskIndices[k]=Array.from(mask.keys()).filter(n=>mask[n]);
 }
@@ -79,12 +82,19 @@ function demonBeautyStatus(){
 function demonProtest(kind){if(performance.now()-demonLastProtest<5500)return;demonLastProtest=performance.now();showBeautyReaction(DEMON_LINES[kind],'angry');}
 function applyDemonStroke(cells,kind){
  let changed=false,faceHit=false,hairHit=false;
+ const growth=kind==='grow'?demonGrowthCells(current,demonRestore,cells,W,H,n=>{
+  const x=(n%W+.5)*PIX,y=(Math.floor(n/W)+.5)*PIX;
+  if(!demonInside(x,y,B.growth.region))return false;
+  if(demonPhase!==1)return true;
+  if(demonMasks.eyeOpening[n]&&!original[n])return false;
+  return !!demonRestore[n]||y<165||(x<110||x>210)&&y<250;
+ }):null;
  for(const n of cells){const i=n*4,x=(n%W+.5)*PIX,y=(Math.floor(n/W)+.5)*PIX,prev=current[n];
   if(kind==='hammer'&&demonPhase===1||kind==='scissors'&&demonPhase===2){if(current[n]){if(demonMasks.face[n])faceHit=true;current[n]=0;paint.fill(0,i,i+4);changed=true;}}
   else if(kind==='grow'){
-   if(!demonInside(x,y,B.growth.region))continue;
-   if(demonPhase===1){if(demonMasks.eyeOpening[n]&&!original[n])continue;if(demonTarget[i+3]){current[n]=1;sourcePixels.set(demonTarget.subarray(i,i+4),i);}else if((y<165||(x<110||x>210)&&y<250)&&(current[n]||[n-1,n+1,n-W,n+W].some(q=>q>=0&&q<current.length&&current[q])))current[n]=2;}
-   else if(original[n])current[n]=1;else if(current[n]||[n-1,n+1,n-W,n+W].some(q=>q>=0&&q<current.length&&current[q]))current[n]=2;
+   if(!growth[n])continue;
+   current[n]=demonRestore[n]?1:2;
+   if(demonPhase===1&&demonRestore[n])sourcePixels.set(demonTarget.subarray(i,i+4),i);
    if(prev!==current[n]){paint.fill(0,i,i+4);changed=true;}
   }else if(kind==='erase'){if(paint[i+3]){paint.fill(0,i,i+4);changed=true;}}
   else if(kind==='paint'&&(current[n]||masks.face[n])){if(current[n])hairHit=true;const value=blendBeautyRGBA(gesture.paint.subarray(i,i+4),rgb(paintColor),paintOpacity);if(value.some((v,k)=>v!==paint[i+k]))changed=true;paint.set(value,i);if(demonMasks.face[n]&&!current[n])faceHit=true;}
@@ -108,7 +118,7 @@ function updateDemonScore(action){
 function prepareDemonGeometry(){
  if(!demonGeometryDirty)return;
  demonFringe=demonHornAllowance(current,W,H,2);demonEdge=coffeeMaterialBoundary(current,W,H,1);
- const grown=Uint8Array.from(current,v=>v===2?1:0);demonJoined=demonHornAllowance(grown,W,H,2);demonGeometryDirty=false;
+ const grown=Uint8Array.from(current,(v,n)=>v&&(v===2||!original[n])?1:0);demonJoined=demonHornAllowance(grown,W,H,2);demonGeometryDirty=false;
 }
 function demonMaterialColor(n){
  if(demonEdge[n])return outlineColor;
