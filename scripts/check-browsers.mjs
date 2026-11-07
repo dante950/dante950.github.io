@@ -81,7 +81,8 @@ try{
    console.log(name+': failed export → Excel import → resumed combat → paired export, VBA preserved');
    for(const monster of [10001,10002,10003]){
     await page.goto(base+'/test-combat?mode=story&monster='+monster);
-    await page.waitForFunction(()=>window.lab?.battle);
+    await page.waitForFunction(()=>window.lab?.battle||document.getElementById('notice')?.classList.contains('error'));
+    assert(await page.evaluate(()=>!!window.lab?.battle),name+' story '+monster+': '+await page.locator('#notice').textContent()+'; '+errors.join('; '));
     assert.equal(await page.evaluate(()=>window.xmlCalls),0);
     assert(await page.evaluate(()=>Object.keys(window.lab.scene.images).length>0&&lab.battle.hp>0));
    }

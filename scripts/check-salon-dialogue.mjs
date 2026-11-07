@@ -52,5 +52,5 @@ try{for(const [name,engine] of Object.entries({chromium,webkit})){
   // The developer preview changes are session-local and are never saved or published.
   assert.equal(await page.locator('#ownerStatus').textContent(),'저장 기능 잠김');assert.deepEqual(errors,[]);
   console.log(`${name}: both Excel representations, table edit propagation and multi-line final choices`);
- }finally{await browser.close();}
-}}finally{await new Promise(r=>server.close(r));}
+ }catch(error){console.error(error);throw error;}finally{await browser.close();}
+}}finally{server.closeAllConnections();await new Promise(r=>server.close(r));}

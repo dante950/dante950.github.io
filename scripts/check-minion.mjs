@@ -458,10 +458,10 @@ try {
           'connected growth only', 'face overlay', 'three eyes contact', 'two complaints maximum', 'root recovery', 'free shape by area', 'severed branch removal', 'oversize failure', 'dark-circle request',
           'wrong color', 'small brush completion', 'erase and undo', 'face overpaint penalty', 'red nose request', 'off-nose failure', 'remove sticker', 'nose20 points', 'sticker undo', 'result', 'editor return'] });
       console.log(`${name}: minion free growth, new horn material, dark circles, result and return passed`);
-    } finally { await browser.close(); }
+    } catch(error) { console.error(error); throw error; } finally { await browser.close(); }
   }
 } finally {
-  await new Promise(resolve => server.close(resolve));
+  server.closeAllConnections();await new Promise(resolve => server.close(resolve));
   await fs.writeFile(path.join(output, `browser-results${process.env.YACHA_MINION_ENGINE ? '-'+process.env.YACHA_MINION_ENGINE : ''}.json`), JSON.stringify({
     base, checkedAt: new Date().toISOString(), results: report,
   }, null, 2));

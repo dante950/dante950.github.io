@@ -267,7 +267,7 @@ try{
 
    assert.deepEqual(errors,[]);
    console.log(name+': speech → note, visible mouth animation, seamless zombie growth, irreversible cuts, dye/sticker undo, masks, both guests pass');
-  }finally{await browser.close();}
+  }catch(error){console.error(error);throw error;}finally{await browser.close();}
  }
-}finally{await new Promise(r=>server.close(r));}
+}finally{server.closeAllConnections();await new Promise(r=>server.close(r));}
 
