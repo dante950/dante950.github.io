@@ -23,7 +23,7 @@ const server=http.createServer(async(req,res)=>{
   }
   const file=path.resolve(dist,'.'+(u.pathname==='/'?'/index.html':decodeURIComponent(u.pathname)));
   if(!file.startsWith(dist+path.sep)){res.writeHead(403).end();return;}
-  res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.json':'application/json','.css':'text/css','.png':'image/png','.jpg':'image/jpeg','.ogg':'audio/ogg','.wav':'audio/wav'})[path.extname(file)]||'application/octet-stream');
+  res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.json':'application/json','.css':'text/css','.png':'image/png','.jpg':'image/jpeg','.ogg':'audio/ogg','.wav':'audio/wav','.woff2':'font/woff2'})[path.extname(file)]||'application/octet-stream');
   res.end(await fs.readFile(file));
  }catch{res.writeHead(404).end();}
 });
@@ -34,7 +34,7 @@ try{
   const browser=await type.launch({headless:true});
   try{
    const page=await browser.newPage({viewport:{width:1440,height:960}}),errors=[];
-   page.setDefaultTimeout(60000);page.on('pageerror',e=>errors.push(e.message));
+   page.setDefaultTimeout(60000);page.on('pageerror',e=>errors.push(e.message));page.on('requestfailed',r=>console.log('REQUEST_FAILED',r.url(),r.failure()?.errorText));
    await page.addInitScript(()=>{
     window.xmlCalls=0;const realParse=DOMParser.prototype.parseFromString;
     DOMParser.prototype.parseFromString=function(s,t){window.xmlCalls++;return realParse.call(this,window.failXML?'<broken>':s,t);};

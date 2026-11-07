@@ -15,7 +15,7 @@ export async function checkStoryStarts(page,{screenshotPath,checkContinuation=fa
  await page.locator('#home').click();
  await page.locator('#soundToggle').click();
  await page.locator('#playChapter').click();
- assert.equal(await page.locator('[data-start-guest]').count(),4);
+ assert.equal(await page.locator('[data-start-guest]').count(),5);
  assert.equal(await page.evaluate(()=>window.fullflow.story),null);
  if(screenshotPath)await page.screenshot({path:screenshotPath});
  await page.keyboard.press('Escape');
@@ -34,7 +34,7 @@ export async function checkStoryStarts(page,{screenshotPath,checkContinuation=fa
   await page.locator(`[data-start-guest="${id}"]`).click();
   if(await page.locator('#introSkip').isVisible())await page.locator('#introSkip').click();
   await page.waitForFunction(id=>window.fullflow.story?.guest===id,id);
-  assert.deepEqual(await page.evaluate(()=>window.fullflow.story),{day,index,guest:id,money:0,followers:0,records:[],preview:false});
+  assert.deepEqual(await page.evaluate(()=>window.fullflow.story),{day,index,guest:id,demonPhase:undefined,successLocked:false,money:0,followers:0,records:[],preview:false});
   await page.waitForFunction(id=>{
    try{const d=document.getElementById('salon').contentDocument;const g=JSON.parse(d.getElementById('guest-data').textContent);return g.id===id&&g.mode==='story'&&!!d.getElementById('gameWorld');}catch{return false;}
   },id);
@@ -73,6 +73,7 @@ export async function checkStoryStarts(page,{screenshotPath,checkContinuation=fa
    }
    if(await salon.locator('.beautyFinish').isVisible())await salon.locator('.beautyFinish').click();
    else await salon.locator('.beautyNext').click(); // Sans ends after stickers.
+   if(await salon.locator('#beautyResultContinue').isVisible())await salon.locator('#beautyResultContinue').click();
    await page.locator('#talkLayer').waitFor();await advanceTalk(page);
    assert(!/만족도|\d+\s*\/\s*100/.test(await page.locator('#modalCard').innerText()),'the player sees no satisfaction score after beauty');
    if(id===10004){await page.locator('#storyClosing').waitFor();assert.equal(await page.evaluate(()=>fullflow.story.followers),2000);await page.locator('#home').click();await page.locator('#leavePlay').click();continue;}
