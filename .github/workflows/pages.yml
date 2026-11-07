@@ -66,7 +66,7 @@ jobs:
             while IFS= read -r file; do
               case "$file" in src/combat/demon-*.js) demon_battle_changed=true ;; esac
               case "$file" in
-                src/combat/demon-*.js|src/combat/app.js|src/combat/assets.json|src/combat/bridge.js|src/combat/cursor-scene.js|src/combat/cursor-ui.js|src/ending/*|src/demon-story.js|src/demon-guest.js|src/salon-demon-visit.js|src/app.js|src/battle-result.js|scripts/build.mjs|scripts/import-demon-battle-assets.cjs|scripts/check-demon-battle.mjs|scripts/serve-demon-battle-review.mjs|scripts/check-demon-salon.mjs|tests/demon-battle.test.mjs|tests/demon-salon.test.mjs|tests/ending.test.mjs|public/media/demon-battle/*|docs/demon-battle-2026-11-08/*|.github/workflows/pages.yml) ;;
+                src/index.html|src/style.css|scripts/check-demon-branches.mjs|src/combat/demon-*.js|src/combat/app.js|src/combat/assets.json|src/combat/bridge.js|src/combat/cursor-scene.js|src/combat/cursor-ui.js|src/ending/*|src/demon-story.js|src/demon-guest.js|src/salon-demon-visit.js|src/app.js|src/battle-result.js|scripts/build.mjs|scripts/import-demon-battle-assets.cjs|scripts/check-demon-battle.mjs|scripts/serve-demon-battle-review.mjs|scripts/check-demon-salon.mjs|tests/demon-battle.test.mjs|tests/demon-salon.test.mjs|tests/ending.test.mjs|public/media/demon-battle/*|docs/demon-battle-2026-11-08/*|.github/workflows/pages.yml) ;;
                 *) demon_battle_only=false ;;
               esac
               case "$file" in src/ending/*) ending_changed=true ;; esac
@@ -315,6 +315,8 @@ jobs:
           node scripts/serve-ending-review.mjs &
           node scripts/check-demon-battle.mjs
           node scripts/check-demon-battle.mjs --webkit
+          node scripts/check-demon-branches.mjs
+          node scripts/check-demon-branches.mjs --webkit
           node scripts/check-ending.mjs
       - uses: actions/upload-artifact@v4
         if: always()

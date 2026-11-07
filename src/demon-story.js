@@ -75,3 +75,25 @@ async function finishDemonBattle(outcome,stats){
  story.demonEnding={ending:'battle',form:'goblin',status:'returning'};sendSalon('demon-battle-return');
  // Fade-in waits for the authenticated room-ready message.
 }
+
+// Explicit scene entry for the user's "마왕부터" play route; no visit/reward is recorded.
+function startDemonBranch(branch){
+ if(page!=='story'||!story?.demonQuickStart||!['beauty1','beauty2','beauty','victory'].includes(branch))return;
+ const project=copy(story.project);
+ stopChildren();closeModal();talk=null;talkDone=null;beautyRequest=null;pendingSalon=null;
+ el('talkLayer').hidden=true;el('beautyChoices').hidden=true;el('salon').style.opacity='1';document.body.classList.remove('inBattle');
+ story=createStoryState(project,DEMON_GUEST_ID);story.stars=3;story.demonQuickStart=true;story.demonStartBranch=branch;story.demonPhase=branch==='beauty1'?1:2;
+ story.guest=installDemonDialogue(story.project,demonGuest(story.demonPhase));story.outcome=null;story.demonSuccessLocked=false;story.demonBattleEnding=false;
+ showPage('story');el('phoneButton').hidden=true;updateStoryHud(branch==='victory'?'야차 승리 준비':branch==='beauty'?'미용 성공 준비':'미용');
+ const active=story;gameAudio.unlock().then(()=>{if(story===active)gameAudio.music('salon');});
+ loadSalon(story.guest,'story',()=>{
+  if(story!==active)return;
+  if(branch==='victory'){story.demonVictoryPreview=true;startBattle();story.demonVictoryPreview=false;return;}
+  if(branch==='beauty'){
+   story.portrait=demonSkins[2].portrait;story.headPortrait=demonSkins[2].portrait;story.outcome='beauty';story.demonSuccessLocked=true;
+   story.demonEnding={ending:'beauty',form:'handsome',status:'returning',portrait:story.portrait,headPortrait:story.headPortrait};
+   sendSalon('demon-finish',{portrait:story.portrait,headPortrait:story.headPortrait});return;
+  }
+  sendSalon('beauty-start');el('salon').focus();
+ });
+}

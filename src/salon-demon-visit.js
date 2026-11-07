@@ -66,7 +66,7 @@ if(GUEST.demon&&GUEST.mode!=='backdrop'){
   }
   if(e.data.type==='demon-applause'){companion.classList.add('demonApplause');player.classList.add('demonApplause');send('sound',{key:'beauty-pleased'});}
   if(e.data.type==='demon-finish'||e.data.type==='demon-battle-return'){
-   if(e.data.type==='demon-finish'&&customerState.phase==='closed'&&!beautyActive)return;
+   if(e.data.type==='demon-finish'&&customerState.phase==='closed'&&!beautyActive&&GUEST.demonStartBranch!=='beauty')return;
    beautyActive=false;beautyResultActive=false;dialogueState.active=false;customerState.phase='closed';state.keys.clear();
    clearTimeout(resultRevealTimer);clearTimeout(resultEndTimer);clearReturningReactions();
    beautyScreen.style.display='none';seatedCustomer.style.display='none';interact.style.display='none';interactPrompt.style.display='none';openShopBtn.style.display='none';

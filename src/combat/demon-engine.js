@@ -20,6 +20,8 @@ export function demonCombatData(source,tuning={}){const d=clone(source),cfg={...
 export class DemonCursorBattle extends CursorBattle {
  constructor(data,rng=Math.random,settings={}){const tuning={...DEMON_BATTLE_TUNING,...settings.demon};super(demonCombatData(data,tuning),rng,{...settings,...tuning,requireOpeningFinish:false});this.tuning=tuning;this.isDemon=true;this.boardSize=5;this.shadowMode=false;this.demonCycle=0;this.attackReturnUntil=0;this.activeTiles=[...DEMON_TILES];}
  start(id=10007,phase=1,options={}){super.start(10007,1,{...options,patternID:undefined});this.pos=13;this.enemyHP=this.tuning.maxHP;this.next=this.time+1700;}
+ // Only used by the explicit victory scene entry, never by normal combat.
+ previewVictory(){this.enter(3);this.enemyHP=0;this.state='victory';this.queue=[];this.preview=null;this.planInfo=null;this.transition=null;this.mirrors=null;this.cycle=null;this.shadowMode=false;this.activeTiles=[...DEMON_CROSS];this.broken=Object.fromEntries(DEMON_TILES.filter(t=>!this.activeTiles.includes(t)).map(t=>[t,Infinity]));this.pos=13;}
  get percent(){return this.enemyHP/this.tuning.maxHP*100;}
  get phase(){return Number(this.monster?.PhaseID||1);}
  move(dx,dy){if(this.paused||this.dialogueBlocking||!['attack','recover','opening'].includes(this.state))return false;const p=xy(this.pos),x=p.x+dx,y=p.y+dy,t=tile(x,y);if(x<0||x>4||y<0||y>4||!this.activeTiles.includes(t))return false;this.pos=t;this.cue('move',{tile:t});return true;}

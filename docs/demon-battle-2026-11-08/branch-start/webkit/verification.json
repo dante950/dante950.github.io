@@ -1,0 +1,7 @@
+{
+  "passed": true,
+  "name": "webkit",
+  "base": "http://127.0.0.1:4183/",
+  "errors": [],
+  "coverage": "Visible main menu -> boss; all four branch choices via select/start; phase changes during dialogue; real success/victory ending handoff; no reward or visit records; hidden for other guests. No injected completion flags."
+}
