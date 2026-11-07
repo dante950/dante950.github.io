@@ -38,10 +38,13 @@ function revealBeautyResult(){
  resultCaption.textContent=caption;
  resultContinue.textContent='계속하기 →';renderPortrait(false);
 }
+function publishBeautyResult(){
+ send('beauty-result',{score:totalSatisfaction,mood:resultMood,portrait:captureBeautyCustomer(),headPortrait:captureBeautyHead(),details:isDemon?demonBeautyStatus():isReturningZombie?returningStatus():null});
+}
 function advanceBeautyResult(){
  if(!beautyResultActive)return;clearTimeout(resultRevealTimer);clearTimeout(resultEndTimer);revealBeautyResult();
  clearTimeout(resultEndTimer);for(const span of resultCaption.children)span.style.visibility='visible';beautyResultActive=false;resultContinue.hidden=true;beautyScreen.classList.add('resultSettled');
- send('beauty-result',{score:totalSatisfaction,mood:resultMood,portrait:captureBeautyCustomer(),headPortrait:captureBeautyHead(),details:isDemon?demonBeautyStatus():isReturningZombie?returningStatus():null});
+ publishBeautyResult();
 }
 function startBeautyResult(){
  if(isReturningZombie)clearReturningReactions();
@@ -52,6 +55,8 @@ function startBeautyResult(){
  expression='neutral';talking=false;mouthFrame=false;zonesVisible=false;fallingPieces=[];renderPortrait(false);
  next.disabled=true;finish.disabled=true;state.keys.clear();
  panel.inert=true;nav.inert=true;actions.inert=true;status.inert=true;
+ // Demon guests hand off immediately to their own story dialogue.
+ if(isDemon){beautyResultActive=false;expression=resultMood;beautyCustomer.dataset.expression=expression;resultCaption.hidden=true;resultContinue.hidden=true;renderPortrait(false);publishBeautyResult();return;}
  beautyScreen.classList.add('resultPlaying');resultContinue.hidden=false;resultContinue.textContent='연출 건너뛰기';resultContinue.focus({preventScroll:true});
  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
  resultRevealTimer=setTimeout(revealBeautyResult,reduced?150:2600);

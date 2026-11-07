@@ -23,11 +23,17 @@ for(const [name,engine]of (process.argv.includes('--chromium')?[['chromium',chro
  async function mask(f,expression,brush=1,reverse=false){await size(f,brush);const runs=await f.evaluate(({expression,reverse})=>{const selected=new Function('n','return '+expression),runs=[];for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(!selected(y*W+x))continue;let end=x;while(end+1<W&&selected(y*W+end+1))end++;runs.push([[x*2+1,y*2+1],[end*2+1,y*2+1]]);x=end;}return reverse?runs.reverse():runs;},{expression,reverse});for(const [a,b]of runs)await stroke(f,a,b);console.log(name,expression.slice(0,40),runs.length);}
  const report=async(f,label)=>{const r=await f.evaluate(()=>demonBeautyStatus());console.log(label,JSON.stringify(r));return r;};
  async function complete(f){
-  await stage(f,'attach');await f.locator('.beautyNext').click();
-  await f.waitForFunction(()=>resultRevealed);
-  const caption=await f.locator('.beautyResultCaption').textContent();
-  assert.equal(caption,'');assert(await f.locator('.beautyResultCaption').isHidden(),'demon captions do not duplicate the following conversation');
-  await f.locator('#beautyResultContinue').click();await talks();
+  await stage(f,'attach');
+  const preview=await p.evaluate(()=>!!fullflow.story?.preview);
+  await p.evaluate(()=>{window.__beautyResults=0;window.__resultListener&&removeEventListener('message',window.__resultListener);window.__resultListener=e=>{if(e.source===document.querySelector('#salon').contentWindow&&e.data?.type==='beauty-result')window.__beautyResults++;};addEventListener('message',window.__resultListener);});
+  await f.locator('.beautyNext').click();
+  await p.waitForFunction(()=>window.__beautyResults===1);
+  assert.equal(await f.evaluate(()=>beautyResultActive||resultRevealed||beautyScreen.classList.contains('resultPlaying')),false);
+  assert(await f.locator('#beautyResultContinue').isHidden());
+  assert.equal(await f.locator('.beautyResultCaption').textContent(),'');
+  if(!preview){await p.locator('#talkLayer').waitFor({state:'visible'});assert.doesNotMatch(await p.locator('#talkText').textContent(),/반차 결재|수정 요청/);}
+  await talks();
+  assert.equal(await p.evaluate(()=>window.__beautyResults),1,'one completion message without a common result screen');
  }
  async function waitPhase(n){await p.waitForFunction(n=>fullflow.story?.demonPhase===n&&document.querySelector('#salon').style.opacity==='1',n);let f=await frame();await f.waitForFunction(()=>beautyActive);await talks();await f.waitForFunction(()=>!briefing);return f;}
  async function put(f,id,xy){await f.locator('[data-sticker="ST-RESOURCE-'+id+'"]').click();await stroke(f,xy);}
@@ -146,6 +152,10 @@ await stage(f,'draw');await f.locator('[data-color="#4853F8"]').click();
   await report(f,'shape');await snap('royal-shape');assert.equal((await f.evaluate(()=>demonBeautyStatus())).checks[0],true);
   await stage(f,'draw');await f.locator('[data-color="#18151F"]').click();await mask(f,'current[n]',4);await mask(f,'current[n]&&paint[n*4+3]<242',2);
   await f.locator('[data-color="#ECEBF4"]').click();await size(f,2);await stroke(f,[160,70],[160,100]);
+  assert.equal((await f.evaluate(()=>demonBeautyStatus())).requirements.draw[0],false,'silver bridge outside the central forelock fails');
+  await f.locator('[data-color="#18151F"]').click();await stroke(f,[160,70],[160,100]);
+  await f.locator('[data-color="#ECEBF4"]').click();await size(f,1);await stroke(f,[176,110],[176,138]);
+  assert.equal((await f.evaluate(()=>demonBeautyStatus())).requirements.draw[0],true,'thin central forelock bridge passes');
   await f.locator('[data-color="#18151F"]').click();
   // Draw the visible original brows, independently of the grading mask.
   await size(f,3);await stroke(f,[121,145],[157,145]);await stroke(f,[179,145],[215,145]);

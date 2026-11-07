@@ -33,12 +33,17 @@ test('top hair silhouette and eyebrow tail no longer impose a pixel-shape order'
  assert.equal(demonJudge(2,{...royal,roofPeaks:0,centerHighest:false,forelock:0,brow:0,rightBrowPaint:1}).success,true);
  for(const stage of ['cut','draw'])assert(!demonGuest(2).beauty.requestNotes[stage].match(/세 봉우리|세 칸|원래대로/));
 });
-test('silver stripe can move and vary in width, but a broad patch or an unrelated streak fails',()=>{
- const hair=new Uint8Array(W*H);for(let y=15;y<73;y++)for(let x=40;x<110;x++)hair[y*W+x]=1;
+test('silver bridge must stay within the central forelock, including every silver hair pixel',()=>{
+ const hair=new Uint8Array(W*H);for(let y=15;y<80;y++)for(let x=40;x<110;x++)hair[y*W+x]=1;
  const paintLine=(x,y,w,h)=>{const p=new Uint8ClampedArray(W*H*4);for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++)p.set([236,235,244,255],(yy*W+xx)*4);return p;};
- for(const [x,w] of [[50,1],[85,2],[88,3]])assert.equal(demonSilverStripe(hair,paintLine(x,63,w,10),W,H).valid,true);
- assert.equal(demonSilverStripe(hair,paintLine(82,63,12,10),W,H).valid,false);
- assert.equal(demonSilverStripe(hair,paintLine(25,63,3,10),W,H).valid,false);
+ for(const [x,w] of [[85,1],[87,2],[88,3]])assert.equal(demonSilverStripe(hair,paintLine(x,56,w,12),W,H).valid,true);
+ for(const [x,y,w,h] of [[50,56,1,12],[85,35,1,12],[85,65,1,12],[84,56,2,12],[91,56,2,12],[85,56,6,12]]){
+  assert.equal(demonSilverStripe(hair,paintLine(x,y,w,h),W,H).valid,false,JSON.stringify({x,y,w,h}));
+ }
+ const extra=paintLine(87,56,2,12);extra.set([236,235,244,255],(60*W+50)*4);
+ assert.equal(demonSilverStripe(hair,extra,W,H).valid,false,'one silver hair cell outside the forelock fails');
+ hair[60*W+50]=0;
+ assert.equal(demonSilverStripe(hair,extra,W,H).valid,true,'free face painting is not a hair bridge');
  assert.equal(demonSilverStripe(hair,new Uint8ClampedArray(W*H*4),W,H).valid,false);
 });
 test('growth uses source interior colours rather than expanding the original black outline',()=>{

@@ -64,11 +64,11 @@ export function demonRoofProfile(material,width,height){
  return {peaks,roofPeaks:peaks.length,centerHighest:peaks.length===3&&peaks[1].y+6<=Math.min(peaks[0].y,peaks[2].y)};
 }
 export function demonSilverStripe(material,paint,width,height){
- const selected=new Uint8Array(material.length),seen=new Uint8Array(material.length),components=[];let tip=0,total=0;
- const zone=DEMON_DESIGN.silverZone;
- for(let n=0;n<material.length;n++)if(material[n]&&demonInside((n%width+.5)*2,(Math.floor(n/width)+.5)*2,zone)){
-  tip=Math.max(tip,Math.floor(n/width));const i=n*4;
-  if(paint[i+3]>=230&&Math.min(paint[i],paint[i+1],paint[i+2])>=190&&Math.max(paint[i],paint[i+1],paint[i+2])-Math.min(paint[i],paint[i+1],paint[i+2])<=40){selected[n]=1;total++;}
+ const selected=new Uint8Array(material.length),seen=new Uint8Array(material.length),components=[];let total=0,outside=0;
+ const zone=DEMON_DESIGN.forelock;
+ for(let n=0;n<material.length;n++)if(material[n]){
+  const i=n*4;
+  if(paint[i+3]>=230&&Math.min(paint[i],paint[i+1],paint[i+2])>=190&&Math.max(paint[i],paint[i+1],paint[i+2])-Math.min(paint[i],paint[i+1],paint[i+2])<=40){if(demonInside((n%width+.5)*2,(Math.floor(n/width)+.5)*2,zone)){selected[n]=1;total++;}else outside++;}
  }
  for(let n=0;n<selected.length;n++)if(selected[n]&&!seen[n]){
   const cells=[n];seen[n]=1;let x0=width,x1=0,y0=height,y1=0;
@@ -79,8 +79,8 @@ export function demonSilverStripe(material,paint,width,height){
  components.sort((a,b)=>b.cells.length-a.cells.length);const line=components[0],mask=new Uint8Array(material.length);
  if(line)for(const n of line.cells)mask[n]=1;
  const w=line?line.x1-line.x0+1:0,h=line?line.y1-line.y0+1:0;
- const valid=!!line&&h>=6&&w<=4&&h>=w*3&&line.cells.length>=w*h*.5&&total-line.cells.length<=6;
- return {valid,total:line?.cells.length||0,mask,allowance:demonHornAllowance(mask,width,height,2)};
+ const valid=outside===0&&!!line&&h>=6&&w<=4&&h>=w*3&&line.cells.length>=w*h*.5&&total-line.cells.length<=6;
+ return {valid,outside,total:line?.cells.length||0,mask,allowance:demonHornAllowance(mask,width,height,2)};
 }
 // Grading uses painted pixels, not the currently selected colour or opacity slider.
 export const demonBlackPaint=(paint,i)=>paint[i+3]>=230&&Math.max(paint[i],paint[i+1],paint[i+2])<=65;
