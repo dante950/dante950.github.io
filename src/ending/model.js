@@ -16,8 +16,19 @@ export const ENDING_LINES=[
  ['커피 유령','잠깐! 가기 전에 사진 한 장 찍어요!'],
  ['마왕 부하','모두, 이쪽을 봐 주십시오.']
 ];
+// Temporary ending-only showcase, requested 2026-11-08. Never write these into story records.
+export const ENDING_SAMPLE_GUESTS=[['coffee',0],['zombie',1],['sans',1],['minion',2],['returningZombie',3]];
 export function endingReviews(records=[]){
- return runFromStory(records,4).visits.filter(v=>!v.skipped&&v.outcome!=='tutorialSkipped').map(v=>({...reviewPost(v),day:v.day}));
+ const visits=runFromStory(records,4).visits;
+ return ENDING_SAMPLE_GUESTS.map(([guestId,day])=>{
+  const completed=visits.find(v=>v.guestId===guestId&&!v.skipped&&v.outcome!=='tutorialSkipped');
+  const successful=completed&&(Number.isFinite(completed.score)?completed.score>=40:completed.reviewKind!=='battle');
+  const visit={...(successful?completed:{}),id:'ending-sample-'+guestId,guestId,day,score:100,outcome:'beauty',reviewKind:'beauty',forced:false};
+  const post={...reviewPost(visit),day,kind:'beauty',endingSample:true};
+  if(guestId==='coffee'&&!post.photo)post.samplePortrait='coffee';
+  if(guestId==='returningZombie')Object.assign(post,{user:'Rookie_Zom',text:'으어… 첫 월급 받고 다시 왔어요!\n반짝이는 이도, 새 액세서리도 마음에 듭니다…\n내일 출근은 조금 자신 있어요. 감사합니다!\n#몬스터헤어살롱 #첫월급 #단골예약',photo:successful&&completed.portrait||'./media/returning-zombie/front.png',draft:true});
+  return post;
+ });
 }
 export function endingSchedule(count){
  // One clock controls both reviews and credits, including runs started at the boss.

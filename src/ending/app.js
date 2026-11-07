@@ -13,9 +13,17 @@ function endingCard(p,group=false){
  (group?'<div class="ending-group"><img src="'+esc(endingData.photo)+'" alt="플레이어가 꾸민 마왕과 주인공, 마왕 부하, 커피유령의 단체사진"></div>':photoMarkup(p))+
  '<div class="ending-actions">♡ ▢ ⌑</div><p class="ending-copy">'+esc(p.text)+'</p></div></article>';
 }
+async function endingCoffeeSample(){
+ const c=document.createElement('canvas');c.width=320;c.height=350;const x=c.getContext('2d');x.imageSmoothingEnabled=false;
+ const layers=[['body.png',116,192,88,112],['hands.png',52,164,216,72],['head-base.png',68,110,144,116],['hair-complete.png',46,66,228,244],['eyes-happy.png',68,110,144,116],['mouth-normal-sheet.png',68,110,144,116,36,0,36,29]];
+ for(const [file,dx,dy,w,h,sx,sy,sw,sh]of layers){const im=new Image();im.src='./media/coffee-ghost/'+file;await im.decode();if(sw)x.drawImage(im,sx,sy,sw,sh,dx,dy,w,h);else x.drawImage(im,dx,dy,w,h);}
+ x.fillStyle='#000';x.beginPath();x.ellipse(170,163,12,4,0,0,Math.PI*2);x.fill();
+ for(const [side,dx]of [['L',100],['R',184]]){const im=new Image();im.src='./media/stickers/T_hornBig_'+side+'.png';await im.decode();x.drawImage(im,dx,78,42,58);}
+ return c.toDataURL();
+}
 async function initEnding(data){
  if(endingData)return;endingData=data;endingMuted=data.muted===true;E('endingMute').textContent=endingMuted?'소리 꺼짐':'소리 켜짐 ♪';
- const sky=E('returnSky');await sky.decode();endingPosts=endingReviews(data.records);endingPlan=endingSchedule(endingPosts.length);endingPhotoIndex=endingPosts.length;
+ const sky=E('returnSky');await sky.decode();endingPosts=endingReviews(data.records);for(const post of endingPosts)if(post.samplePortrait==='coffee')post.photo=await endingCoffeeSample();endingPlan=endingSchedule(endingPosts.length);endingPhotoIndex=endingPosts.length;
  const run=runFromStory(data.records,4,{settings:data.settings});endingPhone=createSocialPhone(E('endingPhoneHost'),{getRun:()=>run,onManagement(){},onExit(){}});
  endingPhone.restore(data.socialChoices||{});endingPhone.show(true);
  E('memoryTrack').innerHTML=endingPosts.map(p=>endingCard(p)).join('')+endingCard({id:'ending-group',user:'money_slave',place:'몬스터 헤어살롱 · 마지막 영업',text:ENDING_POST},true);
