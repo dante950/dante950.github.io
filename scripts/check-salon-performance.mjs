@@ -8,8 +8,8 @@ export async function checkPortraitRendering(frame,label,{exercise=false}={}){
   const saved={phase:beautyPhase,zones:zonesVisible,expression,talking,mouthFrame,finishing,brushRadius,paintColor,paintOpacity,touched:{...touched},current:current.slice(),paint:paint.slice(),source:sourcePixels.slice(),history:[...history.draw]};
   const a=offscreen().getContext('2d'),b=offscreen().getContext('2d');
   let comparisons=0;
-  const compare=label=>{
-   beforeRender(true,a);renderPortrait(true,b);
+  const compare=(label,includeCape=true)=>{
+   beforeRender(true,a,includeCape);renderPortrait(true,b,includeCape);
    const left=a.getImageData(0,0,W,H).data,right=b.getImageData(0,0,W,H).data;
    for(let n=0;n<left.length;n++)if(left[n]!==right[n])throw Error(label+' pixel mismatch at '+n+': '+left[n]+' / '+right[n]);
    comparisons++;
@@ -18,7 +18,7 @@ export async function checkPortraitRendering(frame,label,{exercise=false}={}){
    for(const phase of ['cut','draw','attach']){beautyPhase=phase;zonesVisible=true;compare(phase+' guides');}
    zonesVisible=false;
    for(const mood of ['neutral','angry','satisfied'])for(const open of [false,true]){expression=mood;talking=true;mouthFrame=open;compare(mood+' mouth '+open);}
-   talking=false;finishing=true;compare('result');finishing=false;
+   talking=false;finishing=true;compare('result');compare('head capture',false);finishing=false;
    renderPortrait(false);
    const cached={...beautyRenderStats};
    for(let n=0;n<10;n++)renderPortrait(false);
