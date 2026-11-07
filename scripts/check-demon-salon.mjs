@@ -8,7 +8,7 @@ const server=http.createServer(async(req,res)=>{try{const f=path.resolve(root,'.
 for(const [name,engine]of (process.argv.includes('--chromium')?[['chromium',chromium]]:process.argv.includes('--webkit')?[['webkit',webkit]]:[['chromium',chromium],['webkit',webkit]])){
  const browser=await engine.launch({channel:name==='chromium'?process.env.YACHACHA_BROWSER_CHANNEL:undefined}),p=await browser.newPage({viewport:{width:1440,height:900},reducedMotion:'reduce'}),errors=[];p.on('pageerror',e=>errors.push(e.message));
  const snap=label=>p.screenshot({path:path.join(out,(publicRun?'public-':'')+name+'-'+label+'.png')});
- async function talks(){let idle=0;for(let i=0;i<350;i++){await p.waitForTimeout(80);if(await p.locator('#beautyChoices').isVisible()){idle=0;await p.locator('#beautyAccept').click();await p.locator('#beautyChoices').waitFor({state:'hidden'});}else if(await p.locator('#talkLayer').isVisible()){idle=0;await p.locator('#talkNext').focus();await p.keyboard.press('f');}else if(++idle>=6)return;}throw Error('Dialogue stalled');}
+ async function talks(stopAtEnding=false){let idle=0;for(let i=0;i<350;i++){await p.waitForTimeout(80);if(stopAtEnding&&await p.evaluate(()=>window.__endingEvents?.length>0))return;if(await p.locator('#beautyChoices').isVisible()){idle=0;await p.locator('#beautyAccept').click();await p.locator('#beautyChoices').waitFor({state:'hidden'});}else if(await p.locator('#talkLayer').isVisible()){idle=0;await p.locator('#talkNext').focus();await p.keyboard.press('f');}else if(++idle>=6)return;}throw Error('Dialogue stalled');}
  async function frame(){const f=await p.locator('#salon').elementHandle().then(h=>h.contentFrame());await f.waitForFunction(()=>window.beautyDebug?.ready);return f;}
  async function begin(){await p.goto(base);await p.waitForFunction(()=>window.fullflow);await p.locator('#play').click();await p.locator('[data-start-guest="10007"]').click();return frame();}
  let checkExterior=true;
@@ -22,7 +22,7 @@ for(const [name,engine]of (process.argv.includes('--chromium')?[['chromium',chro
  async function size(f,n){await f.locator('#sculptSize').fill(String(n));await f.locator('#sculptSize').dispatchEvent('input');}
  async function mask(f,expression,brush=1,reverse=false){await size(f,brush);const runs=await f.evaluate(({expression,reverse})=>{const selected=new Function('n','return '+expression),runs=[];for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(!selected(y*W+x))continue;let end=x;while(end+1<W&&selected(y*W+end+1))end++;runs.push([[x*2+1,y*2+1],[end*2+1,y*2+1]]);x=end;}return reverse?runs.reverse():runs;},{expression,reverse});for(const [a,b]of runs)await stroke(f,a,b);console.log(name,expression.slice(0,40),runs.length);}
  const report=async(f,label)=>{const r=await f.evaluate(()=>demonBeautyStatus());console.log(label,JSON.stringify(r));return r;};
- async function complete(f){
+ async function complete(f,stopAtEnding=false){
   await stage(f,'attach');
   const preview=await p.evaluate(()=>!!fullflow.story?.preview);
   const phase=await f.evaluate(()=>demonPhase);const resultEvent=await f.evaluate(()=>demonBeautyStatus().success?'normal':'fail');
@@ -35,7 +35,7 @@ for(const [name,engine]of (process.argv.includes('--chromium')?[['chromium',chro
   assert.equal(await f.locator('.beautyResultCaption').textContent(),'');
   if(!preview){await p.locator('#talkLayer').waitFor({state:'visible'});assert.doesNotMatch(await p.locator('#talkText').textContent(),/반차 결재|수정 요청/);}
   if(!preview&&!publicRun)await p.waitForFunction(marker=>document.querySelector('#talkText').textContent.includes(marker),'결과 연결 확인 '+phase+' '+resultEvent);
-  await talks();
+  await talks(stopAtEnding);
   assert.equal(await p.evaluate(()=>window.__beautyResults),1,'one completion message without a common result screen');
  }
  async function waitPhase(n){await p.waitForFunction(n=>fullflow.story?.demonPhase===n&&document.querySelector('#salon').style.opacity==='1',n);let f=await frame();await f.waitForFunction(()=>beautyActive);await talks();await f.waitForFunction(()=>!briefing);return f;}
@@ -200,8 +200,8 @@ await stage(f,'draw');await f.locator('[data-color="#4853F8"]').click();
   await put(f,'T_blackCrown',[166,26]);assert.equal((await report(f,'horn-pair-and-black-crown')).success,true);
   await snap('royal-complete');await checkPortraitRendering(f,'demon-royal');assert.equal(await f.locator('.requestItem:not(.complete)').count(),0);
   await p.evaluate(()=>{window.__endingEvents=[];window.addEventListener('yachacha-ending-ready',e=>window.__endingEvents.push(e.detail));});
-  await complete(f);
-  await f.waitForFunction(()=>!beautyActive&&!dialogueState.active&&salonLab.customerPhase==='closed');
+  await complete(f,true);
+  await f.waitForFunction(()=>!beautyActive&&dialogueState.active&&salonLab.customerPhase==='cutscene'&&document.querySelector('#demonEndingRoom'));
   await p.waitForFunction(()=>window.__endingEvents.length===1);
   const ending=await p.evaluate(()=>window.__endingEvents[0]);
   assert.equal(ending.ending,'beauty');assert.equal(ending.form,'handsome');assert.equal(ending.status,'ready');assert(ending.portrait.startsWith('data:image/'));
@@ -209,8 +209,8 @@ await stage(f,'draw');await f.locator('[data-color="#4853F8"]').click();
   assert.equal(await p.evaluate(()=>fullflow.story.demonPhase),2);assert.equal(await p.evaluate(()=>fullflow.story.successLocked),true);
   assert(!(await p.locator('#storyBattle').getAttribute('srcdoc')));
   assert.equal(await f.locator('#demonSelfie,#demonPhotoExit').count(),0);assert.equal(await p.locator('#demonFinishHome,#demonViewPhoto').count(),0);
-  assert(await f.locator('#demonStanding').isVisible());assert(!(await f.locator('#beautyScreen').isVisible()));
-  await p.locator('#salon').focus();const before=await f.evaluate(()=>state.x);await p.keyboard.down('d');await p.waitForTimeout(180);await p.keyboard.up('d');assert((await f.evaluate(()=>state.x))>before,'movement resumes in the salon');
+  assert(await f.locator('#demonStanding').isHidden());assert(!(await f.locator('#beautyScreen').isVisible()));
+  await p.locator('#salon').focus();const before=await f.evaluate(()=>state.x);await p.keyboard.down('d');await p.waitForTimeout(180);await p.keyboard.up('d');assert.equal(await f.evaluate(()=>state.x),before,'ending cutscene holds player movement');
   await f.evaluate(()=>send('demon-room-ready'));await p.waitForTimeout(100);assert.equal(await p.evaluate(()=>window.__endingEvents.length),1);
   assert.equal(await p.locator('#storyHint').isVisible(),false);assert(await f.locator('#demonEndingRoom').isVisible());
   await snap('handsome-room-return');
