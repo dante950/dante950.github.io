@@ -89,10 +89,11 @@ function field(label,key,val,type='text',hint=''){if(type==='text'&&(/request|Hi
 
 function workshopBeautyGuest(){return demonWorkshopGuest(draft.guests.find(g=>g.id===guestID),workshopDemonPhase);}
 function workshopPhaseSelect(g){
- return g.demon?'<label for="workshopDemonPhase">마왕 미용 페이즈</label><select id="workshopDemonPhase"><option value="1" '+(workshopDemonPhase===1?'selected':'')+'>1페이즈 · 투구</option><option value="2" '+(workshopDemonPhase===2?'selected':'')+'>2페이즈 · 미형</option></select>':'';
+ const id=editorMode==='beauty'?'workshopDemonPhase':'dialogueDemonPhase';
+ return g.demon?'<label for="'+id+'">마왕 미용 페이즈</label><select id="'+id+'"><option value="1" '+(workshopDemonPhase===1?'selected':'')+'>1페이즈 · 투구</option><option value="2" '+(workshopDemonPhase===2?'selected':'')+'>2페이즈 · 미형</option></select>':'';
 }
 function bindWorkshopPhase(render){
- const select=el('workshopDemonPhase');if(select)select.onchange=()=>{workshopDemonPhase=Number(select.value);selectedRegion=0;render();};
+ const select=el(editorMode==='beauty'?'workshopDemonPhase':'dialogueDemonPhase');if(select)select.onchange=()=>{workshopDemonPhase=Number(select.value);selectedRegion=0;render();};
 }
 function workshopRequestLink(stage){
  const g=draft.guests.find(g=>g.id===guestID);
