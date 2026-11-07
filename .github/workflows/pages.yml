@@ -71,7 +71,7 @@ jobs:
               esac
               case "$file" in src/ending/*) ending_changed=true ;; esac
               case "$file" in
-                src/ending/*|public/media/ending/*|src/demon-story.js|src/salon-demon-visit.js|src/app.js|src/style.css|scripts/build.mjs|tests/ending.test.mjs|tests/demon-salon.test.mjs|scripts/check-ending.mjs|scripts/serve-ending-review.mjs|scripts/check-demon-salon.mjs|docs/beauty-ending-2026-11-07/*|.github/workflows/pages.yml) ;;
+                src/ending/*|public/media/ending/*|src/demon-story.js|src/salon-demon-visit.js|src/app.js|src/style.css|scripts/build.mjs|tests/ending.test.mjs|tests/demon-salon.test.mjs|scripts/check-ending.mjs|scripts/check-ending-victory.mjs|scripts/check-demon-branches.mjs|scripts/check-demon-battle.mjs|scripts/serve-demon-battle-review.mjs|scripts/serve-ending-review.mjs|scripts/check-demon-salon.mjs|docs/beauty-ending-2026-11-07/*|docs/demon-battle-2026-11-08/happy-ending/*|.github/workflows/pages.yml) ;;
                 *) ending_only=false ;;
               esac
               case "$file" in scripts/check-demon-public-release.mjs|.github/workflows/pages.yml) ;; *) release_only=false ;; esac
@@ -285,17 +285,22 @@ jobs:
         with:
           node-version: '22'
       - run: npm ci --ignore-scripts --no-audit --no-fund
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps chromium webkit
       - run: npm run build
       - name: Check salon handoff, ending timeline and navigation
         run: |
           node scripts/serve-ending-review.mjs &
+          node scripts/serve-demon-battle-review.mjs &
           node scripts/check-ending.mjs
+          node scripts/check-ending-victory.mjs
+          node scripts/check-ending-victory.mjs --webkit
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: ending-checks-${{ github.sha }}
-          path: docs/beauty-ending-2026-11-07/
+          path: |
+            docs/beauty-ending-2026-11-07/
+            docs/demon-battle-2026-11-08/happy-ending/
   demon-battle-browser:
     needs: build
     if: needs.build.outputs.demon_battle_only == 'true'

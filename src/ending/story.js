@@ -42,6 +42,7 @@ addEventListener('message',e=>{
  const s=beautyEndingSession,m=e.data;if(!s||!story||story!==s.story)return;
  if(e.source===el('salon').contentWindow&&m?.source==='yachacha-salon'&&m.token===salonToken){
   if(m.type==='demon-ending-room-done'&&m.scene===s.waiting){if(m.photo)s.photo=m.photo;const done=s.resolve;s.resolve=null;s.waiting=null;done?.();}
+  if(m.type==='demon-ending-shutter')endingEffect('ending-shutter');
   if(m.type==='demon-ending-error'){toast('엔딩 장면을 준비하지 못했습니다: '+m.message);}
  }
  if(e.source!==s.frame?.contentWindow||e.origin!==location.origin||m?.source!=='yachacha-ending'||m.token!==s.token)return;
@@ -58,13 +59,20 @@ async function startBattleVictoryEnding(){
  if(beautyEndingSession||!story?.demonSuccessLocked)return;
  const s={story,cancelled:false,photo:null,token:token()};beautyEndingSession=s;story.demonEnding.status='playing';document.body.classList.add('beauty-ending');el('storyHint').hidden=true;
  const active=()=>beautyEndingSession===s&&!s.cancelled&&story===s.story;
- await endingTalk([['마왕 부하','관습에 따르면, 마왕을 야차로 꺾으신 분이 새로운 마왕이 되셔야 합니다.']]);if(!active())return;
- await waitEndingRoom('refuse');if(!active())return;
- await endingTalk([['마왕 부하','……아. 그건 싫으시다고요.'],['마왕 부하','알겠습니다. 그럼 원래 세계로 돌려보내 드리겠습니다.'],['몬스터','……그래. 그대가 원하는 것이 그것이라면.']]);if(!active())return;
- // A temporary group pose supplies the final SNS photograph for this branch.
- await waitEndingRoom('coffee');if(!active())return;await waitEndingRoom('group');if(!active())return;
- endingEffect('ending-shutter');await waitEndingRoom('photo');if(!active())return;
- endingEffect('ending-return');await waitEndingRoom('return');if(!active())return;
+ await endingTalk([['마왕 부하','야차에서 이기셨으니, 이제 새로운 마왕이 되실 수 있습니다.'],['플레이어','제가요?! 저는 그냥 원래 세계로 돌아가고 싶은데요!'],['플레이어','마왕은…… 이분이 계속하면 안 돼요?'],['몬스터','이런 모습을 알고도 나를 따르겠다는 자가 있겠느냐.']]);if(!active())return;
+ await waitEndingRoom('loyalty');if(!active())return;
+ await endingTalk([['마왕 부하','제 앞에 계신 분은 여전히 마왕님이십니다.'],['몬스터','……그런가.'],['몬스터','그대를 이곳으로 불러 놓고, 내 뜻대로 되지 않는다고 검까지 들었군.'],['몬스터','……미안하네.'],['플레이어','그럼 이제 정말 돌아갈 수 있는 거죠?'],['몬스터','그래. 돌아갈 길을 열어라. 이 사람을 무사히 원래 세계까지 모셔 드리도록.'],['마왕 부하','네, 마왕님. 바로 준비하겠습니다.']]);if(!active())return;
+ await waitEndingRoom('coffee');if(!active())return;
+ await endingTalk([['커피 유령','벌써 가시는 거예요……?'],['커피 유령','그럼 가기 전에, 다 같이 사진 찍어요!'],['플레이어','좋아요! 이리 와요.'],['플레이어','마왕님도 같이 찍어요!']]);if(!active())return;
+ await waitEndingRoom('group');if(!active())return;
+ await endingTalk([['커피 유령','마왕님, 조금만 더 가까이요!'],['몬스터','……이 정도면 되겠느냐?']]);if(!active())return;
+ // Play the supplied phone animation once, alongside the player's shooting line.
+ await Promise.all([waitEndingRoom('camera'),endingTalk([['플레이어','좋아요. 찍습니다!']])]);if(!active())return;
+ await waitEndingRoom('photo');if(!active())return;
+ await endingTalk([['마왕 부하','준비됐습니다. 이제 원래 세계로 돌아가실 수 있어요.'],['마왕 부하','갑자기 소환해서 어려운 부탁까지 드렸는데, 끝까지 도와주셔서 감사합니다.']]);if(!active())return;
+ endingEffect('ending-return');await waitEndingRoom('portal');if(!active())return;
+ await endingTalk([['플레이어','다들 잘 지내요!']]);if(!active())return;
+ await waitEndingRoom('depart');if(!active())return;
  await gameAudio.music('salon');if(!active())return;if(gameAudio.track)gameAudio.track.gain.gain.setTargetAtTime(.12,gameAudio.ctx.currentTime,.5);
  const frame=document.createElement('iframe');frame.id='beautyEnding';frame.title='야차 승리 엔딩 · 인간세계 귀환';frame.allow='autoplay';frame.src='./ending.html?story='+encodeURIComponent(s.token);s.frame=frame;el('storyScreen').append(frame);
 }

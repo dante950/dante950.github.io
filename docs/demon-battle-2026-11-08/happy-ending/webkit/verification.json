@@ -1,0 +1,61 @@
+{
+  "passed": true,
+  "engine": "webkit",
+  "base": "http://127.0.0.1:4183/",
+  "errors": [],
+  "lines": [
+    "……내가 졌다.",
+    "결국 이 모습까지 보이고 말았군.",
+    "그 모습으로 저랑 끝까지 싸우신 거잖아요.",
+    "방금 죽을 뻔했는데, 웃음이 나오겠어요?",
+    "야차에서 이기셨으니, 이제 새로운 마왕이 되실 수 있습니다.",
+    "제가요?! 저는 그냥 원래 세계로 돌아가고 싶은데요!",
+    "마왕은…… 이분이 계속하면 안 돼요?",
+    "이런 모습을 알고도 나를 따르겠다는 자가 있겠느냐.",
+    "제 앞에 계신 분은 여전히 마왕님이십니다.",
+    "그대를 이곳으로 불러 놓고, 내 뜻대로 되지 않는다고 검까지 들었군.",
+    "……미안하네.",
+    "그럼 이제 정말 돌아갈 수 있는 거죠?",
+    "그래. 돌아갈 길을 열어라. 이 사람을 무사히 원래 세계까지 모셔 드리도록.",
+    "네, 마왕님. 바로 준비하겠습니다.",
+    "벌써 가시는 거예요……?",
+    "그럼 가기 전에, 다 같이 사진 찍어요!",
+    "좋아요! 이리 와요.",
+    "마왕님도 같이 찍어요!",
+    "……이 정도면 되겠느냐?",
+    "좋아요. 찍습니다!",
+    "준비됐습니다. 이제 원래 세계로 돌아가실 수 있어요.",
+    "갑자기 소환해서 어려운 부탁까지 드렸는데, 끝까지 도와주셔서 감사합니다.",
+    "다들 잘 지내요!"
+  ],
+  "scenes": [
+    "loyalty",
+    "coffee",
+    "group",
+    "camera",
+    "photo",
+    "portal",
+    "depart"
+  ],
+  "cameraFrames": [
+    null,
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+  ],
+  "newsPlan": {
+    "lead": 4500,
+    "scroll": 49444.444444444445,
+    "tail": 5000,
+    "comments": 14000,
+    "commentsAt": 58944.444444444445,
+    "total": 72944.44444444444
+  },
+  "coverage": "Actual start-menu victory branch and keyboard dialogue; authored camera frames and portal-before-farewell; single shared group-photo article; automatic scrolling/pause; four comments/three replies; replay/home. Ending timeline checkpoints use response-only test helpers."
+}

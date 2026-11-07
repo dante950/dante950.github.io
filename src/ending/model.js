@@ -43,12 +43,38 @@ export const ENDING_COMMENTS=[
 
 // Victory branch from the cutscene specification; separate from beauty success.
 export const BATTLE_ENDING_NEWS=[
- {id:'royal-aftermath',user:'마계일보',place:'왕실 소식',photo:'./media/demon-battle/demon_idle3.png',text:'마왕의 정체는 고블린… 왕실, 사실 인정\n\n미용실에서 공개된 기념사진을 계기로 마왕의 정체를 둘러싼 논란이 커지고 있다.\n왕실은 “사진 속 인물은 폐하가 맞다”고 밝혔다.\n\n정체 공개 이후 국정 운영 개선… 마왕 지지율 상승\n\n밀린 결재와 민원 처리가 빨라지면서 긍정적인 반응이 늘고 있다.\n왕실 관계자는 “최근 폐하께서 거울보다 서류를 오래 보신다”고 전했다.'}
+ {
+  "id": "royal-aftermath",
+  "user": "왕실 보도",
+  "place": "왕실 소식",
+  "groupPhoto": true,
+  "text": "마왕, 인간 미용사의 귀환을 배웅하다\n\n왕실은 오늘, 마계에서 미용실을 운영해 온 인간 미용사가 원래 세계로 무사히 돌아갔다고 전했다.\n\n귀환에 앞서 열린 야차에서는 인간 미용사가 승리했다. 마왕은 패배를 인정했으며, 승리자가 새로운 마왕의 자리 대신 귀환을 선택하자 직접 배웅에 나섰다.\n\n마왕과 부하들, 인간 미용사가 함께한 사진에는 투구를 벗은 마왕의 모습이 담겼다.\n\n이번 사진은 마왕의 요청으로 공개됐다. 왕실 관계자는 마왕이 사진 속 자신의 모습을 한동안 바라본 뒤, “이 사진으로 실어 주게.”라고 말했다고 전했다.\n\n마왕은 같은 사진을 집무실에도 걸어 두도록 했다. 함께 찍은 이들이 모두 잘 보이는 크기로 준비해 달라는 부탁도 덧붙였다.\n\n인간 미용사가 머물렀던 미용실은 당분간 그대로 보존된다. 마왕은 그가 다시 마계를 찾는 날에는 편히 쉬어 갈 수 있도록 준비하라고 당부했다."
+ }
 ];
-export const BATTLE_ENDING_COMMENTS=[{user:'마계 주민',text:'그래서 지금까지 거울을 그렇게 많이 들고 다니셨구나.'},{user:'마계 주민',text:'고블린이면 어때. 내 민원은 드디어 처리됐는데.'}];
+export const BATTLE_ENDING_COMMENTS=[
+ {
+  "user": "마계 회사원",
+  "text": "마왕님, 사진 잘 봤습니다. 혹시 밀린 결재 서류도 봐주실 수 있을까요? 서류들이 저보다 오래 퇴근을 못 하고 있습니다."
+ },
+ {
+  "user": "마왕",
+  "reply": true,
+  "text": "……전부 내 책상 위에 있는 건가?"
+ },
+ {
+  "user": "마왕 부하",
+  "reply": true,
+  "text": "책상 옆에도 있습니다, 마왕님."
+ },
+ {
+  "user": "마왕",
+  "reply": true,
+  "text": "……알겠다. 오늘부터 처리하지."
+ }
+];
 
 // Measure the rendered article so wrapping and future copy edits cannot crop its ending.
 export function battleNewsSchedule(overflow,textLength){
- const lead=4500,scroll=Math.max(10000,Math.max(0,overflow)/14*1000,Math.max(0,textLength)/9*1000),tail=5000,comments=9500;
+ const lead=4500,scroll=Math.max(10000,Math.max(0,overflow)/14*1000,Math.max(0,textLength)/9*1000),tail=5000,comments=14000;
  return {lead,scroll,tail,comments,commentsAt:lead+scroll+tail,total:lead+scroll+tail+comments};
 }

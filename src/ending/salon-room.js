@@ -3,7 +3,7 @@ let endingRoom=null;
 async function prepareDemonEndingRoom(head,form='handsome'){
  const images={};
  await Promise.all(Object.entries({body:form==='goblin'?'./media/demon-battle/demon_idle3.png':'./media/ending/king-body-source.png',head:head||'./media/demon/goblin.png',
- hero:SPRITES.front,minion:GUEST.companion,coffee:'./media/coffee-ghost/appeared-sheet.png',
+ camera:'./media/ending/T_yacha_win.png',hero:SPRITES.front,minion:GUEST.companion,coffee:'./media/coffee-ghost/appeared-sheet.png',
  magic:'./media/intro/pt/summoning.png'}).map(async([key,src])=>{
   const im=new Image();im.src=src;await im.decode();images[key]=im;
  }));
@@ -13,7 +13,7 @@ async function prepareDemonEndingRoom(head,form='handsome'){
  for(const n of [player,shadow,standing,companion,customer,customerShadow,seatedCustomer,mimic])n.style.visibility='hidden';
  for(const n of gameWorld.querySelectorAll('.phone,.hudTop,.help,.resourceNote,#interactPrompt'))n.style.visibility='hidden';
  dialogueState.active=true;customerState.phase='cutscene';state.keys.clear();
- endingRoom={form,layer,cx:layer.getContext('2d'),images,scene:'room',elapsed:0,group:0,coffee:0,last:performance.now(),ack:false};
+ endingRoom={form,layer,cx:layer.getContext('2d'),images,scene:'room',elapsed:0,group:0,coffee:0,loyalty:0,portalReady:false,last:performance.now(),ack:false};
  endingRoom.scenery={};
  await Promise.all(['.wall','.floor'].map(async selector=>{const url=getComputedStyle(gameWorld.querySelector(selector)).backgroundImage.match(/url\(["']?(.*?)["']?\)/)?.[1];if(url){const im=new Image();im.src=url;await im.decode();endingRoom.scenery[url]=im;}}));
  renderDemonEndingRoom();
@@ -23,7 +23,7 @@ async function prepareDemonEndingRoom(head,form='handsome'){
 function endingSprite(cx,im,x,feet,h){cx.drawImage(im,x-h*im.width/im.height/2,feet-h,h*im.width/im.height,h);}
 function drawEndingActors(cx,{group=0,coffee=0,sink=0,portal=0,time=0}={}){
  const im=endingRoom.images,lerp=(a,b)=>a+(b-a)*group;
- const hx=lerp(330,endingRoom.form==='goblin'?520:300),kx=lerp(580,endingRoom.form==='goblin'?325:470),mx=lerp(745,640),cy=420;
+ const hx=lerp(330,endingRoom.form==='goblin'?520:300),kx=lerp(580,endingRoom.form==='goblin'?325:470),mx=lerp(745-endingRoom.loyalty*75,640),cy=420;
  cx.imageSmoothingEnabled=false;
  if(portal>0){
   cx.save();cx.globalAlpha=portal;cx.shadowColor='#44ffac';cx.shadowBlur=16;
@@ -43,7 +43,12 @@ function drawEndingActors(cx,{group=0,coffee=0,sink=0,portal=0,time=0}={}){
  cx.save();cx.beginPath();cx.rect(0,0,950,cy+2);cx.clip();cx.globalAlpha=1-sink*.85;
  const heroH=214,heroW=heroH*219/162;
  if(endingRoom.scene==='refuse'){cx.translate(hx,cy-heroH/2);cx.rotate(Math.sin(time/70)*.075);cx.translate(-hx,-cy+heroH/2);}
- cx.drawImage(im.hero,0,0,219,162,hx-heroW/2,cy-heroH+sink*220,heroW,heroH);
+ if(['camera','photo'].includes(endingRoom.scene)&&endingRoom.form==='goblin'){
+  // Authored sheet: nine 360x247 cells, shared visible bounds x153..221, y143..246.
+  const frame=endingRoom.scene==='camera'?Math.min(8,Math.floor(time/120)):8,h=174,w=h*69/104;
+  endingRoom.layer.dataset.cameraFrame=frame;
+  cx.drawImage(im.camera,frame*360+153,143,69,104,hx-w/2,cy-h,w,h);
+ }else cx.drawImage(im.hero,0,0,219,162,hx-heroW/2,cy-heroH+sink*220,heroW,heroH);
  cx.restore();
  if(coffee>0){
   const x=lerp(880,790),h=132;cx.globalAlpha=coffee;
@@ -68,11 +73,15 @@ function drawDemonEndingBackdrop(cx){
 function renderDemonEndingRoom(){
  const r=endingRoom;if(!r)return;const t=r.elapsed,cx=r.cx;cx.clearRect(0,0,950,531);
  let sink=0,portal=0;
+ if(r.scene==='loyalty')r.loyalty=Math.min(1,t/700);
  if(r.scene==='coffee')r.coffee=Math.min(1,t/650);
  if(r.scene==='group')r.group=Math.min(1,t/850);
+ if(r.scene==='portal'){r.group=Math.max(0,1-t/650);portal=Math.min(1,Math.max(0,(t-650)/650));}
+ if(r.scene==='depart'){r.group=0;portal=1;sink=Math.min(1,t/650);}
  if(r.scene==='return'){r.group=Math.max(0,1-t/650);portal=Math.min(1,Math.max(0,(t-650)/1000));sink=Math.min(1,Math.max(0,(t-1650)/1200));}
  drawEndingActors(cx,{group:r.group,coffee:r.coffee,sink,portal,time:t});
- if(r.scene==='photo'&&t<160){cx.fillStyle='#fff';cx.globalAlpha=1-t/160;cx.fillRect(0,0,950,531);cx.globalAlpha=1;}
+ if(r.scene==='photo'&&r.form!=='goblin'&&t<160){cx.fillStyle='#fff';cx.globalAlpha=1-t/160;cx.fillRect(0,0,950,531);cx.globalAlpha=1;}
+ if(r.scene==='depart'&&t>1000){cx.fillStyle='rgba(0,0,0,'+Math.min(1,(t-1000)/650)+')';cx.fillRect(0,0,950,531);}
  if(r.scene==='return'&&t>2850){cx.fillStyle='rgba(0,0,0,'+Math.min(1,(t-2850)/650)+')';cx.fillRect(0,0,950,531);}
 }
 function demonEndingRoomTick(now){
@@ -81,7 +90,8 @@ function demonEndingRoomTick(now){
  const dt=Math.min(80,now-r.last);r.last=now;if(!paused)r.elapsed+=dt;
  if(r.paused!==paused){r.paused=paused;send('demon-ending-paused',{paused});}
  renderDemonEndingRoom();
- const durations={refuse:1100,coffee:700,group:900,photo:800,return:3500};
+ if(r.scene==='camera'){for(const at of [120,720])if(r.elapsed>=at&&!r.shutters.has(at)){r.shutters.add(at);send('demon-ending-shutter');}}
+ const durations={loyalty:750,refuse:1100,coffee:700,group:900,camera:1080,photo:800,portal:1350,depart:1700,return:3500};
  if(!r.ack&&r.elapsed>=(durations[r.scene]||Infinity)){
   r.ack=true;
   if(r.scene==='photo'){
@@ -93,6 +103,6 @@ function demonEndingRoomTick(now){
  requestAnimationFrame(demonEndingRoomTick);
 }
 function setDemonEndingScene(scene){
- if(!endingRoom||!['refuse','coffee','group','photo','return'].includes(scene))return;
- endingRoom.scene=scene;endingRoom.layer.dataset.scene=scene;endingRoom.elapsed=0;endingRoom.ack=false;
+ if(!endingRoom||!['loyalty','refuse','coffee','group','camera','photo','portal','depart','return'].includes(scene))return;
+ endingRoom.scene=scene;endingRoom.layer.dataset.scene=scene;endingRoom.elapsed=0;endingRoom.ack=false;endingRoom.shutters=new Set();
 }

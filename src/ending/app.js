@@ -9,7 +9,7 @@ function resizeEnding(){document.documentElement.style.setProperty('--ending-sca
 addEventListener('resize',resizeEnding);resizeEnding();
 function endingSound(key){if(endingSounds.has(key))return;endingSounds.add(key);endingMessage('sound',{key});}
 function endingCard(p,group=false){
- return '<article class="ending-post '+(p.photo&&group?'ending-news':'')+'" data-review="'+esc(p.id)+'"><div class="post-card"><header><b>'+esc(p.user)+'</b><small>'+esc(p.place||'몬스터 헤어살롱')+'</small></header>'+
+ return '<article class="ending-post '+((p.photo||p.groupPhoto)&&group?'ending-news':'')+'" data-review="'+esc(p.id)+'"><div class="post-card"><header><b>'+esc(p.user)+'</b><small>'+esc(p.place||'몬스터 헤어살롱')+'</small></header>'+
  (group?'<div class="ending-group"><img src="'+esc(p.photo||endingData.photo)+'" alt="'+(p.photo?'고블린 모습의 마왕':endingData.ending==='battle'?'고블린 마왕과 주인공, 마왕 부하, 커피유령의 단체사진':'플레이어가 꾸민 마왕과 주인공, 마왕 부하, 커피유령의 단체사진')+'"></div>':photoMarkup(p))+
  '<div class="ending-actions">♡ ▢ ⌑</div><p class="ending-copy">'+esc(p.text)+'</p></div></article>';
 }
@@ -28,7 +28,7 @@ async function initEnding(data){
  endingPhone.restore(data.socialChoices||{});endingPhone.show(true);
  E('memoryTrack').innerHTML=endingPosts.map(p=>endingCard(p)).join('')+(data.ending==='battle'?BATTLE_ENDING_NEWS.map(p=>endingCard(p,true)).join(''):'')+endingCard({id:'ending-group',user:'money_slave',place:'몬스터 헤어살롱 · 마지막 영업',text:data.ending==='battle'?'마지막 영업, 그리고 작별의 기념사진.':ENDING_POST},true);
  await Promise.all([...document.images].map(im=>im.decode().catch(()=>{})));
- E('endingComments').querySelector('div:last-child').innerHTML=(data.ending==='battle'?BATTLE_ENDING_COMMENTS:ENDING_COMMENTS).map(c=>'<p><b>'+esc(c.user)+'</b>'+esc(c.text)+'</p>').join('');
+ E('endingComments').querySelector('div:last-child').innerHTML=(data.ending==='battle'?BATTLE_ENDING_COMMENTS:ENDING_COMMENTS).map(c=>'<p'+(c.reply?' class="ending-reply"':'')+'><b>'+(c.reply?'↳ ':'')+esc(c.user)+'</b>'+esc(c.text)+'</p>').join('');
  if(data.ending==='battle'){
   await document.fonts.ready;
   const article=E('memoryTrack').querySelector('.ending-news .post-card');
@@ -77,7 +77,7 @@ function renderEnding(){
  }else credit.style.opacity=0;
  const finalT=memoryT-total-(battleEnding?endingNewsPlan.total:0);view.style.left=memoryT>=total?'415px':'110px';
  const commentT=battleEnding?aftermathT-endingNewsPlan.commentsAt+5000:finalT,comments=E('endingComments');comments.style.opacity=(battleEnding&&aftermathT>=endingNewsPlan.total)?0:clamp((commentT-5000)/500);comments.style.transform='translateY('+(500*(1-smooth((commentT-5000)/700)))+'px)';
- comments.querySelectorAll('p').forEach((p,i)=>p.style.opacity=clamp((commentT-5700-i*1700)/450));
+ comments.querySelectorAll('p').forEach((p,i)=>p.style.opacity=clamp((commentT-5700-i*(battleEnding?2800:1700))/450));
  if(commentT>=5700)endingSound('ending-comment-1');if(commentT>=7400)endingSound('ending-comment-2');
  if(finalT>=11500){fade.style.opacity=clamp((finalT-11500)/2400);if(finalT>=12000)endingSound('ending-music-fade');}
  E('endingThanks').style.opacity=finalT<14200?0:Math.min(clamp((finalT-14200)/2000),clamp((22200-finalT)/2000));

@@ -66,7 +66,7 @@ async function finishDemonBattle(outcome,stats){
  }
  story.demonBattleEnding=true;story.outcome='victory';story.demonSuccessLocked=true;document.body.classList.add('beauty-ending');
  story.guest.endingPortrait='./media/demon-battle/goblin-portrait.png';
- await endingTalk([['몬스터','……내가 졌다.'],['몬스터','환영도, 허세도 없이… 내 힘을 다했다.'],['몬스터','그런데도 네가 이겼군.']]);if(story!==active)return;
+ await endingTalk([['몬스터','……내가 졌다.'],['몬스터','결국 이 모습까지 보이고 말았군.'],['플레이어','그 모습으로 저랑 끝까지 싸우신 거잖아요.'],['몬스터','……우습지도 않으냐?'],['플레이어','방금 죽을 뻔했는데, 웃음이 나오겠어요?']]);if(story!==active)return;
  gameAudio.effect('clash');
  await new Promise(resolve=>{const dispose=showBattleResult({outcome:'victory',monsterID:10007,onContinue:resolve});setTimeout(()=>{dispose();resolve();},1500);});if(story!==active)return;
  const fade=document.createElement('div');fade.id='endingRoomFade';fade.style.cssText='position:fixed;inset:0;background:#000;z-index:100;pointer-events:none;opacity:0;transition:opacity .5s';document.body.append(fade);requestAnimationFrame(()=>fade.style.opacity='1');

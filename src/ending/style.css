@@ -15,3 +15,5 @@
 /* One complete article: the clock scrolls the whole card before comments appear. */
 #memoryTrack .ending-news .post-card{height:560px;overflow:hidden;scroll-behavior:auto;overflow-anchor:none}
 #memoryTrack .ending-news .ending-copy{font-size:15px;line-height:1.8;max-height:none;overflow:visible;padding:0 18px 12px}
+
+#endingComments p.ending-reply{margin-left:20px;padding-left:12px;border-left:2px solid #dfc4d0}
