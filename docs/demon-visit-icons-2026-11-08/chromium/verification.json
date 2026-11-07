@@ -1,0 +1,129 @@
+{
+  "passed": true,
+  "engine": "chromium",
+  "base": "http://127.0.0.1:4183/",
+  "errors": [],
+  "visits": [
+    {
+      "stars": 0,
+      "seen": [
+        "black",
+        "outside",
+        "walk",
+        "outside",
+        "sign",
+        "pass",
+        "black"
+      ],
+      "kingFrames": [],
+      "minionFrames": [],
+      "lastPassPosition": [
+        1320,
+        1390
+      ]
+    },
+    {
+      "stars": 1,
+      "seen": [
+        "black",
+        "outside",
+        "walk",
+        "outside",
+        "sign",
+        "pass",
+        "black"
+      ],
+      "kingFrames": [],
+      "minionFrames": [],
+      "lastPassPosition": [
+        1320,
+        1390
+      ]
+    },
+    {
+      "stars": 2,
+      "seen": [
+        "black",
+        "outside",
+        "walk",
+        "outside",
+        "sign",
+        "pass",
+        "black"
+      ],
+      "kingFrames": [],
+      "minionFrames": [],
+      "lastPassPosition": [
+        1320,
+        1390
+      ]
+    },
+    {
+      "stars": 3,
+      "seen": [
+        "black",
+        "outside",
+        "walk",
+        "outside",
+        "sign",
+        "outside",
+        "enter"
+      ],
+      "kingFrames": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "minionFrames": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ]
+    }
+  ],
+  "icons": [
+    [
+      "취준좀비",
+      10001,
+      "T_Zombie_Talk"
+    ],
+    [
+      "취객",
+      10002,
+      "T_Dwarf_Talk"
+    ],
+    [
+      "샌즈",
+      10003,
+      "T_Sans_Talk"
+    ],
+    [
+      "마왕 부하",
+      10004,
+      "T_MidBoss_Talk"
+    ],
+    [
+      "취업 성공 좀비",
+      10006,
+      "T_Zombie_Talk"
+    ],
+    [
+      "커피 유령",
+      10007,
+      "T_CoffeeGhost_Talk"
+    ],
+    [
+      "마왕",
+      10007,
+      "T_Boss_Talk1"
+    ],
+    [
+      "양아치 두목",
+      10007,
+      "T_Gang_Talk"
+    ]
+  ],
+  "coverage": "Starting stars injected into main story, real business start and dialogue input; no cutscene time/sequence injection. Stars 0/1/2 both move right out of frame; star3 both back-sheet four frames. Dialogue probes render named icons in main story and tutorial."
+}

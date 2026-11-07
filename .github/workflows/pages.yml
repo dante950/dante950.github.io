@@ -78,7 +78,7 @@ jobs:
               case "$file" in data/schema.json|src/combat/versions.js|src/project-archive.js|src/workshop-dialogue.js|scripts/check-project-archive.mjs|tests/project-archive.test.mjs) archive_changed=true ;; esac
               case "$file" in src/demon/*|src/demon-guest.js|src/demon-story.js|src/salon-demon*.js|public/demon.html|public/demon-assets.json|public/media/demon/*|scripts/check-demon*.mjs|tests/demon*.test.mjs|docs/demon-day-four.md|docs/demon-recovery-2026-11-06/*) demon_changed=true ;; esac
               case "$file" in
-                data/schema.json|src/combat/versions.js|src/workshop-dialogue.js|tests/project-archive.test.mjs|tests/workshop-dialogue.test.mjs|scripts/check-project-archive.mjs|data/project.json|src/app.js|src/model.js|src/index.html|src/style.css|src/salon.html|src/salon-beauty.js|src/salon-beauty.css|src/salon-beauty-result.js|src/speaker-avatar.js|scripts/build.mjs|scripts/check-minion.mjs|scripts/check-returning-zombie.mjs|scripts/check-local-story.mjs|tests/story-start.test.mjs|tests/salon-dialogue.test.mjs|docs/demon-native-2026-11-06/*|src/demon/*|src/demon-guest.js|src/demon-story.js|src/salon-demon*.js|public/demon.html|public/demon-assets.json|public/media/demon/*|scripts/check-demon*.mjs|tests/demon*.test.mjs|docs/demon-day-four.md|docs/demon-recovery-2026-11-06/*|.github/workflows/pages.yml) ;;
+                data/schema.json|src/combat/versions.js|src/workshop-dialogue.js|tests/project-archive.test.mjs|tests/workshop-dialogue.test.mjs|scripts/check-project-archive.mjs|data/project.json|src/app.js|src/model.js|src/index.html|src/style.css|src/salon.html|src/salon-beauty.js|src/salon-beauty.css|src/salon-beauty-result.js|src/speaker-avatar.js|scripts/build.mjs|scripts/check-minion.mjs|scripts/check-returning-zombie.mjs|scripts/check-local-story.mjs|tests/story-start.test.mjs|tests/salon-dialogue.test.mjs|docs/demon-native-2026-11-06/*|src/demon/*|src/demon-guest.js|src/demon-story.js|src/salon-demon*.js|src/speaker-avatar.js|src/guest-speech.css|public/media/dialogue-icons/*|tests/speaker-avatar.test.mjs|docs/demon-visit-icons-2026-11-08/*|public/demon.html|public/demon-assets.json|public/media/demon/*|scripts/check-demon*.mjs|tests/demon*.test.mjs|docs/demon-day-four.md|docs/demon-recovery-2026-11-06/*|.github/workflows/pages.yml) ;;
                 *) demon_only=false ;;
               esac
               case "$file" in
@@ -141,7 +141,7 @@ jobs:
         run: node --test tests/coffee-dialogue.test.mjs tests/beauty-reaction-dialogue.test.mjs tests/returning-zombie.test.mjs tests/story-start.test.mjs tests/story-progress.test.mjs tests/beauty-shape.test.mjs tests/salon-dialogue.test.mjs tests/workshop-dialogue.test.mjs tests/closing.test.mjs tests/social.test.mjs tests/coffee-beauty.test.mjs
       - name: Check day-four beauty, star gates and story handoff rules
         if: steps.scope.outputs.demon_only == 'true'
-        run: node --test tests/demon-salon.test.mjs tests/project-archive.test.mjs tests/story-progress.test.mjs tests/story-start.test.mjs tests/beauty-shape.test.mjs tests/coffee-beauty.test.mjs tests/salon-dialogue.test.mjs tests/workshop-dialogue.test.mjs tests/returning-zombie.test.mjs tests/beauty-reaction-dialogue.test.mjs
+        run: node --test tests/speaker-avatar.test.mjs tests/demon-salon.test.mjs tests/project-archive.test.mjs tests/story-progress.test.mjs tests/story-start.test.mjs tests/beauty-shape.test.mjs tests/coffee-beauty.test.mjs tests/salon-dialogue.test.mjs tests/workshop-dialogue.test.mjs tests/returning-zombie.test.mjs tests/beauty-reaction-dialogue.test.mjs
       - name: Check beauty-success ending and retained review records
         if: steps.scope.outputs.ending_only == 'true'
         run: node --test tests/ending.test.mjs tests/demon-salon.test.mjs tests/story-progress.test.mjs tests/social.test.mjs
@@ -262,6 +262,10 @@ jobs:
       - run: npm run build
       - run: node scripts/check-demon-salon.mjs --chromium
       - run: node scripts/check-demon-salon-regression.mjs --chromium
+      - name: Check exterior star branches and dialogue icons
+        run: |
+          node scripts/serve-demon-battle-review.mjs &
+          node scripts/check-demon-visit-icons.mjs
       - name: Check actual XLSM and XLSX archive roundtrip
         if: needs.build.outputs.archive_changed == 'true'
         run: node scripts/check-project-archive.mjs --chromium
@@ -274,6 +278,7 @@ jobs:
             docs/demon-two-phase-2026-11-06/*.png
             docs/demon-native-2026-11-06/*.png
             docs/project-archive-fix/*.png
+            docs/demon-visit-icons-2026-11-08/
   ending-browser:
     needs: build
     if: needs.build.outputs.ending_only == 'true'

@@ -1,0 +1,44 @@
+[
+  {
+    "file": "T_Boss_Talk1.png",
+    "sourceSHA256": "ef38aa1cad26bb731198997228e4172d318103082c2f7b964c8ec2dd14d78dae",
+    "operation": "First authored 35x35 cell, no redraw",
+    "outputSHA256": "6435718e6101c7fe50e29785cecf34744bc00cde7c86f054c764cb51274c12db"
+  },
+  {
+    "file": "T_CoffeeGhost_Talk.png",
+    "sourceSHA256": "60851688bae8436316d807abe5e033e4551e99d926cf7b8f2f10cc7167d12962",
+    "operation": "First authored 35x35 cell, no redraw",
+    "outputSHA256": "bcd298c4ce2417e62d578d76b71ebe403e34b42077a4d893dd2a424810638ecb"
+  },
+  {
+    "file": "T_Dwarf_Talk.png",
+    "sourceSHA256": "5496c699ceaf06e4b170c3c21dadcf1b91afa6f331e52aaef7cf73db401f3995",
+    "operation": "First authored 35x35 cell, no redraw",
+    "outputSHA256": "1c55bddc789eaefec4ba048fa0d2a07817cc4331201a60c414b9a88025127621"
+  },
+  {
+    "file": "T_Gang_Talk.png",
+    "sourceSHA256": "c036074e5878b6c05743b7394284ee20f239ba11d5ac818291cd53133e0940d4",
+    "operation": "First authored 35x35 cell, no redraw",
+    "outputSHA256": "20168c2ac961fbe53462956b8115f03d67705aec98b9f133cdaafabf9d868e4e"
+  },
+  {
+    "file": "T_MidBoss_Talk.png",
+    "sourceSHA256": "dfbdca201856d4873b5ed1f30e667a5408c7e08c7e92d64f8453aaae9bf72bcc",
+    "operation": "First authored 35x35 cell, no redraw",
+    "outputSHA256": "151bf2b9bd015970b69824212384811286608463fa52411388596c59c350ca09"
+  },
+  {
+    "file": "T_Sans_Talk.png",
+    "sourceSHA256": "d4b2cfd6a9312163a6bf1ae7eca8ebe7cb8defbedf9b77b52e5080722910a285",
+    "operation": "First authored 35x35 cell, no redraw",
+    "outputSHA256": "d14c22f71bdd16096b303dedc862d450926ef512351387622683087ba5b7d975"
+  },
+  {
+    "file": "T_Zombie_Talk.png",
+    "sourceSHA256": "cbcaaf635f7873b7c6d4ace4f96238271751d4e4eeba5fc75af91adee58af72c",
+    "operation": "First authored 35x35 cell, no redraw",
+    "outputSHA256": "86b4338da802599698e6773df9cd8b781d0c56d8b8b77f0d5c8b1de2d4dca9cb"
+  }
+]

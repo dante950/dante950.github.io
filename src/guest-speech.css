@@ -4,7 +4,6 @@
 .speechAvatar{grid-column:1;grid-row:1/span 3;display:flex;align-items:center;justify-content:center;width:80px;height:88px;position:relative;overflow:hidden;pointer-events:none}
 .speechAvatar img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
 .speechAvatar[data-kind=player] img{position:absolute;width:1707%;height:auto;max-width:none;left:-135%;top:-84%}
-.speechAvatar[data-kind=king] img{position:absolute;width:1000%;height:auto;max-width:none;left:-450%;top:-125%}
 .guestSpeech .speechText{grid-column:2;white-space:pre-line;margin:0;color:var(--speech-ink);font-size:17px;line-height:1.75;min-height:48px;overflow-wrap:anywhere}
 .guestSpeech .speechActions{grid-column:2;display:flex;justify-content:flex-end;gap:10px;margin-top:12px}
 .guestSpeech .speechActions button{background:#f6ddb4;color:#49392f;border:2px solid #957457;border-radius:9px;padding:7px 20px}

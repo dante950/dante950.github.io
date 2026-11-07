@@ -6,8 +6,15 @@ if(GUEST.demon&&GUEST.mode!=='backdrop'){
  const standing=document.createElement('img');standing.id='demonStanding';standing.src='./media/demon/king.png';standing.alt='마왕';standing.style.cssText='position:absolute;left:48%;bottom:20%;width:225px;height:345px;object-fit:contain;image-rendering:pixelated;z-index:49;pointer-events:none;display:none';gameWorld.append(standing);
  const style=document.createElement('style');style.textContent='.demonCinema{position:absolute;inset:0;z-index:600;background:#100d17;pointer-events:auto;opacity:1;transition:opacity .45s}.demonCinema canvas{width:100%;height:100%;image-rendering:pixelated}.demonCinema button{position:absolute;right:24px;top:22px;font:16px Galmuri9;background:#fff4e1;color:#503a30;border:3px solid #775844;border-radius:9px;padding:10px 15px}.demonApplause{animation:demonClap .3s 6 alternate}@keyframes demonClap{to{transform:translateY(-5px) rotate(3deg)}}';document.head.append(style);
  let cinema=null,canvas=null,cx=null,sequence=[],index=0,at=0,frame=0,visitActive=false,waiting=false,last=0,elapsed=0;
- const art={},loadArt=Promise.all([['king','./media/demon/king.png'],['minion',GUEST.companion],['mimic','./media/demon/mimic.png'],['hero',SPRITES.front],['outside','./media/demon/visit-exterior-reference.png']].map(async([key,src])=>{const i=new Image();i.src=src;await i.decode();art[key]=i;}));
+ const art={},loadArt=Promise.all([['king','./media/demon/king.png'],['kingBack','./media/demon/T_Finalboss_walk_back_sheet.png'],['minionBackBody','./media/minion-walk-back-body.png'],['minionBackHead','./media/minion-walk-back-head.png'],['minionBackHair','./media/minion-walk-back-hair.png'],['minion',GUEST.companion],['mimic','./media/demon/mimic.png'],['hero',SPRITES.front],['outside','./media/demon/visit-exterior-reference.png']].map(async([key,src])=>{const i=new Image();i.src=src;await i.decode();art[key]=i;}));
  const sprite=(name,x,feet,h,flip=false)=>{const im=art[name];if(!im)return;const w=h*im.width/im.height;cx.save();cx.translate(x,feet);if(flip)cx.scale(-1,1);cx.drawImage(im,-w/2,-h,w,h);cx.restore();};
+ function walkBack(name,x,feet,h,t){
+  // King timing matches the supplied four-frame GIF; minion uses the existing layered walk.
+  const king=name==='king',fw=king?180:120,fh=king?207:176,frame=Math.floor(t*1000/(king?200:140))%4,w=h*fw/fh;
+  const layers=king?['kingBack']:['minionBackBody','minionBackHead','minionBackHair'];
+  for(const key of layers)cx.drawImage(art[key],frame*fw,0,fw,fh,x-w/2,feet-h,w,h);
+  cinema.dataset[name+'Frame']=frame;
+ }
  function visitBeat(){const beat=sequence[index];if(!beat){endVisit();return;}elapsed=0;waiting=false;cinema.dataset.scene=beat.scene;if(beat.sound)send('sound',{key:beat.sound});}
  function advanceVisit(){if(!visitActive)return;index++;visitBeat();}
  function showExterior(scene,t){
@@ -20,7 +27,10 @@ if(GUEST.demon&&GUEST.mode!=='backdrop'){
   if(scene==='enter'){x=220+105*p;y=500-105*p;h=350-180*p;mx=390-55*Math.max(0,(p-.2)/.8);my=500-105*p;mh=210-100*p;}
   if(scene==='pass'){x=220+1100*p;mx=390+1000*Math.max(0,(p-.3)/.7);}
   if(scene==='sign'){cx.save();cx.translate(475,265);cx.scale(1+p*.4,1+p*.4);cx.translate(-323,-205);cx.drawImage(art.outside,272,117,195,135,0,0,950,531);cx.fillStyle='#E8E2AF';cx.fillRect(163,170,320,81);cx.fillStyle='#FFD341';cx.font='53px Galmuri9';cx.fillText('★'.repeat(stars),181,229);cx.restore();return;}
-  const bob=['walk','enter','pass'].includes(scene)?Math.sin(t*14)*3:0;sprite('king',x,y+bob,h);sprite('minion',mx,my-bob,mh,scene==='pass'&&t>.65&&t<1.2);
+  cinema.dataset.direction=scene==='enter'?'back':scene==='pass'?'right':'front';
+  cinema.dataset.kingX=x;cinema.dataset.minionX=mx;
+  if(scene==='enter'){walkBack('king',x,y,h,t);walkBack('minion',mx,my,mh,t);}
+  else{const bob=['walk','pass'].includes(scene)?Math.sin(t*14)*3:0;sprite('king',x,y+bob,h);sprite('minion',mx,my-bob,mh);}
  }
  function drawVisit(){
   const beat=sequence[index];if(!beat)return;const t=elapsed/1000;cx.clearRect(0,0,950,531);cinema.style.background=['armor','foot'].includes(beat.scene)?'transparent':'#100d17';
