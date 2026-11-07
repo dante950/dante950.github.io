@@ -32,6 +32,57 @@ for(const [name,engine]of (process.argv.includes('--chromium')?[['chromium',chro
  async function waitPhase(n){await p.waitForFunction(n=>fullflow.story?.demonPhase===n&&document.querySelector('#salon').style.opacity==='1',n);let f=await frame();await f.waitForFunction(()=>beautyActive);await talks();await f.waitForFunction(()=>!briefing);return f;}
  async function put(f,id,xy){await f.locator('[data-sticker="ST-RESOURCE-'+id+'"]').click();await stroke(f,xy);}
  try{
+  if(!publicRun){let f;
+   await p.goto(base);await p.waitForFunction(()=>window.fullflow);await p.locator('#developer').click();if(await p.locator('#updateOK').isVisible())await p.locator('#updateOK').click();
+   await p.locator('[data-editor="dialogue"]:visible').first().click();await p.locator('#dialogueGuest').selectOption('10007');await p.locator('#dialogueEvent').selectOption('exterior');
+   assert.equal(await p.locator('#dialogueEvent option:checked').textContent(),'미용실 외부 등장 씬');assert.match(await p.locator('[data-line-text]').first().inputValue(),/^마왕님,/);await snap('exterior-dialogue-editor');
+   await p.locator('[data-editor="beauty"]:visible').first().click();await p.locator('#beautyGuest').selectOption('10007');
+   assert.equal(await p.locator('#workshopDemonPhase').inputValue(),'1');
+   const helmetImage=await p.locator('#regionStage .layeredPortrait').getAttribute('src');
+   const helmetRequest=await p.locator('[data-field="request"]').inputValue();
+   await p.locator('#workshopDemonPhase').selectOption('2');
+   assert.equal(await p.locator('#toolSelect').inputValue(),'scissors');
+   assert.notEqual(await p.locator('#regionStage .layeredPortrait').getAttribute('src'),helmetImage);
+   assert.match(await p.locator('[data-field="request"]').inputValue(),/내 얼굴/);
+   await p.locator('[data-field="growth.color"]').fill('#d8d0e0');await p.locator('[data-field="growth.color"]').dispatchEvent('change');
+   await p.locator('[data-field="request"]').fill('작업실 미형 대사 확인입니다.');await p.locator('[data-field="request"]').dispatchEvent('change');
+   await p.locator('#workshopDemonPhase').selectOption('1');
+   assert.equal(await p.locator('#toolSelect').inputValue(),'hammer');
+   assert.equal(await p.locator('[data-field="growth.color"]').inputValue(),'#242236');
+   assert.equal(await p.locator('[data-field="request"]').inputValue(),helmetRequest);
+   await p.locator('#workshopDemonPhase').selectOption('2');
+   assert.equal(await p.locator('[data-field="growth.color"]').inputValue(),'#d8d0e0');
+   await snap('workshop-phase-two');
+   await p.locator('[data-editor="dialogue"]:visible').first().click();await p.locator('#dialogueEvent').selectOption('cut');
+   assert.equal(await p.locator('#dialogueDemonPhase').inputValue(),'2');
+   assert.equal(await p.locator('#beautyRequestText').inputValue(),'작업실 미형 대사 확인입니다.');
+   await p.locator('#dialogueDemonPhase').selectOption('1');
+   console.log('phase-switch-state',JSON.stringify(await p.evaluate(()=>({phase:workshopDemonPhase,mode:editorMode,event:selectedEvent,select:el('dialogueDemonPhase').value,handler:String(el('dialogueDemonPhase').onchange),link:workshopRequestLink('cut'),first:workshopRequestGroup('cut').lines[0].Text,shown:el('beautyRequestText').value,groups:draft.guests.find(g=>g.id===10007).demonPhaseDialogue}))));
+   assert.equal(await p.locator('#beautyRequestText').inputValue(),helmetRequest);
+   await p.locator('#dialogueDemonPhase').selectOption('2');
+   await p.locator('[data-editor="beauty"]:visible').first().click();await p.locator('#beautyTry').click();await p.locator('#previewStart').click();
+   f=await frame();await p.waitForFunction(()=>document.querySelector('#talkText').textContent.includes('작업실 미형 대사 확인입니다.'));
+   await talks();await f.waitForFunction(()=>beautyActive&&!briefing);
+   assert.equal(await f.evaluate(()=>demonPhase),2);assert.equal(await f.evaluate(()=>B.growth.color),'#d8d0e0');
+   assert.equal(await p.evaluate(()=>fullflow.story.preview),true);
+   assert.equal(await f.locator('.demonCinema').count(),0);
+   await snap('workshop-phase-two-trial');
+   await complete(f);await p.locator('#returnBeauty').click();
+   assert.equal(await p.locator('#workshopDemonPhase').inputValue(),'2');
+   assert.equal(await p.locator('[data-field="growth.color"]').inputValue(),'#d8d0e0');
+   await p.locator('#workshopDemonPhase').selectOption('1');await p.locator('#beautyTry').click();await p.locator('#previewStart').click();
+   f=await frame();await talks();await f.waitForFunction(()=>beautyActive&&!briefing);
+   assert.equal(await f.evaluate(()=>demonPhase),1);
+   await f.locator('[data-tool="hammer"]').click();await size(f,22);
+   previewDamage:for(let y=177;y<253;y+=12)for(let x=105;x<230;x+=12){
+    if(await p.locator('#returnBeauty').isVisible())break previewDamage;await stroke(f,[x,y]);if(await f.evaluate(()=>demonSudden))break previewDamage;
+   }
+   await p.locator('#returnBeauty').waitFor();assert.equal(await p.locator('#demonRetryBeauty').count(),0);
+   await p.locator('#returnBeauty').click();assert.equal(await p.locator('#workshopDemonPhase').inputValue(),'1');
+   await p.locator('#beautyGuest').selectOption('10001');assert.equal(await p.locator('#workshopDemonPhase').count(),0);
+   console.log('workshop: phase-specific edit, dialogue, direct trials, return, and sudden-failure isolation passed');
+
+  }
   let f=await begin();if(process.argv.includes('--phase2')&&!publicRun){await p.evaluate(()=>__demonFixture.phase(2));f=await waitPhase(2);}else{
    await enter(f,!process.argv.includes('--cinema'));await snap('helmet');await checkPortraitRendering(f,'demon-helmet');await f.locator('[data-tool="grow"]').click();await mask(f,'demonMasks.horn[n]&&!current[n]',4);await stage(f,'draw');await f.locator('[data-color="#242236"]').click();await mask(f,'demonMasks.scratch[n]',4);
    assert.equal((await report(f,'helmet')).success,true);await stage(f,'cut');await f.locator('[data-tool="grow"]').click();await size(f,8);const edge=await f.evaluate(()=>{const y=65;let x=0;while(x<W&&!current[y*W+x])x++;return [x*2+1,y*2+1];});await stroke(f,edge,[edge[0]-10,edge[1]]);assert(await f.evaluate(()=>{prepareDemonGeometry();let edge=0,inside=0;for(let n=0;n<current.length;n++)if(current[n]===2){const c=demonMaterialColor(n);if(demonEdge[n]){if(c.join(',')!==outlineColor.join(','))return false;edge++;}else inside++;}let seams=0;for(let n=0;n<current.length;n++)if(current[n]&&demonOldEdge[n]&&demonJoined[n]&&!demonEdge[n]){const expected=demonPhase===1&&demonMasks.horn[n]?demonTarget:demonGrowthColors;if(demonMaterialColor(n).join(',')!==expected.subarray(n*4,n*4+3).join(','))return false;seams++;}return edge>0&&inside>0&&seams>0;}),'grown helmet has outline, local material colour and a joined seam');await snap('helmet-growth-joined');
@@ -144,55 +195,6 @@ await stage(f,'draw');await f.locator('[data-color="#4853F8"]').click();
    f=await begin();await enter(f);await f.locator('[data-tool="hammer"]').click();await size(f,18);outer:for(let y=177;y<253;y+=12)for(let x=105;x<230;x+=12){if(await p.locator('#talkLayer').isVisible())break outer;await stroke(f,[x,y]);const r=await f.evaluate(()=>demonBeautyStatus());if(r.metrics.exposure>=.15&&r.metrics.exposure<.35)assert.equal(r.sudden,false);if(r.sudden)break outer;}await talks();await p.waitForSelector('#demonRetryBeauty');assert((await f.evaluate(()=>demonBeautyStatus())).metrics.exposure>=.35);assert.equal(await p.evaluate(()=>fullflow.story.demonPhase),1);await snap('warning-35');await p.locator('#demonRetryBeauty').click();await waitPhase(1);
    for(const stars of [0,1,2]){f=await begin();await p.evaluate(n=>__demonFixture.stars(n),stars);f=await frame();await f.locator('#openShopBtn').click();await f.locator('.demonCinema button').click();await p.waitForSelector('#demonRestart');await p.locator('#demonRestart').click();await p.locator('#cancelStoryStart').click();}
    await p.evaluate(()=>__demonFixture.closing());const closing=await p.locator('#storyClosing').elementHandle().then(h=>h.contentFrame());await closing.waitForLoadState('domcontentloaded');await closing.evaluate(()=>parent.postMessage({source:'yachacha-closing',type:'next-day',token:new URLSearchParams(location.search).get('story'),stars:3},location.origin));await frame();await p.waitForFunction(()=>fullflow.story?.guest===10007);assert.equal(await p.evaluate(()=>fullflow.story.followers),6100);
-  }
-  if(!publicRun){
-   await p.goto(base);await p.waitForFunction(()=>window.fullflow);await p.locator('#developer').click();if(await p.locator('#updateOK').isVisible())await p.locator('#updateOK').click();
-   await p.locator('[data-editor="dialogue"]:visible').first().click();await p.locator('#dialogueGuest').selectOption('10007');await p.locator('#dialogueEvent').selectOption('exterior');
-   assert.equal(await p.locator('#dialogueEvent option:checked').textContent(),'미용실 외부 등장 씬');assert.match(await p.locator('[data-line-text]').first().inputValue(),/^마왕님,/);await snap('exterior-dialogue-editor');
-   await p.locator('[data-editor="beauty"]:visible').first().click();await p.locator('#beautyGuest').selectOption('10007');
-   assert.equal(await p.locator('#workshopDemonPhase').inputValue(),'1');
-   const helmetImage=await p.locator('#regionStage .layeredPortrait').getAttribute('src');
-   const helmetRequest=await p.locator('[data-field="request"]').inputValue();
-   await p.locator('#workshopDemonPhase').selectOption('2');
-   assert.equal(await p.locator('#toolSelect').inputValue(),'scissors');
-   assert.notEqual(await p.locator('#regionStage .layeredPortrait').getAttribute('src'),helmetImage);
-   assert.match(await p.locator('[data-field="request"]').inputValue(),/내 얼굴/);
-   await p.locator('[data-field="growth.color"]').fill('#d8d0e0');await p.locator('[data-field="growth.color"]').dispatchEvent('change');
-   await p.locator('[data-field="request"]').fill('작업실 미형 대사 확인입니다.');await p.locator('[data-field="request"]').dispatchEvent('change');
-   await p.locator('#workshopDemonPhase').selectOption('1');
-   assert.equal(await p.locator('#toolSelect').inputValue(),'hammer');
-   assert.equal(await p.locator('[data-field="growth.color"]').inputValue(),'#242236');
-   assert.equal(await p.locator('[data-field="request"]').inputValue(),helmetRequest);
-   await p.locator('#workshopDemonPhase').selectOption('2');
-   assert.equal(await p.locator('[data-field="growth.color"]').inputValue(),'#d8d0e0');
-   await snap('workshop-phase-two');
-   await p.locator('[data-editor="dialogue"]:visible').first().click();await p.locator('#dialogueEvent').selectOption('cut');
-   assert.equal(await p.locator('#dialogueDemonPhase').inputValue(),'2');
-   assert.equal(await p.locator('#beautyRequestText').inputValue(),'작업실 미형 대사 확인입니다.');
-   await p.locator('#dialogueDemonPhase').selectOption('1');assert.equal(await p.locator('#beautyRequestText').inputValue(),helmetRequest);
-   await p.locator('#dialogueDemonPhase').selectOption('2');
-   await p.locator('[data-editor="beauty"]:visible').first().click();await p.locator('#beautyTry').click();await p.locator('#previewStart').click();
-   f=await frame();await p.waitForFunction(()=>document.querySelector('#talkText').textContent.includes('작업실 미형 대사 확인입니다.'));
-   await talks();await f.waitForFunction(()=>beautyActive&&!briefing);
-   assert.equal(await f.evaluate(()=>demonPhase),2);assert.equal(await f.evaluate(()=>B.growth.color),'#d8d0e0');
-   assert.equal(await p.evaluate(()=>fullflow.story.preview),true);
-   assert.equal(await f.locator('.demonCinema').count(),0);
-   await snap('workshop-phase-two-trial');
-   await complete(f);await p.locator('#returnBeauty').click();
-   assert.equal(await p.locator('#workshopDemonPhase').inputValue(),'2');
-   assert.equal(await p.locator('[data-field="growth.color"]').inputValue(),'#d8d0e0');
-   await p.locator('#workshopDemonPhase').selectOption('1');await p.locator('#beautyTry').click();await p.locator('#previewStart').click();
-   f=await frame();await talks();await f.waitForFunction(()=>beautyActive&&!briefing);
-   assert.equal(await f.evaluate(()=>demonPhase),1);
-   await f.locator('[data-tool="hammer"]').click();await size(f,22);
-   previewDamage:for(let y=177;y<253;y+=12)for(let x=105;x<230;x+=12){
-    if(await p.locator('#returnBeauty').isVisible())break previewDamage;await stroke(f,[x,y]);if(await f.evaluate(()=>demonSudden))break previewDamage;
-   }
-   await p.locator('#returnBeauty').waitFor();assert.equal(await p.locator('#demonRetryBeauty').count(),0);
-   await p.locator('#returnBeauty').click();assert.equal(await p.locator('#workshopDemonPhase').inputValue(),'1');
-   await p.locator('#beautyGuest').selectOption('10001');assert.equal(await p.locator('#workshopDemonPhase').count(),0);
-   console.log('workshop: phase-specific edit, dialogue, direct trials, return, and sudden-failure isolation passed');
-
   }
   assert.deepEqual(errors,[]);console.log(name,'two beauty phases, horn pair AND either crown, free face painting, dialogue effects, room handoff and gates passed');
  }catch(e){await snap('failure-debug');console.error(errors);throw e;}finally{await browser.close();}
