@@ -172,3 +172,18 @@ test('demon dialogue emphasis uses only the agreed dark palette and valid tags',
  assert(colors>40);assert.equal(DEMON_LINES.arrival.length,8);assert.equal(DEMON_LINES.phase1Success.length,3);assert.equal(demonGuest(2).demonRequest.cut.length,15);
  assert(!JSON.stringify(DEMON_LINES).includes('투구 뒤에 숨'));
 });
+
+test('helmet extension does not stretch highlight bands or opaque scratch pixels into slabs',()=>{
+ const w=25,h=21,p=new Uint8ClampedArray(w*h*4);
+ for(let y=2;y<19;y++)for(let x=3;x<22;x++){
+  const edge=x===3||x===21||y===2||y===18,blue=y<9&&x<11;
+  p.set(edge?[0,0,0,255]:blue?[72,83,248,255]:[36,34,54,255],(y*w+x)*4);
+ }
+ for(let y=10;y<17;y++)p.set([65,62,91,255],(y*w+20)*4);
+ p.set([51,55,57,255],(17*w+20)*4);
+ p.set([150,155,162,255],(15*w+20)*4);
+ const before=p.slice(),colors=demonGrowthPalette(p,w,h,true),used=new Set();
+ for(let n=0;n<w*h;n++){assert.equal(colors[n*4+3],255);used.add([...colors.slice(n*4,n*4+3)].join(','));}
+ assert.deepEqual([...used].sort(),['36,34,54','72,83,248']);
+ assert.deepEqual(p,before,'authored source and scratches remain intact');
+});

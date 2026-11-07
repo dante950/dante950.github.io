@@ -31,7 +31,7 @@ function prepareDemonBeauty(){
  if(demonPhase===2){sculptAnchors.fill(0);for(let n=0;n<W*H;n++)if(original[n]&&demonMasks.face[n]&&(Math.floor(n/W)+.5)*PIX<155)sculptAnchors[n]=1;}
  demonRestore=Uint8Array.from({length:W*H},(_,n)=>demonPhase===1?+(demonTarget[n*4+3]>100):original[n]);
  demonGrowthColors=demonGrowthPalette(demonTarget,W,H,demonPhase===1);
- const targetEdge=coffeeMaterialBoundary(demonRestore,W,H,2),initialEdge=coffeeMaterialBoundary(original,W,H,2);
+ const targetEdge=coffeeMaterialBoundary(demonRestore,W,H,3),initialEdge=coffeeMaterialBoundary(original,W,H,3);
  demonOldEdge=Uint8Array.from(targetEdge,(v,n)=>v||initialEdge[n]);
  demonMasks.hornAllowance=demonHornAllowance(demonMasks.horn,W,H,4);demonMasks.roofAllowance=demonHornAllowance(demonMasks.roof,W,H,2);demonMasks.silverAllowance=demonHornAllowance(demonMasks.silver,W,H,2);demonMasks.browAllowance=demonHornAllowance(demonMasks.brow,W,H,2);
  for(const [k,mask]of Object.entries(demonMasks))demonMaskIndices[k]=Array.from(mask.keys()).filter(n=>mask[n]);
@@ -94,7 +94,7 @@ function applyDemonStroke(cells,kind){
   else if(kind==='grow'){
    if(!growth[n])continue;
    current[n]=demonRestore[n]?1:2;
-   if(demonPhase===1&&demonRestore[n])sourcePixels.set(demonTarget.subarray(i,i+4),i);
+   // Rendering restores from the immutable target; cancelling a stroke must not alter source pixels.
    if(prev!==current[n]){paint.fill(0,i,i+4);changed=true;}
   }else if(kind==='erase'){if(paint[i+3]){paint.fill(0,i,i+4);changed=true;}}
   else if(kind==='paint'&&(current[n]||masks.face[n])){if(current[n])hairHit=true;const value=blendBeautyRGBA(gesture.paint.subarray(i,i+4),rgb(paintColor),paintOpacity);if(value.some((v,k)=>v!==paint[i+k]))changed=true;paint.set(value,i);if(demonMasks.face[n]&&!current[n])faceHit=true;}
@@ -118,11 +118,16 @@ function updateDemonScore(action){
 function prepareDemonGeometry(){
  if(!demonGeometryDirty)return;
  demonFringe=demonHornAllowance(current,W,H,2);demonEdge=coffeeMaterialBoundary(current,W,H,1);
- const grown=Uint8Array.from(current,(v,n)=>v&&(v===2||!original[n])?1:0);demonJoined=demonHornAllowance(grown,W,H,2);demonGeometryDirty=false;
+ const grown=Uint8Array.from(current,(v,n)=>v&&(v===2||!original[n])?1:0);demonJoined=demonHornAllowance(grown,W,H,4);demonGeometryDirty=false;
 }
 function demonMaterialColor(n){
  if(demonEdge[n])return outlineColor;
- if(current[n]===2||demonOldEdge[n]&&demonJoined[n])return demonGrowthColors.subarray(n*4,n*4+3);
+ const i=n*4,target=demonTarget.subarray(i,i+3);
+ // The broken horn's old cut line can be several pixels inside its repaired silhouette.
+ // Reveal the intact horn under that line as soon as adjacent material is restored.
+ if(demonPhase===1&&demonJoined[n]&&demonMasks.horn[n])return target;
+ if(current[n]===2||demonOldEdge[n]&&demonJoined[n])return demonGrowthColors.subarray(i,i+3);
+ if(demonPhase===1&&!original[n]&&demonRestore[n])return target;
  return null;
 }
 function drawDemonStones(){}

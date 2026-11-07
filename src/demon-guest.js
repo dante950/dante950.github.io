@@ -118,15 +118,24 @@ export function demonGrowthCells(current,restore,cells,width,height,canGrow){
  for(let i=0;i<queue.length;i++)for(const k of neighbors(queue[i]))if(candidates[k]&&!connected[k]){connected[k]=1;queue.push(k);}
  return connected;
 }
-// Extend the source palette into new material, keeping the original PNG unchanged.
+// Continue material colour, never extrude a scratch, painted detail or PNG shadow stripe.
 export function demonGrowthPalette(pixels,width,height,helmet=false){
  const filled=new Uint8Array(width*height),colors=new Uint8ClampedArray(pixels.length),queue=[];
  const occupied=Uint8Array.from({length:width*height},(_,n)=>pixels[n*4+3]>100?1:0);
+ const buckets=[new Map(),new Map()],seeds=[];
  for(let n=0;n<occupied.length;n++){const x=n%width,y=Math.floor(n/width),i=n*4;
-  const r=pixels[i],g=pixels[i+1],b=pixels[i+2],scratch=helmet&&r>85&&r<205&&g>85&&b-r<55&&Math.abs(r-g)<40;
-  if(!scratch&&occupied[n]&&Math.max(r,g,b)>35&&x>0&&x<width-1&&y>0&&y<height-1&&occupied[n-1]&&occupied[n+1]&&occupied[n-width]&&occupied[n+width]){filled[n]=1;colors.set(pixels.subarray(i,i+4),i);queue.push(n);}
+  const r=pixels[i],g=pixels[i+1],b=pixels[i+2],blue=b>110&&b>r*1.7&&b>g*1.5;
+  const scratch=r>85&&r<205&&g>85&&b-r<55&&Math.abs(r-g)<40;
+  if(!occupied[n]||x===0||x===width-1||y===0||y===height-1||!occupied[n-1]||!occupied[n+1]||!occupied[n-width]||!occupied[n+width])continue;
+  if(helmet?(scratch||!blue&&(Math.max(r,g,b)>85||Math.max(r,g,b)<36)):Math.max(r,g,b)<=35)continue;
+  const type=helmet&&blue?1:0;seeds.push([n,type]);
+  const key=[r,g,b].map(v=>v>>3).join(','),bucket=buckets[type].get(key)||[0,0,0,0];
+  bucket[0]+=r;bucket[1]+=g;bucket[2]+=b;bucket[3]++;buckets[type].set(key,bucket);
  }
+ const dominant=buckets.map((map,t)=>{const best=[...map.values()].sort((a,b)=>b[3]-a[3])[0];return best?best.slice(0,3).map(v=>Math.round(v/best[3])):t?[72,83,248]:[36,34,54];});
+ for(const [n,type]of seeds){filled[n]=1;colors.set(helmet?[...dominant[type],255]:pixels.subarray(n*4,n*4+4),n*4);queue.push(n);}
  for(let q=0;q<queue.length;q++){const n=queue[q],x=n%width,y=Math.floor(n/width);for(const [xx,yy]of [[x-1,y],[x+1,y],[x,y-1],[x,y+1]]){if(xx<0||xx>=width||yy<0||yy>=height)continue;const k=yy*width+xx;if(!filled[k]){filled[k]=1;colors.set(colors.subarray(n*4,n*4+4),k*4);queue.push(k);}}}
+ if(!queue.length)for(let n=0;n<occupied.length;n++)colors.set([...dominant[0],255],n*4);
  return colors;
 }
 export function demonGuest(phase=1){

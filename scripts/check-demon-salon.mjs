@@ -34,7 +34,44 @@ for(const [name,engine]of (process.argv.includes('--chromium')?[['chromium',chro
  try{
   let f=await begin();if(process.argv.includes('--phase2')&&!publicRun){await p.evaluate(()=>__demonFixture.phase(2));f=await waitPhase(2);}else{
    await enter(f,!process.argv.includes('--cinema'));await snap('helmet');await checkPortraitRendering(f,'demon-helmet');await f.locator('[data-tool="grow"]').click();await mask(f,'demonMasks.horn[n]&&!current[n]',4);await stage(f,'draw');await f.locator('[data-color="#242236"]').click();await mask(f,'demonMasks.scratch[n]',4);
-   assert.equal((await report(f,'helmet')).success,true);await stage(f,'cut');await f.locator('[data-tool="grow"]').click();await size(f,8);const edge=await f.evaluate(()=>{const y=65;let x=0;while(x<W&&!current[y*W+x])x++;return [x*2+1,y*2+1];});await stroke(f,edge,[edge[0]-10,edge[1]]);assert(await f.evaluate(()=>{prepareDemonGeometry();let edge=0,inside=0;for(let n=0;n<current.length;n++)if(current[n]===2){const c=demonMaterialColor(n);if(demonEdge[n]){if(c.join(',')!==outlineColor.join(','))return false;edge++;}else inside++;}let seams=0;for(let n=0;n<current.length;n++)if(current[n]&&demonOldEdge[n]&&demonJoined[n]&&!demonEdge[n]){if(demonMaterialColor(n).join(',')!==demonGrowthColors.subarray(n*4,n*4+3).join(','))return false;seams++;}return edge>0&&inside>0&&seams>0;}),'grown helmet has outline, local material colour and a joined seam');await snap('helmet-growth-joined');await stage(f,'draw');await f.locator('[data-color="#4853F8"]').click();
+   assert.equal((await report(f,'helmet')).success,true);await stage(f,'cut');await f.locator('[data-tool="grow"]').click();await size(f,8);const edge=await f.evaluate(()=>{const y=65;let x=0;while(x<W&&!current[y*W+x])x++;return [x*2+1,y*2+1];});await stroke(f,edge,[edge[0]-10,edge[1]]);assert(await f.evaluate(()=>{prepareDemonGeometry();let edge=0,inside=0;for(let n=0;n<current.length;n++)if(current[n]===2){const c=demonMaterialColor(n);if(demonEdge[n]){if(c.join(',')!==outlineColor.join(','))return false;edge++;}else inside++;}let seams=0;for(let n=0;n<current.length;n++)if(current[n]&&demonOldEdge[n]&&demonJoined[n]&&!demonEdge[n]){const expected=demonPhase===1&&demonMasks.horn[n]?demonTarget:demonGrowthColors;if(demonMaterialColor(n).join(',')!==expected.subarray(n*4,n*4+3).join(','))return false;seams++;}return edge>0&&inside>0&&seams>0;}),'grown helmet has outline, local material colour and a joined seam');await snap('helmet-growth-joined');
+   assert(await f.evaluate(()=>{
+    prepareDemonGeometry();let repaired=0;
+    for(let n=0;n<current.length;n++)if(current[n]&&demonMasks.horn[n]&&demonJoined[n]&&!demonEdge[n]){
+     const i=n*4,c=demonMaterialColor(n);if(c.join(',')!==demonTarget.subarray(i,i+3).join(','))return false;
+     if(original[n]&&Math.max(...sourcePixels.subarray(i,i+3))<80)repaired++;
+    }
+    return repaired>0;
+   }),'restored horn replaces the original black fracture inside the blue surface');
+   // Reproduce broad growth on both cheeks and around the horn, then return to the
+   // player's earlier state so this visual regression cannot satisfy the beauty exam.
+   const growthEvidence=await f.evaluate(()=>{
+    const before=current.slice(),beforePaint=paint.slice(),beforeSource=sourcePixels.slice();
+    const savedTouched={...touched},savedTool=activeTool,previousGesture=gesture;
+    const counts={};gesture={paint:paint.slice()};activeTool='grow';
+    for(const [name,a,b,r]of [['left',{x:47,y:140},{x:25,y:200},16],['right',{x:265,y:140},{x:290,y:200},16],['horn',{x:242,y:70},{x:260,y:30},10]]){
+     applyDemonStroke(strokeCells(W,H,[a,b],r),'grow');prepareDemonGeometry();
+     counts[name]=current.reduce((sum,v,n)=>sum+ +(v===2&&!before[n]),0);
+    }
+    beautyPixelRevision++;renderPortrait(false);
+    const colors=new Set();let outlined=0,filled=0,joined=0;
+    for(let n=0;n<current.length;n++)if(current[n]===2){
+     const c=demonMaterialColor(n);if(demonEdge[n])outlined++;else {colors.add(c.join(','));filled++;}
+    }
+    for(let n=0;n<current.length;n++)if(current[n]&&demonOldEdge[n]&&demonJoined[n]&&!demonEdge[n])joined++;
+    const png=portrait.toDataURL('image/png'),sourceUnchanged=sourcePixels.every((v,i)=>v===beforeSource[i]);
+    current.set(before);paint.set(beforePaint);Object.assign(touched,savedTouched);gesture=previousGesture;activeTool=savedTool;
+    demonGeometryDirty=true;demonScoreCache=null;beautyPixelRevision++;updateBeautyScore();renderPortrait(false);
+    return {counts,outlined,filled,joined,colors:[...colors],sourceUnchanged,png};
+   });
+   assert(growthEvidence.counts.left>0&&growthEvidence.counts.right>growthEvidence.counts.left&&growthEvidence.counts.horn>growthEvidence.counts.right);
+   assert(growthEvidence.outlined>0&&growthEvidence.filled>0&&growthEvidence.joined>0);
+   assert(growthEvidence.colors.length<=2,'new helmet material uses metal/horn colours without streaks');
+   assert(growthEvidence.sourceUnchanged,'growth never rewrites the PNG source, including on cancellation');
+   await fs.writeFile(path.join(out,name+'-helmet-growth-stress.png'),Buffer.from(growthEvidence.png.split(',')[1],'base64'));
+   console.log('HELMET_GROWTH_PREVIEW '+growthEvidence.png);
+   console.log('helmet-growth-stress',JSON.stringify({...growthEvidence,png:undefined}));
+await stage(f,'draw');await f.locator('[data-color="#4853F8"]').click();
    const eyeProtestBefore=await f.evaluate(()=>demonLastProtest);
    await mask(f,'demonMasks.eyeOpening[n]',1);
    assert((await f.evaluate(()=>demonBeautyStatus())).metrics.eyePaint>.15,'eye paint exceeds the retired limit');
