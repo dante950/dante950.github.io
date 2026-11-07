@@ -29,20 +29,37 @@ for(const [i,[x,y,size,color]] of flowerPositions.entries()){
 }
 const resultCaption=document.createElement('div');resultCaption.className='beautyResultCaption';resultCaption.setAttribute('role','status');beautyScreen.append(resultCaption);
 const resultContinue=document.createElement('button');resultContinue.className='beautyResultContinue';resultContinue.id='beautyResultContinue';resultContinue.hidden=true;resultContinue.onclick=advanceBeautyResult;beautyScreen.append(resultContinue);
+let demonResultCaptionFrame=0;
+function clearDemonResultCaption(){cancelAnimationFrame(demonResultCaptionFrame);demonResultCaptionFrame=0;}
+function showDemonResultCaption(text){
+ clearDemonResultCaption();
+ const rich=parseDialogueText(text),started=performance.now(),reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const spans=rich.glyphs.map(g=>{const span=document.createElement('span');span.textContent=g.char;span.style.display='inline-block';span.style.whiteSpace='pre';return span;});
+ resultCaption.replaceChildren(...spans);resultCaption.setAttribute('aria-label',rich.plain);
+ const draw=()=>{
+  if(!beautyResultActive){clearDemonResultCaption();return;}
+  const clock=reduced?rich.duration:performance.now()-started;
+  rich.glyphs.forEach((g,i)=>{const span=spans[i],v=dialogueGlyphStyle(g,i,clock);span.style.visibility=g.at<=clock?'visible':'hidden';span.style.color=v.color.toUpperCase()==='#F0EEE3'?'inherit':v.color;span.style.fontSize=v.fontSize/17+'em';span.style.opacity=reduced?1:v.opacity;span.style.transform=reduced?'none':'translate('+v.x+'px,'+v.y+'px) scale('+v.scale+')';});
+  if(!reduced)demonResultCaptionFrame=requestAnimationFrame(draw);
+ };draw();
+ // Leave enough time to read the last glyph before returning to story dialogue.
+ clearTimeout(resultEndTimer);resultEndTimer=setTimeout(advanceBeautyResult,reduced?1400:rich.duration+1400);
+}
 function revealBeautyResult(){
  if(resultRevealed)return;resultRevealed=true;expression=resultMood;talking=false;mouthFrame=false;
  beautyCustomer.dataset.expression=expression;beautyScreen.dataset.resultMood=resultMood;beautyScreen.classList.add('resultRevealed');
- resultCaption.textContent=B.resultLines?.[resultMood]|| (GUEST.skin?.layers?(resultMood==='satisfied'?'좋습니다. 이 얼굴로 반차 결재를 올리겠습니다.':resultMood==='angry'?'…이건 수정 요청을 드려야겠군요.':'네, 회의에는 갈 수 있겠습니다.'):bone?(resultMood==='satisfied'?'헤. 꽤 멋진데?':resultMood==='angry'?'…뼈아픈데.':'음. 이 정도면 됐어.'):(resultMood==='satisfied'?'정말… 마음에 들어요…!':resultMood==='angry'?'어… 이건 좀…':'음… 괜찮아요…'));
+ const caption=(isDemon?GUEST.resultLines:B.resultLines)?.[resultMood]|| (GUEST.skin?.layers?(resultMood==='satisfied'?'좋습니다. 이 얼굴로 반차 결재를 올리겠습니다.':resultMood==='angry'?'…이건 수정 요청을 드려야겠군요.':'네, 회의에는 갈 수 있겠습니다.'):bone?(resultMood==='satisfied'?'헤. 꽤 멋진데?':resultMood==='angry'?'…뼈아픈데.':'음. 이 정도면 됐어.'):(resultMood==='satisfied'?'정말… 마음에 들어요…!':resultMood==='angry'?'어… 이건 좀…':'음… 괜찮아요…'));
+ if(isDemon)showDemonResultCaption(caption);else resultCaption.textContent=caption;
  resultContinue.textContent='계속하기 →';renderPortrait(false);
 }
 function advanceBeautyResult(){
  if(!beautyResultActive)return;clearTimeout(resultRevealTimer);clearTimeout(resultEndTimer);revealBeautyResult();
- beautyResultActive=false;resultContinue.hidden=true;beautyScreen.classList.add('resultSettled');
+ clearTimeout(resultEndTimer);clearDemonResultCaption();for(const span of resultCaption.children)span.style.visibility='visible';beautyResultActive=false;resultContinue.hidden=true;beautyScreen.classList.add('resultSettled');
  send('beauty-result',{score:totalSatisfaction,mood:resultMood,portrait:captureBeautyCustomer(),headPortrait:captureBeautyHead(),details:isDemon?demonBeautyStatus():isReturningZombie?returningStatus():null});
 }
 function startBeautyResult(){
  if(isReturningZombie)clearReturningReactions();
- if(!ready||finishing||briefing||!beautyLessonDone)return;cancelGesture();updateBeautyScore();finishing=true;beautyPhase='result';beautyResultActive=true;
+ if(!ready||finishing||briefing||!beautyLessonDone)return;clearDemonResultCaption();cancelGesture();updateBeautyScore();finishing=true;beautyPhase='result';beautyResultActive=true;
  clearTimeout(actionMoodTimer);requestAnimationSerial++;
  resultMood=isDemon?(demonBeautyStatus().success?'satisfied':'angry'):isReturningZombie?returningStatus().mood:beautyResultMood(B,shapeProgress,totalSatisfaction);
  eyeReaction.hidden=true;clearTimeout(reactionTimer);clearInterval(reactionTick);reactionOpen=false;

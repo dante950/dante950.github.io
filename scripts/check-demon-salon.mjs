@@ -17,7 +17,15 @@ for(const [name,engine]of (process.argv.includes('--chromium')?[['chromium',chro
  async function size(f,n){await f.locator('#sculptSize').fill(String(n));await f.locator('#sculptSize').dispatchEvent('input');}
  async function mask(f,expression,brush=1,reverse=false){await size(f,brush);const runs=await f.evaluate(({expression,reverse})=>{const selected=new Function('n','return '+expression),runs=[];for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(!selected(y*W+x))continue;let end=x;while(end+1<W&&selected(y*W+end+1))end++;runs.push([[x*2+1,y*2+1],[end*2+1,y*2+1]]);x=end;}return reverse?runs.reverse():runs;},{expression,reverse});for(const [a,b]of runs)await stroke(f,a,b);console.log(name,expression.slice(0,40),runs.length);}
  const report=async(f,label)=>{const r=await f.evaluate(()=>demonBeautyStatus());console.log(label,JSON.stringify(r));return r;};
- async function complete(f){await stage(f,'attach');await f.locator('.beautyNext').click();await f.locator('#beautyResultContinue').click();await talks();}
+ async function complete(f){
+  await stage(f,'attach');await f.locator('.beautyNext').click();
+  await f.waitForFunction(()=>resultRevealed);
+  const caption=await f.locator('.beautyResultCaption').textContent();
+  assert.equal(caption,await f.evaluate(()=>parseDialogueText(GUEST.resultLines.satisfied).plain));
+  assert(!caption.includes('<wait=')&&!caption.includes('반차 결재'));
+  assert(await f.locator('.beautyResultCaption span').count()>0);
+  await f.locator('#beautyResultContinue').click();await talks();
+ }
  async function waitPhase(n){await p.waitForFunction(n=>fullflow.story?.demonPhase===n&&document.querySelector('#salon').style.opacity==='1',n);let f=await frame();await f.waitForFunction(()=>beautyActive);await talks();await f.waitForFunction(()=>!briefing);return f;}
  async function put(f,id,xy){await f.locator('[data-sticker="ST-RESOURCE-'+id+'"]').click();await stroke(f,xy);}
  try{
@@ -78,13 +86,26 @@ for(const [name,engine]of (process.argv.includes('--chromium')?[['chromium',chro
   await stroke(f,[166,26]);assert.equal((await report(f,'horn-pair-without-crown')).success,false,'horns also require a crown');
   await put(f,'T_blackCrown',[166,26]);assert.equal((await report(f,'horn-pair-and-black-crown')).success,true);
   await snap('royal-complete');await checkPortraitRendering(f,'demon-royal');assert.equal(await f.locator('.requestItem:not(.complete)').count(),0);
-  await complete(f);for(let n=0;n<12&&!await p.locator('#demonFinishHome').isVisible();n++){await p.waitForTimeout(300);await talks();}await p.waitForSelector('#demonFinishHome');assert.equal(await p.evaluate(()=>fullflow.story.demonPhase),2);assert.equal(await p.evaluate(()=>fullflow.story.successLocked),true);assert(!(await p.locator('#storyBattle').getAttribute('srcdoc')));await p.locator('#demonViewPhoto').click();await f.locator('#demonSelfie.captured').waitFor();await snap('handsome-selfie');
+  await p.evaluate(()=>{window.__endingEvents=[];window.addEventListener('yachacha-ending-ready',e=>window.__endingEvents.push(e.detail));});
+  await complete(f);
+  await f.waitForFunction(()=>!beautyActive&&!dialogueState.active&&salonLab.customerPhase==='closed');
+  await p.waitForFunction(()=>window.__endingEvents.length===1);
+  const ending=await p.evaluate(()=>window.__endingEvents[0]);
+  assert.equal(ending.ending,'beauty');assert.equal(ending.form,'handsome');assert.equal(ending.status,'ready');assert(ending.portrait.startsWith('data:image/'));
+  assert.equal(await f.locator('#demonStanding').getAttribute('src'),ending.portrait);
+  assert.equal(await p.evaluate(()=>fullflow.story.demonPhase),2);assert.equal(await p.evaluate(()=>fullflow.story.successLocked),true);
+  assert(!(await p.locator('#storyBattle').getAttribute('srcdoc')));
+  assert.equal(await f.locator('#demonSelfie,#demonPhotoExit').count(),0);assert.equal(await p.locator('#demonFinishHome,#demonViewPhoto').count(),0);
+  assert(await f.locator('#demonStanding').isVisible());assert(!(await f.locator('#beautyScreen').isVisible()));
+  await p.locator('#salon').focus();const before=await f.evaluate(()=>state.x);await p.keyboard.down('d');await p.waitForTimeout(180);await p.keyboard.up('d');assert((await f.evaluate(()=>state.x))>before,'movement resumes in the salon');
+  await f.evaluate(()=>send('demon-room-ready'));await p.waitForTimeout(100);assert.equal(await p.evaluate(()=>window.__endingEvents.length),1);
+  await snap('handsome-room-return');
   if(!publicRun){
    f=await begin();await enter(f);await f.locator('[data-tool="hammer"]').click();await size(f,18);outer:for(let y=177;y<253;y+=12)for(let x=105;x<230;x+=12){if(await p.locator('#talkLayer').isVisible())break outer;await stroke(f,[x,y]);const r=await f.evaluate(()=>demonBeautyStatus());if(r.metrics.exposure>=.15&&r.metrics.exposure<.35)assert.equal(r.sudden,false);if(r.sudden)break outer;}await talks();await p.waitForSelector('#demonRetryBeauty');assert((await f.evaluate(()=>demonBeautyStatus())).metrics.exposure>=.35);assert.equal(await p.evaluate(()=>fullflow.story.demonPhase),1);await snap('warning-35');await p.locator('#demonRetryBeauty').click();await waitPhase(1);
    for(const stars of [0,1,2]){f=await begin();await p.evaluate(n=>__demonFixture.stars(n),stars);f=await frame();await f.locator('#openShopBtn').click();await f.locator('.demonCinema button').click();await p.waitForSelector('#demonRestart');await p.locator('#demonRestart').click();await p.locator('#cancelStoryStart').click();}
    await p.evaluate(()=>__demonFixture.closing());const closing=await p.locator('#storyClosing').elementHandle().then(h=>h.contentFrame());await closing.waitForLoadState('domcontentloaded');await closing.evaluate(()=>parent.postMessage({source:'yachacha-closing',type:'next-day',token:new URLSearchParams(location.search).get('story'),stars:3},location.origin));await frame();await p.waitForFunction(()=>fullflow.story?.guest===10007);assert.equal(await p.evaluate(()=>fullflow.story.followers),6100);
   }
-  assert.deepEqual(errors,[]);console.log(name,'two beauty phases, horn pair AND either crown, free face painting, selfie and gates passed');
+  assert.deepEqual(errors,[]);console.log(name,'two beauty phases, horn pair AND either crown, free face painting, dialogue effects, room handoff and gates passed');
  }catch(e){await snap('failure-debug');console.error(errors);throw e;}finally{await browser.close();}
 }
 server.close();

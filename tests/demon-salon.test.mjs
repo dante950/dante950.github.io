@@ -95,3 +95,35 @@ test('eyebrow masks exclude pale skin and remain separate from lowered eyelid cr
  }
  const m=demonMakeup(hair,paint,masks,W,H);assert.equal(m.browLeft,1);assert.equal(m.browRight,1);assert.equal(m.eyelidLeft,false);assert.equal(m.eyelidRight,false);
 });
+
+test('demon authored dialogue retains valid effects in both configured beauty phases',async()=>{
+ const {parseDialogueText}=await import('../src/text-effects.js');
+ const g=project.guests.find(g=>g.id===10007),rows=project.combat.sheets.find(s=>s.name==='대사').rows;
+ for(const phase of [1,2])for(const stage of ['cut','draw','attach'])for(const [key,field]of [['RequestGroupID','demonRequest'],['DetailGroupID','demonRequestDetails']]){
+  const gid=g.demonPhaseDialogue[phase][stage][key],actual=rows.filter(l=>l.GroupID===gid).sort((a,b)=>a.Order-b.Order);
+  const expected=demonGuest(phase)[field][stage];
+  assert.deepEqual(actual.map(l=>l.Text),expected.map(l=>Array.isArray(l)?l[1]:l));
+  for(const row of actual){const parsed=parseDialogueText(row.Text);assert.deepEqual(parsed.warnings,[]);assert(parsed.duration>0);assert(row.Text.includes('<'));}
+ }
+ for(const row of rows.filter(l=>l.GroupID===g.bindings.arrival))assert.deepEqual(parseDialogueText(row.Text).warnings,[]);
+ for(const phase of [1,2])for(const line of Object.values(demonGuest(phase).resultLines))assert.deepEqual(parseDialogueText(line).warnings,[]);
+});
+
+test('phase-two success hands off exactly once after an authenticated room return',async()=>{
+ const {default:vm}=await import('node:vm');
+ const runtime=await fs.readFile(new URL('../src/demon-story.js',import.meta.url),'utf8');
+ const frame={},nodes={salon:{contentWindow:frame,focus(){}},storyHint:{}},messages=[],events=[],listeners=[];
+ let done,spoken;
+ const ctx={story:{guest:{demon:true,demonPhase:2},portrait:'edited-portrait',headPortrait:'edited-head'},salonToken:'current-token',
+  el:id=>nodes[id],copy:structuredClone,updateStoryHud(){},sendSalon:(type,data)=>messages.push({type,data}),
+  addEventListener:(type,fn)=>listeners.push(fn),window:{dispatchEvent:e=>events.push(e)},CustomEvent:class{constructor(type,options){this.type=type;this.detail=options.detail;}}};
+ vm.createContext(ctx);vm.runInContext(runtime,ctx);ctx.playDemonLines=(lines,callback)=>{spoken=lines;done=callback;};
+ ctx.finishDemonBeauty({success:true});
+ assert.equal(spoken.length,2);assert(!spoken.join('').match(/사진|셀카/));assert.equal(ctx.story.demonEnding.status,'returning');
+ assert.equal(events.length,0);done();assert.equal(messages.at(-1).type,'demon-finish');
+ const ready={source:frame,data:{source:'yachacha-salon',type:'demon-room-ready',token:'current-token'}};
+ listeners[0]({...ready,source:{}});listeners[0]({...ready,data:{...ready.data,token:'old-token'}});assert.equal(events.length,0);
+ listeners[0](ready);listeners[0](ready);ctx.finishDemonBeauty({success:true});
+ assert.equal(events.length,1);assert.equal(events[0].type,'yachacha-ending-ready');assert.equal(events[0].detail.form,'handsome');assert.equal(events[0].detail.portrait,'edited-portrait');assert.equal(ctx.story.outcome,'beauty');
+ assert.equal(messages.filter(x=>x.type==='demon-finish').length,1);
+});

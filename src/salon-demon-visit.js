@@ -4,8 +4,7 @@ if(GUEST.demon&&GUEST.mode!=='backdrop'){
  const companion=document.createElement('img');companion.id='demonCompanion';companion.src=GUEST.companion;companion.alt='마왕 부하';companion.style.cssText='position:absolute;left:64%;top:50%;width:112px;height:177px;object-fit:contain;image-rendering:pixelated;z-index:48;pointer-events:none;display:none';gameWorld.append(companion);
  const mimic=document.createElement('img');mimic.id='demonMimic';mimic.src='./media/demon/mimic.png';mimic.alt='팁박스';mimic.style.cssText='position:absolute;left:78%;top:48%;width:64px;height:72px;object-fit:contain;image-rendering:pixelated;z-index:19;pointer-events:none';gameWorld.append(mimic);
  const standing=document.createElement('img');standing.id='demonStanding';standing.src='./media/demon/king.png';standing.alt='마왕';standing.style.cssText='position:absolute;left:48%;bottom:20%;width:225px;height:345px;object-fit:contain;image-rendering:pixelated;z-index:49;pointer-events:none;display:none';gameWorld.append(standing);
- const style=document.createElement('style');style.textContent='.demonCinema{position:absolute;inset:0;z-index:600;background:#100d17;pointer-events:auto;opacity:1;transition:opacity .45s}.demonCinema canvas{width:100%;height:100%;image-rendering:pixelated}.demonCinema button{position:absolute;right:24px;top:22px;font:16px Galmuri9;background:#fff4e1;color:#503a30;border:3px solid #775844;border-radius:9px;padding:10px 15px}.demonFlash{position:absolute;inset:0;z-index:610;background:white;pointer-events:none;animation:demonFlash .6s both}@keyframes demonFlash{from{opacity:1}to{opacity:0}}.demonApplause{animation:demonClap .3s 6 alternate}@keyframes demonClap{to{transform:translateY(-5px) rotate(3deg)}}';document.head.append(style);
- const photoStyle=document.createElement('style');photoStyle.textContent='.demonSelfie{position:absolute;inset:0;z-index:605;overflow:hidden;background:#DADEBD;box-shadow:inset 0 0 0 14px #FFF3DD;animation:selfieEnter .55s ease-out both}.demonSelfieBackdrop{position:absolute;inset:0;opacity:.6;filter:brightness(1.2)}.demonSelfieHero.playerPortraitCrop{left:145px;top:50px;right:auto;bottom:auto;width:380px;height:420px;z-index:2;transform:rotate(-5deg);transform-origin:bottom center}.demonSelfieHero img{left:-729px;top:-390px;width:8070px;height:4671px}.demonSelfieKing{position:absolute;left:450px;top:35px;width:400px;height:437px;object-fit:contain;image-rendering:pixelated;z-index:2;transform:rotate(3deg);transform-origin:bottom center}.demonSelfieCaption{position:absolute;bottom:0;left:0;right:0;height:53px;display:grid;place-items:center;background:#FFF3DD;color:#6E4F37;font:18px Galmuri9;z-index:3}.demonSelfieFocus{position:absolute;top:23px;left:26px;font:12px Galmuri9;color:#FFF4DF;background:#493E3DBB;padding:8px 12px;border-radius:5px;z-index:3}.demonSelfie.captured{box-shadow:inset 0 0 0 18px #FFF3DD}.demonSelfie.captured .demonSelfieCaption{letter-spacing:2px}@keyframes selfieEnter{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}';document.head.append(photoStyle);
+ const style=document.createElement('style');style.textContent='.demonCinema{position:absolute;inset:0;z-index:600;background:#100d17;pointer-events:auto;opacity:1;transition:opacity .45s}.demonCinema canvas{width:100%;height:100%;image-rendering:pixelated}.demonCinema button{position:absolute;right:24px;top:22px;font:16px Galmuri9;background:#fff4e1;color:#503a30;border:3px solid #775844;border-radius:9px;padding:10px 15px}.demonApplause{animation:demonClap .3s 6 alternate}@keyframes demonClap{to{transform:translateY(-5px) rotate(3deg)}}';document.head.append(style);
  let cinema=null,canvas=null,cx=null,sequence=[],index=0,at=0,frame=0,visitActive=false,waiting=false,last=0,elapsed=0;
  const art={},loadArt=Promise.all([['king','./media/demon/king.png'],['minion',GUEST.companion],['mimic','./media/demon/mimic.png'],['hero',SPRITES.front],['outside','./media/demon/visit-exterior-reference.png']].map(async([key,src])=>{const i=new Image();i.src=src;await i.decode();art[key]=i;}));
  const sprite=(name,x,feet,h,flip=false)=>{const im=art[name];if(!im)return;const w=h*im.width/im.height;cx.save();cx.translate(x,feet);if(flip)cx.scale(-1,1);cx.drawImage(im,-w/2,-h,w,h);cx.restore();};
@@ -50,7 +49,7 @@ if(GUEST.demon&&GUEST.mode!=='backdrop'){
   const skip=document.createElement('button');skip.textContent='건너뛰기';skip.onclick=()=>endVisit();cinema.append(skip);gameWorld.append(cinema);send('cutscene-start');
   try{await loadArt;}catch(error){console.error(error);cinema.remove();customerState.phase='closed';dialogueState.active=false;openShopBtn.disabled=false;return;}
   const gate=demonGate(stars);
-  sequence=[{scene:'black',ms:450},{scene:'outside',ms:1000},{scene:'walk',ms:2300},{scene:'outside',ms:350,line:['마왕 부하','폐하, 이곳입니다.']},{scene:'sign',ms:1400,line:gate.line},...(gate.admitted?[{scene:'outside',ms:400,line:'들어가 보도록 하지.'},{scene:'enter',ms:2400},{scene:'black',ms:550},{scene:'door',ms:2100,sound:'door'},{scene:'reaction',ms:1300},{scene:'foot',ms:1200,sound:'foot0'},{scene:'armor',ms:3300},{scene:'black',ms:500}]:[{scene:'pass',ms:3000},{scene:'black',ms:650}])];
+  sequence=[{scene:'black',ms:450},{scene:'outside',ms:1000},{scene:'walk',ms:2300},{scene:'outside',ms:350,line:['마왕 부하','폐하,<wait=0.25> 이곳입니다.']},{scene:'sign',ms:1400,line:gate.line},...(gate.admitted?[{scene:'outside',ms:400,line:'<wait=0.3>들어가 보도록 하지.'},{scene:'enter',ms:2400},{scene:'black',ms:550},{scene:'door',ms:2100,sound:'door'},{scene:'reaction',ms:1300},{scene:'foot',ms:1200,sound:'foot0'},{scene:'armor',ms:3300},{scene:'black',ms:500}]:[{scene:'pass',ms:3000},{scene:'black',ms:650}])];
   visitActive=true;index=0;last=performance.now();visitBeat();frame=requestAnimationFrame(tick);
  }
  if(phase===1){openShopBtn.textContent='영업 시작 · 마왕 맞이';openShopBtn.onclick=startDemonBusiness;startBusiness=startDemonBusiness;}
@@ -65,20 +64,14 @@ if(GUEST.demon&&GUEST.mode!=='backdrop'){
   }
   if(e.data.type==='demon-applause'){companion.classList.add('demonApplause');player.classList.add('demonApplause');send('sound',{key:'beauty-pleased'});}
   if(e.data.type==='demon-finish'){
-   beautyActive=false;dialogueState.active=true;beautyScreen.style.display='none';seatedCustomer.style.display='none';standing.src=e.data.portrait;standing.style.cssText='position:absolute;left:48%;bottom:21%;width:180px;height:197px;object-fit:contain;image-rendering:pixelated;z-index:49;pointer-events:none';companion.style.display='block';state.x=380;state.y=420;state.direction='right';render(false);
+   if(customerState.phase==='closed'&&!beautyActive)return;
+   beautyActive=false;beautyResultActive=false;dialogueState.active=false;customerState.phase='closed';state.keys.clear();
+   clearTimeout(resultRevealTimer);clearTimeout(resultEndTimer);clearDemonResultCaption();clearReturningReactions();
+   beautyScreen.style.display='none';seatedCustomer.style.display='none';interact.style.display='none';interactPrompt.style.display='none';openShopBtn.style.display='none';
+   standing.src=e.data.portrait||GUEST.skin.portrait;standing.style.cssText='position:absolute;left:48%;bottom:21%;width:180px;height:197px;object-fit:contain;image-rendering:pixelated;z-index:49;pointer-events:none';
+   companion.style.display='block';companion.classList.remove('demonApplause');player.classList.remove('demonApplause');
+   state.x=380;state.y=420;state.direction='right';render(false);updateInteraction();send('demon-room-ready');
   }
-  if(e.data.type==='demon-photo'){
-   state.x=430;state.y=435;state.direction='front';render(false);standing.style.left='50%';
-   const photo=document.createElement('div');photo.id='demonSelfie';photo.className='demonSelfie';photo.setAttribute('role','img');photo.setAttribute('aria-label','완성한 미형 마왕과 주인공의 기념 셀카');
-   const backdrop=document.createElement('div');backdrop.className='demonSelfieBackdrop';for(const child of gameWorld.children)if(child.matches('.wall,.sideWall,.ceiling,.floor,.windowScene,.prop:not(.chair):not(.foreground)'))backdrop.append(child.cloneNode(true));photo.append(backdrop);
-   const hero=document.querySelector('.playerPortraitCrop').cloneNode(true);hero.classList.add('demonSelfieHero');photo.append(hero);
-   const king=document.createElement('img');king.className='demonSelfieKing';king.src=standing.src;king.alt='플레이어가 완성한 미형 마왕';photo.append(king);
-   const caption=document.createElement('div');caption.className='demonSelfieCaption';caption.textContent='YACHACHA · 왕실 지정 미용실';photo.append(caption);
-   const focus=document.createElement('span');focus.className='demonSelfieFocus';focus.textContent='찰칵 준비';photo.append(focus);gameWorld.append(photo);
-  }
-  if(e.data.type==='demon-view-photo'){
-   let exit=document.getElementById('demonPhotoExit');if(!exit){exit=document.createElement('button');exit.id='demonPhotoExit';exit.textContent='메인으로';exit.style.cssText='position:absolute;right:34px;bottom:23px;z-index:615;padding:10px 16px;border:2px solid #825D43;background:#FFF2DD;color:#50382C;border-radius:8px;font:14px Galmuri9';exit.onclick=()=>send('home');gameWorld.append(exit);}
-  }
-  if(e.data.type==='demon-shutter'){document.getElementById('demonSelfie')?.classList.add('captured');const focus=document.querySelector('.demonSelfieFocus');if(focus)focus.textContent='미용 성공 · 왕과 함께';const flash=document.createElement('div');flash.className='demonFlash';gameWorld.append(flash);setTimeout(()=>flash.remove(),650);}
+
  });
 }
