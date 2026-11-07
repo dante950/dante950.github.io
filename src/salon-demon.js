@@ -139,7 +139,7 @@ function drawDemonGuides(target){
    const remove=demonMasks.earL[n]||demonMasks.earR[n]||demonMasks.eyes[n]||demonMasks.longHair[n]||demonMasks.tip[n]&&!demonMasks.tipKeep[n];
    const keep=demonMasks.tipKeep[n];
    color=remove&&current[n]?'#5DCD8588':keep?'#FFD87366':null;
-  }else if(beautyPhase==='draw')color=current[n]&&demonInside((n%W+.5)*PIX,(Math.floor(n/W)+.5)*PIX,DEMON_DESIGN.silverZone)?'#CFE8FF88':(demonMasks.brow[n]||demonMasks.browRight[n])?'#FFD873DD':(demonMasks.eyelidLeft[n]||demonMasks.eyelidRight[n])?'#83CDEACC':demonMasks.lips[n]?'#EF929277':current[n]?'#5DCD8544':null;
+  }else if(beautyPhase==='draw')color=current[n]&&demonInside((n%W+.5)*PIX,(Math.floor(n/W)+.5)*PIX,DEMON_DESIGN.forelock)?'#CFE8FF88':(demonMasks.brow[n]||demonMasks.browRight[n])?'#FFD873DD':(demonMasks.eyelidLeft[n]||demonMasks.eyelidRight[n])?'#83CDEACC':demonMasks.lips[n]?'#EF929277':current[n]?'#5DCD8544':null;
   if(color){target.fillStyle=color;target.fillRect(n%W,Math.floor(n/W),1,1);}
  }
  if(beautyPhase==='attach'){target.lineWidth=1;target.strokeStyle='#D7A331';target.setLineDash([3,2]);const boxes=demonPhase===2?[DEMON_DESIGN.crown,DEMON_DESIGN.hornLeft,DEMON_DESIGN.hornRight]:[DEMON_DESIGN.helmetStickerArea];for(const box of boxes)target.strokeRect(box.x/2,box.y/2,box.w/2,box.h/2);}
