@@ -66,7 +66,7 @@ async function finishDemonBattle(outcome,stats){
  }
  story.demonBattleEnding=true;story.outcome='victory';story.demonSuccessLocked=true;document.body.classList.add('beauty-ending');
  story.guest.endingPortrait='./media/demon-battle/goblin-portrait.png';
- await endingTalk([['몬스터','……내가 졌다.'],['몬스터','결국 이 모습까지 보이고 말았군.'],['플레이어','그 모습으로 저랑 끝까지 싸우신 거잖아요.'],['몬스터','……우습지도 않으냐?'],['플레이어','방금 죽을 뻔했는데, 웃음이 나오겠어요?']]);if(story!==active)return;
+ await endingTalk('battleScene0');if(story!==active)return;
  gameAudio.effect('clash');
  await new Promise(resolve=>{const dispose=showBattleResult({outcome:'victory',monsterID:10007,onContinue:resolve});setTimeout(()=>{dispose();resolve();},1500);});if(story!==active)return;
  const fade=document.createElement('div');fade.id='endingRoomFade';fade.style.cssText='position:fixed;inset:0;background:#000;z-index:100;pointer-events:none;opacity:0;transition:opacity .5s';document.body.append(fade);requestAnimationFrame(()=>fade.style.opacity='1');
@@ -78,16 +78,17 @@ async function finishDemonBattle(outcome,stats){
 
 // Explicit scene entry for the user's "마왕부터" play route; no visit/reward is recorded.
 function startDemonBranch(branch){
- if(page!=='story'||!story?.demonQuickStart||!['beauty1','beauty2','beauty','victory'].includes(branch))return;
+ if(page!=='story'||!story?.demonQuickStart||!['beauty1','beauty2','beauty','victory','gate0','gate1','gate2','gate3'].includes(branch))return;
  const project=copy(story.project);
  stopChildren();closeModal();talk=null;talkDone=null;beautyRequest=null;pendingSalon=null;
  el('talkLayer').hidden=true;el('beautyChoices').hidden=true;el('salon').style.opacity='1';document.body.classList.remove('inBattle');
- story=createStoryState(project,DEMON_GUEST_ID);story.stars=3;story.demonQuickStart=true;story.demonStartBranch=branch;story.demonPhase=branch==='beauty1'?1:2;
+ story=createStoryState(project,DEMON_GUEST_ID);story.stars=branch.startsWith('gate')?Number(branch.slice(-1)):3;story.demonQuickStart=true;story.demonStartBranch=branch;story.demonPhase=branch==='beauty1'||branch.startsWith('gate')?1:2;
  story.guest=installDemonDialogue(story.project,demonGuest(story.demonPhase));story.outcome=null;story.demonSuccessLocked=false;story.demonBattleEnding=false;
  showPage('story');el('phoneButton').hidden=true;updateStoryHud(branch==='victory'?'야차 승리 준비':branch==='beauty'?'미용 성공 준비':'미용');
  const active=story;gameAudio.unlock().then(()=>{if(story===active)gameAudio.music('salon');});
  loadSalon(story.guest,'story',()=>{
   if(story!==active)return;
+  if(branch.startsWith('gate')){sendSalon('demon-visit-start');el('salon').focus();return;}
   if(branch==='victory'){story.demonVictoryPreview=true;startBattle();story.demonVictoryPreview=false;return;}
   if(branch==='beauty'){
    story.portrait=demonSkins[2].portrait;story.headPortrait=demonSkins[2].portrait;story.outcome='beauty';story.demonSuccessLocked=true;

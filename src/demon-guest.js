@@ -149,6 +149,8 @@ export function demonGuest(phase=1){
 }
 // Existing workbook sheets keep the prose; phase selection stays in project JSON.
 export const DEMON_EVENT_DIALOGUES=[
+ ...[["returnFarewell","귀환 컷씬 · 작별",[["플레이어","그럼, 안녕히…"]],0],["returnAwake","귀환 컷씬 · 인간세계",[["플레이어","……돌아온 건가."]],0],["returnMemory","귀환 컷씬 · 회상",[["플레이어","그곳에서의 생활도…\n나름 나쁘지 않았지."]],0]],
+ ...[["gateDeparture","외관 · 0~2스타 방문 무산 대화",[["마왕 부하","그렇긴 합니다만…"],["몬스터","가자.<wait=0.35> 시간을 낭비했군."],["마왕 부하","……예, 마왕님."]],0],["gateAfter","외관 · 방문 무산 후 나레이션",[["나레이션","끝내, 마지막 손님은 문을 열지 않았다."]],0],["endingScene0","미용 성공 · 귀환 허락",[["몬스터","그대에게 큰 상을 내리겠노라."],["마왕 부하","그럼 약속대로… 원래 세계로 돌려보내 드리겠습니다."]],0],["endingScene1","미용 성공 · 커피 유령 합류",[["커피 유령","잠깐! 가기 전에 사진 한 장 찍어요!"]],0],["endingScene2","미용 성공 · 단체 사진",[["마왕 부하","모두, 이쪽을 봐 주십시오."]],0],["endingScene3","야차 승리 · 후계 제안",[["마왕 부하","야차에서 이기셨으니, 이제 새로운 마왕이 되실 수 있습니다."],["플레이어","제가요?! 저는 그냥 원래 세계로 돌아가고 싶은데요!"],["플레이어","마왕은…… 이분이 계속하면 안 돼요?"],["몬스터","이런 모습을 알고도 나를 따르겠다는 자가 있겠느냐."]],0],["endingScene4","야차 승리 · 충성 및 사과",[["마왕 부하","제 앞에 계신 분은 여전히 마왕님이십니다."],["몬스터","……그런가."],["몬스터","그대를 이곳으로 불러 놓고, 내 뜻대로 되지 않는다고 검까지 들었군."],["몬스터","……미안하네."],["플레이어","그럼 이제 정말 돌아갈 수 있는 거죠?"],["몬스터","그래. 돌아갈 길을 열어라. 이 사람을 무사히 원래 세계까지 모셔 드리도록."],["마왕 부하","네, 마왕님. 바로 준비하겠습니다."]],0],["endingScene5","야차 승리 · 커피 유령 합류",[["커피 유령","벌써 가시는 거예요……?"],["커피 유령","그럼 가기 전에, 다 같이 사진 찍어요!"],["플레이어","좋아요! 이리 와요."],["플레이어","마왕님도 같이 찍어요!"]],0],["endingScene6","야차 승리 · 사진 자리",[["커피 유령","마왕님, 조금만 더 가까이요!"],["몬스터","……이 정도면 되겠느냐?"]],0],["endingScene7","야차 승리 · 촬영",[["플레이어","좋아요. 찍습니다!"]],0],["endingScene8","야차 승리 · 귀환 준비",[["마왕 부하","준비됐습니다. 이제 원래 세계로 돌아가실 수 있어요."],["마왕 부하","갑자기 소환해서 어려운 부탁까지 드렸는데, 끝까지 도와주셔서 감사합니다."]],0],["endingScene9","야차 승리 · 작별",[["플레이어","다들 잘 지내요!"]],0],["battleScene0","야차 승리 · 정체 공개",[["몬스터","……내가 졌다."],["몬스터","결국 이 모습까지 보이고 말았군."],["플레이어","그 모습으로 저랑 끝까지 싸우신 거잖아요."],["몬스터","……우습지도 않으냐?"],["플레이어","방금 죽을 뻔했는데, 웃음이 나오겠어요?"]],0]],
  ...DEMON_LINES.gates.map((text,stars)=>['gate'+stars,'외관 · '+stars+'스타 확인',[text],0]),
  ['enter','외관 · 3스타 확인 후 입장',[DEMON_LINES.enter],0],
  ['warning','미용 중 · 얼굴 가림 첫 훼손',[DEMON_LINES.warning],1],
@@ -188,7 +190,7 @@ export function ensureDemonDialogueCatalogue(project){
   if(groups.some(r=>r.GroupID===g.bindings[key]))continue;
   const id=Math.max(80000,...groups.map(r=>r.GroupID))+1;g.bindings[key]=id;
   groups.push({GroupID:id,Name:'마왕 · '+label,PlaybackMode:'순서대로',PauseCombat:!phase,AdvanceMode:phase?'자동':'입력',CPS:30,HoldMs:phase?5500:1400,GapMs:100,Notes:phase?'미용 중 반응 · 발생 조건은 시뮬레이터':'미용실 외관 · 별 확인 분기',ActorEffect:'없음',FinishEffect:'없음'});
-  for(const [i,text]of texts.entries())lines.push({DialogueID:Math.max(900000,...lines.map(r=>r.DialogueID))+1,GroupID:id,Order:i+1,Speaker:'몬스터',Text:text,Notes:'마왕 · '+label});
+  for(const [i,text]of texts.entries())lines.push({DialogueID:Math.max(900000,...lines.map(r=>r.DialogueID))+1,GroupID:id,Order:i+1,Speaker:Array.isArray(text)?text[0]:'몬스터',Text:Array.isArray(text)?text[1]:text,Notes:'마왕 · '+label});
  }
  return project;
 }

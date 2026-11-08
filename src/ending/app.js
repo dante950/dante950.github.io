@@ -1,3 +1,4 @@
+import {parseDialogueText,dialogueGlyphStyle} from '../text-effects.js';
 import {ENDING_CREDITS,ENDING_POST,ENDING_COMMENTS,BATTLE_ENDING_NEWS,BATTLE_ENDING_COMMENTS,endingReviews,endingSchedule,battleNewsSchedule} from './model.js';
 import {runFromStory} from '../closing/model.js';
 import {createSocialPhone,photoMarkup} from '../closing/social-ui.js';
@@ -23,8 +24,8 @@ async function endingCoffeeSample(){
 }
 async function initEnding(data){
  if(endingData)return;endingData=data;endingMuted=data.muted===true;E('endingMute').textContent=endingMuted?'소리 꺼짐':'소리 켜짐 ♪';
- const sky=E('returnSky');await sky.decode();endingPosts=endingReviews(data.records);for(const post of endingPosts)if(post.samplePortrait==='coffee')post.photo=await endingCoffeeSample();endingPlan=endingSchedule(endingPosts.length);endingPhotoIndex=endingPosts.length;
- const run=runFromStory(data.records,4,{settings:data.settings});endingPhone=createSocialPhone(E('endingPhoneHost'),{getRun:()=>run,onManagement(){},onExit(){}});
+ const sky=E('returnSky');await sky.decode();endingPosts=endingReviews(data.records,data.social);for(const post of endingPosts)if(post.samplePortrait==='coffee')post.photo=await endingCoffeeSample();endingPlan=endingSchedule(endingPosts.length);endingPhotoIndex=endingPosts.length;
+ const run={...runFromStory(data.records,4,{settings:data.settings}),social:data.social};endingPhone=createSocialPhone(E('endingPhoneHost'),{getRun:()=>run,onManagement(){},onExit(){}});
  endingPhone.restore(data.socialChoices||{});endingPhone.show(true);
  E('memoryTrack').innerHTML=endingPosts.map(p=>endingCard(p)).join('')+(data.ending==='battle'?BATTLE_ENDING_NEWS.map(p=>endingCard(p,true)).join(''):'')+endingCard({id:'ending-group',user:'money_slave',place:'몬스터 헤어살롱 · 마지막 영업',text:data.ending==='battle'?'마지막 영업, 그리고 작별의 기념사진.':ENDING_POST},true);
  await Promise.all([...document.images].map(im=>im.decode().catch(()=>{})));
@@ -47,7 +48,7 @@ addEventListener('visibilitychange',()=>endingMessage('pause',{paused:endingPaus
 function renderEnding(){
  const t=endingTime,sky=E('returnSky'),shade=E('nightShade'),mono=E('monologue'),fade=E('endingFade'),star=E('fallingStar');
  E('endingStage').dataset.phase=t<4000?'farewell':t<21000?'sky':t<25500?'phone':t<25500+endingPlan.total?'memories':'group';
- mono.textContent=t<2600?'그럼, 안녕히…':t>=8500&&t<13500?'……돌아온 건가.':t>=14000&&t<20200?'그곳에서의 생활도…\n나름 나쁘지 않았지.':'';
+ const monoKey=t<2600?'returnFarewell':t>=8500&&t<13500?'returnAwake':t>=14000&&t<20200?'returnMemory':null;const monoText=monoKey?(endingData.monologues?.[monoKey]??{"returnFarewell":"그럼, 안녕히…","returnAwake":"……돌아온 건가.","returnMemory":"그곳에서의 생활도…\n나름 나쁘지 않았지."}[monoKey]):'';if(mono.dataset.text!==monoText){mono.dataset.text=monoText;mono.replaceChildren(...parseDialogueText(monoText).glyphs.map(g=>{const span=document.createElement('span');span.textContent=g.char;span.style.color=g.style.color;span.style.fontSize=(g.style.size/17)+'em';return span;}));}
  mono.style.opacity=t<2600?Math.min(clamp(t/500),clamp((2600-t)/500)):t>=8500&&t<13500?Math.min(clamp((t-8500)/700),clamp((13500-t)/700)):t>=14000&&t<20200?Math.min(clamp((t-14000)/700),clamp((20200-t)/700)):0;
  star.style.opacity=t>=2600&&t<4200?Math.sin(clamp((t-2600)/1600)*Math.PI):0;star.style.transform='translateY('+clamp((t-2600)/1600)*370+'px) scale('+(1-clamp((t-2600)/1600)*.9)+')';
  sky.style.opacity=clamp((t-4000)/1400);sky.style.transform='translateY('+(-1125*smooth((t-5500)/14000))+'px)';

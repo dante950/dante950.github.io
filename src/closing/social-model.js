@@ -1,3 +1,4 @@
+import {socialReviewPost} from '../social-catalog.js';
 // Authored review copy: Notion 403648bf6778803c987fe9ac906a6fe3 (2026-10-24).
 export const REVIEW_COPY = {
  zombie:{user:'Dubuk_zom',place:'언데드 생명 보험 앞',beauty:'으어... 취직했다... 앞머리도 방구석 생활도 해방됨...... 몇달만에 사람 얼굴 제대로 보는 느낌ㅠㅠ #몬스터헤어살롱 덕분에 붙은 것 같아요 감사합니다. 모두 기 받아가세요! #취업성공 #취준생 #화이팅',battle:'으어… 여기 야차 맛집이였네요… 죽은 뒤로 방구석에만 있어서 굳은 몸은 확 풀렸습니다…\n이 기세로 면접까지 가봅니다…!\n#몬스터헤어살롱 #취준생 #셀카'},
@@ -21,7 +22,8 @@ export function reviewVariant(visit){
  if(!failed)return 'beauty';
  return ['victory','forcedWin','offerWin'].includes(visit.outcome)?'battle':null;
 }
-export function reviewPost(visit){
+export function reviewPost(visit,catalog){
+ if(catalog)return socialReviewPost(visit,catalog)||{id:visit.id,user:visit.name||visit.guestId,place:'오늘의 영업',text:'이 결과에 표시할 후기가 없습니다.',title:'후기 게시 없음',comments:[],choices:[]};
  if(visit.guestId==='returningZombie')return {id:visit.id,user:visit.returnBranch==='lottery'?'Lucky_Zom':'Rookie_Zom',place:'몬스터 헤어살롱 · 재방문',text:'재등장 좀비의 후기 문구와 성공·실패별 게시 여부는 검토 중입니다.',photo:visit.portrait||null,wholePortrait:true,guest:'returningZombie',kind:null,title:'재방문 기록',symbol:'✦',comments:[],draft:true};
  if(visit.guestId==='coffee')return {id:visit.id,user:visit.review?.user||'coffee_ghost',place:visit.review?.place||'몬스터 헤어살롱 · 첫 손님',text:visit.review?.text||'첫 변신을 마쳤어요! 부하님을 조금 닮았나요? #몬스터헤어살롱',photo:visit.portrait||null,wholePortrait:true,guest:'coffee',kind:'beauty',title:'첫 손님의 첫 변신',symbol:'☕',comments:[],draft:true};
  const kind=reviewVariant(visit),copy=REVIEW_COPY[visit.guestId];
@@ -44,7 +46,7 @@ WORLD_POSTS.push(
 
 export function chooseComment(state,post,choiceIndex,nickname='yacha_vely'){
  if(state[post.id]||!post.choices?.[choiceIndex])return state;
- const c=post.choices[choiceIndex];return {...state,[post.id]:{choiceIndex,comments:[{user:nickname,text:c.comment},{user:post.user,text:c.reply,reply:true}]}};
+ const c=post.choices[choiceIndex];return {...state,[post.id]:{choiceIndex,comments:[{user:nickname,text:c.comment},{user:c.replyUser||post.user,text:c.reply,reply:true}]}};
 }
 export function rollWeather(random=Math.random){return {day:22+Math.min(6,Math.max(0,Math.floor(random()*7))),night:13+Math.min(5,Math.max(0,Math.floor(random()*6)))}};
 export function closingExitAction(reviewed){return reviewed?'calendar':'management';}

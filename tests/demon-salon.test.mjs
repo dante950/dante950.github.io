@@ -243,7 +243,7 @@ test('star gate and beauty reaction lines live in editable workbook groups witho
  const g=p.guests.find(g=>g.id===10007),lines=p.combat.sheets.find(s=>s.name==='대사').rows;
  for(const [key,,texts]of DEMON_EVENT_DIALOGUES){
   const group=lines.filter(l=>l.GroupID===g.bindings[key]).sort((a,b)=>a.Order-b.Order);
-  assert.deepEqual(group.map(l=>l.Text),texts);group[0].Text='수정한 '+key+'<wait=0.2><color=#285780>강조</color>';
+  assert.deepEqual(group.map(l=>l.Text),texts.map(t=>Array.isArray(t)?t[1]:t));group[0].Text='수정한 '+key+'<wait=0.2><color=#285780>강조</color>';
  }
  const saved=JSON.parse(JSON.stringify(p));ensureDemonDialogueCatalogue(saved);assert.deepEqual(saved,p);
  assert.deepEqual(projectProblems(saved),[]);
