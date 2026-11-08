@@ -22,7 +22,7 @@ function renderSocial(){
  el('socialDuplicate').onclick=()=>{const p=copy(post);p.id='post-'+crypto.randomUUID();p.title+=' · 복사';p.order++;catalog.posts.push(p);socialEditID=p.id;markDirty();renderSocial();};
  el('socialDelete').onclick=()=>{if(!confirm('이 게시글을 작업본에서 삭제할까요?'))return;catalog.posts=catalog.posts.filter(p=>p!==post);socialEditID=null;markDirty();renderSocial();};
  el('socialEditor').querySelectorAll('[data-social-field]').forEach(node=>{const key=node.dataset.socialField;node.onchange=node.oninput=()=>{
-  if(key==='assetPreset'){if(node.value){post.image=node.value;post.imageMode='composite';markDirty();renderSocial();}return;}
+  if(key==='assetPreset'){if(node.value){post.image=node.value;post.imageMode=post.kind==='guest'?'composite':'image';markDirty();renderSocial();}return;}
   post[key]=['day','order','guestId'].includes(key)?Number(node.value):node.value;markDirty();
   if(key==='day'){socialEditDay=post.day;renderSocial();}
  };});

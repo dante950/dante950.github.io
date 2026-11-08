@@ -10,7 +10,7 @@ const browser=await chromium.launch(),p=await browser.newPage({viewport:{width:1
 const out='docs/social-workshop-2026-11-08';await fs.mkdir(out,{recursive:true});
 try{
  await p.goto('http://127.0.0.1:'+server.address().port+'/');await p.locator('#siteLoading').waitFor({state:'detached'});
- await p.locator('#developer').click();await p.locator('#devScreen [data-editor="social"]').click();
+ await p.locator('#developer').click();if(await p.locator('#updateOK').isVisible())await p.locator('#updateOK').click();await p.locator('#devScreen [data-editor="social"]').click();
  await p.locator('#socialDay').selectOption('1');await p.locator('[data-social-post="world-day1-1"]').click();
  await p.locator('[data-social-field="user"]').fill('edited_author');await p.locator('[data-social-field="text"]').fill('수정한 게시글 본문 <script>실행되지 않는 글자</script>');
  await p.locator('[data-social-row="choices"][data-index="0"][data-key="label"]').fill('편집한 선택지');

@@ -769,7 +769,7 @@ export function socialMatches(post,visit){
  return post.outcome==='any'||(post.outcome==='beauty'&&!failed)||(post.outcome==='failure'&&failed)||(post.outcome==='battle'&&failed&&['victory','forcedWin','offerWin'].includes(visit.outcome));
 }
 export function socialPost(template,visit=null){
- const composite=template.imageMode==='composite',result=template.imageMode==='result';
+ const composite=template.kind==='guest'&&template.imageMode==='composite',result=template.imageMode==='result';
  return {...template,day:visit?Math.max(template.day,visit.day):template.day,id:template.id+(visit?'@'+visit.id:''),guest:visit?.guestId,kind:visit?(template.outcome==='beauty'?'beauty':'battle'):null,
   user:template.user||'작성자 미지정',photo:template.imageMode==='none'?null:result?socialImageURL(visit?.portrait):socialImageURL(template.image),
   wholePortrait:!composite,portrait:composite?socialImageURL(visit?.headPortrait):null,avatar:socialImageURL(template.avatar),draft:false};
