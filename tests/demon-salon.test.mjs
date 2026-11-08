@@ -78,13 +78,20 @@ test('both painted eyebrows and both thin upper-eye creases are required',()=>{
  fill('brow');let m=demonMakeup(hair,paint,masks,W,H);assert.equal(m.browLeft,1);assert.equal(m.browRight,0);assert.equal(m.eyelidLeft,false);
  fill('browRight');fill('eyelidLeft');fill('eyelidRight');m=demonMakeup(hair,paint,masks,W,H);assert.equal(m.browRight,1);assert(m.eyelidLeft);assert(m.eyelidRight);
 });
-test('both published phases match their current requests and details',()=>{
+test('both runtime phases use authored request groups instead of fallback prose',()=>{
  const g=project.guests.find(g=>g.id===10007),lines=project.combat.sheets.find(s=>s.name==='대사').rows;
- for(const phase of [1,2]){const guest=demonGuest(phase);
- for(const stage of ['cut','draw','attach'])for(const [key,list]of [['RequestGroupID',guest.demonRequest[stage]],['DetailGroupID',guest.demonRequestDetails[stage]]]){
-  const actual=lines.filter(r=>r.GroupID===g.demonPhaseDialogue[phase][stage][key]).sort((a,b)=>a.Order-b.Order).map(r=>r.Text);
-  assert.deepEqual(actual,list.map(v=>Array.isArray(v)?v[1]:v));
- }}
+ for(const phase of [1,2]){
+  const runtime=structuredClone(project);installDemonDialogue(runtime,demonGuest(phase));
+  const runtimeLines=runtime.combat.sheets.find(s=>s.name==='대사').rows;
+  const links=runtime.combat.sheets.find(s=>s.name==='미용 대사 연결').rows;
+  for(const stage of ['cut','draw','attach'])for(const key of ['RequestGroupID','DetailGroupID']){
+   const expectedID=g.demonPhaseDialogue[phase][stage][key],actualID=links.find(r=>r.MonsterID===10007&&r.Stage===stage)[key];
+   assert.equal(actualID,expectedID);
+   const sorted=(rows,id)=>rows.filter(r=>r.GroupID===id).sort((a,b)=>a.Order-b.Order);
+   assert(sorted(lines,expectedID).length>0);
+   assert.deepEqual(sorted(runtimeLines,actualID),sorted(lines,expectedID));
+  }
+ }
  assert.deepEqual(g.beauty.requestBriefNotes,demonGuest(1).beauty.requestBriefNotes);
 });
 
