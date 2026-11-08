@@ -1,8 +1,8 @@
 {
   "format": "YACHACHA_FULLFLOW",
   "schemaVersion": 1,
-  "version": 15,
-  "updatedAt": "2026-10-16T12:52:04.029Z",
+  "version": 24,
+  "updatedAt": "2026-11-08T08:38:04.184Z",
   "combat": {
     "version": 4,
     "layout": "legacy",
@@ -4210,11 +4210,83 @@
             "Notes": "커피 유령 튜토리얼"
           },
           {
+            "DialogueID": 1000106,
+            "GroupID": 90043,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "<size=20><color=#285780>별 하나 없는 곳</color></size>에<wait=0.35> 내 머리를 맡기라는 것이냐?",
+            "Notes": "마왕 · 외관 · 0스타 확인"
+          },
+          {
+            "DialogueID": 1000107,
+            "GroupID": 90044,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "흥…<wait=0.35> 별이 <size=20><color=#285780>하나뿐</color></size>인가.<wait=0.4> 형편없는 미용실이군.",
+            "Notes": "마왕 · 외관 · 1스타 확인"
+          },
+          {
+            "DialogueID": 1000108,
+            "GroupID": 90045,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "별이 둘이라…<wait=0.5> 내 머리를 맡기엔 <size=20><color=#285780>부족하군.</color></size>",
+            "Notes": "마왕 · 외관 · 2스타 확인"
+          },
+          {
+            "DialogueID": 1000109,
+            "GroupID": 90046,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "흠..<wait=0.35> <size=20><color=#285780>3스타 미용실</color></size>..<wait=0.45> 일단 합격이군.",
+            "Notes": "마왕 · 외관 · 3스타 확인"
+          },
+          {
+            "DialogueID": 1000110,
+            "GroupID": 90047,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "<wait=0.3>들어가 보도록 하지.",
+            "Notes": "마왕 · 외관 · 3스타 확인 후 입장"
+          },
+          {
+            "DialogueID": 1000111,
+            "GroupID": 90048,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "그곳은 복원할 곳이 아니다.<wait=0.4> <cps=22><size=20><color=#A13636>손을 멈추게.</color></size></cps>",
+            "Notes": "마왕 · 미용 중 · 얼굴 가림 첫 훼손"
+          },
+          {
+            "DialogueID": 1000112,
+            "GroupID": 90049,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "얼굴에는<wait=0.35> <cps=22><size=20><color=#A13636>손대지 말라고</color></size> 했을 텐데.</cps>",
+            "Notes": "마왕 · 미용 중 · 얼굴 가림 재차 훼손"
+          },
+          {
+            "DialogueID": 1000113,
+            "GroupID": 90050,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "투구보다 <size=20><color=#285780>장식이 먼저 입장할</color></size> 기세로군.<wait=0.45> 조금 줄여주게.",
+            "Notes": "마왕 · 미용 중 · 투구 장식 개수·면적 초과"
+          },
+          {
+            "DialogueID": 1000114,
+            "GroupID": 90051,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "<size=20><color=#43536B>검은 머리와 은빛 한 줄.</color></size><wait=0.45> 내 주문을 다시 살펴보게.",
+            "Notes": "마왕 · 미용 중 · 머리 염색 색상 항의"
+          },
+          {
             "DialogueID": 1000036,
             "GroupID": 90024,
             "Order": 1,
             "Speaker": "마왕 부하",
-            "Text": "약속드린 날짜가 되어<wait=0.25> <color=#653D7C>마왕님</color>을 모셔왔습니다.",
+            "Text": "약속드린 날짜가 되어 <color=#653D7C><pulse=1.15>마왕님</pulse></color>을 모셔왔습니다.",
             "Notes": "마왕 미용 · 웹 전용"
           },
           {
@@ -4222,7 +4294,7 @@
             "GroupID": 90024,
             "Order": 2,
             "Speaker": "몬스터",
-            "Text": "호오…<wait=0.45> 단기간에 미용 실력을 증명했다던 자가<wait=0.35> <color=#285780>자네</color>인가?",
+            "Text": "호오…<wait=0.35> 단기간에 미용 실력을 증명했다던 자가 <color=#653D7C><pulse=1.15>자네</pulse></color>인가?",
             "Notes": "마왕 미용 · 웹 전용"
           },
           {
@@ -4230,7 +4302,7 @@
             "GroupID": 90024,
             "Order": 3,
             "Speaker": "플레이어",
-            "Text": "네.<wait=0.2> 손님들이 꽤 <color=#285780>까다로우시더라고요.</color>",
+            "Text": "네.<wait=0.35> 손님들이 <size=20>꽤</size> 까다로우시더라고요.",
             "Notes": "마왕 미용 · 웹 전용"
           },
           {
@@ -4238,7 +4310,7 @@
             "GroupID": 90025,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "전장의 흔적은 지워주게.<wait=0.4> <size=20><color=#653D7C>위엄</color></size>까지 지우지는 말고.",
+            "Text": "전장의 흔적은 <color=#285780>지워주게.</color><wait=0.35> <color=#653D7C><pulse=1.15>위엄</pulse></color>까지 지우지는 말고.",
             "Notes": "마왕 미용 · 웹 전용"
           },
           {
@@ -4254,7 +4326,7 @@
             "GroupID": 90025,
             "Order": 3,
             "Speaker": "몬스터",
-            "Text": "단,<wait=0.45> <cps=24>투구 안을 들여다볼 생각은 <size=20><color=#A13636>버리게.</color></size></cps>",
+            "Text": "단,<wait=0.35> <cps=24>투구 안을 들<wait=0.05>여<wait=0.05>다<wait=0.05>볼<wait=0.05> 생<wait=0.05>각<wait=0.05>은<wait=0.1> <size=20><color=#A13636>버리게.</color></size></cps>",
             "Notes": "마왕 미용 · 웹 전용"
           },
           {
@@ -4262,7 +4334,7 @@
             "GroupID": 90026,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "반대쪽 뿔을 보고 <size=20><color=#285780>높이와 굵기</color></size>를 맞추게.<wait=0.25> 발모제로 채우고 망치·정으로 다듬으면 되네.",
+            "Text": "반대쪽 뿔을 보고 <size=20><color=#285780>높이와 굵기</color></size>를 맞추게.<wait=0.35> 발모제로 채우고 망치·정으로 다듬으면 되네.",
             "Notes": "마왕 미용 · 웹 전용"
           },
           {
@@ -4270,7 +4342,7 @@
             "GroupID": 90026,
             "Order": 2,
             "Speaker": "몬스터",
-            "Text": "실수로 낸 구멍이라면 <color=#285780>서둘러 메우게.</color><wait=0.4> 내 인내심에도 한계는 있으니.",
+            "Text": "실수로 낸 구멍이라면 <color=#285780>서둘러 메우게.</color><wait=0.35> 내 인내심에도 한계는 있으니.",
             "Notes": "마왕 미용 · 웹 전용"
           },
           {
@@ -4278,7 +4350,7 @@
             "GroupID": 90026,
             "Order": 3,
             "Speaker": "몬스터",
-            "Text": "그 선을 넘으면…<wait=0.4> 다음에는 미용이 아니라 <size=20><color=#A13636>야차</color></size>일세.",
+            "Text": "그 선을 넘으면…<wait=0.35> 다음에는 미용이 아니라 <size=20><color=#A13636>야차</color></size>일세.",
             "Notes": "마왕 미용 · 웹 전용"
           },
           {
@@ -4286,7 +4358,7 @@
             "GroupID": 90027,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "기스가 <size=20><color=#285780>남아 보이지 않게</color></size><wait=0.2> 덮어주게.",
+            "Text": "기스가 <size=20><color=#285780>남아 보이지 않게</color></size> 덮어주게.",
             "Notes": "마왕 미용 · 웹 전용"
           },
           {
@@ -4294,7 +4366,7 @@
             "GroupID": 90027,
             "Order": 2,
             "Speaker": "몬스터",
-            "Text": "짙은 바탕은 <size=20><color=#285780>일곱 할 이상</color></size> 남기고,<wait=0.3> 나머지 색과 무늬는 맡기지.",
+            "Text": "짙은 바탕은 <size=20><color=#285780>대부분</color></size> 남기고,<wait=0.25> 나머지 색과 무늬는 맡기지.",
             "Notes": "마왕 미용 · 웹 전용"
           },
           {
@@ -4310,7 +4382,7 @@
             "GroupID": 90028,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "기스가 <size=20><color=#285780>남아 보이지 않게</color></size><wait=0.2> 덮어주게.",
+            "Text": "전장에서 갑옷이 베인 상처가 있네. <color=#285780>같은 색으로</color> 안 보이게 덮어주게.",
             "Notes": "마왕 미용 · 웹 전용"
           },
           {
@@ -4318,7 +4390,7 @@
             "GroupID": 90028,
             "Order": 2,
             "Speaker": "몬스터",
-            "Text": "짙은 바탕은 <size=20><color=#285780>일곱 할 이상</color></size> 남기고,<wait=0.3> 나머지 색과 무늬는 맡기지.",
+            "Text": "원래의 짙은 바탕색을 <size=20><color=#285780>일곱 할 이상</color></size> 남겨 주게.<wait=0.35> 나머지는 맡기지.",
             "Notes": "마왕 미용 · 웹 전용"
           },
           {
@@ -4326,7 +4398,7 @@
             "GroupID": 90028,
             "Order": 3,
             "Speaker": "몬스터",
-            "Text": "눈 부분의 색과 무늬도<wait=0.25> <size=20><color=#24634D>그대에게</color></size> 맡기겠네.",
+            "Text": "눈 부분의 색과 무늬는 <color=#24634D>맡기겠네.</color>",
             "Notes": "마왕 미용 · 웹 전용"
           },
           {
@@ -4334,15 +4406,7 @@
             "GroupID": 90029,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "작은 장식은 <size=20><color=#285780>두 개</color></size>까지 허락하겠네.<wait=0.35> 안 붙여도 좋고.",
-            "Notes": "마왕 미용 · 웹 전용"
-          },
-          {
-            "DialogueID": 1000052,
-            "GroupID": 90029,
-            "Order": 2,
-            "Speaker": "몬스터",
-            "Text": "작은 장식이라면 눈 부분을 포함해 얼굴 어디에 붙여도 좋네.<wait=0.4> <size=20><color=#285780>투구보다 장식이 커서는</color></size><wait=0.25> 곤란하고.",
+            "Text": "작은 장식은 <size=20><color=#285780>두 개</color></size>까지 허락하겠네.<wait=0.35> <color=#A13636>너무 큰 장식</color>은 삼가해주게.",
             "Notes": "마왕 미용 · 웹 전용"
           },
           {
@@ -4350,7 +4414,7 @@
             "GroupID": 90030,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "작은 장식은 <size=20><color=#285780>두 개</color></size>까지 허락하겠네.<wait=0.35> 안 붙여도 좋고.",
+            "Text": "장식 <color=#285780><size=20>두 개 까지</size></color>는 괜찮네. 안 붙여도 좋고.",
             "Notes": "마왕 미용 · 웹 전용"
           },
           {
@@ -4358,7 +4422,7 @@
             "GroupID": 90030,
             "Order": 2,
             "Speaker": "몬스터",
-            "Text": "작은 장식이라면 눈 부분을 포함해 얼굴 어디에 붙여도 좋네.<wait=0.4> <size=20><color=#285780>투구보다 장식이 커서는</color></size><wait=0.25> 곤란하고.",
+            "Text": "작은 장식이라면 눈 부분을 포함해 얼굴 어디에 붙여도 좋네.<wait=0.4> <color=#A13636>투구보다 장식이 커서는</color><wait=0.25> 곤란하고.",
             "Notes": "마왕 미용 · 웹 전용"
           },
           {
@@ -4366,7 +4430,7 @@
             "GroupID": 90031,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "이것이 <color=#653D7C>내 얼굴</color>일세.",
+            "Text": "이것이 <color=#653D7C><pulse=1.15>내 얼굴</pulse></color>일세.",
             "Notes": "마왕 2페이즈 미용"
           },
           {
@@ -4374,7 +4438,7 @@
             "GroupID": 90031,
             "Order": 2,
             "Speaker": "플레이어",
-            "Text": "……<wait=0.35>투구를 쓰고 계셨을 때랑 <color=#285780>인상이 꽤 다르시네요.</color>",
+            "Text": "……<wait=0.35>투구를 쓰고 계셨을 때랑 인상이 <size=20>꽤</size> 다르시네요.",
             "Notes": "마왕 2페이즈 미용"
           },
           {
@@ -4382,7 +4446,7 @@
             "GroupID": 90031,
             "Order": 3,
             "Speaker": "몬스터",
-            "Text": "하지만 이 정도로는 만족스럽지 않네.<wait=0.35> <color=#653D7C>왕의 얼굴</color>에는 부족함이 없어야 하니.",
+            "Text": "하지만 이 정도로는 만족스럽지 않네.<wait=0.35> <color=#653D7C><pulse=1.15>왕의 얼굴</pulse></color>에는 부족함이 없어야 하니.",
             "Notes": "마왕 2페이즈 미용"
           },
           {
@@ -4406,7 +4470,7 @@
             "GroupID": 90031,
             "Order": 6,
             "Speaker": "몬스터",
-            "Text": "머리 전체를 <size=20><color=#285780>귓불 아래로 내려오지 않게</color></size> 다듬게.<wait=0.25> 전투 중 목에 닿으면 거슬리니.",
+            "Text": "머리 전체를 <size=20><color=#285780>귓불 아래로 내려오지 않게</color></size> 다듬게.<wait=0.35> 전투 중 목에 닿으면 거슬리니.",
             "Notes": "마왕 2페이즈 미용"
           },
           {
@@ -4446,7 +4510,7 @@
             "GroupID": 90031,
             "Order": 11,
             "Speaker": "몬스터",
-            "Text": "머리 위에는 좌우에 맞는 <size=20><color=#285780>큰 뿔 한 쌍</color></size>을 붙이고,<wait=0.2> 티아라나 검은 왕관 하나도 올려주게.<wait=0.4> 왕관이 없다고 <size=20><color=#653D7C>누가 왕인지</color></size><wait=0.25> 헷갈려서는 곤란하지.",
+            "Text": "머리 위에는 좌우에 맞는 <size=20><color=#285780>큰 뿔 한 쌍</color></size>을 붙이고,<wait=0.2> <size=20><color=#285780>티아라나 검은 왕관</color></size> 하나도 올려주게.<wait=0.4> 왕관이 없다고 <color=#653D7C><pulse=1.15>누가 왕인지</pulse></color><wait=0.25> 헷갈려서는 곤란하지.",
             "Notes": "마왕 2페이즈 미용"
           },
           {
@@ -4478,7 +4542,7 @@
             "GroupID": 90032,
             "Order": 3,
             "Speaker": "몬스터",
-            "Text": "손질 가이드는 <size=20><color=#285780>초록 부분을 덜고,</color></size><wait=0.25> 금빛 안쪽을 남기거나 채우는 표시일세.",
+            "Text": "손질 가이드는 <color=#13790b>초록 부분을 덜고,</color><wait=0.25> <color=#9f8a1d>금빛 안쪽을 남기거나 채우는</color> 표시일세.",
             "Notes": "마왕 2페이즈 미용"
           },
           {
@@ -4486,7 +4550,7 @@
             "GroupID": 90033,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "<size=20><color=#285780>이마 가운데로 내려온 앞머리</color></size>에 가느다란 은빛 세로 브릿지 한 줄을 넣게.<wait=0.3> 그 한 줄을 제외한 머리는 <size=20><color=#242236>검게</color></size> 물들이게.",
+            "Text": "<color=#285780>이마 가운데로 내려온 앞머리</color>에 가느다란 <color=#285780>은빛 세로 브릿지 한 줄</color>을 넣게.<wait=0.3> 그 한 줄을 제외한 머리는 <color=#285780>검게</color> 물들이게.",
             "Notes": "마왕 2페이즈 미용"
           },
           {
@@ -4494,7 +4558,7 @@
             "GroupID": 90033,
             "Order": 2,
             "Speaker": "몬스터",
-            "Text": "눈썹은 양쪽 모두 검게.<wait=0.25> 양쪽 눈 위에는 <size=20><color=#285780>얇은 검정 쌍꺼풀 선</color></size>을 그어주게.",
+            "Text": "눈썹은 <color=#285780>양쪽 모두 검게.</color><wait=0.25> 양쪽 눈 위에는 <color=#285780>얇은 검정 쌍꺼풀 선</color>을 그어주게.",
             "Notes": "마왕 2페이즈 미용"
           },
           {
@@ -4510,7 +4574,7 @@
             "GroupID": 90033,
             "Order": 4,
             "Speaker": "몬스터",
-            "Text": "주문한 화장 외의 얼굴은 <size=20><color=#24634D>자유롭게</color></size> 꾸미게.<wait=0.35> 그대의 감각도 보고 싶군.",
+            "Text": "주문한 화장 외의 얼굴은 <size=20><color=#285780>자유롭게</color></size> 꾸미게.<wait=0.35> 그대의 감각도 보고 싶군.",
             "Notes": "마왕 2페이즈 미용"
           },
           {
@@ -4518,7 +4582,7 @@
             "GroupID": 90034,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "<size=20><color=#285780>이마 가운데로 내려온 앞머리</color></size>를 따라 은빛 선을 세로로 길고 얇게 넣게.<wait=0.25> 도구 크기 1~3 정도면 좋겠네.",
+            "Text": "<color=#285780>이마 가운데로 내려온 앞머리</color>를 따라 <color=#285780>은빛 선을 세로로 길고 얇게</color> 넣게.<wait=0.25> 도구 크기 <size=20><color=#285780>1~3</color></size> 정도면 좋겠네.",
             "Notes": "마왕 2페이즈 미용"
           },
           {
@@ -4526,7 +4590,7 @@
             "GroupID": 90034,
             "Order": 2,
             "Speaker": "몬스터",
-            "Text": "금빛 눈썹은 검게 물들이고,<wait=0.2> 눈썹 아래 하늘색 표시에는 가는 검정 쌍꺼풀 선을 그리게.<wait=0.25> 도구 크기는 <size=20><color=#285780>1~2</color></size>로.",
+            "Text": "금빛 눈썹은 <color=#285780>검게 물들이고,</color><wait=0.2> 눈썹 아래 <color=#285780>하늘색 표시</color>에는 <color=#285780>가는 검정 쌍꺼풀 선</color>을 그리게.<wait=0.25> 도구 크기는 <size=20><color=#285780>1~2</color></size>로.",
             "Notes": "마왕 2페이즈 미용"
           },
           {
@@ -4534,7 +4598,7 @@
             "GroupID": 90034,
             "Order": 3,
             "Speaker": "몬스터",
-            "Text": "입술의 붉은 표시를 따라 빨강,<wait=0.2> 불투명도 <size=20><color=#285780>15~30%</color></size>,<wait=0.2> 도구 크기 1~2로 얇게 긋게.<wait=0.25> 색을 겹쳐 너무 진해졌다면 지우고 다시 칠하면 되네.",
+            "Text": "입술의 <color=#285780>붉은 표시를 따라 빨강</color>,<wait=0.2> 불투명도 <size=20><color=#285780>15~30%</color></size>,<wait=0.2> 도구 크기 <color=#285780><size=20>1~2</size></color>로 얇게 긋게.<wait=0.35> 색을 겹쳐 너무 진해졌다면 지우고 다시 칠하면 되네.",
             "Notes": "마왕 2페이즈 미용"
           },
           {
@@ -4542,7 +4606,7 @@
             "GroupID": 90035,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "화면 왼쪽에는 <size=20><color=#285780>왼쪽 큰 뿔</color></size>,<wait=0.25> 오른쪽에는 <size=20><color=#285780>오른쪽 큰 뿔</color></size>을 붙여주게.",
+            "Text": "머리의 양쪽에 <size=20><color=#285780>큰 뿔</color></size>을 달아주게.",
             "Notes": "마왕 2페이즈 미용"
           },
           {
@@ -4550,7 +4614,7 @@
             "GroupID": 90035,
             "Order": 2,
             "Speaker": "몬스터",
-            "Text": "거기에 티아라나 검은 왕관 중 하나를 올리게.<wait=0.25> 뿔 한 쌍과 머리 장식이 <size=20><color=#285780>모두</color></size> 있어야 하네.<wait=0.35> 그 외의 장식은 그대 마음대로 더해도 좋네.",
+            "Text": "거기에 <color=#285780><size=20>왕의 위엄에 맞는 왕관</size></color> 하나를 올려 주게.",
             "Notes": "마왕 2페이즈 미용"
           },
           {
@@ -4558,7 +4622,7 @@
             "GroupID": 90036,
             "Order": 1,
             "Speaker": "몬스터",
-            "Text": "화면 왼쪽에는 <size=20><color=#285780>왼쪽 큰 뿔</color></size>,<wait=0.25> 오른쪽에는 <size=20><color=#285780>오른쪽 큰 뿔</color></size>을 붙여주게.",
+            "Text": "화면 기준 왼쪽에는 <size=20><color=#285780>왼쪽 큰 뿔</color></size>,<wait=0.25> 오른쪽에는 <size=20><color=#285780>오른쪽 큰 뿔</color></size>을 붙여주게.",
             "Notes": "마왕 2페이즈 미용"
           },
           {
@@ -4574,7 +4638,7 @@
             "GroupID": 90024,
             "Order": 4,
             "Speaker": "마왕 부하",
-            "Text": "그 까다로운 손님들이 <color=#24634D>인정한 솜씨</color>입니다.",
+            "Text": "그 <size=20>까다로운 손님</size>들이 <size=20>인정한 솜씨</size>입니다.",
             "Notes": "마왕 미용"
           },
           {
@@ -4582,7 +4646,7 @@
             "GroupID": 90024,
             "Order": 5,
             "Speaker": "몬스터",
-            "Text": "소문은 들었다.<wait=0.35> 다만…<wait=0.3> <color=#653D7C>남의 칭찬만으로</color> 내 머리를 맡길 수는 없지.",
+            "Text": "소문은 들었다.<wait=0.35> 다만…<wait=0.35> <pulse=1.15><color=#653D7C>남의 칭찬만으로</color></pulse> 내 머리를 맡길 수는 없지.",
             "Notes": "마왕 미용"
           },
           {
@@ -4590,7 +4654,7 @@
             "GroupID": 90024,
             "Order": 6,
             "Speaker": "플레이어",
-            "Text": "마음에 드시면,<wait=0.25> 저를 <color=#285780>돌려보내 주신다는 약속</color>은요?",
+            "Text": "마음에 드시면,<wait=0.25> 저를 <color=#653D7C>돌려보내 주신다는 약속</color>은요?",
             "Notes": "마왕 미용"
           },
           {
@@ -4598,7 +4662,7 @@
             "GroupID": 90024,
             "Order": 7,
             "Speaker": "몬스터",
-            "Text": "왕의 <color=#653D7C>약속</color>은 가볍지 않네.<wait=0.35> 그대도 그에 걸맞은 솜씨를 보여주게.",
+            "Text": "<color=#653D7C><pulse=1.15>왕의 약속</pulse></color>은 가볍지 않네.<wait=0.35> 그대도 그에 걸맞은 솜씨를 보여주게.",
             "Notes": "마왕 미용"
           },
           {
@@ -4606,7 +4670,7 @@
             "GroupID": 90024,
             "Order": 8,
             "Speaker": "몬스터",
-            "Text": "그럼…<wait=0.35> 우선 <color=#285780>이 모습</color>부터 맡겨보지.",
+            "Text": "그럼…<wait=0.35> 우선 <color=#653D7C><pulse=1.15>이 모습</pulse></color>부터 맡겨보지.",
             "Notes": "마왕 미용"
           },
           {
@@ -4630,7 +4694,7 @@
             "GroupID": 90031,
             "Order": 14,
             "Speaker": "마왕 부하",
-            "Text": "오늘은<wait=0.3> 상당히 <size=20><color=#285780>간소하게</color></size><wait=0.25> 말씀하신 편입니다.",
+            "Text": "오늘은 상당히 <size=20><color=#285780>간소하게</color></size><wait=0.25> 말씀하신 편입니다.",
             "Notes": "마왕 미용"
           },
           {
@@ -4638,7 +4702,7 @@
             "GroupID": 90031,
             "Order": 15,
             "Speaker": "몬스터",
-            "Text": "아.<wait=0.4> 주문한 눈썹과 눈매,<wait=0.2> 입술만 살려두면<wait=0.25> 나머지 얼굴은 <size=20><color=#24634D>그대 마음대로</color></size> 꾸며도 좋네.",
+            "Text": "아.<wait=0.4> 주문한 눈썹과 눈매,<wait=0.25> 입술만 살려두면 나머지 얼굴은 <color=#24634D>그대 마음대로</color> 꾸며도 좋네.",
             "Notes": "마왕 미용"
           },
           {
@@ -4648,6 +4712,134 @@
             "Speaker": "마왕 부하",
             "Text": "마왕님,<wait=0.25> 이곳입니다.",
             "Notes": "미용실 외부 등장 씬"
+          },
+          {
+            "DialogueID": 1000091,
+            "GroupID": 90038,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "…<wait=0.3>…<wait=0.3>제법이군.<wait=0.45> 이제 <size=20><color=#653D7C>투구를 벗어도</color></size> 되겠어.",
+            "Notes": "마왕 1페이즈 결과"
+          },
+          {
+            "DialogueID": 1000092,
+            "GroupID": 90038,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "내가 <wave=1>손대지 말라 한 곳은 지키면서도</wave>…<wait=0.4> 솜씨를 보였군.",
+            "Notes": "마왕 1페이즈 결과"
+          },
+          {
+            "DialogueID": 1000093,
+            "GroupID": 90038,
+            "Order": 3,
+            "Speaker": "몬스터",
+            "Text": "좋다.<wait=0.4> 이제 그대에게 <pulse=1.15><color=#653D7C>내 얼굴</color>을 보여주도록 하지.</pulse>",
+            "Notes": "마왕 1페이즈 결과"
+          },
+          {
+            "DialogueID": 1000094,
+            "GroupID": 90039,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "…<wait=0.4>…<wait=0.45><cps=22>이게 <size=20><color=#A13636>무엇이냐.</color></size></cps>",
+            "Notes": "마왕 1페이즈 결과"
+          },
+          {
+            "DialogueID": 1000095,
+            "GroupID": 90039,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "나를…<wait=0.55> <cps=24><size=20><color=#A13636>웃음거리</color></size>로 만들 셈이냐?</cps>",
+            "Notes": "마왕 1페이즈 결과"
+          },
+          {
+            "DialogueID": 1000096,
+            "GroupID": 90039,
+            "Order": 3,
+            "Speaker": "마왕 부하",
+            "Text": "폐하,<wait=0.25> 잠시 진정하시고—",
+            "Notes": "마왕 1페이즈 결과"
+          },
+          {
+            "DialogueID": 1000097,
+            "GroupID": 90039,
+            "Order": 4,
+            "Speaker": "몬스터",
+            "Text": "<size=22><color=#A13636><shake=1.5 dur=0.6>입 다물어라!</shake></color></size><wait=0.4> 이 모욕은<wait=0.25> <size=22><color=#A13636><shake=1.2 dur=0.6>야차로 갚게 하겠다!</shake></color></size>",
+            "Notes": "마왕 1페이즈 결과"
+          },
+          {
+            "DialogueID": 1000098,
+            "GroupID": 90040,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "얼굴에는<wait=0.35> <cps=22><size=20><color=#A13636><pulse=1.15>손대지 말라고</pulse></color></size> 했을 텐데.</cps>",
+            "Notes": "마왕 1페이즈 결과"
+          },
+          {
+            "DialogueID": 1000099,
+            "GroupID": 90040,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "이 모욕은<wait=0.25> <size=22><color=#A13636><shake=1.2 dur=0.6>야차로 갚게 하겠다!</shake></color></size>",
+            "Notes": "마왕 1페이즈 결과"
+          },
+          {
+            "DialogueID": 1000100,
+            "GroupID": 90041,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "…<wait=0.3>…<wait=0.3>내가 요구한 것은<wait=0.25> <size=20><color=#285780>모두 해냈군.</color></size>",
+            "Notes": "마왕 2페이즈 결과"
+          },
+          {
+            "DialogueID": 1000101,
+            "GroupID": 90041,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "<size=20>분노와 관용.</size><wait=0.35> 그리고 <size=20><color=#653D7C>왕의 품격</color></size>까지.<wait=0.45> 훗…<wait=0.3> 마음에 드는군.",
+            "Notes": "마왕 2페이즈 결과"
+          },
+          {
+            "DialogueID": 1000102,
+            "GroupID": 90042,
+            "Order": 1,
+            "Speaker": "몬스터",
+            "Text": "…<wait=0.4>…<wait=0.45><cps=22>이게 <size=20><color=#A13636>무엇이냐.</color></size></cps>",
+            "Notes": "마왕 2페이즈 결과"
+          },
+          {
+            "DialogueID": 1000103,
+            "GroupID": 90042,
+            "Order": 2,
+            "Speaker": "몬스터",
+            "Text": "나를…<wait=0.55> <cps=24><size=20><color=#A13636>웃음거리</color></size>로 만들 셈이냐?</cps>",
+            "Notes": "마왕 2페이즈 결과"
+          },
+          {
+            "DialogueID": 1000104,
+            "GroupID": 90042,
+            "Order": 3,
+            "Speaker": "마왕 부하",
+            "Text": "폐하,<wait=0.25> 잠시 진정하시고—",
+            "Notes": "마왕 2페이즈 결과"
+          },
+          {
+            "DialogueID": 1000105,
+            "GroupID": 90042,
+            "Order": 4,
+            "Speaker": "몬스터",
+            "Text": "<size=22><color=#A13636><shake=1.5 dur=0.6>입 다물어라!</shake></color></size><wait=0.4> 이 모욕은<wait=0.25> <size=22><color=#A13636><shake=1.2 dur=0.6>야차로 갚게 하겠다!</shake></color></size>",
+            "Notes": "마왕 2페이즈 결과"
+          },
+          {
+            "DialogueID": 1000115,
+            "GroupID": 90026,
+            "Order": 5,
+            "Speaker": "몬스터",
+            "Text": "다시 말하지만, 투구 안은 <color=#A13636><wave=1>절<wait=0.1>대<wait=0.15> 보<wait=0.05>려<wait=0.1> 하<wait=0.05>지<wait=0.1> 말<wait=0.2>게<wait=0.2>.</wave></color>",
+            "Notes": "미용 선택지 대사"
           }
         ]
       },
@@ -6981,6 +7173,188 @@
             "Notes": "미용실 외관 · 별 확인 전",
             "ActorEffect": "없음",
             "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 90038,
+            "Name": "마왕 · 1페이즈 · 미용 만족 · 성공",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "마왕 결과 대사 · 프로젝트의 페이즈별 연결",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 90039,
+            "Name": "마왕 · 1페이즈 · 미용 불만족 · 실패",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "마왕 결과 대사 · 프로젝트의 페이즈별 연결",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 90040,
+            "Name": "마왕 · 1페이즈 · 얼굴 훼손 · 돌발 야차",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "마왕 결과 대사 · 프로젝트의 페이즈별 연결",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 90041,
+            "Name": "마왕 · 2페이즈 · 미용 만족 · 성공",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "마왕 결과 대사 · 프로젝트의 페이즈별 연결",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 90042,
+            "Name": "마왕 · 2페이즈 · 미용 불만족 · 실패",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "마왕 결과 대사 · 프로젝트의 페이즈별 연결",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 90043,
+            "Name": "마왕 · 외관 · 0스타 확인",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "미용실 외관 · 별 확인 분기",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 90044,
+            "Name": "마왕 · 외관 · 1스타 확인",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "미용실 외관 · 별 확인 분기",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 90045,
+            "Name": "마왕 · 외관 · 2스타 확인",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "미용실 외관 · 별 확인 분기",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 90046,
+            "Name": "마왕 · 외관 · 3스타 확인",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "미용실 외관 · 별 확인 분기",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 90047,
+            "Name": "마왕 · 외관 · 3스타 확인 후 입장",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": true,
+            "AdvanceMode": "입력",
+            "CPS": 30,
+            "HoldMs": 1400,
+            "GapMs": 100,
+            "Notes": "미용실 외관 · 별 확인 분기",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 90048,
+            "Name": "마왕 · 미용 중 · 얼굴 가림 첫 훼손",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": false,
+            "AdvanceMode": "자동",
+            "CPS": 30,
+            "HoldMs": 5500,
+            "GapMs": 100,
+            "Notes": "미용 중 반응 · 발생 조건은 시뮬레이터",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 90049,
+            "Name": "마왕 · 미용 중 · 얼굴 가림 재차 훼손",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": false,
+            "AdvanceMode": "자동",
+            "CPS": 30,
+            "HoldMs": 5500,
+            "GapMs": 100,
+            "Notes": "미용 중 반응 · 발생 조건은 시뮬레이터",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 90050,
+            "Name": "마왕 · 미용 중 · 투구 장식 개수·면적 초과",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": false,
+            "AdvanceMode": "자동",
+            "CPS": 30,
+            "HoldMs": 5500,
+            "GapMs": 100,
+            "Notes": "미용 중 반응 · 발생 조건은 시뮬레이터",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
+          },
+          {
+            "GroupID": 90051,
+            "Name": "마왕 · 미용 중 · 머리 염색 색상 항의",
+            "PlaybackMode": "순서대로",
+            "PauseCombat": false,
+            "AdvanceMode": "자동",
+            "CPS": 30,
+            "HoldMs": 5500,
+            "GapMs": 100,
+            "Notes": "미용 중 반응 · 발생 조건은 시뮬레이터",
+            "ActorEffect": "없음",
+            "FinishEffect": "없음"
           }
         ]
       },
@@ -8718,40 +9092,49 @@
       "battle": "none",
       "bindings": {
         "arrival": 90024,
-        "exterior": 90037
+        "exterior": 90037,
+        "gate0": 90043,
+        "gate1": 90044,
+        "gate2": 90045,
+        "gate3": 90046,
+        "enter": 90047,
+        "warning": 90048,
+        "warningAgain": 90049,
+        "helmetSticker": 90050,
+        "color": 90051
       },
       "note": "4일차 마왕. 투구 복원과 미형 미용의 두 페이즈. 미용 성공 후 미용실로 복귀하여 엔딩 분기에 전달. 고블린은 야차에서만 공개. 야차 전투 미연결.",
       "demonRequest": {
         "cut": [
-          "전장의 흔적은 지워주게.<wait=0.4> <size=20><color=#653D7C>위엄</color></size>까지 지우지는 말고.",
+          "전장의 흔적은 <color=#285780>지워주게.</color><wait=0.35> <color=#653D7C><pulse=1.15>위엄</pulse></color>까지 지우지는 말고.",
           "부러진 뿔을 반대쪽과 <size=20><color=#285780>균형 있게</color></size> 복원하게.<wait=0.3> 상단과 옆면의 장식은 그대의 안목을 보겠네.",
-          "단,<wait=0.45> <cps=24>투구 안을 들여다볼 생각은 <size=20><color=#A13636>버리게.</color></size></cps>"
+          "단,<wait=0.35> <cps=24>투구 안을 들<wait=0.05>여<wait=0.05>다<wait=0.05>볼<wait=0.05> 생<wait=0.05>각<wait=0.05>은<wait=0.1> <size=20><color=#A13636>버리게.</color></size></cps>"
         ],
         "draw": [
-          "기스가 <size=20><color=#285780>남아 보이지 않게</color></size><wait=0.2> 덮어주게.",
-          "짙은 바탕은 <size=20><color=#285780>일곱 할 이상</color></size> 남기고,<wait=0.3> 나머지 색과 무늬는 맡기지.",
+          "기스가 <size=20><color=#285780>남아 보이지 않게</color></size> 덮어주게.",
+          "짙은 바탕은 <size=20><color=#285780>대부분</color></size> 남기고,<wait=0.25> 나머지 색과 무늬는 맡기지.",
           "눈 부분의 색과 무늬도<wait=0.25> <size=20><color=#24634D>그대에게</color></size> 맡기겠네."
         ],
         "attach": [
-          "작은 장식은 <size=20><color=#285780>두 개</color></size>까지 허락하겠네.<wait=0.35> 안 붙여도 좋고.",
-          "작은 장식이라면 눈 부분을 포함해 얼굴 어디에 붙여도 좋네.<wait=0.4> <size=20><color=#285780>투구보다 장식이 커서는</color></size><wait=0.25> 곤란하고."
+          "작은 장식은 <size=20><color=#285780>두 개</color></size>까지 허락하겠네.<wait=0.35> <color=#A13636>너무 큰 장식</color>은 삼가해주게."
         ]
       },
       "demonRequestDetails": {
         "cut": [
-          "반대쪽 뿔을 보고 <size=20><color=#285780>높이와 굵기</color></size>를 맞추게.<wait=0.25> 발모제로 채우고 망치·정으로 다듬으면 되네.",
-          "실수로 낸 구멍이라면 <color=#285780>서둘러 메우게.</color><wait=0.4> 내 인내심에도 한계는 있으니.",
-          "그 선을 넘으면…<wait=0.4> 다음에는 미용이 아니라 <size=20><color=#A13636>야차</color></size>일세.",
-          "상단·옆면 외형은<wait=0.2> 원래 투구 크기의 <size=20><color=#285780>삼 할</color></size>까지 늘려도 좋네."
+          "반대쪽 뿔을 보고 <size=20><color=#285780>높이와 굵기</color></size>를 맞추게.<wait=0.35> 발모제로 채우고 망치·정으로 다듬으면 되네.",
+          "실수로 낸 구멍이라면 <color=#285780>서둘러 메우게.</color><wait=0.35> 내 인내심에도 한계는 있으니.",
+          "그 선을 넘으면…<wait=0.35> 다음에는 미용이 아니라 <size=20><color=#A13636>야차</color></size>일세.",
+          "상단·옆면 외형은<wait=0.2> 원래 투구 크기의 <size=20><color=#285780>삼 할</color></size>까지 늘려도 좋네.",
+          "다시 말하지만, 투구 안은 <color=#A13636><wave=1>절<wait=0.1>대<wait=0.15> 보<wait=0.05>려<wait=0.1> 하<wait=0.05>지<wait=0.1> 말<wait=0.2>게<wait=0.2>.</wave></color>"
         ],
         "draw": [
-          "기스가 <size=20><color=#285780>남아 보이지 않게</color></size><wait=0.2> 덮어주게.",
-          "짙은 바탕은 <size=20><color=#285780>일곱 할 이상</color></size> 남기고,<wait=0.3> 나머지 색과 무늬는 맡기지.",
-          "눈 부분의 색과 무늬도<wait=0.25> <size=20><color=#24634D>그대에게</color></size> 맡기겠네."
+          "전장에서 갑옷이 베인 상처가 있네. <color=#285780>같은 색으로</color> 안 보이게 덮어주게.",
+          "원래의 짙은 바탕색을 <size=20><color=#285780>일곱 할 이상</color></size> 남겨 주게.<wait=0.35> 나머지는 맡기지.",
+          "눈 부분의 색과 무늬는 <color=#24634D>맡기겠네.</color>"
         ],
         "attach": [
-          "작은 장식은 <size=20><color=#285780>두 개</color></size>까지 허락하겠네.<wait=0.35> 안 붙여도 좋고.",
-          "작은 장식이라면 눈 부분을 포함해 얼굴 어디에 붙여도 좋네.<wait=0.4> <size=20><color=#285780>투구보다 장식이 커서는</color></size><wait=0.25> 곤란하고."
+          "장식 <color=#285780><size=20>두 개 까지</size></color>는 괜찮네. 안 붙여도 좋고.",
+          "작은 장식이라면 눈 부분을 포함해 얼굴 어디에 붙여도 좋네.<wait=0.4> <color=#A13636>투구보다 장식이 커서는</color><wait=0.25> 곤란하고."
         ]
       },
       "beauty": {
@@ -8849,6 +9232,17 @@
             "RequestGroupID": 90035,
             "DetailGroupID": 90036
           }
+        }
+      },
+      "demonResultDialogue": {
+        "1": {
+          "normal": 90038,
+          "fail": 90039,
+          "sudden": 90040
+        },
+        "2": {
+          "normal": 90041,
+          "fail": 90042
         }
       }
     }

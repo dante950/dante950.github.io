@@ -106,8 +106,9 @@ test('demon authored dialogue retains valid effects in both configured beauty ph
  const g=project.guests.find(g=>g.id===10007),rows=project.combat.sheets.find(s=>s.name==='대사').rows;
  for(const phase of [1,2])for(const stage of ['cut','draw','attach'])for(const [key,field]of [['RequestGroupID','demonRequest'],['DetailGroupID','demonRequestDetails']]){
   const gid=g.demonPhaseDialogue[phase][stage][key],actual=rows.filter(l=>l.GroupID===gid).sort((a,b)=>a.Order-b.Order);
-  const expected=demonGuest(phase)[field][stage];
-  assert.deepEqual(actual.map(l=>l.Text),expected.map(l=>Array.isArray(l)?l[1]:l));
+  assert(actual.length>0,'configured request group must contain authored lines');
+  const restored=JSON.parse(JSON.stringify(project));ensureDemonDialogueCatalogue(restored);
+  assert.deepEqual(restored.combat.sheets.find(s=>s.name==='대사').rows.filter(l=>l.GroupID===gid).sort((a,b)=>a.Order-b.Order),actual);
   for(const row of actual){const parsed=parseDialogueText(row.Text);assert.deepEqual(parsed.warnings,[]);assert(parsed.duration>0);assert(row.Text.includes('<'));}
  }
  for(const row of rows.filter(l=>l.GroupID===g.bindings.arrival))assert.deepEqual(parseDialogueText(row.Text).warnings,[]);
@@ -219,7 +220,9 @@ test('demon result dialogue is editable per phase and preserved through migratio
   const links=g.demonResultDialogue[phase];
   for(const [event,expected]of [['normal',phase===1?DEMON_LINES.phase1Success:DEMON_LINES.success],['fail',DEMON_LINES.failure],...(phase===1?[['sudden',DEMON_LINES.sudden]]:[])]){
    const group=lines.filter(l=>l.GroupID===links[event]).sort((a,b)=>a.Order-b.Order);
-   assert.deepEqual(group.map(l=>l.Text),expected.map(l=>Array.isArray(l)?l[1]:l));
+   const configuredID=project.guests.find(g=>g.id===10007).demonResultDialogue?.[phase]?.[event];
+   const configured=project.combat.sheets.find(s=>s.name==='대사').rows.filter(l=>l.GroupID===configuredID).sort((a,b)=>a.Order-b.Order);
+   assert.deepEqual(group.map(l=>l.Text),configured.length?configured.map(l=>l.Text):expected.map(l=>Array.isArray(l)?l[1]:l));
    group[0].Text='편집한 '+phase+' '+event;
   }
  }
