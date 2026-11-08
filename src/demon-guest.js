@@ -148,6 +148,14 @@ export function demonGuest(phase=1){
  resultLines:{satisfied:phase===1?'…<wait=0.3>…<wait=0.3>제법이군.<wait=0.45> 이제 <size=20>투구를 벗어도</size> 되겠어.':'훗…<wait=0.35> 정말 <size=20>만족스럽군!</size>',angry:'…<wait=0.4>…<wait=0.45><cps=22>이게 <size=20>무엇이냐.</size></cps>',neutral:'……'},basePay:0,tipRate:0};
 }
 // Existing workbook sheets keep the prose; phase selection stays in project JSON.
+export const DEMON_EVENT_DIALOGUES=[
+ ...DEMON_LINES.gates.map((text,stars)=>['gate'+stars,'외관 · '+stars+'스타 확인',[text],0]),
+ ['enter','외관 · 3스타 확인 후 입장',[DEMON_LINES.enter],0],
+ ['warning','미용 중 · 얼굴 가림 첫 훼손',[DEMON_LINES.warning],1],
+ ['warningAgain','미용 중 · 얼굴 가림 재차 훼손',[DEMON_LINES.warningAgain],1],
+ ['helmetSticker','미용 중 · 투구 장식 개수·면적 초과',[DEMON_LINES.helmetSticker],1],
+ ['color','미용 중 · 머리 염색 색상 항의',[DEMON_LINES.color],2]
+];
 export function ensureDemonDialogueCatalogue(project){
  const g=project?.guests?.find(g=>g.id===DEMON_GUEST_ID);if(!g||!project.combat?.sheets)return project;
  g.workbookExcluded=false;
@@ -175,6 +183,12 @@ export function ensureDemonDialogueCatalogue(project){
    groups.push({GroupID:id,Name:'마왕 · '+phase+'페이즈 · '+title,PlaybackMode:'순서대로',PauseCombat:true,AdvanceMode:'입력',CPS:30,HoldMs:1400,GapMs:100,Notes:'마왕 결과 대사 · 프로젝트의 페이즈별 연결',ActorEffect:'없음',FinishEffect:'없음'});
    for(const [i,line]of texts.entries())lines.push({DialogueID:Math.max(900000,...lines.map(r=>r.DialogueID))+1,GroupID:id,Order:i+1,Speaker:Array.isArray(line)?line[0]:'몬스터',Text:Array.isArray(line)?line[1]:line,Notes:'마왕 '+phase+'페이즈 결과'});
   }
+ }
+ for(const [key,label,texts,phase]of DEMON_EVENT_DIALOGUES){
+  if(groups.some(r=>r.GroupID===g.bindings[key]))continue;
+  const id=Math.max(80000,...groups.map(r=>r.GroupID))+1;g.bindings[key]=id;
+  groups.push({GroupID:id,Name:'마왕 · '+label,PlaybackMode:'순서대로',PauseCombat:!phase,AdvanceMode:phase?'자동':'입력',CPS:30,HoldMs:phase?5500:1400,GapMs:100,Notes:phase?'미용 중 반응 · 발생 조건은 시뮬레이터':'미용실 외관 · 별 확인 분기',ActorEffect:'없음',FinishEffect:'없음'});
+  for(const [i,text]of texts.entries())lines.push({DialogueID:Math.max(900000,...lines.map(r=>r.DialogueID))+1,GroupID:id,Order:i+1,Speaker:'몬스터',Text:text,Notes:'마왕 · '+label});
  }
  return project;
 }

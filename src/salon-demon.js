@@ -79,7 +79,8 @@ function demonBeautyStatus(){
  }
  return demonScoreCache={...demonJudge(demonPhase,metrics),phase:demonPhase,metrics};
 }
-function demonProtest(kind){if(performance.now()-demonLastProtest<5500)return;demonLastProtest=performance.now();showBeautyReaction(DEMON_LINES[kind],'angry');}
+function demonReactionText(key){return GUEST.demonReactions?.[key]??DEMON_LINES[key];}
+function demonProtest(kind){if(performance.now()-demonLastProtest<5500)return;demonLastProtest=performance.now();showBeautyReaction(demonReactionText(kind),'angry');}
 function applyDemonStroke(cells,kind){
  let changed=false,faceHit=false,hairHit=false;
  const growth=kind==='grow'?demonGrowthCells(current,demonRestore,cells,W,H,n=>{
@@ -100,7 +101,7 @@ function applyDemonStroke(cells,kind){
   else if(kind==='paint'&&(current[n]||masks.face[n])){if(current[n])hairHit=true;const value=blendBeautyRGBA(gesture.paint.subarray(i,i+4),rgb(paintColor),paintOpacity);if(value.some((v,k)=>v!==paint[i+k]))changed=true;paint.set(value,i);if(demonMasks.face[n]&&!current[n])faceHit=true;}
  }
  if(!changed)return;touched[beautyPhase]=true;demonScoreCache=null;if(['grow','hammer','scissors'].includes(kind))demonGeometryDirty=true;demonPendingStroke={kind,faceHit,hairHit};
- if(demonPhase===1&&kind==='hammer'&&faceHit&&demonWarningCount<2&&!gesture?.demonWarned){if(gesture)gesture.demonWarned=true;showBeautyReaction(demonWarningCount++?DEMON_LINES.warningAgain:DEMON_LINES.warning,'angry');}
+ if(demonPhase===1&&kind==='hammer'&&faceHit&&demonWarningCount<2&&!gesture?.demonWarned){if(gesture)gesture.demonWarned=true;showBeautyReaction(demonReactionText(demonWarningCount++?'warningAgain':'warning'),'angry');}
 
 }
 function demonStickerReaction(){demonPendingStroke={kind:'sticker'};}

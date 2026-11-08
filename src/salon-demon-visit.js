@@ -59,7 +59,7 @@ if(GUEST.demon&&GUEST.mode!=='backdrop'){
   const skip=document.createElement('button');skip.textContent='건너뛰기';skip.onclick=()=>endVisit();cinema.append(skip);gameWorld.append(cinema);send('cutscene-start');
   try{await loadArt;}catch(error){console.error(error);cinema.remove();customerState.phase='closed';dialogueState.active=false;openShopBtn.disabled=false;return;}
   const gate=demonGate(stars);
-  sequence=[{scene:'black',ms:450},{scene:'outside',ms:1000},{scene:'walk',ms:2300},{scene:'outside',ms:350,event:'exterior'},{scene:'sign',ms:1400,line:gate.line},...(gate.admitted?[{scene:'outside',ms:400,line:DEMON_LINES.enter},{scene:'enter',ms:2400},{scene:'black',ms:550},{scene:'door',ms:2100,sound:'door'},{scene:'reaction',ms:1300},{scene:'foot',ms:1200,sound:'foot0'},{scene:'armor',ms:3300},{scene:'black',ms:500}]:[{scene:'pass',ms:3000},{scene:'black',ms:650}])];
+  sequence=[{scene:'black',ms:450},{scene:'outside',ms:1000},{scene:'walk',ms:2300},{scene:'outside',ms:350,event:'exterior'},{scene:'sign',ms:1400,event:'gate'+gate.stars,line:gate.line},...(gate.admitted?[{scene:'outside',ms:400,event:'enter',line:DEMON_LINES.enter},{scene:'enter',ms:2400},{scene:'black',ms:550},{scene:'door',ms:2100,sound:'door'},{scene:'reaction',ms:1300},{scene:'foot',ms:1200,sound:'foot0'},{scene:'armor',ms:3300},{scene:'black',ms:500}]:[{scene:'pass',ms:3000},{scene:'black',ms:650}])];
   visitActive=true;index=0;last=performance.now();visitBeat();frame=requestAnimationFrame(tick);
  }
  if(phase===1){openShopBtn.textContent='영업 시작 · 마왕 맞이';openShopBtn.onclick=startDemonBusiness;startBusiness=startDemonBusiness;}

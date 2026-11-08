@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs/promises';
-import {demonWorkshopGuest,installDemonDialogue,DEMON_LINES,demonGrowthCells,demonGuest,demonJudge,demonGate,demonHornAllowance,demonFacePaintLimit,DEMON_FACE_LIMIT,demonRoyalStickers,demonRoofProfile,demonPolygon,DEMON_DESIGN,demonSilverStripe,demonGrowthPalette,demonMakeupMasks,demonMakeup,demonLipPaint,ensureDemonDialogueCatalogue} from '../src/demon-guest.js';
+import {DEMON_EVENT_DIALOGUES,demonWorkshopGuest,installDemonDialogue,DEMON_LINES,demonGrowthCells,demonGuest,demonJudge,demonGate,demonHornAllowance,demonFacePaintLimit,DEMON_FACE_LIMIT,demonRoyalStickers,demonRoofProfile,demonPolygon,DEMON_DESIGN,demonSilverStripe,demonGrowthPalette,demonMakeupMasks,demonMakeup,demonLipPaint,ensureDemonDialogueCatalogue} from '../src/demon-guest.js';
 import {projectProblems,storyStartOptions} from '../src/model.js';
 const project=JSON.parse(await fs.readFile(new URL('../data/project.json',import.meta.url),'utf8'));
 test('demon stays a fourth-day beauty guest in workbook data; its story controller owns the battle branch',()=>{assert.deepEqual(projectProblems(project),[]);const start=storyStartOptions(project).find(x=>x.guest.id===10007);assert.equal(start.day,4);assert.equal(start.guest.battle,'none');assert.equal(start.guest.workbookExcluded,false);});
@@ -226,4 +226,16 @@ test('demon result dialogue is editable per phase and preserved through migratio
  assert.notEqual(g.demonResultDialogue[1].normal,g.demonResultDialogue[2].normal);
  const saved=JSON.parse(JSON.stringify(p));ensureDemonDialogueCatalogue(saved);assert.deepEqual(saved,p);
  assert.deepEqual(projectProblems(saved),[]);
+});
+
+test('star gate and beauty reaction lines live in editable workbook groups without replacing author edits',()=>{
+ const p=structuredClone(project);ensureDemonDialogueCatalogue(p);
+ const g=p.guests.find(g=>g.id===10007),lines=p.combat.sheets.find(s=>s.name==='대사').rows;
+ for(const [key,,texts]of DEMON_EVENT_DIALOGUES){
+  const group=lines.filter(l=>l.GroupID===g.bindings[key]).sort((a,b)=>a.Order-b.Order);
+  assert.deepEqual(group.map(l=>l.Text),texts);group[0].Text='수정한 '+key+'<wait=0.2><color=#285780>강조</color>';
+ }
+ const saved=JSON.parse(JSON.stringify(p));ensureDemonDialogueCatalogue(saved);assert.deepEqual(saved,p);
+ assert.deepEqual(projectProblems(saved),[]);
+ for(const phase of [1,2])assert.deepEqual(installDemonDialogue(saved,demonGuest(phase)).bindings,g.bindings);
 });
