@@ -3,7 +3,7 @@ import {WORLD_POSTS,reviewPost,chooseComment,rollWeather,followerWidgetData} fro
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function photoMarkup(post){
  if(!post.photo)return `<div class="world-photo">${post.symbol||'✂'}<strong>${esc(post.title||'오늘의 기록')}</strong></div>`;
- if(post.wholePortrait)return `<div class="social-photo coffee-beauty"><img class="photo-base" src="${esc(post.photo)}" alt="${esc(post.user)}의 이번 미용 모습"></div>`;
+ if(post.wholePortrait)return `<div class="social-photo coffee-beauty"><img class="photo-base" src="${esc(post.photo)}" alt="${esc(post.user)} 게시글 이미지"></div>`;
  return `<div class="social-photo ${post.guest}-${post.kind}"><img class="photo-base" src="${esc(socialImageURL(post.photo))}" alt="${esc(post.user)} 후기 사진"><img class="photo-head" src="${esc(socialImageURL(post.portrait)||`./media/social/${post.guest}-sample-head.png`)}" alt="${post.portrait?'이번에 손질한 모습':'시연용 기본 머리'}"></div>`;
 }
 export function phoneFrameMarkup(screenMarkup){return "<div class=\"phone-status\"><span>21:00</span><span class=\"status-indicators\"><span aria-label=\"통신 신호\">▂▄▆</span><span aria-label=\"와이파이\">◉</span><span class=\"battery\" aria-label=\"배터리 87퍼센트\"></span></span></div><div class=\"phone-app-title\">HOME</div><div class=\"social-screen\">"+screenMarkup+"</div><nav class=\"social-navigation\"><button data-home aria-label=\"핸드폰 홈\">⌂</button><button data-back aria-label=\"뒤로 가기\">〈</button></nav>";}

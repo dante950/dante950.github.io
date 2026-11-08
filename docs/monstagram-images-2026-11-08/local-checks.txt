@@ -1,0 +1,3 @@
+Related unit tests: 25 passed.
+Chromium: 28 images decoded; day 0-3 preview; image and avatar selection; guest composite layers; disabled post; preview record isolation passed.
+All original asset SHA-256 matches.
