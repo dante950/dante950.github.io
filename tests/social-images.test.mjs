@@ -25,8 +25,8 @@ test('existing authored image choices are preserved when loading projects',()=>{
 
 test('new coffee and returning-zombie art follows beauty results in either return branch',()=>{
  const portrait='data:image/png;base64,AAAA';
- const coffee=socialReviewPost({id:'coffee',day:0,guestId:'coffee',score:100},catalog);
- assert.equal(coffee.photo,'./media/social/imported/reviews/coffee-ghost.png');assert.equal(coffee.wholePortrait,true);
+ const coffee=socialReviewPost({id:'coffee',day:0,guestId:'coffee',score:100,headPortrait:portrait},catalog);
+ assert.equal(coffee.photo,'./media/social/imported/reviews/coffee-ghost.png');assert.equal(coffee.wholePortrait,false);assert.equal(coffee.portrait,portrait);
  for(const returnBranch of ['employed','lottery'])for(const score of [100,0]){
   const post=socialReviewPost({id:'return',day:3,guestId:'returningZombie',score,returnBranch,headPortrait:portrait},catalog);
   assert.equal(post.photo,'./media/social/imported/reviews/returning-zombie-'+(score?'beauty':'failure')+'.png');assert.equal(post.portrait,portrait);

@@ -9881,7 +9881,7 @@
         "place": "몬스터 헤어살롱",
         "text": "눈도 셋! 뿔도 한 쌍! 어때요, 부하님을 닮은 저?\n머리도 다듬고, 비어 있던 곳도 쑥쑥! 더 멋있어졌죠? 대련은 졌지만…\n이제 부하님이랑 눈 개수도 똑같아요. 저를 부하님처럼 만들어준 미용실, 최고예요!\n#몬스터헤어살롱 #머리자랑 #부하님처럼",
         "image": "./media/social/imported/reviews/coffee-ghost.png",
-        "imageMode": "image",
+        "imageMode": "composite",
         "imageNote": "커피유령의 인증사진. 커피 컵을 든 손은 마왕 부하의 손이다.",
         "comments": [],
         "choices": [

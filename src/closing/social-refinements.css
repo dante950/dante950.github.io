@@ -40,3 +40,6 @@
 .returningZombie-battle .photo-head{width:30%;left:43.5%;bottom:44%}
 
 .returning-sample-head{display:block;aspect-ratio:170/190}.returning-sample-head .sample-face,.returning-sample-head .sample-mouth{position:absolute;left:14.706%;top:18.421%;width:85.294%;height:81.579%;image-rendering:pixelated}.returning-sample-head .sample-mouth{background:url('./media/returning-zombie/T_Successzombie_mouth_Normal.png') left top/200% 100% no-repeat}.returning-sample-head .sample-hair{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+
+.social-photo.coffee-review{display:block;height:auto;background:none}.social-photo.coffee-review .photo-base{width:100%;height:auto;max-width:none}.coffee-review .photo-head{width:56%;left:55%;bottom:43%}
+.coffee-sample-head{display:block;aspect-ratio:228/244}.coffee-sample-head .sample-face,.coffee-sample-head .sample-mouth{position:absolute;left:9.649%;top:18.033%;width:63.158%;height:47.541%;image-rendering:pixelated}.coffee-sample-head .sample-hair{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}.coffee-sample-head .sample-mouth{background:url('./media/coffee-ghost/mouth-normal-sheet.png') right top/200% 100% no-repeat}
