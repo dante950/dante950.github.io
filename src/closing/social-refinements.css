@@ -43,3 +43,7 @@
 
 .social-photo.coffee-review{display:block;height:auto;background:none}.social-photo.coffee-review .photo-base{width:100%;height:auto;max-width:none}.coffee-review .photo-head{width:56%;left:55%;bottom:43%}
 .coffee-sample-head{display:block;aspect-ratio:228/244}.coffee-sample-head .sample-face,.coffee-sample-head .sample-mouth{position:absolute;left:9.649%;top:18.033%;width:63.158%;height:47.541%;image-rendering:pixelated}.coffee-sample-head .sample-hair{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}.coffee-sample-head .sample-mouth{background:url('./media/coffee-ghost/mouth-normal-sheet.png') right top/200% 100% no-repeat}
+
+/* The daily settlement uses a fixed-height photo area as well. */
+.post .social-photo.returningZombie-beauty{width:213.871px;height:255px;margin:auto}
+.post .social-photo.returningZombie-battle,.post .social-photo.coffee-review{width:226.667px;height:255px;margin:auto}
