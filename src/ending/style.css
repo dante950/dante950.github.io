@@ -17,3 +17,6 @@
 #memoryTrack .ending-news .ending-copy{font-size:15px;line-height:1.8;max-height:none;overflow:visible;padding:0 18px 12px}
 
 #endingComments p.ending-reply{margin-left:20px;padding-left:12px;border-left:2px solid #dfc4d0}
+
+#memoryTrack .ending-artwork{position:relative;width:266.667px;height:300px;margin:auto}
+#memoryTrack .ending-artwork .ending-beauty-head{position:absolute;width:32%;height:auto;left:59%;bottom:50%;transform:translateX(-50%);object-fit:contain;padding:0}

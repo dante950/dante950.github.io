@@ -12,7 +12,7 @@ try{
  const origin=process.env.PUBLIC_BASE_URL||'http://127.0.0.1:'+server.address().port+'/';
  await p.goto(origin);await p.locator('#siteLoading').waitFor({state:'detached'});
  await p.locator('#developer').click();if(await p.locator('#updateOK').isVisible())await p.locator('#updateOK').click();await p.locator('#devScreen [data-editor="social"]').click();
- assert.equal(await p.locator('[data-social-field="imagePreset"] option').count(),29);assert.equal(await p.locator('[data-social-field="avatarPreset"] option').count(),12);
+ assert.equal(await p.locator('[data-social-field="imagePreset"] option').count(),34);assert.equal(await p.locator('[data-social-field="avatarPreset"] option').count(),12);
  const all=await p.locator('[data-social-field="imagePreset"] option').evaluateAll(nodes=>nodes.map(n=>n.value).filter(Boolean));
  const bad=await p.evaluate(async paths=>{const failures=[];for(const path of paths){const image=new Image();image.src=path;try{await image.decode();if(!image.naturalWidth)failures.push(path);}catch{failures.push(path);}}return failures;},all);assert.deepEqual(bad,[]);
  for(const day of ['0','1','2','3']){
@@ -27,5 +27,5 @@ try{
  const avatar=await p.locator('[data-social-field="avatarPreset"] option').nth(1).getAttribute('value');await p.locator('[data-social-field="avatarPreset"]').selectOption(avatar);
  await p.locator('#socialPhonePreview').click();const edited=await p.locator('#socialPreviewFrame').elementHandle().then(h=>h.contentFrame());const a=edited.locator('[data-post="world-day0-1"]');await a.waitFor();assert.equal(await a.locator('.photo-base').getAttribute('src'),poster);assert.equal(await a.locator('.social-avatar img').getAttribute('src'),avatar);await p.locator('#socialPreviewClose').click();
  assert.equal(await p.evaluate(()=>fullflow.story),null);assert.deepEqual(errors,[]);
- console.log('PASS: 28 image decodes, days 0-3 phone feed, guest composites, profile images, disabled post, both selectors and isolated preview.');
+ console.log('PASS: 33 image decodes, days 0-3 phone feed, guest composites, profile images, disabled post, both selectors and isolated preview.');
 }finally{await browser.close();server.close();}

@@ -11,7 +11,7 @@ addEventListener('resize',resizeEnding);resizeEnding();
 function endingSound(key){if(endingSounds.has(key))return;endingSounds.add(key);endingMessage('sound',{key});}
 function endingCard(p,group=false){
  return '<article class="ending-post '+((p.photo||p.groupPhoto)&&group?'ending-news':'')+'" data-review="'+esc(p.id)+'"><div class="post-card"><header><b>'+esc(p.user)+'</b><small>'+esc(p.place||'몬스터 헤어살롱')+'</small></header>'+
- (group?'<div class="ending-group"><img src="'+esc(p.photo||endingData.photo)+'" alt="'+(p.photo?'고블린 모습의 마왕':endingData.ending==='battle'?'고블린 마왕과 주인공, 마왕 부하, 커피유령의 단체사진':'플레이어가 꾸민 마왕과 주인공, 마왕 부하, 커피유령의 단체사진')+'"></div>':photoMarkup(p))+
+ (group?'<div class="ending-group">'+(!p.photo&&endingData.ending!=='battle'?'<div class="ending-artwork">':'')+'<img src="'+esc(p.photo||(endingData.ending==='battle'?endingData.photo:'./media/social/imported/reviews/demon-beauty.png'))+'" alt="'+(p.photo?'고블린 모습의 마왕':endingData.ending==='battle'?'고블린 마왕과 주인공, 마왕 부하, 커피유령의 단체사진':'플레이어가 꾸민 마왕과 주인공, 마왕 부하, 커피유령의 단체사진')+'">'+(!p.photo&&endingData.ending!=='battle'?'<img class="ending-beauty-head" src="'+esc(endingData.headPortrait||'./media/demon/face.png')+'" alt="손질한 마왕의 모습"></div>':'')+'</div>':photoMarkup(p))+
  '<div class="ending-actions">♡ ▢ ⌑</div><p class="ending-copy">'+esc(p.text)+'</p></div></article>';
 }
 async function endingCoffeeSample(){
@@ -22,9 +22,18 @@ async function endingCoffeeSample(){
  for(const [side,dx]of [['L',100],['R',184]]){const im=new Image();im.src='./media/stickers/T_hornBig_'+side+'.png';await im.decode();x.drawImage(im,dx,78,42,58);}
  return c.toDataURL();
 }
+async function endingHeadPortrait(source){
+ const im=new Image();im.src=source||'./media/demon/face.png';await im.decode();
+ const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;
+ const x=c.getContext('2d');x.drawImage(im,0,0);const pixels=x.getImageData(0,0,c.width,c.height).data;
+ let left=c.width,top=c.height,right=-1,bottom=-1;
+ for(let y=0;y<c.height;y++)for(let col=0;col<c.width;col++)if(pixels[(y*c.width+col)*4+3]>16){left=Math.min(left,col);right=Math.max(right,col);top=Math.min(top,y);bottom=Math.max(bottom,y);}
+ if(right<left)return source;
+ const head=document.createElement('canvas');head.width=right-left+1;head.height=bottom-top+1;head.getContext('2d').drawImage(c,left,top,head.width,head.height,0,0,head.width,head.height);return head.toDataURL();
+}
 async function initEnding(data){
  if(endingData)return;endingData=data;endingMuted=data.muted===true;E('endingMute').textContent=endingMuted?'소리 꺼짐':'소리 켜짐 ♪';
- const sky=E('returnSky');await sky.decode();endingPosts=endingReviews(data.records,data.social);for(const post of endingPosts)if(post.samplePortrait==='coffee')post.photo=await endingCoffeeSample();endingPlan=endingSchedule(endingPosts.length);endingPhotoIndex=endingPosts.length;
+ const sky=E('returnSky');await sky.decode();if(data.ending!=='battle')endingData.headPortrait=await endingHeadPortrait(data.headPortrait);endingPosts=endingReviews(data.records,data.social);for(const post of endingPosts)if(post.samplePortrait==='coffee')post.photo=await endingCoffeeSample();endingPlan=endingSchedule(endingPosts.length);endingPhotoIndex=endingPosts.length;
  const run={...runFromStory(data.records,4,{settings:data.settings}),social:data.social};endingPhone=createSocialPhone(E('endingPhoneHost'),{getRun:()=>run,onManagement(){},onExit(){}});
  endingPhone.restore(data.socialChoices||{});endingPhone.show(true);
  E('memoryTrack').innerHTML=endingPosts.map(p=>endingCard(p)).join('')+(data.ending==='battle'?BATTLE_ENDING_NEWS.map(p=>endingCard(p,true)).join(''):'')+endingCard({id:'ending-group',user:'money_slave',place:'몬스터 헤어살롱 · 마지막 영업',text:data.ending==='battle'?'마지막 영업, 그리고 작별의 기념사진.':ENDING_POST},true);

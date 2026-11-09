@@ -45,6 +45,7 @@ export const ENDING_COMMENTS=[
 export const BATTLE_ENDING_NEWS=[
  {
   "id": "royal-aftermath",
+  "photo": "./media/social/imported/reviews/demon-battle.png",
   "user": "왕실 보도",
   "place": "왕실 소식",
   "groupPhoto": true,

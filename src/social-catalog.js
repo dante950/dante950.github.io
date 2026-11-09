@@ -167,6 +167,36 @@ export const SOCIAL_IMAGE_ASSETS=[
     "path": "./media/social/imported/profiles/T_Monstagram_zombie_profile.png",
     "kind": "profiles",
     "label": "프로필 · T_Monstagram_zombie_profile.png"
+  },
+  {
+    "id": "T_Monstagram_coffeeghost_.png",
+    "path": "./media/social/imported/reviews/coffee-ghost.png",
+    "kind": "posts",
+    "label": "커피유령 후기"
+  },
+  {
+    "id": "T_Monstagram_Finalboss_happy-export.png",
+    "path": "./media/social/imported/reviews/demon-beauty.png",
+    "kind": "posts",
+    "label": "마왕 미용 성공"
+  },
+  {
+    "id": "T_Monstagram_Finalboss_sad.png",
+    "path": "./media/social/imported/reviews/demon-battle.png",
+    "kind": "posts",
+    "label": "마왕 야차 승리"
+  },
+  {
+    "id": "T_Monstagram_zombieyacha-export.png",
+    "path": "./media/social/imported/reviews/returning-zombie-beauty.png",
+    "kind": "reviews",
+    "label": "재등장 좀비 성공 · 거울셀카"
+  },
+  {
+    "id": "T_Monstagram_Successzombieyacha-export-export.png",
+    "path": "./media/social/imported/reviews/returning-zombie-failure.png",
+    "kind": "reviews",
+    "label": "재등장 좀비 실패 · 머니건"
   }
 ];
 export const DEFAULT_SOCIAL_CATALOG={
@@ -186,8 +216,8 @@ export const DEFAULT_SOCIAL_CATALOG={
       "avatar": "",
       "place": "몬스터 헤어살롱",
       "text": "눈도 셋! 뿔도 한 쌍! 어때요, 부하님을 닮은 저?\n머리도 다듬고, 비어 있던 곳도 쑥쑥! 더 멋있어졌죠? 대련은 졌지만…\n이제 부하님이랑 눈 개수도 똑같아요. 저를 부하님처럼 만들어준 미용실, 최고예요!\n#몬스터헤어살롱 #머리자랑 #부하님처럼",
-      "image": "",
-      "imageMode": "result",
+      "image": "./media/social/imported/reviews/coffee-ghost.png",
+      "imageMode": "image",
       "imageNote": "커피유령의 인증사진. 커피 컵을 든 손은 마왕 부하의 손이다.",
       "comments": [],
       "choices": [
@@ -747,8 +777,8 @@ export const DEFAULT_SOCIAL_CATALOG={
       "avatar": "./media/social/imported/profiles/T_Monstagram_zombie_profile.png",
       "place": "몬스터 헤어살롱",
       "text": "이런이런, 너무 달라져서 못 알아보셨나요? 방구석에서 자소서 쓰던 저는 잊어주세요. 이제는 제가 회사에 지원하는 게 아니라 회사가 제게 지원을 합니다.\n아, 오늘도 모 보험회사에서 면담 요청이 왔군요. 새로 한 머리를 자랑할 시간도 없네요. #일상 #요즘잘나가는좀비 #이게나야",
-      "image": "",
-      "imageMode": "result",
+      "image": "./media/social/imported/reviews/returning-zombie-beauty.png",
+      "imageMode": "composite",
       "imageNote": "거울 셀카. 단정하게 드러난 눈, 구겨졌던 재킷 대신 빳빳한 새 재킷. 손목에는 번쩍이는 시계.",
       "comments": [],
       "choices": [
@@ -780,9 +810,9 @@ export const DEFAULT_SOCIAL_CATALOG={
       "avatar": "./media/social/imported/profiles/T_Monstagram_zombie_profile.png",
       "place": "몬스터 헤어살롱",
       "text": "오늘 재방문한 미용실에서 머리를 망쳐놨군요. 조금 괘씸하긴 해도 이 정도야 넘어갈 수 있습니다. 잔고에 여유가 생기니 마음에도 여유가 생기더군요. 하하. 뭐, 미용실을 살 수도 있는 마당에 이런 게 신경쓰이겠습니까? #일상 #머리망함 #부자의여유",
-      "image": "",
-      "imageMode": "result",
-      "imageNote": "미용실 문 밖에서 찍은 사진. 자랑하려는 듯 슬쩍 든 고급 가죽지갑이 인상적이다.",
+      "image": "./media/social/imported/reviews/returning-zombie-failure.png",
+      "imageMode": "composite",
+      "imageNote": "미용실 앞에서 머니건으로 돈을 뿌리는 재등장 좀비.",
       "comments": [],
       "choices": [
         {
