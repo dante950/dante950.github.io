@@ -20,3 +20,7 @@
 
 #memoryTrack .ending-artwork{position:relative;width:266.667px;height:300px;margin:auto}
 #memoryTrack .ending-artwork .ending-beauty-head{position:absolute;width:32%;height:auto;left:59%;bottom:50%;transform:translateX(-50%);object-fit:contain;padding:0}
+
+/* Preserve the supplied portrait aspect ratio so the haircut stays at the neck. */
+#memoryTrack .social-photo.returningZombie-beauty{width:209.677px;height:250px;margin:auto}
+#memoryTrack .social-photo.returningZombie-battle{width:222.222px;height:250px;margin:auto}
