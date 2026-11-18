@@ -215,6 +215,7 @@ export const DEFAULT_SOCIAL_CATALOG={
       "user": "coffee_ghost",
       "avatar": "",
       "place": "몬스터 헤어살롱",
+      // Shared across styling results: do not assert eye, horn, or hair task completion.
       "text": "오늘은 몬스터헤어살롱에 다녀왔어요!\n미용사님과 함께하니 시간 가는 줄 몰랐어요. 부하님께도 오늘 이야기를 잔뜩 들려드릴 거예요!\n다음에 또 놀러 갈게요!\n#몬스터헤어살롱 #첫손님 #즐거운하루",
       "image": "./media/social/imported/reviews/coffee-ghost.png",
       "imageMode": "composite",
