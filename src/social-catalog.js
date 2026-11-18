@@ -215,7 +215,7 @@ export const DEFAULT_SOCIAL_CATALOG={
       "user": "coffee_ghost",
       "avatar": "",
       "place": "몬스터 헤어살롱",
-      "text": "눈도 셋! 뿔도 한 쌍! 어때요, 부하님을 닮은 저?\n머리도 다듬고, 비어 있던 곳도 쑥쑥! 더 멋있어졌죠? 대련은 졌지만…\n이제 부하님이랑 눈 개수도 똑같아요. 저를 부하님처럼 만들어준 미용실, 최고예요!\n#몬스터헤어살롱 #머리자랑 #부하님처럼",
+      "text": "오늘은 몬스터헤어살롱에 다녀왔어요!\n미용사님과 함께하니 시간 가는 줄 몰랐어요. 부하님께도 오늘 이야기를 잔뜩 들려드릴 거예요!\n다음에 또 놀러 갈게요!\n#몬스터헤어살롱 #첫손님 #즐거운하루",
       "image": "./media/social/imported/reviews/coffee-ghost.png",
       "imageMode": "composite",
       "imageNote": "커피유령의 인증사진. 커피 컵을 든 손은 마왕 부하의 손이다.",
@@ -225,13 +225,13 @@ export const DEFAULT_SOCIAL_CATALOG={
           "label": "멋있는 후기 감사합니다✨💗",
           "comment": "멋있는 후기 감사합니다✨💗",
           "replyUser": "coffee_ghost",
-          "reply": "멋진 머리 감사해요!❤️🩷🧡💛💚"
+          "reply": "즐거운 시간 감사해요!❤️🩷🧡💛💚"
         },
         {
-          "label": "누가 했는지 정말 멋진 머리네요.",
-          "comment": "누가 했는지 정말 멋진 머리네요.",
+          "label": "다음에도 놀러 오세요!",
+          "comment": "다음에도 놀러 오세요!",
           "replyUser": "coffee_ghost",
-          "reply": "미용사님!! 미용사님이 해준 머리, 잊지 못할 거예요😚"
+          "reply": "미용사님!! 다음에도 저 반겨주실 거죠?😚"
         }
       ]
     },

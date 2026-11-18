@@ -3,7 +3,7 @@ export const COFFEE_TUTORIAL_FOLLOWERS=100;
 export const COFFEE_TUTORIAL_STORAGE='yachacha-coffee-tutorial-handoff-v1';
 export const COFFEE_TUTORIAL_REVIEW=Object.freeze({
  user:'coffee_ghost',place:'몬스터 헤어살롱 · 첫 손님',
- text:'눈도 셋! 뿔도 한 쌍! 오늘은 부하님을 조금 닮았어요.\n머리도 다듬고, 비어 있던 곳도 쑥쑥! 대련은 졌지만 멋은 이긴 것 같아요.\n이제 부하님이랑 눈 개수도 똑같아요. 세 눈으로 꼼꼼히 보고 추천합니다!\n#몬스터헤어살롱 #첫손님 #부하님처럼',
+ text:"오늘은 몬스터헤어살롱에 다녀왔어요!\n미용사님과 함께하니 시간 가는 줄 몰랐어요. 부하님께도 오늘 이야기를 잔뜩 들려드릴 거예요!\n다음에 또 놀러 갈게요!\n#몬스터헤어살롱 #첫손님 #즐거운하루",
  draft:true
 });
 const coffeeSafePortrait=value=>typeof value==='string'&&/^data:image\/(png|webp|jpeg);base64,/.test(value)&&value.length<1_000_000?value:null;
